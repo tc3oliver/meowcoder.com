@@ -1,0 +1,80 @@
+---
+/**
+ * The MeowCoder wordmark lockup (MCD-28).
+ *
+ * A cat face built from two coding brackets, beside the MeowCoder wordmark.
+ * It sits in the footer, which is where PRD §42's brand model puts the site
+ * itself — `Site Engineering · meowcoder.com` at the base of the tree, with
+ * `Oliver Yu` at the top. The header therefore keeps the plain-text name and
+ * this mark never competes with it (doc-2 §1).
+ *
+ * Inlined rather than referenced through `<img>` for two reasons: the artwork
+ * paints with `currentColor`, so inlining is what lets it inherit the footer's
+ * text color and follow light/dark without a second asset; and an inline SVG
+ * costs no extra request.
+ *
+ * Two deliberate changes from the source asset:
+ *
+ *   - `font-family` was `Inter`, which this site does not load — no web font
+ *     ships at all (PRD §26). It now uses the same system stack as
+ *     `--font-sans`, so the wordmark is set in the same face as every other
+ *     word on the page rather than silently falling back to something else.
+ *   - The asset's `<title id="title">` / `<desc id="desc">` were dropped in
+ *     favour of `role="img"` + `aria-label`. Those ids are generic enough to
+ *     collide with anything else on the page, and one accessible name is
+ *     exactly what this needs.
+ *
+ * The name is the domain, so it is not translated (PRD §7).
+ */
+---
+
+<svg
+  class="brand-wordmark"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 560 128"
+  width="105"
+  height="24"
+  role="img"
+  aria-label="meowcoder.com"
+>
+  <g fill="currentColor">
+    <!-- Cat ears -->
+    <path d="M42 38 L50 10 L72 30 Z"></path>
+    <path d="M102 30 L124 10 L132 38 Z"></path>
+
+    <!-- Nose -->
+    <path d="M78 70 L96 70 L87 82 Z"></path>
+  </g>
+
+  <!-- Coding brackets / cheeks -->
+  <g
+    fill="none"
+    stroke="currentColor"
+    stroke-width="9"
+    stroke-linecap="square"
+    stroke-linejoin="miter"
+  >
+    <path d="M61 51 L31 66 L61 81"></path>
+    <path d="M113 51 L143 66 L113 81"></path>
+  </g>
+
+  <text
+    x="170"
+    y="82"
+    fill="currentColor"
+    font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif"
+    font-size="62"
+    font-weight="700"
+    letter-spacing="-2.2">MeowCoder</text
+  >
+</svg>
+
+<style>
+  /* Explicit intrinsic size on the element plus a fixed box here: the footer
+     must not reflow once the SVG paints. */
+  .brand-wordmark {
+    display: block;
+    width: 105px;
+    height: 24px;
+  }
+</style>

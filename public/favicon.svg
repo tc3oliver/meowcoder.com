@@ -1,24 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="meowcoder.com">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="meowcoder.com">
   <!--
-    Wordmark initial in the site's accent ink blue on the warm neutral surface,
-    using the same values as `--color-bg` and `--color-accent` in
-    src/styles/tokens.css. Kept to two flat colors and one letterform: PRD §25
-    rules out decorative marks, gradients, and imagery.
+    The MeowCoder mark: a cat face built from two coding brackets. Drawn in the
+    site's accent ink blue on the warm neutral surface, using the same values as
+    `--color-bg` and `--color-accent` in src/styles/tokens.css.
 
-    `prefers-color-scheme` mirrors the light-dark() pairs the stylesheet uses,
+    The source asset (`meowcoder-mark.svg`) paints with `currentColor`. That is
+    right for an inlined mark, but a favicon has no inherited text color to
+    resolve against — browsers render it standalone — so both palettes are
+    declared explicitly here instead.
+
+    `prefers-color-scheme` mirrors the `light-dark()` pairs the stylesheet uses,
     so the tab icon follows the theme the page renders in.
+
+    The artwork occupies y 10–86 in its own 128 grid, which sits high; the
+    `translate` below re-centres it optically inside the rounded square.
   -->
   <style>
     .bg { fill: #faf8f5; }
     .fg { fill: #1d4e89; }
+    .stroke { stroke: #1d4e89; }
     @media (prefers-color-scheme: dark) {
       .bg { fill: #14130f; }
       .fg { fill: #8fb6e8; }
+      .stroke { stroke: #8fb6e8; }
     }
   </style>
-  <rect class="bg" width="32" height="32" rx="6" />
-  <path
-    class="fg"
-    d="M7 23V9h3.4l5.6 8.7L21.6 9H25v14h-3.1v-8.8L16.9 22h-1.8l-5-8.8V23H7z"
-  />
+
+  <rect class="bg" width="128" height="128" rx="24" />
+
+  <g transform="translate(0 16)">
+    <g class="fg">
+      <!-- Cat ears -->
+      <path d="M24 38 L32 10 L54 30 Z" />
+      <path d="M74 30 L96 10 L104 38 Z" />
+
+      <!-- Nose -->
+      <path d="M51 70 L77 70 L64 86 Z" />
+    </g>
+
+    <!-- Coding brackets / cheeks -->
+    <g
+      class="stroke"
+      fill="none"
+      stroke-width="9"
+      stroke-linecap="square"
+      stroke-linejoin="miter"
+    >
+      <path d="M42 51 L14 66 L42 81" />
+      <path d="M86 51 L114 66 L86 81" />
+    </g>
+  </g>
 </svg>

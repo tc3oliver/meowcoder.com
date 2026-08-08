@@ -8,6 +8,7 @@
  * identical and matching PRD §8.
  */
 
+import BrandWordmark from '../components/BrandWordmark.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
@@ -102,6 +103,6 @@ const footerLinks = [
   <slot />
 
   <Footer slot="footer" navLabel={t.footer.ariaLabel} links={footerLinks}>
-    <span slot="meta">meowcoder.com</span>
+    <BrandWordmark slot="meta" />
   </Footer>
 </BaseLayout>
