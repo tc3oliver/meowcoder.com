@@ -1,10 +1,10 @@
 ---
 id: TASK-1
 title: MCD-1 — 儲存庫啟動
-status: In Progress
+status: Done
 assignee: []
 created_date: '2026-08-08 06:41'
-updated_date: '2026-08-08 13:49'
+updated_date: '2026-08-08 14:21'
 labels: []
 dependencies: []
 priority: high
@@ -19,23 +19,24 @@ ordinal: 1000
 
 - doc-1 §18-23（含 §23 Open Source Quality Bar 的建議 CI 流程）、§26、§39 (MCD-1)
 - decision-1（在現有 backlog 工作目錄中實作 meowcoder.com 網站）
+- decision-3（將 Cloudflare Pages staging 自 MCD-1 拆出為獨立任務）
 
 ## 目標
 
-在本目錄建立可建置、可測試、通過 CI 的 Astro + TypeScript 網站骨架，並完成 GitHub 儲存庫與 Cloudflare Pages staging 部署。
+在本目錄建立可建置、可測試、通過 CI 的 Astro + TypeScript 網站骨架，並完成 GitHub 儲存庫建立與推送。
 
 ## 範圍
 
 - 在 /home/oliver/meowcoder 執行 git init；以 gh CLI（已認證為 tc3oliver）建立並推送 tc3oliver/meowcoder.com
 - Astro + TypeScript 專案 scaffold，目錄結構依 PRD §26
 - lint / format / typecheck 工具與對應 npm scripts
-- 測試執行器（例如 Vitest）與 npm run test script，含一個最小的通過範例測試
+- 測試執行器（Vitest）與 npm run test script，含最小範例測試
 - GitHub Actions CI：install、format/lint、typecheck、build、test（順序依 PRD §23）
-- Cloudflare Pages staging 環境連接
 - .gitignore、原始碼 MIT LICENSE、內容授權聲明（PRD §21）
 
 ## 不在範圍
 
+- Cloudflare Pages staging 部署：依 decision-3 拆出為 TASK-14
 - 任何頁面內容、設計系統、雙語路由（屬後續 MCD 任務）
 - 正式網域切換與 DNS（MCD-13）
 - 連結檢查、機密掃描、相依更新機制（MCD-10）
@@ -46,26 +47,26 @@ ordinal: 1000
 - 不得提交 PRD §20 列出的任何機密或私人檔案
 - 需與既有 .agent-workflow/、.claude/、backlog/、.omc/ 共存；.omc/ 屬本機執行狀態，不應進入公開儲存庫
 - 完成 git 初始化後，/backlog-auto 的平行執行（config.yml max_parallel_tasks: 3）才能建立 git worktree；本任務是所有平行執行的前置條件
-- 測試執行器必須在本任務就位：MCD-3、MCD-5、MCD-9 的測試需求都預設有可用的 npm run test，否則那些任務將無處撰寫測試
-- 實作完成後必須將實際可用指令回填 .agent-workflow/PROJECT.md（含 Tests），後續任務才有可引用的驗證指令
+- 測試執行器必須在本任務就位：MCD-3、MCD-5、MCD-9 的測試需求都預設有可用的 npm run test
+- 實作完成後必須將實際可用指令回填 .agent-workflow/PROJECT.md（含 Tests）
 
 ## 驗證
 
-- npm install、npm run lint、npm run typecheck、npm run test、npm run build（實際 script 名稱於實作時確定，並回填 .agent-workflow/PROJECT.md）
+- npm install、npm run format:check、npm run lint、npm run typecheck、npm run build、npm test
 - gh repo view tc3oliver/meowcoder.com 可查到儲存庫
-- Cloudflare Pages staging URL 可開啟並顯示 scaffold
+- GitHub Actions 於 push 後全綠
 
 ## 測試需求
 
 - 建立測試執行器與最小範例測試，證明 npm run test 可執行且在 CI 中生效
-- 本任務無產品邏輯，不需為 scaffold 撰寫額外單元測試；以 CI 綠燈（含 test 階段）作為驗證證據
+- 以 CI 綠燈（含 test 階段）作為驗證證據
 
 ## 影響
 
 - 安全性：儲存庫衛生與機密排除（PRD §20、§32）
 - 資料 / Schema：無
 - API / 相容性：測試執行器選型成為後續所有任務撰寫測試的共用契約
-- 文件：README 骨架、LICENSE、內容授權聲明、.agent-workflow/PROJECT.md
+- 文件：README 骨架、LICENSE、LICENSE-CONTENT.md、.agent-workflow/PROJECT.md
 - 遷移 / 回滾：無
 <!-- SECTION:DESCRIPTION:END -->
 
@@ -77,15 +78,14 @@ ordinal: 1000
 - [x] #4 本機 build 成功產出靜態檔案
 - [x] #5 .gitignore 已排除 node_modules、build 產物、本機機密，以及 .omc/ 本機狀態
 - [x] #6 MIT LICENSE 涵蓋原始碼，另有獨立內容授權聲明說明個人內容與品牌資產不適用 MIT（PRD §21）
-- [ ] #7 Cloudflare Pages staging 部署可正常提供已推送的 scaffold
-- [x] #8 .agent-workflow/PROJECT.md 的 Validation commands 已從 not detected 更新為實際可執行指令
-- [x] #9 測試執行器已設定，npm run test 可在乾淨環境執行並通過至少一個範例測試
-- [x] #10 GitHub Actions CI 於 push 與 PR 觸發，並依 PRD §23 順序執行 install、format/lint、typecheck、build、test
+- [x] #7 .agent-workflow/PROJECT.md 的 Validation commands 已從 not detected 更新為實際可執行指令
+- [x] #8 測試執行器已設定，npm run test 可在乾淨環境執行並通過至少一個範例測試
+- [x] #9 GitHub Actions CI 於 push 與 PR 觸發，並依 PRD §23 順序執行 install、format/lint、typecheck、build、test
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 Acceptance Criteria all pass
+- [x] #1 Acceptance Criteria all pass
 - [x] #2 Required applicable tests, lint, typecheck, and build pass
 - [x] #3 Documentation and Requirement Matrix are synchronized when applicable
 - [x] #4 Validation evidence is recorded in the task
@@ -257,3 +257,17 @@ README 承載授權分割說明。
 eslint exit 0、`astro check` `0 errors, 0 warnings, 0 hints`、
 vitest `Tests 10 passed (10)`、`astro build` Complete、`npm audit` 0 vulnerabilities。
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+在 /home/oliver/meowcoder 建立可建置、可測試、CI 全綠的 Astro 7 + TypeScript static-first scaffold，並建立 private 儲存庫 github.com/tc3oliver/meowcoder.com 完成推送。
+
+交付：Astro 7 + TypeScript strict、Prettier、ESLint 10 flat config、astro check、Vitest（10 項測試）、GitHub Actions CI 依 PRD §23 六步驟、MIT LICENSE 與 LICENSE-CONTENT.md 路徑對照表的授權分割、README 依 PRD §22、.agent-workflow/PROJECT.md 的驗證指令全數回填。
+
+執行中做出兩項工程決策：升級至 Node 22 + Astro 7 以取得 npm audit 0 vulnerabilities（Astro 5/6 皆有 8 條 high severity advisory，其中 sharp/libvips 與 PRD §29 的圖片處理直接相關）；不啟用 eslint-plugin-jsx-a11y（peer 相依卡在 ESLint 9，無障礙改由 MCD-11 承擔）。
+
+經獨立 code review 後修正兩項 HIGH 機密外洩缺口（.dev.vars/.wrangler/ 與 .claude/settings.local.json 未被忽略）、absoluteUrl 的 trailing slash 與重複斜線契約、以及平行執行時驗證工具遞迴進 worktree 的問題。
+
+原 AC #7 Cloudflare Pages staging 因缺少外部憑證受阻，依 decision-3 拆出為 TASK-14，本任務以其餘 9 項 AC 正當收斂。
+<!-- SECTION:FINAL_SUMMARY:END -->

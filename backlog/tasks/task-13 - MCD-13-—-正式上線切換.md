@@ -4,11 +4,12 @@ title: MCD-13 — 正式上線切換
 status: To Do
 assignee: []
 created_date: '2026-08-08 06:47'
-updated_date: '2026-08-08 13:48'
+updated_date: '2026-08-08 14:21'
 labels: []
 dependencies:
   - TASK-3
   - TASK-11
+  - TASK-14
 priority: high
 type: chore
 ordinal: 13000
