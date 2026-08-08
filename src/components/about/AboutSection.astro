@@ -1,12 +1,12 @@
 ---
 /**
- * One About section (MCD-8).
+ * One About section (MCD-8, MCD-25).
  *
  * Every section on the page is a labelled landmark with the same heading
- * rhythm, so the page reads as a sequence of equal-weight sections rather than
- * a document with one dominant block. The heading id is supplied by the caller
- * and reused for `aria-labelledby`, which is what gives each `<section>` an
- * accessible name in the landmark list.
+ * rhythm, so the composition doc-2 §14 asks for is built by placing these, not
+ * by giving one of them a louder treatment than the rest. The heading id is
+ * supplied by the caller and reused for `aria-labelledby`, which is what gives
+ * each `<section>` an accessible name in the landmark list.
  */
 
 interface Props {
@@ -29,6 +29,9 @@ const { id, heading } = Astro.props;
        PRD §25 asks for thin borders and large whitespace, not cards. */
     border-block-start: var(--border-width) solid var(--color-border);
     padding-block-start: var(--space-7);
+    /* Paired sections are grid items in the doc-2 §14 composition, and a grid
+       item's `auto` minimum lets long content push past its track. */
+    min-width: 0;
   }
 
   .about-section__heading {

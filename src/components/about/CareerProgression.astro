@@ -1,0 +1,135 @@
+---
+/**
+ * The career progression (MCD-25, doc-2 §14).
+ *
+ * doc-2 §14 asks for the progression to be shown, not listed:
+ *
+ *   Software Engineering  →  System Architecture  →  AI Systems
+ *
+ * It is built from semantic markup and CSS rather than an image, so it
+ * translates, reflows, and inherits the type scale like the rest of the page.
+ * An `<ol>` is the honest element here — the three rungs are ordered, and that
+ * order is the whole point — while the arrows are decorative repetitions of
+ * that order and are hidden from assistive technology.
+ *
+ * Two constraints shape the layout:
+ *
+ *   - PRD §11 — no dates, employers, or internal projects. Each rung names
+ *     domains only, so this reads as a progression, not an employment history.
+ *   - doc-2 §17 — at ~390px the row becomes a column and the arrows turn to
+ *     point down, so nothing is ever wider than the viewport.
+ */
+
+import type { AboutStrings } from '../../i18n/pages/about';
+
+interface Props {
+  career: AboutStrings['career'];
+  /** Id for the block's label; the list is named by it. */
+  id: string;
+}
+
+const { career, id } = Astro.props;
+---
+
+<div class="progression">
+  <p class="progression__label" id={id}>{career.label}</p>
+  <ol class="progression__stages" role="list" aria-labelledby={id}>
+    {
+      career.stages.map((stage, index) => (
+        <li class="progression__stage">
+          {index > 0 && (
+            <span class="progression__arrow" aria-hidden="true">
+              →
+            </span>
+          )}
+          <span class="progression__body">
+            <span class="progression__name">{stage.label}</span>
+            <span class="progression__detail">{stage.detail}</span>
+          </span>
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  .progression {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    /* Hairlines and whitespace, not a card — PRD §25. */
+    border-block: var(--border-width) solid var(--color-border);
+    padding-block: var(--space-5);
+  }
+
+  .progression__label {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .progression__stages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .progression__stage {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    /* Even thirds while the row fits; the basis is wide enough that a narrow
+       viewport can only ever place one rung per line. */
+    flex: 1 1 13rem;
+    min-width: 0;
+  }
+
+  .progression__arrow {
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+    line-height: 1;
+  }
+
+  .progression__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .progression__name {
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+  }
+
+  .progression__detail {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+
+  /* Below the breakpoint the rungs stack, so the arrow leads into the next one
+     from above instead of from the left. */
+  @media (width < 48rem) {
+    .progression__stages {
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .progression__stage {
+      flex: 0 0 auto;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .progression__arrow {
+      rotate: 90deg;
+    }
+  }
+</style>
