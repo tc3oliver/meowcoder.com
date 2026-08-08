@@ -1,0 +1,23 @@
+---
+/**
+ * Traditional Chinese home page (MCD-3 shell).
+ *
+ * A complete localized experience, not mixed-language content inside the
+ * English page (PRD §7). Sections arrive in MCD-4.
+ */
+
+import { home } from '../../i18n/pages/home';
+import SiteShell from '../../layouts/SiteShell.astro';
+
+const locale = 'zh' as const;
+const t = home[locale];
+---
+
+<SiteShell locale={locale} route="/" title={t.title} description={t.description}>
+  <div class="container">
+    <div class="prose">
+      <h1>{t.heading}</h1>
+      <p>{t.intro}</p>
+    </div>
+  </div>
+</SiteShell>

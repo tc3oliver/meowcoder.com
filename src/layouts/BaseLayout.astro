@@ -1,39 +1,42 @@
 ---
 /**
- * Base page shell (MCD-2).
+ * Base page shell (MCD-2, extended for bilingual metadata in MCD-3).
  *
  * Owns the document skeleton — `<head>` metadata, the header/main/footer
  * landmarks, and the stylesheet — so every page inherits the same design system
  * without repeating it.
  *
+ * Pages identify themselves by `locale` + `route`, never by URL. Canonical,
+ * `hreflang`, and Open Graph URLs are all derived from that pair here, which is
+ * what stops them from drifting apart (PRD §7).
+ *
  * `Header` and `Footer` are the defaults of named slots rather than fixed
- * markup: MCD-3 overrides them with locale-aware instances, and any page that
- * needs a different shell can supply its own.
+ * markup, so a page can supply locale-aware instances.
  */
 
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { absoluteUrl } from '../lib/site';
+import { LOCALE_TAG, OG_LOCALE, type Locale } from '../i18n/locales';
+import { alternatesFor, localizeUrl, type Route } from '../lib/i18n';
 
 interface Props {
+  locale: Locale;
+  route: Route;
   title: string;
-  description?: string;
-  /** BCP 47 tag for `<html lang>`; MCD-3 supplies the per-locale value. */
-  lang?: string;
-  /** Site-relative path of this page, used to build the canonical URL. */
-  path?: string;
-  /** Localized skip-link text. Omitted here means no skip link is rendered. */
+  description: string;
+  /** Localized skip-link text. Omitted means no skip link is rendered. */
   skipLinkLabel?: string;
 }
 
-const { title, description, lang = 'en', path = '/', skipLinkLabel } = Astro.props;
+const { locale, route, title, description, skipLinkLabel } = Astro.props;
 
-const canonical = absoluteUrl(path);
+const canonical = localizeUrl(locale, route);
+const alternates = alternatesFor(route);
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={LOCALE_TAG[locale]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -43,9 +46,25 @@ const canonical = absoluteUrl(path);
     from flashing a light background on a dark-mode device. */
     }
     <meta name="color-scheme" content="light dark" />
-    <link rel="canonical" href={canonical} />
+
     <title>{title}</title>
-    {description && <meta name="description" content={description} />}
+    <meta name="description" content={description} />
+
+    <link rel="canonical" href={canonical} />
+    {
+      alternates.map((alternate) => (
+        <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
+      ))
+    }
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="meowcoder.com" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={OG_LOCALE[locale]} />
+    <meta name="twitter:card" content="summary" />
+
     <slot name="head" />
   </head>
   <body>

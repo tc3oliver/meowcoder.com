@@ -1,0 +1,20 @@
+---
+/**
+ * Traditional Chinese Work index (MCD-3 shell). Entries arrive in MCD-5.
+ */
+
+import { work } from '../../../i18n/pages/work';
+import SiteShell from '../../../layouts/SiteShell.astro';
+
+const locale = 'zh' as const;
+const t = work[locale];
+---
+
+<SiteShell locale={locale} route="/work" title={t.title} description={t.description}>
+  <div class="container">
+    <div class="prose">
+      <h1>{t.heading}</h1>
+      <p>{t.intro}</p>
+    </div>
+  </div>
+</SiteShell>
