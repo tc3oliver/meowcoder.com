@@ -1,0 +1,76 @@
+---
+/**
+ * Language switch (MCD-3, PRD §7, §8).
+ *
+ * Renders one plain link per locale pointing at the *same route*, so switching
+ * preserves the current page instead of dropping to the home page.
+ *
+ * No client-side JavaScript and no `Accept-Language` sniffing: the target URLs
+ * are computed at build time and remain stable and shareable (PRD §7).
+ */
+
+import { LOCALE_TAG, LOCALES, type Locale } from '../i18n/locales';
+import { localizePath, type Route } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  route: Route;
+  ariaLabel: string;
+  labels: Record<Locale, string>;
+}
+
+const { locale, route, ariaLabel, labels } = Astro.props;
+---
+
+<nav class="lang-switch" aria-label={ariaLabel}>
+  <ul class="lang-switch__list" role="list">
+    {
+      LOCALES.map((entry) => (
+        <li>
+          <a
+            class="lang-switch__link"
+            href={localizePath(entry, route)}
+            lang={LOCALE_TAG[entry]}
+            hreflang={LOCALE_TAG[entry]}
+            aria-current={entry === locale ? 'true' : undefined}
+          >
+            {labels[entry]}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .lang-switch__list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  /* A separator that is decorative only, so it stays out of the accessibility
+     tree and out of the copied text. */
+  .lang-switch__list > li + li::before {
+    content: '/';
+    margin-inline-end: var(--space-2);
+    color: var(--color-border);
+  }
+
+  .lang-switch__link {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .lang-switch__link:hover {
+    color: var(--color-text);
+  }
+
+  /* Current language is marked by weight and color, not color alone. */
+  .lang-switch__link[aria-current='true'] {
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+  }
+</style>

@@ -17,6 +17,11 @@ interface NavItem {
   label: string;
   /** Marks the entry for the page currently being viewed. */
   current?: boolean;
+  /**
+   * Off-site destination (PRD §8 marks Writing and GitHub with `↗`). Opts the
+   * link into the safe `rel` treatment and the visible external indicator.
+   */
+  external?: boolean;
 }
 
 interface Props {
@@ -25,9 +30,15 @@ interface Props {
   /** Accessible name for the navigation landmark, from the locale dictionary. */
   navLabel?: string;
   navItems?: NavItem[];
+  /**
+   * Localized glyph appended to off-site links. Decorative — it is hidden from
+   * assistive technology, which announces the destination from `rel` and the
+   * link text instead.
+   */
+  externalIndicator?: string;
 }
 
-const { homeHref = '/', navLabel, navItems = [] } = Astro.props;
+const { homeHref = '/', navLabel, navItems = [], externalIndicator } = Astro.props;
 
 const hasBrand = Astro.slots.has('brand');
 const hasActions = Astro.slots.has('actions');
@@ -52,9 +63,15 @@ const hasActions = Astro.slots.has('actions');
                 <a
                   class="site-header__link"
                   href={item.href}
+                  rel={item.external ? 'noopener noreferrer' : undefined}
                   aria-current={item.current ? 'page' : undefined}
                 >
                   {item.label}
+                  {item.external && externalIndicator && (
+                    <span class="site-header__external" aria-hidden="true">
+                      {externalIndicator}
+                    </span>
+                  )}
                 </a>
               </li>
             ))}
@@ -124,6 +141,11 @@ const hasActions = Astro.slots.has('actions');
     font-weight: var(--weight-medium);
     text-decoration: underline;
     text-underline-offset: 0.35em;
+  }
+
+  .site-header__external {
+    margin-inline-start: 0.25em;
+    font-size: 0.85em;
   }
 
   .site-header__actions {

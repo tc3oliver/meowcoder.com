@@ -1,0 +1,20 @@
+---
+/**
+ * English About page (MCD-3 shell). Content arrives in MCD-8.
+ */
+
+import { about } from '../i18n/pages/about';
+import SiteShell from '../layouts/SiteShell.astro';
+
+const locale = 'en' as const;
+const t = about[locale];
+---
+
+<SiteShell locale={locale} route="/about" title={t.title} description={t.description}>
+  <div class="container">
+    <div class="prose">
+      <h1>{t.heading}</h1>
+      <p>{t.intro}</p>
+    </div>
+  </div>
+</SiteShell>

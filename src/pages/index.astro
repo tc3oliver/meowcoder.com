@@ -1,34 +1,23 @@
 ---
 /**
- * Homepage placeholder.
+ * English home page (MCD-3 shell).
  *
- * Exercises the MCD-2 shell — layout, header, footer, reading measure, focus,
- * theming — with no product content. The real homepage sections land in MCD-4,
- * and the localized strings that replace the literals below land in MCD-3.
+ * Homepage sections — Hero, Shouri, Engineering Expertise, Open Source,
+ * Research, Technical Writing, Professional Experience — arrive in MCD-4.
  */
 
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
+import { home } from '../i18n/pages/home';
+import SiteShell from '../layouts/SiteShell.astro';
+
+const locale = 'en' as const;
+const t = home[locale];
 ---
 
-<BaseLayout title="meowcoder.com" path="/" skipLinkLabel="Skip to content">
-  <Header slot="header">
-    {
-      /* The wordmark is the domain itself, so it reads the same in both
-    locales. The navigation entries do not, and arrive with MCD-3. */
-    }
-    <span slot="brand">meowcoder.com</span>
-  </Header>
-
+<SiteShell locale={locale} route="/" title={t.title} description={t.description}>
   <div class="container">
     <div class="prose">
-      <h1>meowcoder.com</h1>
-      <p>Design foundations are in place. Content ships in a later release.</p>
+      <h1>{t.heading}</h1>
+      <p>{t.intro}</p>
     </div>
   </div>
-
-  <Footer slot="footer">
-    <span slot="meta">meowcoder.com</span>
-  </Footer>
-</BaseLayout>
+</SiteShell>

@@ -1,0 +1,78 @@
+---
+/**
+ * Locale-aware page shell (MCD-3).
+ *
+ * Wires the shared chrome dictionary into `BaseLayout`'s header and footer
+ * slots so a page only has to declare which locale and route it is. The
+ * navigation is built here, once, which is what keeps every route's nav
+ * identical and matching PRD §8.
+ */
+
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+import { chrome } from '../i18n/chrome';
+import type { Locale } from '../i18n/locales';
+import { GITHUB_URL, STUDY_URL } from '../lib/external';
+import { localizePath, type Route } from '../lib/i18n';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  locale: Locale;
+  route: Route;
+  title: string;
+  description: string;
+}
+
+const { locale, route, title, description } = Astro.props;
+
+const t = chrome[locale];
+
+/*
+ * Primary navigation, in the exact order PRD §8 specifies:
+ *   Oliver Yu | Work | Writing ↗ | About | GitHub ↗ | EN / 中文
+ *
+ * The brand is the wordmark, the language switch is the `actions` slot, and
+ * these four are everything in between. PRD §8 also forbids top-level Blog,
+ * Notes, Categories, Tags, Archive, Skills, Certifications, Research, and
+ * Resume entries — research and credentials live inside About instead.
+ */
+const navItems = [
+  { href: localizePath(locale, '/work'), label: t.nav.work, current: route === '/work' },
+  { href: STUDY_URL, label: t.nav.writing, external: true },
+  { href: localizePath(locale, '/about'), label: t.nav.about, current: route === '/about' },
+  { href: GITHUB_URL, label: t.nav.github, external: true },
+];
+---
+
+<BaseLayout
+  locale={locale}
+  route={route}
+  title={title}
+  description={description}
+  skipLinkLabel={t.skipLink}
+>
+  <Header
+    slot="header"
+    homeHref={localizePath(locale, '/')}
+    navLabel={t.nav.ariaLabel}
+    navItems={navItems}
+    externalIndicator={t.nav.externalIndicator}
+  >
+    <span slot="brand">{t.brand}</span>
+    <LanguageSwitcher
+      slot="actions"
+      locale={locale}
+      route={route}
+      ariaLabel={t.languageSwitch.ariaLabel}
+      labels={{ en: t.languageSwitch.en, zh: t.languageSwitch.zh }}
+    />
+  </Header>
+
+  <slot />
+
+  <Footer slot="footer" navLabel={t.footer.ariaLabel}>
+    {/* The link row PRD §9.8 specifies is MCD-4 scope; the wordmark is chrome. */}
+    <span slot="meta">meowcoder.com</span>
+  </Footer>
+</BaseLayout>
