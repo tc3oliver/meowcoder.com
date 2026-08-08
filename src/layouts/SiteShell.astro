@@ -78,6 +78,8 @@ const footerLinks = [
   description={description}
   skipLinkLabel={t.skipLink}
 >
+  {/* Lets a page add its own `<head>` content — JSON-LD, for instance. */}
+  <slot name="head" slot="head" />
   <Header
     slot="header"
     homeHref={localizePath(locale, '/')}

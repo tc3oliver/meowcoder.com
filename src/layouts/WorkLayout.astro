@@ -11,10 +11,12 @@
  * reasoned about as plain markup.
  */
 
+import StructuredData from '../components/StructuredData.astro';
 import { chrome } from '../i18n/chrome';
 import type { Locale } from '../i18n/locales';
 import { work } from '../i18n/pages/work';
 import { localizePath, workDetailRoute } from '../lib/i18n';
+import { shouriSchema } from '../lib/structured-data';
 import type { WorkEntryData } from '../lib/work';
 import SiteShell from './SiteShell.astro';
 
@@ -33,6 +35,14 @@ const t = work[locale];
  * file, and the wordmark is a proper name PRD §7 leaves untranslated.
  */
 const title = `${entry.title} — ${chrome[locale].brand}`;
+
+/*
+ * PRD §30 asks for a `SoftwareApplication`/`Product` node for Shouri
+ * specifically, so this is keyed on the slug rather than emitted for every case
+ * study. AI Coding Skills is open-source work, not a product, and has no
+ * equivalent node in §30.
+ */
+const schemas = entry.slug === 'shouri' ? [shouriSchema(locale)] : [];
 ---
 
 <SiteShell
@@ -41,6 +51,7 @@ const title = `${entry.title} — ${chrome[locale].brand}`;
   title={title}
   description={entry.summary}
 >
+  {schemas.length > 0 && <StructuredData slot="head" schemas={schemas} />}
   <article class="container container--reading work">
     <header class="work__header">
       <dl class="work__meta">

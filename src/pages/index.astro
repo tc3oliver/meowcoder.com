@@ -12,10 +12,12 @@
  */
 
 import HomeContent from '../components/home/HomeContent.astro';
+import StructuredData from '../components/StructuredData.astro';
 import { chrome } from '../i18n/chrome';
 import { home } from '../i18n/pages/home';
 import SiteShell from '../layouts/SiteShell.astro';
 import { getStudyPosts } from '../lib/study-feed';
+import { personSchema, webSiteSchema } from '../lib/structured-data';
 
 const locale = 'en' as const;
 const t = home[locale];
@@ -25,6 +27,8 @@ const { posts } = await getStudyPosts();
 ---
 
 <SiteShell locale={locale} route="/" title={t.title} description={t.description}>
+  <StructuredData slot="head" schemas={[personSchema(locale), webSiteSchema(locale)]} />
+
   <HomeContent
     locale={locale}
     t={t}

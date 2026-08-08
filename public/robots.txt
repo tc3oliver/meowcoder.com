@@ -1,0 +1,13 @@
+# meowcoder.com
+#
+# Everything here is meant to be found. The site is small, entirely static, and
+# has no admin surface, private area, or generated URL space worth excluding.
+#
+# This file also replaces the robots.txt Cloudflare injects for zones with no
+# origin-supplied one: that managed file expresses AI content signals but names
+# no sitemap, so crawlers had no discovery hint.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://meowcoder.com/sitemap-index.xml
