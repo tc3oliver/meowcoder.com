@@ -17,6 +17,25 @@ export interface WorkPageStrings extends PageStrings {
    */
   caseStudyCta: string;
   /**
+   * The same link on the professional-experience entry (doc-2 §21).
+   *
+   * A separate label rather than the same one, because the two lead to
+   * different kinds of thing: `caseStudyCta` opens a project a reader can then
+   * go and verify in public, and this one opens an account of work that cannot
+   * be verified that way.
+   */
+  experienceCta: string;
+  /**
+   * What stands where a case study prints its evidence label (doc-2 §21).
+   *
+   * decision-11 makes the missing public link the point rather than a gap, so
+   * the index says so in the same slot and the same treatment the other entries
+   * use to name what can be checked. It describes the entry's kind, which is
+   * the same statement for every experience entry, so it is page chrome rather
+   * than something a content file restates.
+   */
+  noEvidence: string;
+  /**
    * Labels for the two visuals doc-2 §11 gives the index, keyed by the case
    * study each belongs to. They describe presentation rather than the projects,
    * which is why they sit here and not in the content files.
@@ -47,13 +66,20 @@ export const work = {
   en: {
     title: 'Work — Oliver Yu',
     description:
-      'Selected engineering work that can be publicly inspected: product execution, open source, and the decisions behind them.',
+      'Selected engineering work: product execution, open source, more than a decade of professional systems and AI engineering, and the decisions behind them.',
     heading: 'Work',
-    // PRD §10: `/work` contains only work that can be publicly inspected.
+    /*
+     * doc-2 §21 supersedes PRD §10's "only work that can be publicly inspected"
+     * for this index, so the intro no longer claims exclusivity it does not
+     * have. It still promises evidence — conditionally, which is the honest
+     * version once one entry has none and says so.
+     */
     intro:
-      'Only work that can be inspected in public — the problem, the architecture, the decisions, and the evidence behind them.',
+      'The problem, the architecture, the decisions, and — where the work is public — the evidence behind them.',
     empty: 'No case studies are published yet.',
     caseStudyCta: 'View Case Study',
+    experienceCta: 'Explore Experience',
+    noEvidence: 'No public link · employer work, described in general terms',
     visuals: {
       // The same asset the homepage shows, so it is the same description. It is
       // restated rather than imported because the Work index does not depend on
@@ -77,11 +103,14 @@ export const work = {
   },
   zh: {
     title: '作品 — Oliver Yu',
-    description: '可公開檢視的工程作品：產品執行、開源專案，以及背後的工程決策。',
+    description:
+      '工程作品選集：產品執行、開源專案、超過 10 年的系統與 AI 工程經歷，以及背後的工程決策。',
     heading: '作品',
-    intro: '只收錄可公開檢視的作品：問題、架構、工程決策，以及對應的證據。',
+    intro: '問題、架構、工程決策，以及在作品可公開檢視時，對應的證據。',
     empty: '目前尚未發佈案例研究。',
     caseStudyCta: '閱讀案例研究',
+    experienceCta: '深入了解經歷',
+    noEvidence: '無公開連結 · 任職期間的工作，僅以概括方式描述',
     visuals: {
       shouri: {
         alt: '收理在桌機與手機上的畫面。網頁應用正進行五個單元的學習路線；後方的產品頁把一段收下的料理影片與整理後的結構化食譜並列。兩個手機畫面則是收藏庫，以及拆成摘要、材料與步驟的同一份食譜。',

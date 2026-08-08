@@ -410,6 +410,68 @@ button {
   font-weight: var(--weight-medium);
 }
 
+/* -------------------------------------------------------------------------
+ * Experience registers (MCD-31, doc-2 §21)
+ *
+ * The experience entry carries neither `.state-flow` nor `.decision`, and that
+ * is a content rule rather than a stylistic one: doc-2 §21 forbids an
+ * experience summary borrowing either apparatus, because both exist to expose
+ * reasoning a reader can go and check, and this entry has nothing checkable
+ * behind it. What it carries instead is two things no case study needs — the
+ * domains a theme spans, and the shape of a career — and both are set quiet.
+ * ---------------------------------------------------------------------- */
+
+/* The domains a theme covers, read before its narrative rather than after it.
+   Small and muted, so it reads as a label on the section and never competes
+   with the heading above it. */
+.prose .theme-domains {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--color-text-muted);
+}
+
+/* The career progression: stages and arrows, drawn in text. No asset, no
+   script, and no fixed track — the stages are a wrapping flex line, so the
+   figure reflows onto as many rows as the viewport needs instead of setting a
+   minimum width the page has to scroll to reach. */
+.prose .progression {
+  margin-block-start: var(--space-6);
+  padding-block: var(--space-5);
+  border-block: var(--border-width) solid var(--color-border);
+}
+
+.prose .progression__stages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+}
+
+/* Each stage owns the arrow that follows it. An in-flow `::after` rather than a
+   positioned one, so when the line wraps the arrow travels with the stage
+   before it instead of stranding itself at the start of the next row. */
+.prose .progression__stage {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+}
+
+.prose .progression__stage:not(:last-child)::after {
+  content: '→';
+  font-weight: var(--weight-regular);
+  color: var(--color-text-muted);
+}
+
+.prose .progression__caption {
+  margin-block-start: var(--space-5);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-muted);
+}
+
 .site-main {
   /* Absorbs the leftover height so the footer sits at the bottom of short
      pages without being fixed. */

@@ -7,24 +7,38 @@
  * in different shapes.
  *
  * doc-2 §11 replaces what this page used to be — a text list of type, linked
- * title, and summary — with two large project entries. Two is the whole list on
- * purpose: doc-1 §10 admits only work that can be publicly inspected, so the
- * page is not padded out into a card wall and no third project is invented to
- * balance a row.
+ * title, and summary — with large entries. The list is short on purpose: it is
+ * not padded out into a card wall and no project is invented to balance a row.
  *
- * Each entry carries its position, type, title, one outcome sentence, a
- * concise evidence label, and the link to its case study. Two rules shape the
- * markup:
+ * doc-2 §21 then adds a third entry of a different kind — the synthesized
+ * professional experience — and the one thing this layout has to get right
+ * about it is that it *is* different. Two of the three lead somewhere a reader
+ * can go and check; the third leads to an account of work that cannot be
+ * checked, because it was done inside organisations and there is nothing
+ * public to link to. Three things carry that distinction, none of them a
+ * disclaimer bolted on at the end:
  *
- * - **One link per entry.** The link is the `View Case Study` action, and the
- *   project's own title is appended to it out of sight, so a screen reader
- *   reading a list of links hears two distinct destinations instead of the same
- *   phrase twice. Nothing wraps the entry, so there is no nested interactive
- *   element and the whole 1160px block is not one giant tab stop.
+ * - It says so in the slot where the others print their evidence label, in the
+ *   same monospace treatment. Same position, same weight, opposite content.
+ * - Its call to action reads `Explore Experience →` rather than
+ *   `View Case Study`, and is drawn with a dashed border — the convention
+ *   `global.css` already uses on `state-flow__part--derived`, where a broken
+ *   line marks the thing that is not the solid, checkable one.
+ * - It has no visual. There is no screenshot and no diagram that could honestly
+ *   stand for a decade of employer work, so it holds copy alone and the
+ *   two-column rule below does not apply to it.
+ *
+ * Two further rules shape the markup:
+ *
+ * - **One link per entry.** The project's own title is appended to the action
+ *   out of sight, so a screen reader reading a list of links hears distinct
+ *   destinations instead of the same phrase repeated. Nothing wraps the entry,
+ *   so there is no nested interactive element and the whole 1160px block is not
+ *   one giant tab stop.
  * - **Shouri gets the largest visual area**, as doc-2 §11 requires. It is the
- *   only entry whose visual spans the full content width; the other entry's
- *   diagram sits in a narrower second column from 64rem up. The difference is
- *   the layout's, not a size written onto an image.
+ *   only entry whose visual spans the full content width; the diagram entry
+ *   sits in a narrower second column from 64rem up. The difference is the
+ *   layout's, not a size written onto an image.
  *
  * Neither visual is new. The screenshot is the asset the homepage already
  * shows, through Astro's `<Image>` so it keeps build-time optimization and the
@@ -61,8 +75,9 @@ const t = work[locale];
  * Keyed by slug because that is what the pairing actually is: a fact about two
  * specific projects, not something an entry could declare about itself — the
  * screenshot is an asset in this repository and the diagram is a component, and
- * neither is expressible in frontmatter. A case study not named here renders as
- * copy alone, which is the same shape the index had before this redesign.
+ * neither is expressible in frontmatter. An entry not named here renders as
+ * copy alone, which is the same shape the index had before this redesign and is
+ * the correct shape for the experience entry, which has no honest visual.
  */
 const VISUALS: Readonly<Record<string, 'screenshot' | 'workflow'>> = {
   shouri: 'screenshot',
@@ -89,9 +104,17 @@ function position(index: number): string {
         <ul class="work-index" role="list">
           {entries.map((entry, index) => {
             const visual = VISUALS[entry.data.slug];
+            const isExperience = entry.data.kind === 'experience';
 
             return (
-              <li class:list={['work-entry', visual === 'screenshot' && 'work-entry--featured']}>
+              <li
+                class:list={[
+                  'work-entry',
+                  visual === 'screenshot' && 'work-entry--featured',
+                  visual === 'workflow' && 'work-entry--diagram',
+                  isExperience && 'work-entry--experience',
+                ]}
+              >
                 <div class="work-entry__copy">
                   <p class="work-entry__label">
                     {/* Decoration: the list already carries the ordering, so
@@ -104,13 +127,29 @@ function position(index: number): string {
                   </p>
                   <h2 class="work-entry__title">{entry.data.title}</h2>
                   <p class="work-entry__outcome">{entry.data.outcome ?? entry.data.summary}</p>
-                  {entry.data.evidence && <p class="work-entry__evidence">{entry.data.evidence}</p>}
+                  {/* One slot, filled either way: what can be checked, or the
+                      statement that nothing can be. An entry that is neither —
+                      a case study is required to declare evidence — prints
+                      nothing here, as it did before. */}
+                  {isExperience ? (
+                    <p class="work-entry__evidence">{t.noEvidence}</p>
+                  ) : (
+                    entry.data.evidence && <p class="work-entry__evidence">{entry.data.evidence}</p>
+                  )}
                   <a
                     class="work-entry__cta"
                     href={localizePath(locale, workDetailRoute(entry.data.slug))}
                   >
-                    {t.caseStudyCta}
+                    {isExperience ? t.experienceCta : t.caseStudyCta}
                     <span class="visually-hidden"> — {entry.data.title}</span>
+                    {/* Decoration, and only on this action: it is the one that
+                        does not lead out to something inspectable, so the arrow
+                        reads as "further in" rather than as a link out. */}
+                    {isExperience && (
+                      <span class="work-entry__arrow" aria-hidden="true">
+                        →
+                      </span>
+                    )}
                   </a>
                 </div>
 
@@ -166,8 +205,8 @@ function position(index: number): string {
     margin: 0;
   }
 
-  /* A hairline between two entries this large. With only two of them, the gap
-     alone leaves it ambiguous where one ends and the next begins. */
+  /* A hairline between entries this large. At this size the gap alone leaves it
+     ambiguous where one ends and the next begins. */
   .work-entry + .work-entry {
     padding-block-start: var(--space-9);
     border-block-start: var(--border-width) solid var(--color-border);
@@ -227,6 +266,7 @@ function position(index: number): string {
      the only thing defining the control, so it owes WCAG 1.4.11 its 3:1. */
   .work-entry__cta {
     display: inline-flex;
+    gap: var(--space-2);
     margin-block-start: var(--space-2);
     padding: var(--space-3) var(--space-5);
     border: var(--border-width) solid var(--color-border-strong);
@@ -241,6 +281,20 @@ function position(index: number): string {
   .work-entry__cta:hover {
     border-color: var(--color-accent);
     color: var(--color-accent);
+  }
+
+  /* Dashed rather than solid, the same distinction `global.css` draws on
+     `state-flow__part--derived`: the broken line is the thing that is not the
+     solid, checkable one. Border width, color and contrast are unchanged, so
+     this reads as a difference in kind and not as a weaker control — and it is
+     never the only signal, since the label and the line above it both differ
+     too. */
+  .work-entry--experience .work-entry__cta {
+    border-style: dashed;
+  }
+
+  .work-entry__arrow {
+    font-family: var(--font-mono);
   }
 
   /* doc-2 §11: the featured project holds the largest visual area on the page.
@@ -263,12 +317,16 @@ function position(index: number): string {
     block-size: auto;
   }
 
-  /* From 64rem the second entry runs its diagram beside the copy rather than
-     under it. That is what keeps the two entries visually unequal by layout:
-     one visual spans 1160px, the other is a column of about a third of that.
-     Below the breakpoint both stack, which is also the 390px case. */
+  /* From 64rem the diagram entry runs its figure beside the copy rather than
+     under it. That is what keeps the two illustrated entries visually unequal
+     by layout: one visual spans 1160px, the other is a column of about a third
+     of that. Below the breakpoint both stack, which is also the 390px case.
+
+     Keyed on the entry that has a diagram rather than on "not the featured
+     one", so the experience entry — which has no visual at all — is not given
+     a two-column grid with an empty second column. */
   @media (min-width: 64rem) {
-    .work-entry:not(.work-entry--featured) {
+    .work-entry--diagram {
       grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
       align-items: start;
       gap: var(--space-8);

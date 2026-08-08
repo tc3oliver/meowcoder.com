@@ -332,6 +332,37 @@ describe('accessibility baseline', () => {
 });
 
 /* -------------------------------------------------------------------------
+ * The progression figure (MCD-31, doc-2 §21)
+ *
+ * The experience entry's closing graphic is five stage labels and four arrows
+ * on one line, which is the shape most likely to reintroduce the 390px
+ * horizontal scroll MCD-13 removed. Both properties that prevent it are single
+ * declarations a later edit could drop without anything else looking wrong, so
+ * they are asserted rather than left to a rendering check.
+ * ---------------------------------------------------------------------- */
+
+describe('progression figure (doc-2 §21)', () => {
+  const stages = GLOBAL_CSS.match(/\.prose \.progression__stages\s*\{[^}]*\}/)?.[0] ?? '';
+
+  it('wraps instead of setting a width the page has to scroll to', () => {
+    expect(stages).toMatch(/flex-wrap:\s*wrap/);
+    expect(GLOBAL_CSS).not.toMatch(/\.prose \.progression[\w-]*\s*\{[^}]*min-width:\s*(?!0)/);
+  });
+
+  /*
+   * A positioned connector would sit at the start of a wrapped row, pointing at
+   * the stage it came from. In the flow it travels with that stage instead.
+   */
+  it('draws the connector in the flow, so a wrapped row reads correctly', () => {
+    const connector =
+      GLOBAL_CSS.match(/\.prose \.progression__stage:not\(:last-child\)::after\s*\{[^}]*\}/)?.[0] ??
+      '';
+    expect(connector).toMatch(/content:\s*'→'/);
+    expect(connector).not.toMatch(/position:\s*absolute/);
+  });
+});
+
+/* -------------------------------------------------------------------------
  * Forbidden visual elements (PRD §25)
  *
  * A source scan, not a rendering check: these effects all leave a
