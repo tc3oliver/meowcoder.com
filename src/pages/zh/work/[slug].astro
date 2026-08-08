@@ -1,0 +1,30 @@
+---
+/**
+ * Traditional Chinese Work detail page (MCD-5).
+ *
+ * The same slugs as the English detail page, under `/zh/` — which is what lets
+ * the language switch move between them by rewriting the prefix alone.
+ */
+
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+
+import WorkLayout from '../../../layouts/WorkLayout.astro';
+import { workEntriesForLocale } from '../../../lib/work';
+
+const locale = 'zh' as const;
+
+export const getStaticPaths = (async () => {
+  const entries = workEntriesForLocale(await getCollection('work'), 'zh');
+
+  return entries.map((entry) => ({ params: { slug: entry.data.slug }, props: { entry } }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+
+const { Content } = await render(entry);
+---
+
+<WorkLayout locale={locale} entry={entry.data}>
+  <Content />
+</WorkLayout>
