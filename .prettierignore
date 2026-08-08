@@ -3,6 +3,9 @@ dist/
 node_modules/
 package-lock.json
 
+# Isolated worktrees from parallel task execution
+.worktrees/
+
 # Backlog.md and workflow artifacts are CLI-managed; formatting them would fight
 # the tooling that owns their layout.
 backlog/

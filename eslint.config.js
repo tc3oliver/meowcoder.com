@@ -9,6 +9,9 @@ export default [
       'dist/',
       '.astro/',
       'node_modules/',
+      // Isolated worktrees from parallel task execution hold other tasks'
+      // in-flight code; linting them would turn this task's CI red.
+      '.worktrees/',
       // CLI-managed workflow artifacts, not application source.
       'backlog/',
       '.agent-workflow/',

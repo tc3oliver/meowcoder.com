@@ -11,9 +11,28 @@ dist/
 !.env.example
 *.pem
 *.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+
+# Cloudflare Wrangler local secrets and state (PRD §20: Cloudflare API credentials)
+.dev.vars
+.dev.vars.local
+.wrangler/
+
+# Personal documents that must never reach the public repository (PRD §14, §20)
+*resume*.pdf
+*cv*.pdf
 
 # Local agent runtime state — must not enter the public repository (decision-1)
 .omc/
+# Machine-local approvals and env; .claude/skills/** stays tracked per decision-1
+.claude/settings.local.json
+.claude/settings.local.*
+
+# Isolated worktrees created by parallel task execution
+.worktrees/
 
 # Editor and OS
 .DS_Store
@@ -23,6 +42,7 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 
-# Tooling caches
+# Tooling caches and logs
 coverage/
 .eslintcache
+*.log
