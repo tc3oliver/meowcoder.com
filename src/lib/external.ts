@@ -16,3 +16,11 @@ export const GITHUB_URL = 'https://github.com/tc3oliver';
 
 /** Product proof (PRD §6). */
 export const SHOURI_URL = 'https://shouri.app';
+
+/**
+ * Research proof (PRD §6, §15) — the JISA publication.
+ *
+ * A DOI rather than a publisher link: DOIs are the stable identifier for a
+ * paper and survive the publisher moving or re-platforming the article.
+ */
+export const PUBLICATION_URL = 'https://doi.org/10.1016/j.jisa.2026.104422';

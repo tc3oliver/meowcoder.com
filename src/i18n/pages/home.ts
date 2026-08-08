@@ -130,6 +130,8 @@ export interface HomeStrings extends PageStrings {
     venue: string;
     summary: string;
     detail: string;
+    /** PRD §9.5's `View Publication ↗`, resolving through the DOI. */
+    cta: CtaLabel;
   };
   /** PRD §9.6. Metadata pulled from Study; never article bodies. */
   writing: {
@@ -172,6 +174,9 @@ export const home = {
       heading: 'Shouri / 收理',
       summary:
         'An AI-powered information organizer for capturing webpages, files and media, then turning them into structured, searchable knowledge.',
+      screenshot: {
+        alt: 'The Shouri web app. Behind, a saved cooking video sits beside the structured recipe it was turned into — ingredients, quantities, and tags. In front, a learning path tracks progress through a five-unit plan.',
+      },
       principlesHeading: 'Product principles',
       principles: [
         {
@@ -274,6 +279,7 @@ export const home = {
         'Co-authored research on leakage-resilient certificate-based encryption designed to preserve security under continual key leakage.',
       detail:
         'The paper proposes LR-CBEET, combining equality testing with resistance to side-channel leakage through key-update mechanisms, with formal analysis under IND-CCA and OW-CCA security notions.',
+      cta: { label: 'View Publication' },
     },
     writing: {
       heading: 'Technical Writing',
@@ -309,6 +315,9 @@ export const home = {
       eyebrow: '精選產品',
       heading: 'Shouri / 收理',
       summary: '以 AI 驅動的資訊整理工具，能收下網頁、檔案與影音，再整理成結構化、可搜尋的知識。',
+      screenshot: {
+        alt: '收理的網頁應用。後方是一段收下的料理影片，與整理後的結構化食譜並列，包含材料、份量與標籤；前方是追蹤五個單元進度的學習路徑。',
+      },
       principlesHeading: '產品原則',
       principles: [
         // The principle names are the product's own vocabulary and stay in
@@ -388,6 +397,7 @@ export const home = {
       summary: '共同發表的研究，探討抗洩漏的憑證式加密，目標是在金鑰持續洩漏下仍能維持安全性。',
       detail:
         '論文提出 LR-CBEET，以金鑰更新機制把等值測試與側通道洩漏防護結合起來，並在 IND-CCA 與 OW-CCA 安全性定義下給出形式化分析。',
+      cta: { label: '閱讀論文' },
     },
     writing: {
       heading: '技術文章',
