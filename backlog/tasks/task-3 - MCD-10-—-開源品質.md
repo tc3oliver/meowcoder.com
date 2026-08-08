@@ -1,10 +1,10 @@
 ---
 id: TASK-3
 title: MCD-10 — 開源品質
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-08-08 06:43'
-updated_date: '2026-08-08 14:27'
+updated_date: '2026-08-08 14:33'
 labels: []
 dependencies:
   - TASK-1
@@ -68,21 +68,21 @@ ordinal: 3000
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 README 依 PRD §22 結構撰寫（Stack、Development、License），維持工程導向且不含個人傳記
-- [ ] #2 授權分割在 README 與 LICENSE 明確標示：原始碼採 MIT、個人內容與品牌資產為 © Oliver Yu
-- [ ] #3 相依更新機制（Dependabot 或 Renovate）已設定並可產生更新 PR
-- [ ] #4 CI 包含連結檢查，能偵測 README 與網站中的失效連結
-- [ ] #5 CI 包含機密掃描步驟，能攔截誤加入的憑證或金鑰
-- [ ] #6 從乾淨 clone 僅依 README 指示即可完成 install 與 build
-- [ ] #7 若接受外部貢獻則存在 CONTRIBUTING.md；若不接受，於 README 明確說明此決定
+- [x] #1 README 依 PRD §22 結構撰寫（Stack、Development、License），維持工程導向且不含個人傳記
+- [x] #2 授權分割在 README 與 LICENSE 明確標示：原始碼採 MIT、個人內容與品牌資產為 © Oliver Yu
+- [x] #3 相依更新機制（Dependabot 或 Renovate）已設定並可產生更新 PR
+- [x] #4 CI 包含連結檢查，能偵測 README 與網站中的失效連結
+- [x] #5 CI 包含機密掃描步驟，能攔截誤加入的憑證或金鑰
+- [x] #6 從乾淨 clone 僅依 README 指示即可完成 install 與 build
+- [x] #7 若接受外部貢獻則存在 CONTRIBUTING.md；若不接受，於 README 明確說明此決定
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 Acceptance Criteria all pass
-- [ ] #2 Required applicable tests, lint, typecheck, and build pass
-- [ ] #3 Documentation and Requirement Matrix are synchronized when applicable
-- [ ] #4 Validation evidence is recorded in the task
+- [x] #1 Acceptance Criteria all pass
+- [x] #2 Required applicable tests, lint, typecheck, and build pass
+- [x] #3 Documentation and Requirement Matrix are synchronized when applicable
+- [x] #4 Validation evidence is recorded in the task
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -99,3 +99,138 @@ ordinal: 3000
 9. AC #6 實測：git clone 本 worktree 至 /tmp 的暫存目錄，僅依 README 指示執行 install 與 build，記錄實際輸出後刪除暫存目錄。
 10. 記錄 Implementation Notes（含實際指令輸出、以及哪些部分只能在 push 後由 CI 首次執行）、逐項勾選 AC 與 DoD、撰寫 Final Summary，最後提交至 backlog/TASK-3（不 push、不 merge）。
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## 實作內容
+
+- `README.md`：在 MCD-1 骨架（PRD §22 的 Stack / Development / License）上補齊「乾淨 clone 可重現」所需的完整指示（Node 22.12+ 與 `nvm install`、install / dev / build / preview），品質檢查清單改為 CI 實際順序並加入 `npm run linkcheck`，新增 Repository layout、Continuous integration、Contributing、Security 段落。維持工程導向，未加入個人傳記，未提及任何內部自動化開發機制。
+- `.github/workflows/ci.yml`：
+  - `verify` job 在 Build 之後、Test 之前加入 `Link check` 步驟，符合 PRD §23 建議的 Install → Format/Lint → Typecheck → Build → Link Validation → Tests 順序。
+  - 新增獨立的 `secret-scan` job：`fetch-depth: 0` 完整歷史 checkout，以固定版本 + SHA256 驗證下載官方 gitleaks 二進位檔，分別掃描工作目錄（`gitleaks dir .`）與完整 git 歷史（`gitleaks git .`）。
+  - 所有 GitHub Actions 由 tag 釘選改為 commit SHA 釘選（MCD-1 review 遺留的儲存庫衛生項目），並在同行註解保留對應版本。
+- `.github/dependabot.yml`：新增 `npm` 與 `github-actions` 兩個 ecosystem，每週一排程、限制同時開啟 5 個 PR、統一 commit message 前綴；開發相依的 minor/patch 更新分組為單一 PR。
+- `package.json` / `package-lock.json`：新增 devDependency `linkinator@^8.0.3` 與 `linkcheck` script（同時檢查 `dist/` 與根目錄 Markdown）。
+- 未修改：`LICENSE`、`LICENSE-CONTENT.md`（MCD-1 既有內容已足以描述授權分割與路徑對照）、`src/**`（依任務「不修改頁面程式碼」限制，避免與 MCD-2 平行執行衝突）。
+
+## 決策紀錄
+
+1. **機密掃描不採用 `gitleaks/gitleaks-action`**：該 Action 以商業 EULA 發布（`action.yml` 標頭指向 gitleaks.io 商業授權，組織帳號需 `GITLEAKS_LICENSE`）。改用官方 release 二進位檔（gitleaks 本體為 MIT），以版本 + SHA256 雙重釘選，完全不需要外部帳號或金鑰，且本機能以完全相同的指令重現。
+2. **連結檢查採 `linkinator`**：單一工具即可同時處理建置後的 `dist/` HTML（`--recurse`）與儲存庫 Markdown（`--markdown`），且是 npm devDependency，開發者在本機就能執行，不必等 push 才知道結果。目前未設定 skip 清單，因為 README 與網站外部連結數量極少；若日後出現第三方站點誤判再視情況加入。
+3. **Actions 版本**：SHA 釘選同時升級至目前主要版本 `actions/checkout` v7.0.1、`actions/setup-node` v7.0.0；已查閱兩者 v7 release notes 確認對本專案使用的輸入參數（`persist-credentials`、`node-version-file`、`cache`）無破壞性變更。後續 SHA 與版本註解由 Dependabot 的 `github-actions` ecosystem 維護，避免釘選後永久停滯。
+4. **AC #7 判定：不接受外部貢獻**，因此不新增 `CONTRIBUTING.md`，改在 README 的 Contributing 段落明確聲明並保留 issue 回報管道。依據 PRD §18（不為了方便陌生人 fork 而增加抽象層、不定位為通用 portfolio template）與 §24（本儲存庫是次要工程證據）。此為可逆決策，日後改為接受貢獻時再新增 `CONTRIBUTING.md` 即可。
+5. **偏離實作計畫第 3 步**：原計畫要在 `LICENSE` 內加註指向 `LICENSE-CONTENT.md` 的範圍說明，實作時改為不修改 `LICENSE`。理由是保持標準 MIT 全文不變才能被 GitHub 的授權偵測正確辨識為 MIT；授權分割的敘述已同時存在於 README 與 `LICENSE-CONTENT.md`（後者已含路徑對照表與「LICENSE 中的 the Software 指哪些路徑」的說明），AC #2 因此仍然成立。
+
+## 驗證證據（本機實測，Node v22.23.2）
+
+依 PRD §23 順序執行，全部通過：
+
+```text
+$ npm run format:check
+Checking formatting...
+All matched files use Prettier code style!
+
+$ npm run lint
+(無輸出，exit 0)
+
+$ npm run typecheck
+Result (7 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+
+$ npm run build
+[build] 1 page(s) built in 221ms
+[build] Complete!
+
+$ npm run linkcheck
+→ crawling dist README.md LICENSE-CONTENT.md
+✓ Successfully scanned 8 links in 0.765 seconds.
+
+$ npm test
+Test Files  1 passed (1)
+     Tests  10 passed (10)
+```
+
+連結檢查具備偵測能力（在 README 暫時插入 `[probe](./does-not-exist.md)` 後執行，隨即還原）：
+
+```text
+$ npm run linkcheck ; echo "EXIT=$?"
+[404] does-not-exist.md
+README.md
+  [404] does-not-exist.md
+ERROR: Detected 1 broken links. Scanned 9 links in 0.162 seconds.
+EXIT=1
+```
+
+機密掃描以 CI 相同版本與指令在本機執行（gitleaks 8.30.1，SHA256 校驗通過）：
+
+```text
+$ echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  gitleaks.tar.gz" | sha256sum -c -
+gitleaks.tar.gz: OK
+
+$ gitleaks dir . --redact --no-banner
+INF scanned ~174068 bytes (174.07 KB) in 29.8ms
+INF no leaks found
+
+$ gitleaks git . --redact --no-banner
+INF 6 commits scanned.
+INF scanned ~442092 bytes (442.09 KB) in 159ms
+INF no leaks found
+```
+
+機密掃描具備攔截能力（暫時放入一個高熵度的假 token 後執行，隨即刪除該檔）：
+
+```text
+$ gitleaks dir . --redact --no-banner ; echo "EXIT=$?"
+WRN leaks found: 1
+EXIT=1
+```
+
+設定檔語法驗證：
+
+```text
+$ actionlint 1.7.7（.github/workflows/ci.yml）
+(無輸出，exit 0)
+
+$ python3 -c "yaml.safe_load(...)"
+.github/workflows/ci.yml -> OK; jobs: ['verify', 'secret-scan']
+.github/dependabot.yml -> OK; top-level keys: ['version', 'updates']
+
+$ jsonschema 驗證 .github/dependabot.yml 對 schemastore dependabot-2.0.json
+dependabot.yml validates against schemastore dependabot-2.0.json
+```
+
+AC #6 乾淨 clone 實測（clone 至 `/tmp/mcd10-clean-clone`，僅依 README 指示操作，驗證後已刪除該暫存目錄）：
+
+```text
+$ git clone <repo> /tmp/mcd10-clean-clone
+$ node -v
+v22.23.2            # README 要求 Node.js 22.12+，.nvmrc 為 22.12.0
+$ npm install
+added 443 packages, and audited 444 packages in 6s
+found 0 vulnerabilities
+$ npm run build
+[build] 1 page(s) built in 292ms
+[build] Complete!
+```
+
+同一個乾淨 clone 內，README 所列的其餘檢查亦全部通過：`format:check`（All matched files use Prettier code style!）、`lint`（exit 0）、`typecheck`（0 errors）、`linkcheck`（Successfully scanned 8 links）、`test`（1 passed / 10 tests）。
+
+## 本機無法驗證、需 push 後首次執行的部分
+
+- CI workflow 的實際執行結果（`verify` 與 `secret-scan` 兩個 job、Actions SHA 是否能被 GitHub 解析、CI 環境中的 gitleaks 下載步驟）只能在推送到 GitHub 後才會首次執行。本機已完成的替代驗證：actionlint 1.7.7 靜態檢查通過、YAML 可解析、gitleaks 以完全相同的版本與指令在本機實際掃描通過。
+- Dependabot 是否實際產生更新 PR，需儲存庫推送至 GitHub 並由 Dependabot 排程觸發後才能觀察。本機已完成的替代驗證：設定檔位於 GitHub 要求的 `.github/dependabot.yml` 路徑，且通過 schemastore 官方 `dependabot-2.0.json` schema 驗證。
+- 儲存庫目前仍為 private（轉為 public 屬 MCD-13 範圍），Dependabot 與 CI 的實際排程行為以轉公開後為準。
+
+## 文件同步
+
+本專案無 Requirement Matrix 文件；PRD（doc-1）為需求來源且本任務未變更任何需求，因此不需同步。README 即為本任務的文件產出本身。
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+以 MCD-1 既有的 README/LICENSE/CI 為基礎，補齊 PRD §19-24 要求的開源品質：README 補上乾淨 clone 可重現的環境建置、CI 檢查清單、Repository layout、CI 說明、明確不接受外部貢獻的政策與安全回報方式，並維持原始碼 MIT / 個人內容與品牌資產 © Oliver Yu 的授權分割敘述；CI 於 Build 之後新增 linkinator 連結檢查步驟，並新增獨立的 secret-scan job 以版本 + SHA256 釘選的官方 gitleaks 二進位檔掃描工作目錄與完整 git 歷史；新增 .github/dependabot.yml 讓 npm 與 github-actions 每週產生更新 PR，同時將所有 Actions 改為 commit SHA 釘選。驗證方式：本機依 PRD §23 順序執行 format:check / lint / typecheck / build / linkcheck / test 全數通過；以暫時插入的失效連結與高熵度假 token 分別證明連結檢查與機密掃描確實會失敗（exit 1）；ci.yml 通過 actionlint 1.7.7、dependabot.yml 通過 schemastore schema 驗證；並實際 git clone 至暫存目錄，僅依 README 指示完成 npm install 與 npm run build。CI 於 GitHub 上的首次實際執行與 Dependabot 產生 PR 需待推送後才能觀察，已在 Implementation Notes 中明確區分。
+<!-- SECTION:FINAL_SUMMARY:END -->
