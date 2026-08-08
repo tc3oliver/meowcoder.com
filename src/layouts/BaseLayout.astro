@@ -1,0 +1,68 @@
+---
+/**
+ * Base page shell (MCD-2).
+ *
+ * Owns the document skeleton — `<head>` metadata, the header/main/footer
+ * landmarks, and the stylesheet — so every page inherits the same design system
+ * without repeating it.
+ *
+ * `Header` and `Footer` are the defaults of named slots rather than fixed
+ * markup: MCD-3 overrides them with locale-aware instances, and any page that
+ * needs a different shell can supply its own.
+ */
+
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { absoluteUrl } from '../lib/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** BCP 47 tag for `<html lang>`; MCD-3 supplies the per-locale value. */
+  lang?: string;
+  /** Site-relative path of this page, used to build the canonical URL. */
+  path?: string;
+  /** Localized skip-link text. Omitted here means no skip link is rendered. */
+  skipLinkLabel?: string;
+}
+
+const { title, description, lang = 'en', path = '/', skipLinkLabel } = Astro.props;
+
+const canonical = absoluteUrl(path);
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {
+      /* Tells the browser to paint its own canvas, scrollbars, and form
+    controls in the resolved theme, which is what keeps the very first frame
+    from flashing a light background on a dark-mode device. */
+    }
+    <meta name="color-scheme" content="light dark" />
+    <link rel="canonical" href={canonical} />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <slot name="head" />
+  </head>
+  <body>
+    {
+      skipLinkLabel && (
+        <a class="skip-link" href="#main">
+          {skipLinkLabel}
+        </a>
+      )
+    }
+
+    <slot name="header"><Header /></slot>
+
+    <main id="main" class="site-main">
+      <slot />
+    </main>
+
+    <slot name="footer"><Footer /></slot>
+  </body>
+</html>

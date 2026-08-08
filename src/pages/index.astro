@@ -1,21 +1,34 @@
 ---
-import { absoluteUrl } from '../lib/site';
+/**
+ * Homepage placeholder.
+ *
+ * Exercises the MCD-2 shell — layout, header, footer, reading measure, focus,
+ * theming — with no product content. The real homepage sections land in MCD-4,
+ * and the localized strings that replace the literals below land in MCD-3.
+ */
 
-const canonical = absoluteUrl('/');
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="canonical" href={canonical} />
-    <title>meowcoder.com</title>
-  </head>
-  <body>
-    <main>
+<BaseLayout title="meowcoder.com" path="/" skipLinkLabel="Skip to content">
+  <Header slot="header">
+    {
+      /* The wordmark is the domain itself, so it reads the same in both
+    locales. The navigation entries do not, and arrive with MCD-3. */
+    }
+    <span slot="brand">meowcoder.com</span>
+  </Header>
+
+  <div class="container">
+    <div class="prose">
       <h1>meowcoder.com</h1>
-      <p>Repository bootstrap (MCD-1). Content ships in later tasks.</p>
-    </main>
-  </body>
-</html>
+      <p>Design foundations are in place. Content ships in a later release.</p>
+    </div>
+  </div>
+
+  <Footer slot="footer">
+    <span slot="meta">meowcoder.com</span>
+  </Footer>
+</BaseLayout>
