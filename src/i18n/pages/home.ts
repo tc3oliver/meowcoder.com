@@ -2,12 +2,13 @@ import type { Locale } from '../locales';
 import type { PageStrings } from './types';
 
 /**
- * Home page content (MCD-4, PRD §9).
+ * Home page content (MCD-4, MCD-16, PRD §9, doc-2 §5).
  *
- * The homepage is a fixed sequence of sections (PRD §35), each answering one
- * question in the visitor journey. Its copy is therefore structured rather than
- * free prose — the same reasoning as `about.ts`: a typed shape per section
- * turns a missing or mismatched translation into a compile error.
+ * The homepage is a fixed sequence of sections — doc-2 §5's order, which
+ * replaces PRD §35 — each answering one question in the visitor journey. Its
+ * copy is therefore structured rather than free prose — the same reasoning as
+ * `about.ts`: a typed shape per section turns a missing or mismatched
+ * translation into a compile error.
  *
  * Four content rules constrain everything here:
  *
@@ -25,8 +26,11 @@ import type { PageStrings } from './types';
  *     below points at something built, published, measured, open-sourced, or
  *     researched.
  *
- * Where PRD §9 states copy verbatim, it is quoted rather than paraphrased; the
- * Chinese side preserves meaning instead of mirroring sentence structure.
+ * Where PRD §9 or doc-2 states copy verbatim, it is quoted rather than
+ * paraphrased; the Chinese side preserves meaning instead of mirroring sentence
+ * structure. doc-2 also asks the homepage to shed roughly 40–50% of its copy
+ * without losing evidence, so shortening here is only ever safe when the detail
+ * that goes still exists on a detail page.
  */
 
 /** A named item with one line of explanation: a pillar, a principle, a claim. */
@@ -56,12 +60,14 @@ export interface ExpertisePillar extends NamedItem {
 
 export interface HomeStrings extends PageStrings {
   /**
-   * PRD §9.1. `heading` is the name and `intro` the statement beneath it, so
+   * doc-2 §5. `heading` is the name and `intro` the statement beneath it, so
    * the hero adds only what `PageStrings` has no field for.
    *
-   * `role` and the second entry of `facts` stay in English in both locales:
-   * PRD §9.1 writes the Chinese hero that way, and each is its own standalone
-   * line rather than a prose block, so no block mixes languages (PRD §34).
+   * doc-2 §5 keeps the name, the role line, the two facts, and exactly two
+   * actions, and replaces only the supporting statement. `role` and the second
+   * entry of `facts` still stay in English in both locales: PRD §9.1 writes the
+   * Chinese hero that way, and each is its own standalone line rather than a
+   * prose block, so no block mixes languages (PRD §34).
    */
   hero: {
     role: string;
@@ -69,7 +75,22 @@ export interface HomeStrings extends PageStrings {
     workCta: string;
     writingCta: string;
   };
-  /** PRD §9.2. The one product that proves design → ship → operate. */
+  /**
+   * doc-2 §6 (PRD §9.2). The one product that proves design → ship → operate,
+   * and the homepage's visual centrepiece.
+   *
+   * doc-2 §6 fixes the copy at exactly six things: the eyebrow, the bilingual
+   * name, one product statement, three principle names, and two actions. The
+   * per-principle sentences and the six-item "Engineering areas" list are gone
+   * from the homepage — not from the site. Both were claims rather than
+   * evidence at this size, and the engineering detail behind them is on the
+   * Shouri case study, which `caseStudyCta` now links to.
+   *
+   * `summary` keeps its name rather than becoming `statement`: it is also the
+   * `SoftwareApplication` description in `src/lib/structured-data.ts`, and the
+   * schema wants the product's own one-line description, which is exactly what
+   * doc-2 §6's statement is.
+   */
   shouri: {
     eyebrow: string;
     /** Intentional bilingual identity, explicitly allowed by PRD §34. */
@@ -85,43 +106,73 @@ export interface HomeStrings extends PageStrings {
      * the figure renders only once both are supplied.
      */
     screenshot?: { alt: string };
-    principlesHeading: string;
-    /** Named product principles; the names are the product's own vocabulary. */
-    principles: readonly NamedItem[];
-    areasHeading: string;
-    areas: readonly string[];
+    /**
+     * The three principle names, as doc-2 §6's compact row. Names only: they
+     * are the product's own vocabulary and stay in English in both locales,
+     * which is why they are plain strings rather than `NamedItem`s now that
+     * the localized explanation beneath each one has moved to the case study.
+     */
+    principles: readonly string[];
+    /** Internal; the case-study route is resolved by the component, not here. */
+    caseStudyCta: CtaLabel;
     cta: CtaLabel;
   };
-  /** PRD §9.3 and §5: four pillars, one concise explanation each. */
+  /**
+   * doc-2 §8 (Engineering Focus). Four areas, one short line each.
+   *
+   * The explanatory meta-copy that used to introduce the section is gone: it
+   * described the section instead of adding evidence, which is exactly what
+   * doc-2 §8 asks to be removed. The four areas signal and navigate; they are
+   * not primary evidence, so they carry no section intro of their own.
+   */
   expertise: {
     heading: string;
-    intro: string;
     pillars: readonly ExpertisePillar[];
   };
-  /** PRD §9.4. The primary open-source proof; the site source is not (PRD §24). */
+  /**
+   * doc-2 §7. The primary open-source proof; the site source is not (PRD §24).
+   *
+   * doc-2 §7 cuts this section back to a single statement, the two skill names,
+   * a workflow visual, and two actions. The seven-stage pipeline, the two
+   * bullet lists, and the attribution paragraph are not deleted from the site —
+   * they live on the AI Coding Skills case study, which is what the new
+   * `caseStudyCta` links to. That is also where PRD §9.4's attribution
+   * requirement is now met: the case study states in full that the bundled
+   * `grilling` skill is Matt Pocock's, used under the MIT License, so nothing
+   * here presents a third-party skill as original work.
+   */
   openSource: {
     eyebrow: string;
     heading: string;
-    summary: string;
-    primaryLabel: string;
-    primaryName: string;
-    /** The requirement-to-delivery stages PRD §9.4 lists, in order. */
-    pipeline: readonly string[];
-    highlightsHeading: string;
-    highlights: readonly string[];
-    secondaryLabel: string;
-    secondaryName: string;
-    secondaryHeading: string;
-    secondaryPoints: readonly string[];
-    /**
-     * PRD §9.4: third-party skills keep clear attribution and are never shown
-     * as original work. The wording follows `.claude/skills/grilling/SKILL.md`
-     * and its bundled `LICENSE`.
-     */
-    attribution: string;
+    /** doc-2 §7's one statement, in place of the old summary and lists. */
+    statement: string;
+    /** The published skills, in doc-2 §7's order: primary first. */
+    skills: readonly string[];
+    /** Labels for doc-2 §7's workflow visual; see `WorkflowDiagram.astro`. */
+    workflow: {
+      /** Accessible name for the diagram — it carries no visible caption. */
+      caption: string;
+      start: string;
+      steps: readonly string[];
+      end: string;
+    };
+    /** Internal; the case-study route is resolved by the component, not here. */
+    caseStudyCta: CtaLabel;
     cta: CtaLabel;
   };
-  /** PRD §9.5. One publication, and deliberately no navigation entry for it. */
+  /**
+   * PRD §9.5, doc-2 §9. One publication, and deliberately no navigation entry
+   * for it — it is the left column of the merged editorial section.
+   *
+   * `heading` is the research area and `paper` the exact citation, which is the
+   * hierarchy doc-2 §9 asks for: the area is the headline a visitor reads, the
+   * title stays as secondary metadata beneath it.
+   *
+   * There is no `detail` field. It carried the IND-CCA / OW-CCA analysis, which
+   * doc-2 §9 rules out here — "unnecessary for homepage credibility and belongs
+   * on About" — and `about.ts` now states it in full in both locales, so the
+   * site keeps the sentence and the homepage does not.
+   */
   research: {
     eyebrow: string;
     heading: string;
@@ -129,23 +180,52 @@ export interface HomeStrings extends PageStrings {
     paper: string;
     venue: string;
     summary: string;
-    detail: string;
     /** PRD §9.5's `View Publication ↗`, resolving through the DOI. */
     cta: CtaLabel;
   };
-  /** PRD §9.6. Metadata pulled from Study; never article bodies. */
+  /**
+   * PRD §9.6, doc-2 §9. Metadata pulled from Study; never article bodies.
+   *
+   * The section's old intro paragraph is gone. It said that Study is the
+   * canonical platform for this writing, which the column now shows rather than
+   * states: `eyebrow` names Study above the heading and the call to action goes
+   * there. That is doc-2's copy reduction applied without losing the fact.
+   */
   writing: {
-    heading: string;
-    intro: string;
-    cta: CtaLabel;
-  };
-  /** PRD §9.7. Scope and seniority at a safe abstraction level (PRD §11). */
-  experience: {
+    /** The platform, as the column's label. A proper noun in both locales. */
     eyebrow: string;
     heading: string;
+    /**
+     * Language names for the badge on a title published in another language,
+     * keyed by the language being named.
+     *
+     * doc-2 §9 asks the English homepage to keep original Chinese titles and
+     * mark them as Chinese, and `resolveTitle` decides when a title needs it.
+     * Naming a language is not translating a title, so this does not touch
+     * PRD §7 — the title itself is still rendered exactly as Study published
+     * it. Both directions are here because the rule is symmetric: an English
+     * title on the Chinese homepage is marked the same way.
+     */
+    languages: Record<Locale, string>;
+    cta: CtaLabel;
+  };
+  /**
+   * doc-2 §10. One horizontal credibility strip, not a section.
+   *
+   * The large "Enterprise Engineering / Current direction" block is gone. What
+   * remains is the claim (`heading`), the arc that backs it (`progression`),
+   * one sentence of scope (`summary`), and the way to read more (`cta` → the
+   * localized About route). PRD §11 still binds every one of them: engineering
+   * domains and seniority only, never an employer, an internal project, an
+   * infrastructure detail, a private measurement, or a customer.
+   */
+  experience: {
+    heading: string;
+    /** The career arc as one line: an arrow chain, not a sentence. */
+    progression: string;
     summary: string;
-    currentLabel: string;
-    current: string;
+    /** Internal; the About route is resolved by the component, not here. */
+    cta: CtaLabel;
   };
 }
 
@@ -162,7 +242,7 @@ export const home = {
       'AI Systems Engineer and System Architect with 10+ years of software engineering experience, building AI systems, developer tooling, model infrastructure, and production software.',
     heading: 'Oliver Yu',
     intro:
-      'I design and build production AI systems that connect models, knowledge, developer tools, and software infrastructure.',
+      'I build reliable AI systems for developer workflows, knowledge retrieval, and model infrastructure.',
     hero: {
       role: 'AI Systems Engineer · System Architect',
       facts: ['10+ Years in Software Engineering', 'Taiwan'],
@@ -173,128 +253,73 @@ export const home = {
       eyebrow: 'Featured Product',
       heading: 'Shouri / 收理',
       summary:
-        'An AI-powered information organizer for capturing webpages, files and media, then turning them into structured, searchable knowledge.',
+        'Save first. Organize with AI when needed. Keep the original as the source of truth.',
       screenshot: {
         alt: 'Shouri on desktop and phone. The web app works through a five-unit learning path; behind it the product page shows a saved cooking video beside the structured recipe it became. Two phone screens show the saved library and that recipe broken into summary, ingredients, and steps.',
       },
-      principlesHeading: 'Product principles',
-      principles: [
-        {
-          name: 'Save First',
-          description: 'Original content is persisted before AI processing.',
-        },
-        {
-          name: 'Explicit AI',
-          description: 'AI organization is intentionally triggered by the user.',
-        },
-        {
-          name: 'Recoverable Architecture',
-          description: 'Source content and AI-derived information are separated.',
-        },
-      ],
-      areasHeading: 'Engineering areas',
-      areas: [
-        'Product Design',
-        'System Architecture',
-        'AI Processing',
-        'Search & Retrieval',
-        'Web / PWA',
-        'Production Operations',
-      ],
+      principles: ['Save First', 'Explicit AI', 'Recoverable by Design'],
+      caseStudyCta: { label: 'View Case Study' },
       cta: { label: 'Visit Shouri' },
     },
     expertise: {
-      heading: 'Engineering Expertise',
-      intro: 'Four problem areas I work in, rather than a list of technologies.',
+      heading: 'Engineering Focus',
       pillars: [
         {
           name: 'AI & Agent Systems',
-          description:
-            'Agentic workflows, tool execution, MCP, evaluation, validation, permissions, and recovery.',
+          description: 'Agent workflows, tool execution, evaluation and recovery.',
         },
         {
           name: 'Knowledge Systems',
-          description:
-            'RAG, source grounding, graph retrieval, knowledge integration, and agent-accessible context.',
+          description: 'Retrieval, grounding and agent-accessible knowledge.',
         },
         {
           name: 'LLM Infrastructure',
-          description:
-            'Model serving, vLLM, ROCm, inference optimization, benchmarking, reliability, and capacity analysis.',
+          description: 'Serving, optimization, benchmarking and reliability.',
           evidence: { label: 'Read the published analysis on Study' },
         },
         {
           name: 'Software Architecture',
-          description:
-            'System design, integration, backend services, cloud infrastructure, security, CI/CD, and software quality.',
+          description: 'Systems, integration, cloud, security and delivery.',
         },
       ],
     },
     openSource: {
       eyebrow: 'Open Source',
       heading: 'AI Coding Skills',
-      summary:
-        'Development workflows for making coding agents more structured, predictable, and evidence-driven.',
-      primaryLabel: 'Primary public work',
-      primaryName: 'backlog-workflow',
-      pipeline: [
-        'Requirement',
-        'Task Decomposition',
-        'Just-in-Time Planning',
-        'Implementation',
-        'Validation',
-        'Evidence',
-        'Delivery',
-      ],
-      highlightsHeading: 'What it defines',
-      highlights: [
-        'Requirement-driven development',
-        'Backlog.md integration',
-        'Manual and autonomous execution',
-        'Explicit execution boundaries',
-        'Validation gates',
-        'Evidence-based completion',
-        'Agent instruction management',
-      ],
-      secondaryLabel: 'Secondary public work',
-      secondaryName: 'audit-claude-md',
-      secondaryHeading: 'What it demonstrates',
-      secondaryPoints: [
-        'Context quality',
-        'Instruction design',
-        'Progressive disclosure',
-        'Maintainability of coding-agent instructions',
-      ],
-      attribution:
-        'backlog-workflow is my own work. The grilling skill it bundles is based on the grilling skill by Matt Pocock and is used under the MIT License, with that license shipped alongside it.',
-      cta: { label: 'View on GitHub' },
+      statement:
+        'Versioned workflows for requirement alignment, just-in-time planning, validation, and evidence-based completion.',
+      skills: ['backlog-workflow', 'audit-claude-md'],
+      workflow: {
+        caption:
+          'The workflow: a requirement is planned, executed and validated, and ends in evidence.',
+        start: 'Requirement',
+        steps: ['Plan', 'Execute', 'Validate'],
+        end: 'Evidence',
+      },
+      caseStudyCta: { label: 'View Case Study' },
+      cta: { label: 'GitHub' },
     },
     research: {
       eyebrow: 'Research',
       heading: 'Leakage-Resilient Cryptography',
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
-      venue: 'Journal of Information Security and Applications, 2026',
+      venue: 'Journal of Information Security and Applications · 2026',
       summary:
-        'Co-authored research on leakage-resilient certificate-based encryption designed to preserve security under continual key leakage.',
-      detail:
-        'The paper proposes LR-CBEET, combining equality testing with resistance to side-channel leakage through key-update mechanisms, with formal analysis under IND-CCA and OW-CCA security notions.',
+        'Co-authored research on certificate-based encryption designed to remain secure under continual key leakage.',
       cta: { label: 'View Publication' },
     },
     writing: {
+      eyebrow: 'Study',
       heading: 'Technical Writing',
-      intro:
-        'I publish continuous technical analysis on Study, which remains the canonical platform for it.',
+      languages: { en: 'English', zh: 'Chinese' },
       cta: { label: 'Explore Technical Writing' },
     },
     experience: {
-      eyebrow: 'Professional Experience',
-      heading: 'Enterprise Engineering',
-      summary:
-        '10+ years of software engineering experience spanning enterprise systems, system architecture, cloud platforms, security, mobile/web applications, and applied AI.',
-      currentLabel: 'Current direction',
-      current:
-        'Current work focuses on enterprise AI systems, coding agents, knowledge infrastructure, and LLM serving.',
+      heading: '10+ Years of Engineering',
+      progression: 'Software engineering → system architecture → AI systems',
+      summary: 'Experience across enterprise software, cloud, security, mobile/web and applied AI.',
+      cta: { label: 'About Oliver' },
     },
   },
   zh: {
@@ -302,7 +327,7 @@ export const home = {
     description:
       '擁有 10+ 年軟體工程經驗的 AI 系統工程師與系統架構師，專注於 AI 系統、開發者工具、模型基礎架構與正式產品開發。',
     heading: 'Oliver Yu',
-    intro: '專注於設計與打造可投入實際使用的 AI 系統，整合模型、知識、開發工具與軟體基礎架構。',
+    intro: '打造可實際落地的 AI 系統，聚焦開發者工作流程、知識檢索與模型基礎架構。',
     hero: {
       // PRD §9.1 keeps the role line and `Taiwan` in English in the Chinese
       // hero; both are standalone lines, so neither mixes languages.
@@ -314,78 +339,56 @@ export const home = {
     shouri: {
       eyebrow: '精選產品',
       heading: 'Shouri / 收理',
-      summary: '以 AI 驅動的資訊整理工具，能收下網頁、檔案與影音，再整理成結構化、可搜尋的知識。',
+      summary: '先完整保存，再依需要交給 AI 整理；原始內容始終保留作為可信來源。',
       screenshot: {
         alt: '收理在桌機與手機上的畫面。網頁應用正進行五個單元的學習路線；後方的產品頁把一段收下的料理影片與整理後的結構化食譜並列。兩個手機畫面則是收藏庫，以及拆成摘要、材料與步驟的同一份食譜。',
       },
-      principlesHeading: '產品原則',
-      principles: [
-        // The principle names are the product's own vocabulary and stay in
-        // English in both locales; the explanation beneath each is localized.
-        {
-          name: 'Save First',
-          description: '原始內容會先完整保存，之後才進入 AI 處理。',
-        },
-        {
-          name: 'Explicit AI',
-          description: 'AI 整理一律由使用者主動觸發。',
-        },
-        {
-          name: 'Recoverable Architecture',
-          description: '原始來源與 AI 產生的資訊分開存放。',
-        },
-      ],
-      areasHeading: '工程領域',
-      areas: ['產品設計', '系統架構', 'AI 處理', '搜尋與檢索', '網頁與 PWA', '正式環境維運'],
+      // The principle names are the product's own vocabulary and stay in
+      // English in both locales — PRD §34 allows exactly that, and they are a
+      // row of names rather than a prose block.
+      principles: ['Save First', 'Explicit AI', 'Recoverable by Design'],
+      // Word for word the label Open Source uses for the same action, so the
+      // two case-study links on the homepage cannot read as different things.
+      caseStudyCta: { label: '閱讀案例研究' },
       cta: { label: '前往 Shouri' },
     },
     expertise: {
-      heading: '工程專長',
-      intro: '這裡列的是我實際處理的四類問題，而不是技術清單。',
+      heading: '工程重點領域',
       pillars: [
         {
           name: 'AI 與 Agent 系統',
-          description: 'Agent 工作流程、工具執行、MCP、評估、驗證、權限控管與失敗復原。',
+          description: 'Agent 工作流程、工具執行、評估與失敗復原。',
         },
         {
           name: '知識系統',
-          description: 'RAG、來源溯源、圖譜檢索、知識整合，以及讓 Agent 能取用的上下文。',
+          description: '檢索、溯源，以及讓 Agent 取用的知識。',
         },
         {
           name: 'LLM 基礎架構',
-          description: '模型服務、vLLM、ROCm、推論最佳化、效能量測、穩定性與容量分析。',
+          description: '模型服務、推論最佳化、效能量測與穩定性。',
           evidence: { label: '閱讀發表於 Study 的公開分析' },
         },
         {
           name: '軟體架構',
-          description: '系統設計、系統整合、後端服務、雲端基礎架構、資安、CI/CD 與軟體品質。',
+          description: '系統設計、系統整合、雲端、資安與交付。',
         },
       ],
     },
     openSource: {
       eyebrow: '開源',
       heading: 'AI Coding Skills',
-      summary: '一套開發流程，讓 coding agent 的行為更有結構、更可預期，也更倚賴證據。',
-      primaryLabel: '主要公開作品',
-      primaryName: 'backlog-workflow',
-      pipeline: ['需求', '任務拆解', '即時規劃', '實作', '驗證', '證據', '交付'],
-      highlightsHeading: '它定義了什麼',
-      highlights: [
-        '需求驅動的開發流程',
-        'Backlog.md 整合',
-        '手動與自動兩種執行模式',
-        '明確的執行邊界',
-        '驗證關卡',
-        '以證據判定完成',
-        'Agent 指令管理',
-      ],
-      secondaryLabel: '次要公開作品',
-      secondaryName: 'audit-claude-md',
-      secondaryHeading: '它展示了什麼',
-      secondaryPoints: ['Context 品質', '指令設計', '漸進式揭露', 'Coding agent 指令的可維護性'],
-      attribution:
-        'backlog-workflow 是我本人的作品；其中隨附的 grilling skill 係基於 Matt Pocock 的 grilling skill，依 MIT License 使用，授權條款隨檔附上。',
-      cta: { label: '在 GitHub 上查看' },
+      statement: '版本化的工作流程，涵蓋需求對齊、即時規劃、驗證，以及用證據判定完成。',
+      // The skill names are repository names, so they read the same in both
+      // locales; the component joins them with a middot (doc-2 §7).
+      skills: ['backlog-workflow', 'audit-claude-md'],
+      workflow: {
+        caption: '工作流程：需求經過規劃、執行與驗證，最後以證據收尾。',
+        start: '需求',
+        steps: ['規劃', '執行', '驗證'],
+        end: '證據',
+      },
+      caseStudyCta: { label: '閱讀案例研究' },
+      cta: { label: 'GitHub' },
     },
     research: {
       eyebrow: '研究',
@@ -393,24 +396,22 @@ export const home = {
       // Publication title and journal name are proper nouns (PRD §7).
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
-      venue: 'Journal of Information Security and Applications, 2026',
-      summary: '共同發表的研究，探討抗洩漏的憑證式加密，目標是在金鑰持續洩漏下仍能維持安全性。',
-      detail:
-        '論文提出 LR-CBEET，以金鑰更新機制把等值測試與側通道洩漏防護結合起來，並在 IND-CCA 與 OW-CCA 安全性定義下給出形式化分析。',
+      venue: 'Journal of Information Security and Applications · 2026',
+      summary: '共同發表的研究，探討憑證式加密如何在金鑰持續洩漏的情況下仍能維持安全性。',
       cta: { label: '閱讀論文' },
     },
     writing: {
+      // The platform's own name, so it reads the same in both locales.
+      eyebrow: 'Study',
       heading: '技術文章',
-      intro: '我持續在 Study 發表技術分析，那裡是這些文章的正式發表平台。',
+      languages: { en: '英文', zh: '中文' },
       cta: { label: '瀏覽技術文章' },
     },
     experience: {
-      eyebrow: '職業經歷',
-      heading: '企業級工程',
-      summary:
-        '超過十年的軟體工程經驗，橫跨企業系統、系統架構、雲端平台、資安、行動與網頁應用，以及應用型 AI。',
-      currentLabel: '目前方向',
-      current: '目前的工作重心是企業級 AI 系統、coding agent、知識基礎架構與 LLM 服務。',
+      heading: '10+ 年工程經驗',
+      progression: '軟體工程 → 系統架構 → AI 系統',
+      summary: '經歷涵蓋企業軟體、雲端、資安、行動／網頁應用與 AI。',
+      cta: { label: '關於 Oliver' },
     },
   },
 } satisfies HomeDictionary;

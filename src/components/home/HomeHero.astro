@@ -1,6 +1,6 @@
 ---
 /**
- * Homepage hero (MCD-4, PRD §9.1).
+ * Homepage hero (MCD-4, MCD-16, doc-2 §5).
  *
  * Typography and whitespace carry the whole section. PRD §9.1 and §25 rule out
  * every piece of the usual portfolio hero furniture — the large portrait, the
@@ -12,6 +12,14 @@
  * The two facts beneath the statement are plain text, not badges: PRD §37
  * prefers evidence over ornament, and "10+ Years in Software Engineering" is
  * already the evidence.
+ *
+ * doc-2 §5 asks for a hero that is confident and spacious but not an empty
+ * full-screen splash: the next section has to be reachable within about one
+ * screen. Two things hold that. The name is the one element on the page that
+ * takes `--text-display`, so the scale does the work a taller block would
+ * otherwise do; and the hero adds no bottom padding, leaving the gap to
+ * Featured Product as exactly the `--space-section` that section already
+ * carries.
  */
 
 import type { Locale } from '../../i18n/locales';
@@ -53,10 +61,9 @@ const { locale, t, externalIndicator } = Astro.props;
 
 <style>
   .hero {
-    /* Held to the reading measure so the statement breaks where PRD §9.1
+    /* Held to the reading measure so the statement breaks where doc-2 §5
        writes it, rather than stretching across the full content width. */
     max-width: var(--width-reading);
-    padding-block-end: var(--space-9);
   }
 
   .hero__role {
@@ -66,8 +73,13 @@ const { locale, t, externalIndicator } = Astro.props;
     letter-spacing: var(--tracking-wide);
   }
 
+  /* The page's focal point, and the only element that opts into the display
+     step — doc-2 §4 puts the desktop hero name at 64–72px, above every
+     numbered step in the scale. Leading and tracking still come from the `h1`
+     baseline in `global.css`. */
   .hero__name {
     margin-block-start: var(--space-2);
+    font-size: var(--text-display);
   }
 
   .hero__statement {

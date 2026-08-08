@@ -1,66 +1,125 @@
 ---
 /**
- * Professional Experience (MCD-4, PRD §9.7).
+ * The 10+ years credibility strip (MCD-4, MCD-16, doc-2 §10).
  *
- * Scope and seniority, nothing else. PRD §11 allows employer work to be
- * described only at a safe abstraction level, so this section names engineering
- * domains and a current direction — never an employer, an internal project, a
- * repository, an infrastructure topology, a private benchmark, or a customer.
- * PRD §11 is explicit that company experience establishes credibility but is
- * not public case-study evidence, which is why this sits last among the content
- * sections and carries no call to action: there is nothing public to inspect.
+ * This used to be a full "Enterprise Engineering / Current direction" section
+ * with two stacked paragraphs. doc-2 §10 replaces it with a single horizontal
+ * strip: the claim, the arc that backs it, one sentence of scope, and a link on
+ * to About. It closes the page rather than competing with it, so it does not
+ * render through `HomeSection` — a 40px heading and the full section rhythm
+ * would give a closing strip the same weight as Featured Product. It keeps that
+ * component's hairline and top spacing so the page rhythm is unbroken, and
+ * nothing else.
+ *
+ * PRD §11 still binds every string: engineering domains and seniority only,
+ * never an employer, an internal project, a repository, an infrastructure
+ * topology, a private benchmark, or a customer. PRD §11 is also why the one
+ * call to action points at About and not at a case study — company experience
+ * establishes credibility, but there is nothing public to inspect.
  *
  * `src/i18n/pages/home.test.ts` guards the copy against disclosure so a later
  * content edit cannot quietly reintroduce it.
  */
 
+import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
-import HomeSection from './HomeSection.astro';
+import { localizePath } from '../../lib/i18n';
 
 interface Props {
+  locale: Locale;
   t: HomeStrings;
 }
 
-const { t } = Astro.props;
+const { locale, t } = Astro.props;
 ---
 
-<HomeSection
-  id="professional-experience"
-  eyebrow={t.experience.eyebrow}
-  heading={t.experience.heading}
->
-  <div class="experience">
-    <p class="experience__summary">{t.experience.summary}</p>
-
-    <div class="experience__current">
-      <p class="experience__label">{t.experience.currentLabel}</p>
-      <p class="experience__statement">{t.experience.current}</p>
-    </div>
+<section class="strip" aria-labelledby="professional-experience">
+  <div class="strip__claim">
+    <h2 class="strip__heading" id="professional-experience">{t.experience.heading}</h2>
+    <p class="strip__progression">{t.experience.progression}</p>
   </div>
-</HomeSection>
+
+  <p class="strip__summary">{t.experience.summary}</p>
+
+  <p class="strip__action">
+    <a class="strip__link" href={localizePath(locale, '/about')}>{t.experience.cta.label}</a>
+  </p>
+</section>
 
 <style>
-  .experience {
+  /* The same hairline and top rhythm every other homepage section carries, so
+     the strip closes the sequence instead of floating away from it. */
+  .strip {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
-    max-width: var(--width-reading);
+    gap: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+    padding-block-start: var(--space-section);
   }
 
-  .experience__summary {
-    font-size: var(--text-md);
-    line-height: var(--leading-relaxed);
+  /* Horizontal from the point three columns of prose still read comfortably —
+     wider than the 48rem the rest of the site splits at, because this row has
+     three parts rather than two and the middle one is a full sentence. Below
+     that the parts stack, which is what keeps the summary off a two-word
+     measure at 390px. */
+  @media (width >= 52rem) {
+    .strip {
+      flex-direction: row;
+      align-items: baseline;
+      gap: var(--space-8);
+    }
+
+    .strip__claim {
+      flex: 0 1 auto;
+    }
+
+    .strip__summary {
+      flex: 1 1 0;
+      max-width: var(--width-reading);
+    }
+
+    .strip__action {
+      flex: none;
+      margin-inline-start: auto;
+    }
   }
 
-  .experience__label {
-    margin-block-end: var(--space-2);
+  /* Well below the `h2` step the other sections use: this is a closing
+     statement, not a section title competing with Featured Product. */
+  .strip__heading {
+    font-size: var(--text-lg);
+    letter-spacing: var(--tracking-normal);
+  }
+
+  .strip__progression {
+    margin-block-start: var(--space-2);
     color: var(--color-text-muted);
-    font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
+    font-size: var(--text-sm);
   }
 
-  .experience__statement {
+  .strip__summary {
+    color: var(--color-text-muted);
     line-height: var(--leading-relaxed);
+  }
+
+  .strip__link {
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* The arrow doc-2 §10 draws on the action. It is generated content rather
+     than a character in the label so the accessible name stays "About Oliver",
+     matching how `CtaLink` hides its off-site indicator. */
+  .strip__link::after {
+    content: ' →';
+  }
+
+  .strip__link:hover {
+    color: var(--color-accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
 </style>

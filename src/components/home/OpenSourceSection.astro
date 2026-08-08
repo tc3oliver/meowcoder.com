@@ -1,67 +1,75 @@
 ---
 /**
- * Open Source — AI Coding Skills (MCD-4, PRD §9.4).
+ * Open Source — AI Coding Skills (MCD-18, doc-2 §7).
  *
  * This is the primary open-source proof. PRD §24 keeps it that way: the
  * meowcoder.com source is secondary engineering evidence and gets a footer link
  * rather than a card here.
  *
- * `backlog-workflow` leads and `audit-claude-md` follows, in that order and at
- * that weight, because PRD §9.4 states the priority. The pipeline is rendered
- * as an ordered list — the PRD draws it as an arrow diagram, but the content is
- * a sequence of stages, and marking it up as one keeps it readable in a screen
- * reader and free of the decorative ASCII art PRD §25 avoids.
+ * doc-2 §7 compresses the section to a statement, the two skill names, a
+ * workflow visual, and two actions. What used to be here — the seven-stage
+ * pipeline, "What it defines", "What it demonstrates", and the attribution
+ * paragraph — is not gone from the site; it is on the AI Coding Skills case
+ * study, which `caseStudyCta` now links to. That includes PRD §9.4's
+ * requirement that the bundled third-party `grilling` skill keeps its
+ * attribution and licence and is never presented as original work: the case
+ * study states it in full, so the homepage can stop restating it without the
+ * site losing it.
  *
- * The attribution line is not optional polish. PRD §9.4 requires third-party
- * skills to retain clear attribution and never be presented as original work,
- * and its wording is taken from `.claude/skills/grilling/SKILL.md` and the MIT
- * `LICENSE` shipped beside it — not from memory.
+ * `backlog-workflow` still leads and `audit-claude-md` still follows, in that
+ * order and at that weight, because PRD §9.4 states the priority — they are now
+ * one line rather than two blocks.
  */
 
+import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
 import { GITHUB_URL } from '../../lib/external';
+import { localizePath, workDetailRoute } from '../../lib/i18n';
+import WorkflowDiagram from '../WorkflowDiagram.astro';
 import CtaLink from './CtaLink.astro';
 import HomeSection from './HomeSection.astro';
 
 interface Props {
+  locale: Locale;
   t: HomeStrings;
   externalIndicator: string;
 }
 
-const { t, externalIndicator } = Astro.props;
+const { locale, t, externalIndicator } = Astro.props;
+
+/** The case study's slug — `src/content/work/{en,zh}/ai-coding-skills.md`. */
+const CASE_STUDY_SLUG = 'ai-coding-skills';
+
+/**
+ * The case study in the reader's own locale. Routing goes through the same
+ * helpers the Work index uses, so this link cannot drift from the page it
+ * points at.
+ */
+const caseStudyHref = localizePath(locale, workDetailRoute(CASE_STUDY_SLUG));
+
+/**
+ * doc-2 §7 prints the two names as one compact line. The middot is a separator
+ * between two proper names rather than punctuation in a sentence, so it is
+ * joined here instead of being written into either locale's strings.
+ */
+const skills = t.openSource.skills.join(' · ');
 ---
 
 <HomeSection id="open-source" eyebrow={t.openSource.eyebrow} heading={t.openSource.heading}>
   <div class="oss">
-    <p class="oss__summary">{t.openSource.summary}</p>
+    <p class="oss__statement">{t.openSource.statement}</p>
 
-    <article class="oss__work">
-      <p class="oss__label">{t.openSource.primaryLabel}</p>
-      <h3 class="oss__name">{t.openSource.primaryName}</h3>
+    <p class="oss__skills">{skills}</p>
 
-      <ol class="pipeline">
-        {t.openSource.pipeline.map((stage) => <li class="pipeline__stage">{stage}</li>)}
-      </ol>
+    <WorkflowDiagram
+      caption={t.openSource.workflow.caption}
+      start={t.openSource.workflow.start}
+      steps={t.openSource.workflow.steps}
+      end={t.openSource.workflow.end}
+    />
 
-      <h4 class="oss__subheading">{t.openSource.highlightsHeading}</h4>
-      <ul class="oss__points">
-        {t.openSource.highlights.map((item) => <li>{item}</li>)}
-      </ul>
-    </article>
-
-    <article class="oss__work">
-      <p class="oss__label">{t.openSource.secondaryLabel}</p>
-      <h3 class="oss__name">{t.openSource.secondaryName}</h3>
-
-      <h4 class="oss__subheading">{t.openSource.secondaryHeading}</h4>
-      <ul class="oss__points">
-        {t.openSource.secondaryPoints.map((item) => <li>{item}</li>)}
-      </ul>
-    </article>
-
-    <p class="oss__attribution">{t.openSource.attribution}</p>
-
-    <p>
+    <div class="oss__actions">
+      <CtaLink href={caseStudyHref} label={t.openSource.caseStudyCta.label} variant="outline" />
       <CtaLink
         href={GITHUB_URL}
         label={t.openSource.cta.label}
@@ -69,7 +77,7 @@ const { t, externalIndicator } = Astro.props;
         indicator={externalIndicator}
         variant="outline"
       />
-    </p>
+    </div>
   </div>
 </HomeSection>
 
@@ -77,86 +85,29 @@ const { t, externalIndicator } = Astro.props;
   .oss {
     display: flex;
     flex-direction: column;
-    gap: var(--space-7);
+    gap: var(--space-6);
+    /* The statement is the section's only prose, so the whole block follows it
+       to the reading measure rather than stretching to the content width. */
+    max-width: var(--width-reading);
   }
 
-  .oss__summary {
-    max-width: var(--width-reading);
+  .oss__statement {
     font-size: var(--text-md);
     line-height: var(--leading-relaxed);
   }
 
-  .oss__work {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-
-  .oss__label {
+  /* The two repository names, as one line. Monospace because they are file and
+     package identifiers, the same treatment they had as headings. */
+  .oss__skills {
     color: var(--color-text-muted);
-    font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
-  }
-
-  .oss__name {
     font-family: var(--font-mono);
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     letter-spacing: var(--tracking-normal);
   }
 
-  .oss__subheading {
-    margin-block-start: var(--space-3);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-medium);
-  }
-
-  .oss__points {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    gap: var(--space-2) var(--space-6);
-    padding-inline-start: var(--space-5);
-  }
-
-  .oss__points li {
-    line-height: var(--leading-snug);
-  }
-
-  .oss__attribution {
-    max-width: var(--width-reading);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    line-height: var(--leading-relaxed);
-  }
-
-  /* -----------------------------------------------------------------------
-   * The requirement-to-delivery pipeline (PRD §9.4)
-   *
-   * A wrapping row of stages on wide viewports, a plain column on narrow ones.
-   * The separator is a CSS `::after` so it never reaches the accessibility
-   * tree — the list order already carries the sequence.
-   * -------------------------------------------------------------------- */
-
-  .pipeline {
+  .oss__actions {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--space-2) var(--space-3);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .pipeline__stage {
-    color: var(--color-text);
-    font-size: var(--text-sm);
-    line-height: var(--leading-snug);
-  }
-
-  .pipeline__stage:not(:last-child)::after {
-    content: '→';
-    margin-inline-start: var(--space-3);
-    color: var(--color-text-muted);
+    gap: var(--space-3);
   }
 </style>

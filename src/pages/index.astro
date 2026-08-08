@@ -22,7 +22,11 @@ import { personSchema, webSiteSchema } from '../lib/structured-data';
 const locale = 'en' as const;
 const t = home[locale];
 
-/** PRD §9.6 asks for the latest 3–5 posts; `getStudyPosts` defaults to 5. */
+/**
+ * doc-2 §9 narrows PRD §9.6's "latest 3–5 posts" to exactly 3, which is
+ * `DEFAULT_POST_LIMIT` — so the count is decided at the source rather than
+ * restated per route, and the two locales cannot ask for different lists.
+ */
 const { posts } = await getStudyPosts();
 ---
 

@@ -1,0 +1,307 @@
+---
+/**
+ * Research + Technical Writing, as one editorial band (MCD-20, doc-2 §9).
+ *
+ * These were two full-width sections. doc-2 §9 merges them into a single
+ * two-column row — research on the left, the latest writing on the right — so
+ * the page reads as one statement about published work rather than two
+ * consecutive claims. The band owns the hairline and the `--space-section`
+ * rhythm once, which is what makes the pair one section rather than two sitting
+ * close together.
+ *
+ * Each column is still its own `<section>` with its own heading, because they
+ * are two different things and a screen reader's landmark list should say so.
+ * What they share is the band, not their identity.
+ *
+ * ## Left column — Research
+ *
+ * The research area is the headline and the exact paper title is secondary
+ * metadata beneath the summary, which is the hierarchy doc-2 §9 fixes: a
+ * visitor reads what the work is about before reading how it is cited. The
+ * IND-CCA / OW-CCA analysis that used to close this column is gone — doc-2 §9
+ * calls it unnecessary for homepage credibility — and lives on About, so the
+ * site still states it (see `about.ts`).
+ *
+ * PRD §9.5 and §8 forbid promoting a single paper into its own navigation
+ * entry, so this column is the whole of Research on the site's primary journey.
+ * `View Publication ↗` resolves through the paper's DOI rather than a publisher
+ * URL, so it survives the article being moved or re-platformed.
+ *
+ * ## Right column — Technical Writing
+ *
+ * Metadata only — date, category, title, and the link back. PRD §9.6 forbids
+ * duplicating full articles here and keeps Study the canonical publication
+ * platform; `src/lib/study-feed.ts` enforces that upstream by never parsing an
+ * article body in the first place. doc-2 §9 narrows the list to the latest
+ * three, which `DEFAULT_POST_LIMIT` already applies at the source.
+ *
+ * Three states are normal rather than exceptional:
+ *
+ *   - No posts. An unreachable feed, a timeout, or a build with no network at
+ *     all resolves to an empty list (PRD §28 requires the build to survive it),
+ *     in which case only the call to action renders. There is no error message:
+ *     a visitor is not the audience for a build-time fetch failure, and the
+ *     reason is already in the build log.
+ *   - No category. Study's feed declares none today, so the category only
+ *     appears for entries that carry one.
+ *   - A title in another language. Study publishes in Chinese, so the English
+ *     page shows Chinese titles. PRD §7 forbids machine-translating them, and
+ *     doc-2 §9 asks for the honest alternative: keep the original and mark it.
+ *     `resolveTitle` decides when that is true — it says so only on the feed's
+ *     own evidence, never by guessing from the characters — and the badge names
+ *     the language in the reader's own language.
+ */
+
+import { LOCALE_TAG, type Locale } from '../../i18n/locales';
+import type { HomeStrings } from '../../i18n/pages/home';
+import { PUBLICATION_URL, STUDY_URL } from '../../lib/external';
+import { resolveTitle, type StudyPost } from '../../lib/study-feed';
+import CtaLink from './CtaLink.astro';
+
+interface Props {
+  locale: Locale;
+  t: HomeStrings;
+  /** Latest Study posts, already limited and ordered by `getStudyPosts`. */
+  posts: readonly StudyPost[];
+  /** Localized off-site glyph, from the chrome dictionary. */
+  externalIndicator: string;
+}
+
+const { locale, t, posts, externalIndicator } = Astro.props;
+
+/* Built once per render rather than per post; `dateStyle: 'medium'` gives each
+   locale its own conventional form instead of imposing one format on both. */
+const dateFormat = new Intl.DateTimeFormat(LOCALE_TAG[locale], { dateStyle: 'medium' });
+
+/**
+ * Everything the list needs, resolved before the markup.
+ *
+ * The language decision in particular is one expression rather than a condition
+ * repeated across two attributes: `badge` and `lang` must agree, since one is
+ * how a sighted reader learns the title is in another language and the other is
+ * how a screen reader pronounces it.
+ */
+const entries = posts.map((post) => {
+  const title = resolveTitle(post, locale);
+
+  return {
+    url: post.url,
+    date: post.date,
+    displayDate: dateFormat.format(new Date(post.date)),
+    category: post.category,
+    title: title.text,
+    lang: title.locale ? LOCALE_TAG[title.locale] : undefined,
+    badge: title.isForeignLanguage && title.locale ? t.writing.languages[title.locale] : undefined,
+  };
+});
+---
+
+<div class="editorial">
+  <section class="editorial__column" aria-labelledby="research">
+    <p class="editorial__eyebrow">{t.research.eyebrow}</p>
+    <h2 class="editorial__heading" id="research">{t.research.heading}</h2>
+
+    <p class="research__venue">{t.research.venue}</p>
+    <p class="research__summary">{t.research.summary}</p>
+    <p class="research__paper"><cite>{t.research.paper}</cite></p>
+
+    <p class="editorial__action">
+      <CtaLink
+        href={PUBLICATION_URL}
+        label={t.research.cta.label}
+        external
+        indicator={externalIndicator}
+        variant="outline"
+      />
+    </p>
+  </section>
+
+  <section class="editorial__column" aria-labelledby="technical-writing">
+    <p class="editorial__eyebrow">{t.writing.eyebrow}</p>
+    <h2 class="editorial__heading" id="technical-writing">{t.writing.heading}</h2>
+
+    {
+      entries.length > 0 && (
+        <ul class="posts" role="list">
+          {entries.map((entry) => (
+            <li class="posts__item">
+              <p class="posts__meta">
+                <time datetime={entry.date}>{entry.displayDate}</time>
+                {entry.category && <span class="posts__category">{entry.category}</span>}
+                {entry.badge && <span class="posts__language">{entry.badge}</span>}
+              </p>
+              <p class="posts__title">
+                <a href={entry.url} rel="noopener noreferrer" lang={entry.lang}>
+                  {entry.title}
+                </a>
+              </p>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <p class="editorial__action">
+      <CtaLink
+        href={STUDY_URL}
+        label={t.writing.cta.label}
+        external
+        indicator={externalIndicator}
+        variant="outline"
+      />
+    </p>
+  </section>
+</div>
+
+<style>
+  /* The same hairline and top rhythm every other homepage section carries, held
+     once for the pair — see the component note. `HomeSection` is not reused
+     here because it renders exactly one heading, and this band has two. */
+  .editorial {
+    display: grid;
+    gap: var(--space-9);
+    border-block-start: var(--border-width) solid var(--color-border);
+    padding-block-start: var(--space-section);
+  }
+
+  /* Stacked below this, which is doc-2 §9's mobile case. The split is wider
+     than the site's usual 48rem because the left column carries a heading at
+     the full `h2` step: at 48rem `Leakage-Resilient Cryptography` would break
+     across three lines and stop reading as a headline. The stacked gap stays
+     below `--space-section` on purpose, so the two columns still read as one
+     band on a phone rather than as the two sections they replaced.
+
+     `minmax(0, …)` on both tracks rather than a bare fraction: a long unbroken
+     title in the list would otherwise set the track's minimum width from its
+     own content and push the page into a horizontal scroll at 390px. */
+  @media (width >= 56rem) {
+    .editorial {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: var(--space-9) var(--space-10);
+    }
+  }
+
+  .editorial__column {
+    /* Each column is already narrower than the reading measure on desktop; the
+       cap is what keeps the stacked column from running the full width of a
+       tablet. */
+    max-width: var(--width-reading);
+  }
+
+  /* The label above the heading, matching `HomeSection`'s treatment so the two
+     columns sit in the same typographic system as every other section. It is a
+     sibling of the heading rather than a child, so it stays out of the
+     section's accessible name (doc-2 §16). */
+  .editorial__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-block-end: var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  /* A short rule ahead of the label. `text-transform` does nothing to Chinese
+     and CJK ignores tracking almost as completely, so on the zh-Hant route the
+     label would otherwise differ from the heading only in size and colour. */
+  .editorial__eyebrow::before {
+    content: '';
+    flex: none;
+    inline-size: var(--space-6);
+    border-block-start: var(--border-width) solid var(--color-border-strong);
+  }
+
+  /* Size and tracking come from the `h2` baseline in `global.css`. */
+  .editorial__heading {
+    margin-block-end: var(--space-5);
+  }
+
+  .editorial__action {
+    margin-block-start: var(--space-6);
+  }
+
+  .research__venue {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .research__summary {
+    margin-block-start: var(--space-4);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* The citation, deliberately quieter than the heading above it: doc-2 §9
+     keeps the exact title as secondary metadata rather than as the column's
+     largest line. Upright because a journal article title is set in roman
+     within a citation, and italic here would also read as emphasis. */
+  .research__paper {
+    margin-block-start: var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+  }
+
+  .research__paper cite {
+    font-style: normal;
+  }
+
+  .posts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin: 0;
+  }
+
+  /* `--text-sm` rather than the smaller eyebrow step: this is the metadata a
+     visitor actually reads on a 390px screen, and doc-2 §9 stacks the columns
+     there rather than shrinking them. */
+  .posts__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* A hairline divider rather than a bullet: the category is a second field on
+     the same line, not a list item. */
+  .posts__category::before {
+    content: '';
+    display: inline-block;
+    width: var(--border-width);
+    height: 1em;
+    margin-inline-end: var(--space-4);
+    background-color: var(--color-border);
+    vertical-align: -0.15em;
+  }
+
+  /* The language mark doc-2 §9 asks for. An outlined chip rather than a third
+     plain field, because it qualifies the title below it instead of describing
+     the article — and it is announced rather than hidden, since a reader who
+     cannot see the script needs the same warning. */
+  .posts__language {
+    padding: 0 var(--space-2);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+  }
+
+  .posts__title {
+    margin-block-start: var(--space-1);
+    font-size: var(--text-md);
+    line-height: var(--leading-snug);
+  }
+
+  .posts__title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .posts__title a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+</style>

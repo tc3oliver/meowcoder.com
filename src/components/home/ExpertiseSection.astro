@@ -1,19 +1,28 @@
 ---
 /**
- * Engineering Expertise (MCD-4, PRD §9.3, §5).
+ * Engineering Focus (MCD-4, MCD-16, doc-2 §8, PRD §5).
  *
- * Exactly the four pillars PRD §5 defines, one concise explanation each. PRD
- * §9.3 forbids replacing them with a technology grid, so the technologies that
- * do appear are inside a sentence explaining what the pillar covers, never as a
+ * Exactly the four pillars PRD §5 defines, one short line each. PRD §9.3
+ * forbids replacing them with a technology grid, so the technologies that do
+ * appear are inside a sentence explaining what the pillar covers, never as a
  * standalone list of framework names.
  *
- * PRD §12 shapes the LLM Infrastructure pillar specifically. It is an expertise
- * area, and its public proof is technical writing — the strongest evidence sits
- * in confidential employer systems, so nothing here implies a public case study
- * exists. That is the one asymmetry between the four blocks, and it is
- * deliberate: whichever pillar the dictionary marks with `evidence` gets a link
- * to Study. The marking lives in the dictionary rather than in a name match
- * here, because the Chinese pillar is not called "LLM Infrastructure".
+ * doc-2 §8 calls these navigation and signalling elements rather than primary
+ * evidence, and requires their visual weight to sit below Featured Product and
+ * Open Source. Three things enforce that here: the section carries no intro
+ * paragraph (its explanatory meta-copy was removed outright), each area is one
+ * short line instead of a technology inventory, and the grid is a fixed 2×2 on
+ * desktop rather than an `auto-fit` row that would spread to four columns and
+ * read as the widest thing on the page.
+ *
+ * PRD §12 shapes the LLM Infrastructure pillar specifically, and doc-2 §8
+ * restates it. It is an expertise area, and its public proof is technical
+ * writing — the strongest evidence sits in confidential employer systems, so
+ * nothing here implies a public case study exists. That is the one asymmetry
+ * between the four blocks, and it is deliberate: whichever pillar the
+ * dictionary marks with `evidence` gets a link to Study. The marking lives in
+ * the dictionary rather than in a name match here, because the Chinese pillar
+ * is not called "LLM Infrastructure".
  */
 
 import type { HomeStrings } from '../../i18n/pages/home';
@@ -29,9 +38,7 @@ interface Props {
 const { t, externalIndicator } = Astro.props;
 ---
 
-<HomeSection id="engineering-expertise" heading={t.expertise.heading}>
-  <p class="expertise__intro">{t.expertise.intro}</p>
-
+<HomeSection id="engineering-focus" heading={t.expertise.heading}>
   <ul class="expertise" role="list">
     {
       t.expertise.pillars.map((pillar) => (
@@ -55,18 +62,25 @@ const { t, externalIndicator } = Astro.props;
 </HomeSection>
 
 <style>
-  .expertise__intro {
-    max-width: var(--width-reading);
-    margin-block-end: var(--space-6);
-    color: var(--color-text-muted);
-    line-height: var(--leading-relaxed);
-  }
-
+  /* One column on a phone, 2×2 from the point two columns fit the reading
+     measure. Deliberately not `auto-fit`: at the full content width that would
+     resolve to four columns and give the section a full-bleed row of equal
+     weight to Featured Product, which doc-2 §8 rules out. */
   .expertise {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-    gap: var(--space-6) var(--space-7);
+    grid-template-columns: 1fr;
+    gap: var(--space-6) var(--space-8);
+    /* Held to the reading measure rather than the content width, so the grid
+       reads as a supporting block rather than the widest element on the page. */
+    max-width: var(--width-reading);
     margin: 0;
+  }
+
+  /* The same breakpoint the About page splits its columns at. */
+  @media (width >= 48rem) {
+    .expertise {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   .expertise__pillar {
@@ -75,13 +89,17 @@ const { t, externalIndicator } = Astro.props;
     gap: var(--space-2);
   }
 
+  /* One step below the `h3`s in Featured Product and Open Source, which sit at
+     `--text-md`. Weight is what ranks the sections against each other here, so
+     the difference has to be visible at a glance (doc-2 §8). */
   .expertise__name {
-    font-size: var(--text-md);
+    font-size: var(--text-base);
     letter-spacing: var(--tracking-normal);
   }
 
   .expertise__description {
     color: var(--color-text-muted);
+    font-size: var(--text-sm);
     line-height: var(--leading-relaxed);
   }
 

@@ -1,0 +1,137 @@
+---
+/**
+ * A small workflow diagram (MCD-18, doc-2 §7).
+ *
+ * doc-2 §7 draws the AI Coding Skills workflow as a shape rather than a list:
+ * one stage opens it, a short run of stages moves left to right, and one stage
+ * closes it.
+ *
+ *     Requirement
+ *         ↓
+ *     Plan → Execute → Validate
+ *                        ↓
+ *                     Evidence
+ *
+ * It is built as an ordered list in a three-row grid, never an image and never
+ * an image-generation asset: the sequence is the content, and marking it up as
+ * a list is what keeps it available to a screen reader in the right order. The
+ * arrows are CSS `::after` content, so the accessibility tree gets the stages
+ * and none of the connectors — the same treatment `CtaLink.astro` gives its
+ * off-site glyph.
+ *
+ * The caption is the diagram's accessible name and is visually hidden: doc-2
+ * §7 shows no caption text, but a figure with no name is announced as an
+ * unlabelled group.
+ *
+ * The component is deliberately generic — the Work index reuses it (MCD-21) —
+ * so it owns the shape and the caller owns every string, including the
+ * localized stage names.
+ */
+
+interface Props {
+  /** Accessible name for the diagram. Rendered, but visually hidden. */
+  caption: string;
+  /** The stage the flow starts from; sits alone on the first row. */
+  start: string;
+  /** The stages that run left to right on the middle row. */
+  steps: readonly string[];
+  /** The stage the flow ends in; sits under the last step. */
+  end: string;
+}
+
+const { caption, start, steps, end } = Astro.props;
+
+/**
+ * The middle row's column count. The turn back down happens under the last
+ * step, so the grid has to know how many there are; it is the one value the
+ * layout cannot derive from the markup alone.
+ */
+const columns = Math.max(steps.length, 1);
+---
+
+<figure class="flow" style={`--flow-columns: ${columns};`}>
+  <figcaption class="visually-hidden">{caption}</figcaption>
+
+  <ol class="flow__stages" role="list">
+    <li class="flow__stage flow__stage--start">{start}</li>
+    {
+      steps.map((step, index) => (
+        <li
+          class:list={[
+            'flow__stage',
+            'flow__stage--step',
+            index === steps.length - 1 && 'flow__stage--turn',
+          ]}
+        >
+          {step}
+        </li>
+      ))
+    }
+    <li class="flow__stage flow__stage--end">{end}</li>
+  </ol>
+</figure>
+
+<style>
+  .flow {
+    margin: 0;
+  }
+
+  .flow__stages {
+    display: grid;
+    /* The markers are removed here, so the `role="list"` on the element is what
+       keeps Safari announcing the stages as a list — the same pairing
+       `global.css` makes for every other structural list on the site. */
+    /* `auto` tracks, so each column is only as wide as its stage name. That is
+       what keeps the middle row inside a 390px viewport without a horizontal
+       scrollbar, in either language. */
+    grid-template-columns: repeat(var(--flow-columns), auto);
+    justify-content: start;
+    gap: var(--space-1) var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .flow__stage {
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+
+  /* Three rows: the opening stage, the run of steps, the closing stage. The
+     closing stage sits in the last column so it lands under the step the flow
+     turns down from. */
+  .flow__stage--start {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .flow__stage--step {
+    grid-row: 2;
+  }
+
+  .flow__stage--end {
+    grid-row: 3;
+    grid-column: var(--flow-columns);
+  }
+
+  /* ---------------------------------------------------------------------
+   * Connectors
+   *
+   * Decoration only. They are generated content rather than characters in the
+   * markup, so the list reads as five stages in order and the arrows never
+   * reach the accessibility tree.
+   * ------------------------------------------------------------------ */
+
+  .flow__stage--start::after,
+  .flow__stage--turn::after {
+    content: '↓';
+    display: block;
+    color: var(--color-text-muted);
+  }
+
+  .flow__stage--step:not(.flow__stage--turn)::after {
+    content: '→';
+    margin-inline-start: var(--space-2);
+    color: var(--color-text-muted);
+  }
+</style>

@@ -1,24 +1,31 @@
 ---
 /**
- * The homepage body (MCD-4, PRD §9, §35).
+ * The homepage body (MCD-4, MCD-16, doc-2 §5).
  *
  * Both locales render through this one component, so the English and Chinese
  * homepages cannot drift apart in structure or section order — only the strings
  * and the feed titles differ. That is what PRD §35 means by "the Chinese
  * version follows the same information architecture".
  *
- * The order below is PRD §35's final order, and it is the visitor journey read
- * top to bottom:
+ * The order below is doc-2 §5's order, which replaces PRD §35. It is the
+ * visitor journey read top to bottom, and it now front-loads the two sections
+ * that carry inspectable evidence:
  *
  *   Hero                    Who is Oliver?
  *   Featured Product        Can he build a real product?
- *   Engineering Expertise   What does he specialize in?
  *   Open Source             Can I inspect his implementation?
- *   Research                Is there deeper technical credibility?
- *   Technical Writing       Can I inspect his technical thinking?
- *   Professional Experience What experience supports this?
+ *   Engineering Focus       What areas does that work sit in?
+ *   Research + Writing      Is there deeper technical credibility, and can I
+ *                           inspect his technical thinking?
+ *   10+ Years strip         What experience supports this?
  *
- * The eighth item, the footer, is site chrome and is rendered by `SiteShell`
+ * Two consequences of that reordering are deliberate. Engineering Focus moved
+ * below Open Source because doc-2 §8 makes it a signalling section rather than
+ * evidence, so it must not outrank the two sections a visitor can verify. And
+ * Research and Technical Writing are one component rather than two: doc-2 §9
+ * makes them a single two-column band, which is `ResearchWritingSection`.
+ *
+ * The seventh item, the footer, is site chrome and is rendered by `SiteShell`
  * after this component — it is the same link row on every route (PRD §9.8).
  */
 
@@ -29,9 +36,8 @@ import ExperienceSection from './ExperienceSection.astro';
 import ExpertiseSection from './ExpertiseSection.astro';
 import HomeHero from './HomeHero.astro';
 import OpenSourceSection from './OpenSourceSection.astro';
-import ResearchSection from './ResearchSection.astro';
+import ResearchWritingSection from './ResearchWritingSection.astro';
 import ShouriSection from './ShouriSection.astro';
-import WritingSection from './WritingSection.astro';
 
 interface Props {
   locale: Locale;
@@ -47,18 +53,27 @@ const { locale, t, posts, externalIndicator } = Astro.props;
 
 <div class="container home">
   <HomeHero locale={locale} t={t} externalIndicator={externalIndicator} />
-  <ShouriSection t={t} externalIndicator={externalIndicator} />
+  <ShouriSection locale={locale} t={t} externalIndicator={externalIndicator} />
+  <OpenSourceSection locale={locale} t={t} externalIndicator={externalIndicator} />
   <ExpertiseSection t={t} externalIndicator={externalIndicator} />
-  <OpenSourceSection t={t} externalIndicator={externalIndicator} />
-  <ResearchSection t={t} externalIndicator={externalIndicator} />
-  <WritingSection locale={locale} t={t} posts={posts} externalIndicator={externalIndicator} />
-  <ExperienceSection t={t} />
+  <ResearchWritingSection
+    locale={locale}
+    t={t}
+    posts={posts}
+    externalIndicator={externalIndicator}
+  />
+  <ExperienceSection locale={locale} t={t} />
 </div>
 
 <style>
   .home {
     display: flex;
     flex-direction: column;
-    gap: var(--space-9);
+    /* No gap. Each section owns the whitespace above it through
+       `--space-section` — on `HomeSection`, or directly for the two that do
+       not render through it — so a flex gap here would stack on top of that
+       and push the rhythm past doc-2 §4's 72–88px mobile / 112–144px desktop
+       band. The hero follows the same rule and carries no bottom padding. */
+    gap: 0;
   }
 </style>
