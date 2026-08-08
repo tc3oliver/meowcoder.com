@@ -4,7 +4,7 @@ title: MCD-1 — 儲存庫啟動
 status: In Progress
 assignee: []
 created_date: '2026-08-08 06:41'
-updated_date: '2026-08-08 07:04'
+updated_date: '2026-08-08 07:14'
 labels: []
 dependencies: []
 priority: high
@@ -71,24 +71,24 @@ ordinal: 1000
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 /home/oliver/meowcoder 已完成 git 初始化，且包含可建置的 Astro + TypeScript scaffold
-- [ ] #2 github.com/tc3oliver/meowcoder.com 已存在，初始 scaffold 已推送到預設分支
-- [ ] #3 lint、format、typecheck 指令皆已設定，且在初始 scaffold 上執行通過
-- [ ] #4 本機 build 成功產出靜態檔案
-- [ ] #5 .gitignore 已排除 node_modules、build 產物、本機機密，以及 .omc/ 本機狀態
-- [ ] #6 MIT LICENSE 涵蓋原始碼，另有獨立內容授權聲明說明個人內容與品牌資產不適用 MIT（PRD §21）
+- [x] #1 /home/oliver/meowcoder 已完成 git 初始化，且包含可建置的 Astro + TypeScript scaffold
+- [x] #2 github.com/tc3oliver/meowcoder.com 已存在，初始 scaffold 已推送到預設分支
+- [x] #3 lint、format、typecheck 指令皆已設定，且在初始 scaffold 上執行通過
+- [x] #4 本機 build 成功產出靜態檔案
+- [x] #5 .gitignore 已排除 node_modules、build 產物、本機機密，以及 .omc/ 本機狀態
+- [x] #6 MIT LICENSE 涵蓋原始碼，另有獨立內容授權聲明說明個人內容與品牌資產不適用 MIT（PRD §21）
 - [ ] #7 Cloudflare Pages staging 部署可正常提供已推送的 scaffold
-- [ ] #8 .agent-workflow/PROJECT.md 的 Validation commands 已從 not detected 更新為實際可執行指令
-- [ ] #9 測試執行器已設定，npm run test 可在乾淨環境執行並通過至少一個範例測試
-- [ ] #10 GitHub Actions CI 於 push 與 PR 觸發，並依 PRD §23 順序執行 install、format/lint、typecheck、build、test
+- [x] #8 .agent-workflow/PROJECT.md 的 Validation commands 已從 not detected 更新為實際可執行指令
+- [x] #9 測試執行器已設定，npm run test 可在乾淨環境執行並通過至少一個範例測試
+- [x] #10 GitHub Actions CI 於 push 與 PR 觸發，並依 PRD §23 順序執行 install、format/lint、typecheck、build、test
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
 - [ ] #1 Acceptance Criteria all pass
-- [ ] #2 Required applicable tests, lint, typecheck, and build pass
-- [ ] #3 Documentation and Requirement Matrix are synchronized when applicable
-- [ ] #4 Validation evidence is recorded in the task
+- [x] #2 Required applicable tests, lint, typecheck, and build pass
+- [x] #3 Documentation and Requirement Matrix are synchronized when applicable
+- [x] #4 Validation evidence is recorded in the task
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -106,3 +106,96 @@ ordinal: 1000
 10. 將實際可用指令回填 .agent-workflow/PROJECT.md 的 Validation commands（含 Tests）。
 11. Cloudflare Pages staging（AC #7）：本機無 wrangler、無 CF_API_TOKEN / CLOUDFLARE_ACCOUNT_ID、無 ~/.wrangler 設定。若無法取得憑證，此項記錄為 true blocker（WORKFLOW.md「True blockers」第 2 項：缺少必要權限、憑證或外部服務），其餘 AC 仍完成後如實回報。
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## 實作結果
+
+Scaffold 完成並推送，CI 全綠。10 項 AC 完成 9 項，AC #7（Cloudflare Pages staging）因缺少憑證受阻。
+
+## 驗證證據
+
+本機（Node v22.23.2、npm 10.9.8）：
+
+- `npx prettier --check .` → `All matched files use Prettier code style!`
+- `npx eslint .` → exit 0，無輸出
+- `npx astro check` → `Result (6 files): 0 errors, 0 warnings, 0 hints`
+- `npx vitest run` → `Test Files 1 passed (1) / Tests 3 passed (3)`
+- `npx astro build` → `1 page(s) built in 266ms / Complete!`
+- `npm audit` → `found 0 vulnerabilities`
+
+GitHub Actions run 31245653657（main，push）→ `completed success`，30s：
+`Install: success / Format check: success / Lint: success / Typecheck: success / Build: success / Test: success`
+
+儲存庫：`gh repo view` → `visibility: PRIVATE`、`defaultBranchRef: main`、
+`url: https://github.com/tc3oliver/meowcoder.com`。遠端 tree 共 45 個 blob。
+
+推送前稽核（全部無命中）：
+- 金鑰樣式（`gh[pousr]_`、`github_pat_`、`AKIA`、`BEGIN PRIVATE KEY`、`xox[baprs]-`、`sk-`）
+- 賦值型 secret（`api_key|secret|token|password` = "..."）
+- email 與電話號碼
+- `.omc/`、`node_modules/`、`dist/`、`.astro/`、`.env` 皆未追蹤（本機與遠端各驗一次）
+
+## 執行中做出的工程決策
+
+**1. Astro 7 + Node 22.12+，而非 Astro 5 或 6**
+
+初次安裝取得 Astro 6.0.5，但本機 Node 為 v20.20.2，Astro 6 要求 `>=22.12.0`，
+`astro check` 與 `astro build` 直接拒絕執行。先降到 Astro 5.18.2 讓 Node 20 可用，
+但 `npm audit` 顯示 `astro <=7.0.9` 全數為 high severity（8 條 XSS/SSRF advisory），
+外加 `esbuild` 與 `sharp`/libvips 的漏洞。
+
+多數 advisory 屬 SSR、server islands 或 dev-server 範疇，對純靜態站不適用；但
+`sharp`/libvips 那組與 PRD §29 的 AVIF/WebP 圖片處理直接相關，且 PRD §23 明訂
+「衛生不良的公開儲存庫會削弱而非強化網站」。因此改採乾淨路徑：以 nvm 安裝
+Node 22.23.2 並設為 nvm 預設，升級至 Astro 7.2.0，`npm audit` 歸零。
+
+Node 20 仍保留在 nvm 中，`nvm alias default 20` 即可還原，屬可逆決策。
+`.nvmrc` 記為 22，CI 以 `node-version-file: .nvmrc` 取用，本機與 CI 一致。
+
+**注意**：本次執行的 shell 於變更前啟動，`PATH` 仍解析到 Node 20，需明確指定
+`$HOME/.nvm/versions/node/v22.23.2/bin`。新啟動的 shell 會自動取得 22。後續任務
+若遇 `Node.js v20.x is not supported by Astro`，先確認 `node -v`。此點已寫入
+`.agent-workflow/PROJECT.md` 的專案限制。
+
+**2. 未啟用 eslint-plugin-jsx-a11y**
+
+`eslint-plugin-astro` 的 `flat/jsx-a11y-recommended` 需要 `eslint-plugin-jsx-a11y`，
+但其 6.10.2 版 peer 相依為 `eslint <=9`，無法在 ESLint 10 下安裝（ERESOLVE）。
+以 `--legacy-peer-deps` 硬裝違反 PRD §23 的衛生要求，故不啟用，並在
+`eslint.config.js` 留下註解說明原因與重啟條件。無障礙驗證改由 MCD-11 的
+axe + Lighthouse + 人工鍵盤測試承擔（TASK-11 既有的測試需求已涵蓋）。
+
+**3. 手動 scaffold 而非 `npm create astro`**
+
+本目錄非空（既有 `backlog/`、`.agent-workflow/`、`.claude/`、`CLAUDE.md`、
+`AGENTS.md`），互動式 scaffold 會拒絕執行或覆寫既有檔案。
+
+**4. 儲存庫建為 private**
+
+AC #2 僅要求儲存庫存在且已推送；轉為 public 是 MCD-13 AC #9 的範圍，且需先完成
+PRD §20 機密確認。依 decision-1，`backlog/`（含 `doc-1` 完整 PRD）一併進入儲存庫，
+這正是 MCD-13 轉 public 前必須明確決定的事項，已記入 `.agent-workflow/PROJECT.md`。
+
+## Blocker — AC #7 Cloudflare Pages staging
+
+真實阻礙，屬 WORKFLOW.md「True blockers」第 2 項：缺少必要權限、憑證或外部服務。
+
+證據：
+- `wrangler` 未安裝
+- 無 `CLOUDFLARE_*` / `CF_*` 環境變數（`env | grep -c CLOUDFLARE` → 0）
+- 無 `~/.wrangler` 設定目錄
+
+Cloudflare Pages 的 GitHub 整合只能在 Cloudflare Dashboard 完成，`wrangler login`
+需要瀏覽器互動，兩者都無法在此環境自動化。
+
+解除阻礙所需（擇一）：
+- 於 Cloudflare Dashboard 連接 `tc3oliver/meowcoder.com`，建置設定為
+  Framework preset `Astro`、Build command `npm run build`、Output directory `dist`、
+  環境變數 `NODE_VERSION=22`；或
+- 提供具 Pages 權限的 `CLOUDFLARE_API_TOKEN` 與 `CLOUDFLARE_ACCOUNT_ID`，改以
+  wrangler 建立 Pages 專案。
+
+其餘 9 項 AC 已完成，程式碼已推送，CI 已綠。此項解除後即可勾選 AC #7 並收尾。
+<!-- SECTION:NOTES:END -->
