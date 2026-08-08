@@ -1,0 +1,56 @@
+---
+/**
+ * One homepage section (MCD-4).
+ *
+ * The homepage is a sequence of equal-weight sections (PRD §35), so each gets
+ * the same landmark treatment as `AboutSection`: a hairline rule, generous
+ * whitespace, and a heading that names the section for the landmark list via
+ * `aria-labelledby`.
+ *
+ * The optional eyebrow is the section's role in the visitor journey — "Featured
+ * Product", "Open Source" — while the heading is what that section is about.
+ * It is rendered inside the labelled heading element so the accessible name
+ * carries both, which is why it is not a separate paragraph above it.
+ */
+
+interface Props {
+  /** Id for the heading; also the section's `aria-labelledby` target. */
+  id: string;
+  eyebrow?: string;
+  heading: string;
+}
+
+const { id, eyebrow, heading } = Astro.props;
+---
+
+<section class="home-section" aria-labelledby={id}>
+  <h2 class="home-section__heading" id={id}>
+    {eyebrow && <span class="home-section__eyebrow">{eyebrow}</span>}
+    {heading}
+  </h2>
+  <slot />
+</section>
+
+<style>
+  .home-section {
+    /* Whitespace plus one hairline, never a card — PRD §25. */
+    border-block-start: var(--border-width) solid var(--color-border);
+    padding-block-start: var(--space-7);
+  }
+
+  .home-section__heading {
+    font-size: var(--text-xl);
+    letter-spacing: var(--tracking-normal);
+    margin-block-end: var(--space-5);
+  }
+
+  .home-section__eyebrow {
+    display: block;
+    margin-block-end: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+</style>

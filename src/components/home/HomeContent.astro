@@ -1,0 +1,64 @@
+---
+/**
+ * The homepage body (MCD-4, PRD §9, §35).
+ *
+ * Both locales render through this one component, so the English and Chinese
+ * homepages cannot drift apart in structure or section order — only the strings
+ * and the feed titles differ. That is what PRD §35 means by "the Chinese
+ * version follows the same information architecture".
+ *
+ * The order below is PRD §35's final order, and it is the visitor journey read
+ * top to bottom:
+ *
+ *   Hero                    Who is Oliver?
+ *   Featured Product        Can he build a real product?
+ *   Engineering Expertise   What does he specialize in?
+ *   Open Source             Can I inspect his implementation?
+ *   Research                Is there deeper technical credibility?
+ *   Technical Writing       Can I inspect his technical thinking?
+ *   Professional Experience What experience supports this?
+ *
+ * The eighth item, the footer, is site chrome and is rendered by `SiteShell`
+ * after this component — it is the same link row on every route (PRD §9.8).
+ */
+
+import type { Locale } from '../../i18n/locales';
+import type { HomeStrings } from '../../i18n/pages/home';
+import type { StudyPost } from '../../lib/study-feed';
+import ExperienceSection from './ExperienceSection.astro';
+import ExpertiseSection from './ExpertiseSection.astro';
+import HomeHero from './HomeHero.astro';
+import OpenSourceSection from './OpenSourceSection.astro';
+import ResearchSection from './ResearchSection.astro';
+import ShouriSection from './ShouriSection.astro';
+import WritingSection from './WritingSection.astro';
+
+interface Props {
+  locale: Locale;
+  t: HomeStrings;
+  /** Latest Study posts, already limited and ordered by `getStudyPosts`. */
+  posts: readonly StudyPost[];
+  /** Localized off-site glyph, from the chrome dictionary. */
+  externalIndicator: string;
+}
+
+const { locale, t, posts, externalIndicator } = Astro.props;
+---
+
+<div class="container home">
+  <HomeHero locale={locale} t={t} externalIndicator={externalIndicator} />
+  <ShouriSection t={t} externalIndicator={externalIndicator} />
+  <ExpertiseSection t={t} externalIndicator={externalIndicator} />
+  <OpenSourceSection t={t} externalIndicator={externalIndicator} />
+  <ResearchSection t={t} />
+  <WritingSection locale={locale} t={t} posts={posts} externalIndicator={externalIndicator} />
+  <ExperienceSection t={t} />
+</div>
+
+<style>
+  .home {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-9);
+  }
+</style>

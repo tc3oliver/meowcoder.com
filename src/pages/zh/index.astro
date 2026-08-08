@@ -1,23 +1,35 @@
 ---
 /**
- * Traditional Chinese home page (MCD-3 shell).
+ * Traditional Chinese home page (MCD-4).
  *
  * A complete localized experience, not mixed-language content inside the
- * English page (PRD §7). Sections arrive in MCD-4.
+ * English page (PRD §7). It renders the same `HomeContent` in the same order as
+ * `/`, with the Chinese dictionary — PRD §35 requires both locales to share one
+ * information architecture.
+ *
+ * Study post titles are the exception: they appear in whatever language Study
+ * published them, because PRD §7 forbids machine-translating them at runtime.
+ * `getStudyPosts` memoizes per feed URL, so this page shares one request with
+ * the English page rather than fetching twice per build.
  */
 
+import HomeContent from '../../components/home/HomeContent.astro';
+import { chrome } from '../../i18n/chrome';
 import { home } from '../../i18n/pages/home';
 import SiteShell from '../../layouts/SiteShell.astro';
+import { getStudyPosts } from '../../lib/study-feed';
 
 const locale = 'zh' as const;
 const t = home[locale];
+
+const { posts } = await getStudyPosts();
 ---
 
 <SiteShell locale={locale} route="/" title={t.title} description={t.description}>
-  <div class="container">
-    <div class="prose">
-      <h1>{t.heading}</h1>
-      <p>{t.intro}</p>
-    </div>
-  </div>
+  <HomeContent
+    locale={locale}
+    t={t}
+    posts={posts}
+    externalIndicator={chrome[locale].nav.externalIndicator}
+  />
 </SiteShell>
