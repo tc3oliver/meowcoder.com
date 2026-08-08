@@ -1,0 +1,95 @@
+---
+/**
+ * Homepage hero (MCD-4, PRD §9.1).
+ *
+ * Typography and whitespace carry the whole section. PRD §9.1 and §25 rule out
+ * every piece of the usual portfolio hero furniture — the large portrait, the
+ * decorative AI artwork, the animated code, the self-writing headline, the
+ * vendor mark row, the proficiency bars — so there is no image, no canvas, and
+ * no client-side JavaScript here at all. `src/styles/design-system.test.ts`
+ * scans the source tree for each of them by name.
+ *
+ * The two facts beneath the statement are plain text, not badges: PRD §37
+ * prefers evidence over ornament, and "10+ Years in Software Engineering" is
+ * already the evidence.
+ */
+
+import type { Locale } from '../../i18n/locales';
+import type { HomeStrings } from '../../i18n/pages/home';
+import { localizePath } from '../../lib/i18n';
+import { STUDY_URL } from '../../lib/external';
+import CtaLink from './CtaLink.astro';
+
+interface Props {
+  locale: Locale;
+  t: HomeStrings;
+  /** Localized off-site glyph, from the chrome dictionary. */
+  externalIndicator: string;
+}
+
+const { locale, t, externalIndicator } = Astro.props;
+---
+
+<div class="hero">
+  <p class="hero__role">{t.hero.role}</p>
+  <h1 class="hero__name">{t.heading}</h1>
+  <p class="hero__statement">{t.intro}</p>
+
+  <ul class="hero__facts" role="list">
+    {t.hero.facts.map((fact) => <li>{fact}</li>)}
+  </ul>
+
+  <div class="hero__actions">
+    <CtaLink href={localizePath(locale, '/work')} label={t.hero.workCta} variant="solid" />
+    <CtaLink
+      href={STUDY_URL}
+      label={t.hero.writingCta}
+      external
+      indicator={externalIndicator}
+      variant="outline"
+    />
+  </div>
+</div>
+
+<style>
+  .hero {
+    /* Held to the reading measure so the statement breaks where PRD §9.1
+       writes it, rather than stretching across the full content width. */
+    max-width: var(--width-reading);
+    padding-block-end: var(--space-9);
+  }
+
+  .hero__role {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-wide);
+  }
+
+  .hero__name {
+    margin-block-start: var(--space-2);
+  }
+
+  .hero__statement {
+    margin-block-start: var(--space-5);
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+  }
+
+  .hero__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin: 0;
+    margin-block-start: var(--space-5);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-4);
+    margin-block-start: var(--space-7);
+  }
+</style>

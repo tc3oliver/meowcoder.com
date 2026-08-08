@@ -1,0 +1,66 @@
+---
+/**
+ * Professional Experience (MCD-4, PRD §9.7).
+ *
+ * Scope and seniority, nothing else. PRD §11 allows employer work to be
+ * described only at a safe abstraction level, so this section names engineering
+ * domains and a current direction — never an employer, an internal project, a
+ * repository, an infrastructure topology, a private benchmark, or a customer.
+ * PRD §11 is explicit that company experience establishes credibility but is
+ * not public case-study evidence, which is why this sits last among the content
+ * sections and carries no call to action: there is nothing public to inspect.
+ *
+ * `src/i18n/pages/home.test.ts` guards the copy against disclosure so a later
+ * content edit cannot quietly reintroduce it.
+ */
+
+import type { HomeStrings } from '../../i18n/pages/home';
+import HomeSection from './HomeSection.astro';
+
+interface Props {
+  t: HomeStrings;
+}
+
+const { t } = Astro.props;
+---
+
+<HomeSection
+  id="professional-experience"
+  eyebrow={t.experience.eyebrow}
+  heading={t.experience.heading}
+>
+  <div class="experience">
+    <p class="experience__summary">{t.experience.summary}</p>
+
+    <div class="experience__current">
+      <p class="experience__label">{t.experience.currentLabel}</p>
+      <p class="experience__statement">{t.experience.current}</p>
+    </div>
+  </div>
+</HomeSection>
+
+<style>
+  .experience {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    max-width: var(--width-reading);
+  }
+
+  .experience__summary {
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+  }
+
+  .experience__label {
+    margin-block-end: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .experience__statement {
+    line-height: var(--leading-relaxed);
+  }
+</style>

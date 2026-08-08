@@ -18,5 +18,9 @@ export const chromeEn = {
   skipLink: 'Skip to content',
   footer: {
     ariaLabel: 'Footer',
+    github: 'GitHub',
+    study: 'Study',
+    shouri: 'Shouri',
+    siteSource: 'Site Source',
   },
 } satisfies ChromeDictionary;

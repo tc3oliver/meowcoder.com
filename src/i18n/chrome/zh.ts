@@ -22,5 +22,10 @@ export const chromeZh = {
   skipLink: '跳至主要內容',
   footer: {
     ariaLabel: '頁尾',
+    // Property names, left untranslated per PRD §7.
+    github: 'GitHub',
+    study: 'Study',
+    shouri: 'Shouri',
+    siteSource: '網站原始碼',
   },
 } satisfies ChromeDictionary;

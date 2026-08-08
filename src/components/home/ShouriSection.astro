@@ -1,0 +1,137 @@
+---
+/**
+ * Featured Product — Shouri (MCD-4, PRD §9.2).
+ *
+ * Shouri is the primary proof that one person can design, implement, ship, and
+ * operate a complete product, so this is the only section with a product
+ * summary, named principles, and an image slot.
+ *
+ * The screenshot is deliberately conditional — see `shouri-screenshot.ts` for
+ * what is still missing and how to supply it. Everything else in the section
+ * stands on its own without it.
+ */
+
+import { Image } from 'astro:assets';
+
+import type { HomeStrings } from '../../i18n/pages/home';
+import { SHOURI_URL } from '../../lib/external';
+// Presentational and content-free — the same hairline term row About uses for
+// PRD §13's domains. Reused rather than copied; a later cleanup can hoist it
+// out of `about/` once a second page outside About needs it.
+import TermList from '../about/TermList.astro';
+import CtaLink from './CtaLink.astro';
+import HomeSection from './HomeSection.astro';
+import { shouriScreenshot } from './shouri-screenshot';
+
+interface Props {
+  t: HomeStrings;
+  externalIndicator: string;
+}
+
+const { t, externalIndicator } = Astro.props;
+
+const { screenshot } = t.shouri;
+---
+
+<HomeSection id="featured-product" eyebrow={t.shouri.eyebrow} heading={t.shouri.heading}>
+  <div class="shouri">
+    <p class="shouri__summary">{t.shouri.summary}</p>
+
+    {
+      shouriScreenshot && screenshot && (
+        <figure class="shouri__figure">
+          <Image
+            src={shouriScreenshot}
+            alt={screenshot.alt}
+            widths={[640, 960, 1160]}
+            sizes="(min-width: 72rem) 1160px, 100vw"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+      )
+    }
+
+    <div class="shouri__block">
+      <h3 class="shouri__subheading">{t.shouri.principlesHeading}</h3>
+      <dl class="principles">
+        {
+          t.shouri.principles.map((principle) => (
+            <div class="principles__item">
+              <dt class="principles__name">{principle.name}</dt>
+              <dd class="principles__description">{principle.description}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+
+    <div class="shouri__block">
+      <h3 class="shouri__subheading">{t.shouri.areasHeading}</h3>
+      {/* Plain text terms: PRD §25 rules out technology icon walls. */}
+      <TermList items={t.shouri.areas} />
+    </div>
+
+    <p>
+      <CtaLink
+        href={SHOURI_URL}
+        label={t.shouri.cta.label}
+        external
+        indicator={externalIndicator}
+        variant="outline"
+      />
+    </p>
+  </div>
+</HomeSection>
+
+<style>
+  .shouri {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .shouri__summary {
+    max-width: var(--width-reading);
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+  }
+
+  .shouri__figure {
+    margin: 0;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-color: var(--color-surface);
+  }
+
+  .shouri__block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .shouri__subheading {
+    font-size: var(--text-md);
+    letter-spacing: var(--tracking-normal);
+  }
+
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+  }
+
+  .principles__name {
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+  }
+
+  .principles__description {
+    margin: 0;
+    margin-block-start: var(--space-2);
+    color: var(--color-text-muted);
+    line-height: var(--leading-relaxed);
+  }
+</style>
