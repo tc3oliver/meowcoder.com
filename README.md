@@ -39,7 +39,11 @@ npm test               # Vitest
 
 ## License
 
-Source code is licensed under the MIT License.
-Personal content and brand assets are © Oliver Yu unless otherwise noted.
+This repository uses split licensing.
 
-See [`LICENSE`](LICENSE) and [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md).
+Source code is licensed under the MIT License — see [`LICENSE`](LICENSE).
+
+Personal content and brand assets (`src/content/**`, `src/assets/brand/**`,
+`public/images/**`) are © Oliver Yu unless otherwise noted and are **not**
+covered by the MIT License — see [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md) for
+the path-by-path breakdown.

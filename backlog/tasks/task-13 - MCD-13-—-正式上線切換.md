@@ -4,7 +4,7 @@ title: MCD-13 — 正式上線切換
 status: To Do
 assignee: []
 created_date: '2026-08-08 06:47'
-updated_date: '2026-08-08 07:01'
+updated_date: '2026-08-08 13:48'
 labels: []
 dependencies:
   - TASK-3
@@ -84,6 +84,7 @@ ordinal: 13000
 - [ ] #8 tc3oliver/meowcoder.com 儲存庫已轉為 public，且確認不含機密或個人敏感檔案
 - [ ] #9 正式環境的 Lighthouse 重測仍符合 MCD-11 的 95 分門檻
 - [ ] #10 PRD §38 的驗收條件已逐項核對並記錄結果，第 17 點標註為依 decision-2 由站長自行完成
+- [ ] #11 轉為 public 前已就 backlog/ 與 .agent-workflow/ 做出明確的保留或移除決定（doc-1 為完整 PRD，含未發佈的產品定位與內容策略，屬 PRD §20「未發佈產品資訊」），不得只做機密掃描就放行
 <!-- AC:END -->
 
 ## Definition of Done

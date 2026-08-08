@@ -4,7 +4,7 @@ title: MCD-1 — 儲存庫啟動
 status: In Progress
 assignee: []
 created_date: '2026-08-08 06:41'
-updated_date: '2026-08-08 07:14'
+updated_date: '2026-08-08 13:49'
 labels: []
 dependencies: []
 priority: high
@@ -198,4 +198,62 @@ Cloudflare Pages 的 GitHub 整合只能在 Cloudflare Dashboard 完成，`wrang
   wrangler 建立 Pages 專案。
 
 其餘 9 項 AC 已完成，程式碼已推送，CI 已綠。此項解除後即可勾選 AC #7 並收尾。
+
+## 獨立 code review 後的修正
+
+以獨立 reviewer lane 複審（未自我核可）。兩項 HIGH 落在 AC #5「.gitignore 排除
+本機機密」範圍內，等同 AC #5 原本未真正達成，已修正：
+
+**HIGH-1 — Wrangler 機密檔未被忽略。** `.dev.vars`、`.dev.vars.local`、`.wrangler/`
+原本 NOT-IGNORED。`.dev.vars` 正是 Cloudflare API token 與分析金鑰落地的檔案，而
+AC #7 解除阻礙時就會產生它，屬 PRD §20 明列的「Cloudflare API credentials」。
+
+**HIGH-2 — `.claude/settings.local.json` 未被忽略。** 依 decision-1 `.claude/` 是
+刻意追蹤的，但 Claude Code 會自動寫入該檔，內含本機絕對路徑、允許清單與可能的
+`env` 金鑰。已排除該檔與 `.claude/settings.local.*`，`.claude/skills/**` 維持追蹤。
+
+一併補上 `id_rsa*`、`id_ed25519*`（無副檔名，`*.key` 抓不到）、`*.p12`、`*.pfx`、
+`*resume*.pdf`、`*cv*.pdf`（PRD §14 明文禁止履歷 PDF 進入公開儲存庫）、`*.log`、
+`.worktrees/`。
+
+以 `git check-ignore` 逐項實測：13 條敏感路徑全數 IGNORED，
+`.claude/skills/**`、`src/`、`backlog/config.yml` 維持 TRACKED。
+
+**MEDIUM — `absoluteUrl` 的 trailing slash 與重複斜線。** 原實作只補前導斜線，
+docstring 卻宣稱統一 trailing-slash 慣例；而 `build.format: 'directory'` 產出的是
+`/work/`，Astro 7 的 `trailingSlash` 預設為 `ignore`。若不修，MCD-11 的 canonical
+會輸出 `/work`、sitemap 輸出 `/work/`，同一頁三種 URL 形式。已設定
+`trailingSlash: 'always'`，並在 `absoluteUrl` 實作 trailing slash 正規化、
+收合中間重複斜線、對絕對 URL 拋錯。測試自 3 條增至 10 條。
+
+實作過程中新測試暴露一個真實設計衝突：`//about`（空 locale 內插）與
+`//other.example/x`（protocol-relative URL）是同一種字串語法，依 RFC 3986 無法區分，
+「收合」與「拋錯」兩條規則直接矛盾。選擇對開頭 `//` 一律拋錯 —— build 時大聲失敗
+可以抓到空 locale 的內插 bug，而收合會把外部 URL 靜默變成錯誤的站內 URL。中間的
+重複斜線無歧義，維持收合。理由已寫入 `src/lib/site.ts` 的註解與測試名稱。
+
+**MEDIUM — 平行執行時驗證工具會遞迴進 worktree。** reviewer 實測建立
+`.worktrees/fake/` 後，`vitest` 會執行別的任務的測試檔（`Test Files 2 passed`），
+`eslint` 與 `prettier` 也會掃到。由於本任務正是平行執行的前置條件，已新增
+`vitest.config.ts` 明確界定 `include: ['src/**/*.test.ts']`，並將 `.worktrees/`
+加入 `.gitignore`、`.prettierignore`、`eslint.config.js`、`tsconfig.json`。
+
+**LOW — 其餘修正。** `.nvmrc` 由 `22` 改為 `22.12.0`（原本 `nvm use` 會選中已安裝的
+22.11 而通過，接著 Astro 7 才拒絕執行）；CI `cancel-in-progress` 改為僅對 PR 生效
+（在 main 上取消會讓被取消的 commit 沒有綠燈，而 MCD-13 以此為門檻）；CI 加上
+`timeout-minutes: 15` 與 checkout 的 `persist-credentials: false`；`LICENSE` 移除
+附加的 NOTE 段落（約 40 字的自訂文字可能讓 GitHub 的 SPDX 相似度比對失敗而顯示
+"Other"，反而削弱 PRD §23 的訊號），改以 `LICENSE-CONTENT.md` 的路徑對照表與
+README 承載授權分割說明。
+
+**已知並移交 MCD-13：** `backlog/`（含 `doc-1` 完整 PRD）依 decision-1 進入儲存庫，
+是本樹最大的公開曝險面。掃描確認無任何金鑰、token、email 或金鑰材料，屬揭露範圍
+決策而非憑證外洩。已於 TASK-13 新增 AC #11，要求轉 public 前必須就 `backlog/` 與
+`.agent-workflow/` 做出明確的保留或移除決定，不得只做機密掃描就放行。
+
+**SHA-pin GitHub Actions** 未在本任務處理，屬 MCD-10 的儲存庫衛生範圍。
+
+修正後複驗（Node v22.23.2）：prettier `All matched files use Prettier code style!`、
+eslint exit 0、`astro check` `0 errors, 0 warnings, 0 hints`、
+vitest `Tests 10 passed (10)`、`astro build` Complete、`npm audit` 0 vulnerabilities。
 <!-- SECTION:NOTES:END -->
