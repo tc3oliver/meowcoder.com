@@ -1,10 +1,10 @@
 ---
 id: TASK-6
 title: MCD-8 — 研究與關於頁
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-08-08 06:44'
-updated_date: '2026-08-08 06:58'
+updated_date: '2026-08-08 14:59'
 labels: []
 dependencies:
   - TASK-4

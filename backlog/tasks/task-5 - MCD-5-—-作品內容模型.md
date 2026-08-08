@@ -1,9 +1,10 @@
 ---
 id: TASK-5
 title: MCD-5 — 作品內容模型
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-08-08 06:44'
+updated_date: '2026-08-08 14:59'
 labels: []
 dependencies:
   - TASK-4

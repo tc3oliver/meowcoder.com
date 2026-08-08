@@ -1,9 +1,10 @@
 ---
 id: TASK-7
 title: MCD-9 — Study 文章整合
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-08-08 06:44'
+updated_date: '2026-08-08 14:59'
 labels: []
 dependencies:
   - TASK-4
