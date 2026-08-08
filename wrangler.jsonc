@@ -1,0 +1,27 @@
+/**
+ * Cloudflare Workers Static Assets configuration (MCD-1a, decision-4).
+ *
+ * This site is static (PRD §26). There is deliberately **no `main`** field:
+ * without an entry script, the Worker serves `assets.directory` and nothing
+ * else — no server-side code runs.
+ *
+ * Declaring this file explicitly is also what stops `wrangler` from
+ * framework-detecting the project and running `astro add cloudflare`, which
+ * would install `@astrojs/cloudflare` and turn the site into SSR. That happened
+ * once before this file existed; see `decision-4`.
+ *
+ * Do not add `main`, and do not install `@astrojs/cloudflare`.
+ * `astro.config.mjs` must stay `output: 'static'`.
+ *
+ * `_headers` (MCD-11) and `_redirects` (MCD-13) belong in `public/`. Astro
+ * copies that directory verbatim into `dist/`, where Workers Static Assets
+ * reads them.
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "meowcoder-com",
+  "compatibility_date": "2026-08-08",
+  "assets": {
+    "directory": "./dist",
+  },
+}
