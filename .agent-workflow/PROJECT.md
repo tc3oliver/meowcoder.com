@@ -17,6 +17,8 @@
 - `doc-1` (`backlog/docs/specifications/doc-1 - MeowCoder-Personal-Site-Redesign-v4-PRD.md`) — verbatim import of the PRD `meowcoder-personal-site-redesign-plan-v4.md`. Authoritative for product scope, IA, bilingual strategy, content, visual direction, and the MCD-1..13 implementation backlog.
 - `decision-1` (`backlog/decisions/decision-1 - 在現有-backlog-工作目錄中實作-meowcoder.com-網站.md`) — confirms this directory is the permanent local working copy for the site.
 - `decision-2` (`backlog/decisions/decision-2 - 不執行-WordPress-遷移程序，由站長直接刪除舊站.md`) — partially overrides PRD §31 and §38 item 17: the WordPress migration procedure is not executed. `doc-1` text is unchanged; consult this decision before treating §31 as in scope.
+- `decision-3` — Cloudflare staging is split out of MCD-1 into TASK-14.
+- `decision-4` (`backlog/decisions/decision-4 - 以-Cloudflare-Workers-Static-Assets-取代-Cloudflare-Pages-作為託管方式.md`) — overrides the `Cloudflare Pages` wording in PRD §26: hosting is Cloudflare **Workers Static Assets**.
 
 ## Validation commands
 
@@ -29,6 +31,22 @@
 
 Run them in the CI order defined by PRD §23: install → format/lint → typecheck
 → build → test.
+
+## Deployment
+
+- Host: Cloudflare **Workers Static Assets** (see `decision-4`, not Pages).
+- Config: `wrangler.jsonc` declares only `assets.directory = "./dist"`. It has
+  **no `main`**, which is what makes it a static-asset-only Worker.
+- Cloudflare project settings: build command `npm run build`, deploy command
+  `npx wrangler deploy`, environment variable `NODE_VERSION` = `22.12.0`.
+- Pushing to `main` triggers a Cloudflare build automatically.
+- Staging URL: `not yet recorded` — fill in once the first deploy succeeds.
+- **Never install `@astrojs/cloudflare` or run `astro add cloudflare`.** Without
+  `wrangler.jsonc`, wrangler framework-detects the project and converts it to
+  SSR, which breaks the static-first architecture PRD §26 requires. This has
+  happened once already; `decision-4` records it.
+- `public/` is copied verbatim into `dist/`. `_headers` (MCD-11 security
+  headers) and `_redirects` (MCD-13) go there.
 
 ## Project-specific constraints
 
