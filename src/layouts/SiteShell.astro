@@ -13,7 +13,7 @@ import Header from '../components/Header.astro';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import { chrome } from '../i18n/chrome';
 import type { Locale } from '../i18n/locales';
-import { GITHUB_URL, STUDY_URL } from '../lib/external';
+import { GITHUB_URL, SHOURI_URL, STUDY_URL } from '../lib/external';
 import { localizePath, type Route } from '../lib/i18n';
 import BaseLayout from './BaseLayout.astro';
 
@@ -43,6 +43,32 @@ const navItems = [
   { href: localizePath(locale, '/about'), label: t.nav.about, current: route === '/about' },
   { href: GITHUB_URL, label: t.nav.github, external: true },
 ];
+
+/*
+ * This site's own repository (PRD §9.8 `Site Source`, `decision-1` and
+ * `.agent-workflow/PROJECT.md`). It is not in `src/lib/external.ts` with the
+ * rest of the ecosystem because that module records the properties the site
+ * links *out* to; this one is the site itself, and PRD §24 is explicit that it
+ * is secondary evidence — a footer link, never a homepage feature.
+ *
+ * The repository is still private and goes public at MCD-13, so `linkcheck`
+ * skips it until then; see the `linkcheck:site` script.
+ */
+const SITE_SOURCE_URL = 'https://github.com/tc3oliver/meowcoder.com';
+
+/*
+ * The footer link row, in the order PRD §9.8 lists it. ORCID is the one
+ * destination PRD §9.8 names that is missing: no ORCID iD appears anywhere in
+ * the PRD, and inventing one would credit another researcher's record. It is
+ * added when the real identifier is confirmed — see the note on
+ * `ChromeDictionary.footer`.
+ */
+const footerLinks = [
+  { href: GITHUB_URL, label: t.footer.github, external: true },
+  { href: STUDY_URL, label: t.footer.study, external: true },
+  { href: SHOURI_URL, label: t.footer.shouri, external: true },
+  { href: SITE_SOURCE_URL, label: t.footer.siteSource, external: true },
+];
 ---
 
 <BaseLayout
@@ -71,8 +97,7 @@ const navItems = [
 
   <slot />
 
-  <Footer slot="footer" navLabel={t.footer.ariaLabel}>
-    {/* The link row PRD §9.8 specifies is MCD-4 scope; the wordmark is chrome. */}
+  <Footer slot="footer" navLabel={t.footer.ariaLabel} links={footerLinks}>
     <span slot="meta">meowcoder.com</span>
   </Footer>
 </BaseLayout>

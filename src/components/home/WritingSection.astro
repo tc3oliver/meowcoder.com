@@ -1,0 +1,136 @@
+---
+/**
+ * Technical Writing (MCD-4, PRD §9.6).
+ *
+ * Metadata only — date, category, title, and the link back. PRD §9.6 forbids
+ * duplicating full articles here and keeps Study the canonical publication
+ * platform, and `src/lib/study-feed.ts` enforces that upstream by never parsing
+ * an article body in the first place.
+ *
+ * Two degraded states are normal rather than exceptional:
+ *
+ *   - No posts. An unreachable feed, a timeout, or a build with no network at
+ *     all resolves to an empty list (PRD §28 requires the build to survive it),
+ *     in which case only the call to action renders. There is no error message:
+ *     a visitor is not the audience for a build-time fetch failure, and the
+ *     reason is already in the build log.
+ *   - No category. Study's feed declares none today, so the category line only
+ *     appears for entries that carry one.
+ *
+ * Titles are shown in the language Study published them in, via
+ * `localizedTitle`. PRD §7 forbids machine-translating them at runtime.
+ */
+
+import { LOCALE_TAG, type Locale } from '../../i18n/locales';
+import type { HomeStrings } from '../../i18n/pages/home';
+import { STUDY_URL } from '../../lib/external';
+import { localizedTitle, type StudyPost } from '../../lib/study-feed';
+import CtaLink from './CtaLink.astro';
+import HomeSection from './HomeSection.astro';
+
+interface Props {
+  locale: Locale;
+  t: HomeStrings;
+  posts: readonly StudyPost[];
+  externalIndicator: string;
+}
+
+const { locale, t, posts, externalIndicator } = Astro.props;
+
+/* Built once per render rather than per post; `dateStyle: 'medium'` gives each
+   locale its own conventional form instead of imposing one format on both. */
+const dateFormat = new Intl.DateTimeFormat(LOCALE_TAG[locale], { dateStyle: 'medium' });
+---
+
+<HomeSection id="technical-writing" heading={t.writing.heading}>
+  <div class="writing">
+    <p class="writing__intro">{t.writing.intro}</p>
+
+    {
+      posts.length > 0 && (
+        <ul class="posts" role="list">
+          {posts.map((post) => (
+            <li class="posts__item">
+              <p class="posts__meta">
+                <time datetime={post.date}>{dateFormat.format(new Date(post.date))}</time>
+                {post.category && <span class="posts__category">{post.category}</span>}
+              </p>
+              <p class="posts__title">
+                <a href={post.url} rel="noopener noreferrer">
+                  {localizedTitle(post, locale)}
+                </a>
+              </p>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <p>
+      <CtaLink
+        href={STUDY_URL}
+        label={t.writing.cta.label}
+        external
+        indicator={externalIndicator}
+        variant="outline"
+      />
+    </p>
+  </div>
+</HomeSection>
+
+<style>
+  .writing {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    max-width: var(--width-reading);
+  }
+
+  .writing__intro {
+    color: var(--color-text-muted);
+    line-height: var(--leading-relaxed);
+  }
+
+  .posts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin: 0;
+  }
+
+  .posts__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* A hairline divider rather than a bullet: the category is a second field on
+     the same line, not a list item. */
+  .posts__category::before {
+    content: '';
+    display: inline-block;
+    width: var(--border-width);
+    height: 1em;
+    margin-inline-end: var(--space-4);
+    background-color: var(--color-border);
+    vertical-align: -0.15em;
+  }
+
+  .posts__title {
+    margin-block-start: var(--space-1);
+    font-size: var(--text-md);
+    line-height: var(--leading-snug);
+  }
+
+  .posts__title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .posts__title a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+</style>

@@ -1,0 +1,97 @@
+---
+/**
+ * A homepage call to action (MCD-4).
+ *
+ * Every CTA on the page — hero, section, and the one inline evidence link —
+ * renders through here, so `rel`, the external glyph, and the focus target are
+ * decided once. The glyph is the localized `externalIndicator` from the chrome
+ * dictionary rather than a literal `↗`, and it is hidden from assistive
+ * technology: screen readers announce the destination from the link text and
+ * `rel`, so repeating an arrow would only add noise. This matches
+ * `Header.astro`, which treats its off-site entries the same way.
+ *
+ * PRD §25 rules out decoration, so the variants differ only in weight: `solid`
+ * is the single emphasized action on the page, `outline` is a section action,
+ * and `text` is a link inside prose.
+ */
+
+interface Props {
+  href: string;
+  label: string;
+  /** Off-site destination: adds the safe `rel` and the visible indicator. */
+  external?: boolean;
+  /** Localized glyph for off-site links, from the chrome dictionary. */
+  indicator?: string;
+  variant?: 'solid' | 'outline' | 'text';
+}
+
+const { href, label, external = false, indicator, variant = 'text' } = Astro.props;
+---
+
+<a
+  class:list={['cta', `cta--${variant}`]}
+  href={href}
+  rel={external ? 'noopener noreferrer' : undefined}
+>
+  {label}
+  {
+    external && indicator && (
+      <span class="cta__indicator" aria-hidden="true">
+        {indicator}
+      </span>
+    )
+  }
+</a>
+
+<style>
+  .cta {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25em;
+    line-height: var(--leading-snug);
+    text-decoration: none;
+  }
+
+  .cta__indicator {
+    font-size: 0.85em;
+  }
+
+  .cta--solid,
+  .cta--outline {
+    padding: var(--space-3) var(--space-5);
+    border: var(--border-width) solid transparent;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+
+  .cta--solid {
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .cta--solid:hover {
+    background-color: var(--color-accent-strong);
+    color: var(--color-on-accent);
+  }
+
+  /* `--color-border-strong` rather than the hairline: the border is the only
+     thing defining this control, so it owes WCAG 1.4.11 its 3:1 contrast. */
+  .cta--outline {
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+  }
+
+  .cta--outline:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .cta--text {
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+</style>

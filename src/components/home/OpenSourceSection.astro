@@ -1,0 +1,162 @@
+---
+/**
+ * Open Source — AI Coding Skills (MCD-4, PRD §9.4).
+ *
+ * This is the primary open-source proof. PRD §24 keeps it that way: the
+ * meowcoder.com source is secondary engineering evidence and gets a footer link
+ * rather than a card here.
+ *
+ * `backlog-workflow` leads and `audit-claude-md` follows, in that order and at
+ * that weight, because PRD §9.4 states the priority. The pipeline is rendered
+ * as an ordered list — the PRD draws it as an arrow diagram, but the content is
+ * a sequence of stages, and marking it up as one keeps it readable in a screen
+ * reader and free of the decorative ASCII art PRD §25 avoids.
+ *
+ * The attribution line is not optional polish. PRD §9.4 requires third-party
+ * skills to retain clear attribution and never be presented as original work,
+ * and its wording is taken from `.claude/skills/grilling/SKILL.md` and the MIT
+ * `LICENSE` shipped beside it — not from memory.
+ */
+
+import type { HomeStrings } from '../../i18n/pages/home';
+import { GITHUB_URL } from '../../lib/external';
+import CtaLink from './CtaLink.astro';
+import HomeSection from './HomeSection.astro';
+
+interface Props {
+  t: HomeStrings;
+  externalIndicator: string;
+}
+
+const { t, externalIndicator } = Astro.props;
+---
+
+<HomeSection id="open-source" eyebrow={t.openSource.eyebrow} heading={t.openSource.heading}>
+  <div class="oss">
+    <p class="oss__summary">{t.openSource.summary}</p>
+
+    <article class="oss__work">
+      <p class="oss__label">{t.openSource.primaryLabel}</p>
+      <h3 class="oss__name">{t.openSource.primaryName}</h3>
+
+      <ol class="pipeline">
+        {t.openSource.pipeline.map((stage) => <li class="pipeline__stage">{stage}</li>)}
+      </ol>
+
+      <h4 class="oss__subheading">{t.openSource.highlightsHeading}</h4>
+      <ul class="oss__points">
+        {t.openSource.highlights.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+
+    <article class="oss__work">
+      <p class="oss__label">{t.openSource.secondaryLabel}</p>
+      <h3 class="oss__name">{t.openSource.secondaryName}</h3>
+
+      <h4 class="oss__subheading">{t.openSource.secondaryHeading}</h4>
+      <ul class="oss__points">
+        {t.openSource.secondaryPoints.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+
+    <p class="oss__attribution">{t.openSource.attribution}</p>
+
+    <p>
+      <CtaLink
+        href={GITHUB_URL}
+        label={t.openSource.cta.label}
+        external
+        indicator={externalIndicator}
+        variant="outline"
+      />
+    </p>
+  </div>
+</HomeSection>
+
+<style>
+  .oss {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+
+  .oss__summary {
+    max-width: var(--width-reading);
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+  }
+
+  .oss__work {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .oss__label {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .oss__name {
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
+    letter-spacing: var(--tracking-normal);
+  }
+
+  .oss__subheading {
+    margin-block-start: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+
+  .oss__points {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-2) var(--space-6);
+    padding-inline-start: var(--space-5);
+  }
+
+  .oss__points li {
+    line-height: var(--leading-snug);
+  }
+
+  .oss__attribution {
+    max-width: var(--width-reading);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* -----------------------------------------------------------------------
+   * The requirement-to-delivery pipeline (PRD §9.4)
+   *
+   * A wrapping row of stages on wide viewports, a plain column on narrow ones.
+   * The separator is a CSS `::after` so it never reaches the accessibility
+   * tree — the list order already carries the sequence.
+   * -------------------------------------------------------------------- */
+
+  .pipeline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pipeline__stage {
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+
+  .pipeline__stage:not(:last-child)::after {
+    content: '→';
+    margin-inline-start: var(--space-3);
+    color: var(--color-text-muted);
+  }
+</style>
