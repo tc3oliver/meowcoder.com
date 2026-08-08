@@ -1,0 +1,257 @@
+---
+title: 'Shouri / 收理'
+type: 'Product · AI Systems'
+summary: 'An AI-powered information organizer for capturing webpages, files and media, then turning them into structured, searchable knowledge.'
+slug: 'shouri'
+locale: 'en'
+translationKey: 'shouri'
+order: 0
+draft: false
+---
+
+## Problem
+
+Saving is the easy half. A twelve-minute cooking video, a PDF specification, a
+link dropped into a group chat — each takes one tap to keep, and each is
+effectively gone by the time it is needed. The collection grows; the ability to
+act on it does not.
+
+Two design choices common in AI-assisted tools make that worse:
+
+- **Processing at capture time.** If extraction or the model call fails, the
+  thing the user actually wanted — the original — can be lost with it.
+- **Derived text written over the source.** Once a summary replaces the page,
+  there is nothing left to re-derive from when the model gets it wrong.
+
+Shouri treats capture and organization as two separate jobs, so neither one can
+destroy the other.
+
+## Product Principles
+
+Three principles, stated in product terms and enforced in the data model rather
+than in the interface.
+
+**Save first.** The original is persisted before any AI call. Text is written to
+the database, uploaded files to storage. The item reaches a saved state the user
+can walk away from before organization is offered at all.
+
+**Explicit AI.** AI organization is off by default and runs only after the user
+turns it on. Consent is requested the first time organization is actually used,
+not bundled into registration, and nothing is sent for processing before that.
+It can be switched off again at any point, and content already saved is
+unaffected.
+
+**Recoverable architecture.** Source content and AI-derived fields are stored
+separately. A failed extraction or a poor organization run does not delete or
+overwrite the saved item, and a correction the user makes survives the next run.
+
+## Architecture
+
+An item moves through three observable states, and the boundaries between them
+are the architecture:
+
+1. **Saved.** The original is durable — text in the database, an uploaded file
+   in private object storage. Nothing has been sent anywhere yet.
+2. **Organizing.** Usable content is extracted and sent for AI processing, which
+   returns a title, summary, key points, a classification, tags, and
+   subject-specific fields.
+3. **Organized.** Derived fields are stored alongside the original, not inside
+   it. The item becomes searchable, correctable, shareable, and eligible for
+   Review.
+
+Properties that follow from that split:
+
+- Stored files are never publicly readable. Display and download go through
+  short-lived signed links generated on demand.
+- Deletion is staged. A deleted item sits in trash for thirty days and can be
+  restored; a daily scheduled job then removes it permanently, original files
+  included. Deleting an entire account is immediate and permanent, with no trash
+  and no recovery window.
+- Items are private by default. The one exception is a share link the user
+  creates: an unguessable URL that anyone holding it can read.
+
+What this page does not describe is the stack, the hosting arrangement, or which
+AI provider is used. The product's own public documentation names third parties
+by category, and this case study stays at the same level.
+
+## Engineering Decisions
+
+Each decision below is paired with the constraint it protects and what it costs.
+
+**Persist before processing, not after.** This rules out the failure mode where
+a capture is lost because a downstream extraction failed. The cost is that a
+saved item can sit unorganized indefinitely, which is part of why the Review
+queue exists.
+
+**Ask for AI consent at the moment of use.** Collecting it during registration
+would have been simpler to implement and would have removed a prompt from the
+moment of use. Asking the first time organization is actually used ties the
+decision to something the user is doing on purpose.
+
+**Store derived fields separately rather than mutating the record.** Reprocessing
+is then always safe, because there is nothing to lose by running it again.
+
+**User corrections win.** Edits to classification, tags, and subject fields are
+final and are not overwritten by the next organization run. Without that rule,
+the system would silently undo the user's work every time it reprocessed an item,
+and correcting anything would stop being worth the effort.
+
+**Show the cost before spending it.** Organization is metered in AI credits and
+priced by content length, so the cost of one item is not obvious in advance. Each
+item displays its estimated cost and waits for the user to accept it.
+
+**Cap the analysis, not the content.** When an item exceeds the per-item analysis
+limit of the current plan, that run stops at the limit. The excess is not
+discarded — the original is retained in full — so a later run on a higher limit
+can go further.
+
+**Keep session and device tokens only as hashes**, so that disclosure of the
+database does not by itself grant access to accounts.
+
+## AI Processing
+
+Organization produces a title, summary, key points, a classification, tags, and
+subject fields. It accepts URLs, plain text, images, PDFs, audio, and video,
+including several files in one upload.
+
+Output is structured by subject rather than reduced to one generic summary.
+Seven subjects each have their own field shape:
+
+- **Recipe** — an ingredient list and steps that can be checked off while
+  cooking.
+- **Show or film** — year, genre, running time, and where it can be watched.
+- **Training** — a video turned into a checkable list of movements.
+- **Tutorial** — the steps, plus what has to be prepared first.
+- **Place** — address and opening hours, grouped by city.
+- **Event** — date and location read from something like a poster, with
+  approaching events surfaced first.
+- **Product** — specification, seller, and the price at the time it was saved.
+
+Manual and automatic organization are separated by plan. On Free, organization is
+triggered per item against a monthly credit allowance. Pro, published but not yet
+open for subscription, organizes on capture — with PDFs, audio, and video, the
+expensive inputs, still confirmed before processing by default.
+
+Analysis limits are published per plan. Free analyses up to 20,000 characters of
+web page, text, or video-subtitle content, 10 images, 20 PDF pages, 10 minutes of
+audio, or 3 minutes of uploaded video per item. Pro raises those to 100,000
+characters, 50 images, 100 pages, 60 minutes, and 30 minutes.
+
+Correctness is not claimed. The product states directly that generated titles,
+summaries, key points, classifications, and tags can be wrong, that the original
+is always kept in full, and that the original is the authority for any judgement
+that matters. User content is not used to train models.
+
+## Search & Retrieval
+
+Retrieval is the point of the product, so organization is designed to produce
+retrieval structure rather than readable prose.
+
+- **Results explain the hit.** A search result shows the passage that matched,
+  not only a title, so a result can be judged without opening it.
+- **Structured entry points sit next to free text.** Classification, tags, and
+  subject fields are all searchable dimensions, and user corrections to them
+  persist across reprocessing.
+- **Review is a prioritized queue, not a reverse-chronological list.** It
+  surfaces items that failed processing, items about to expire, items never
+  organized, and items not opened for a long time — the four states in which a
+  collection quietly rots.
+- **Export is part of retrieval.** An account's items and organization results
+  can be exported at any time, and every exported item points at the download
+  location of its original file.
+
+## Mobile / PWA Integration
+
+Shouri is not distributed through an app store. It is a web application that
+installs to the home screen, and each platform is given the integration path it
+actually supports.
+
+- **Android.** Installing the PWA registers Shouri in the system share menu. No
+  shortcut and no pairing code.
+- **iPhone and iPad.** An official Apple Shortcut, paired once, makes capture
+  available from Safari, Photos, Files, and other apps through the share sheet.
+- **Desktop web.** Paste a URL or text, or drag in images, PDFs, audio, and
+  video — several files at once.
+
+Installation is documented in the product rather than assumed: open the site in
+Safari, use the share button, choose Add to Home Screen, confirm the name. Both
+mobile paths land in the same capture flow, so an item saved from a share menu is
+the same object as one saved on the desktop.
+
+## Production Considerations
+
+Operating the service is a larger problem than building it, and most of the
+operational model is stated publicly rather than left implicit.
+
+**Metering.** Organization consumes AI credits proportional to content length.
+Processing time, outcome, credit usage, and service cost are recorded per job,
+for running and billing the service — explicitly not for advertising or
+profiling.
+
+**Quota behaviour.** Welcome credits expire twelve months after registration; the
+recurring monthly allowance is valid for its period and does not roll over.
+Running out stops new organization only. Existing collections, search, and
+original files are untouched.
+
+**Storage limits are published**: 2 GB with a 50 MB per-file ceiling on Free,
+20 GB and 500 MB on Pro.
+
+**Data lifecycle.** Thirty-day trash, a daily scheduled job for permanent
+deletion including original files, and immediate irreversible account deletion.
+
+**Third-party processors are enumerated by category** rather than left vague: the
+AI service, a parsing service used to fetch public media from social posts, cloud
+storage and hosting, the payment provider, and transactional email. Card data is
+held by the payment provider; Shouri keeps only order number, amount, time, and
+outcome.
+
+**Abuse limits.** Content extraction and social-post parsing exist to organize a
+user's own collection, not to act as a general downloader, and are rate-limited
+on that basis.
+
+**Availability is described honestly.** The service is offered as-is with no
+uptime guarantee, backups are taken regularly, and users are told to keep their
+own copy of anything important rather than treat Shouri as the only place a file
+exists.
+
+**Administrative access is bounded** to aggregate usage, storage, and cost
+statistics.
+
+**Billing failures have a defined repair path.** A successful payment that did
+not activate Pro is repaired by granting the entitlement rather than refunding,
+because the entitlement is what was bought. Duplicate charges are refunded, and
+cancellation is done in the settings page without contacting support.
+
+## Result
+
+What is public and inspectable today:
+
+- Shouri is live at [shouri.app](https://shouri.app), in Traditional Chinese,
+  with Google sign-in.
+- The Free plan is open. Capture, search, and storage are free, and organization
+  runs per item against a monthly credit allowance.
+- Pro is published at NT$199 per month with its limits stated, and is announced
+  as opening for subscription soon.
+- Terms of service, privacy policy, and a refund and cancellation policy are all
+  published, last updated 3 August 2026, and specific enough to be checked
+  against the product's actual behaviour.
+- The product is in a test period, with a limited offer for early registrations.
+
+Operating figures — user counts, processing volume, latency, accuracy — are not
+published, and this page cites none. Everything above can be verified from the
+product and its public documents.
+
+## Evidence
+
+- **Product** — [shouri.app](https://shouri.app)
+- **Plans and credits** — [shouri.app/pricing](https://shouri.app/pricing)
+- **Privacy policy** — [shouri.app/privacy](https://shouri.app/privacy)
+- **Terms of service** — [shouri.app/terms](https://shouri.app/terms)
+- **Refund and cancellation policy** —
+  [shouri.app/refund](https://shouri.app/refund)
+
+Every claim on this page maps to observable product behaviour or to a clause in
+those documents. Deliberately absent: the implementation stack, named providers
+and models, infrastructure detail, and operating metrics. None of that is
+publicly documented, and a case study is not the right place for it to appear
+first.
