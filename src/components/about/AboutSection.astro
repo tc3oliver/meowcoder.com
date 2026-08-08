@@ -1,0 +1,41 @@
+---
+/**
+ * One About section (MCD-8).
+ *
+ * Every section on the page is a labelled landmark with the same heading
+ * rhythm, so the page reads as a sequence of equal-weight sections rather than
+ * a document with one dominant block. The heading id is supplied by the caller
+ * and reused for `aria-labelledby`, which is what gives each `<section>` an
+ * accessible name in the landmark list.
+ */
+
+interface Props {
+  /** Id for the heading; also the section's `aria-labelledby` target. */
+  id: string;
+  heading: string;
+}
+
+const { id, heading } = Astro.props;
+---
+
+<section class="about-section" aria-labelledby={id}>
+  <h2 class="about-section__heading" id={id}>{heading}</h2>
+  <slot />
+</section>
+
+<style>
+  .about-section {
+    /* The separator between sections is the whitespace plus one hairline —
+       PRD §25 asks for thin borders and large whitespace, not cards. */
+    border-block-start: var(--border-width) solid var(--color-border);
+    padding-block-start: var(--space-7);
+  }
+
+  .about-section__heading {
+    /* Section headings sit a step below the page title so the h1 keeps the
+       hierarchy, while the sections stay peers of one another. */
+    font-size: var(--text-lg);
+    letter-spacing: var(--tracking-normal);
+    margin-block-end: var(--space-5);
+  }
+</style>

@@ -1,0 +1,258 @@
+---
+/**
+ * The About page body (MCD-8, PRD §13–§17).
+ *
+ * Both locales render through this one component so the English and Chinese
+ * pages cannot drift apart in structure, section order, or markup — only the
+ * strings differ. The order is the order the PRD introduces the sections in:
+ *
+ *   opening → engineering background → career snapshot →
+ *   research & education → selected credentials → engineering principles
+ *
+ * which also puts credentials near the bottom, where PRD §16 wants them.
+ *
+ * Two omissions are deliberate:
+ *
+ *   - The publication and ORCID carry no link. PRD §15 and §6 name both but
+ *     state no address for either, and a citation is still a citation without
+ *     one; inventing a URL would be worse than omitting it.
+ *   - There is no résumé download. PRD §14 and §20 keep the original résumé out
+ *     of the public repository entirely.
+ */
+
+import type { AboutStrings } from '../../i18n/pages/about';
+import AboutSection from './AboutSection.astro';
+import TermList from './TermList.astro';
+
+interface Props {
+  t: AboutStrings;
+}
+
+const { t } = Astro.props;
+---
+
+<div class="container container--reading about">
+  <header class="about__opening">
+    <h1>{t.heading}</h1>
+    <p class="about__lede">{t.intro}</p>
+    {t.summary.map((paragraph) => <p class="about__paragraph">{paragraph}</p>)}
+  </header>
+
+  <AboutSection id="engineering-background" heading={t.background.heading}>
+    <TermList items={t.background.items} />
+  </AboutSection>
+
+  <AboutSection id="career-snapshot" heading={t.career.heading}>
+    {
+      /* Three rungs, no dates and no employers — PRD §14 asks for a progression,
+        not an employment history, and PRD §11 keeps employers unnamed. */
+    }
+    <dl class="career">
+      {
+        t.career.tiers.map((tier) => (
+          <div class="career__tier">
+            <dt class="career__label">{tier.label}</dt>
+            {tier.items.map((item) => (
+              <dd class="career__item">{item}</dd>
+            ))}
+          </div>
+        ))
+      }
+    </dl>
+  </AboutSection>
+
+  <AboutSection id="research-education" heading={t.research.heading}>
+    <div class="about__stack">
+      <h3 class="about__subheading">{t.research.publicationHeading}</h3>
+      <p class="research__venue">{t.research.venue}</p>
+      <p class="research__paper"><cite>{t.research.paper}</cite></p>
+      <p class="about__label">{t.research.areasLabel}</p>
+      <TermList items={t.research.areas} />
+
+      <h3 class="about__subheading">{t.research.educationHeading}</h3>
+      <p class="research__degree">{t.research.degree}</p>
+      <p class="research__institution">{t.research.institution}</p>
+    </div>
+  </AboutSection>
+
+  <AboutSection id="selected-credentials" heading={t.credentials.heading}>
+    {
+      /* Text entries only. PRD §16 rules out a display built from vendor marks,
+        and course-completion certificates are not listed here at all. */
+    }
+    <ul class="credentials" role="list">
+      {
+        t.credentials.items.map((credential) => (
+          <li class="credentials__item">
+            <p class="credentials__name">{credential.name}</p>
+            <p class="credentials__meta">{credential.meta}</p>
+            {credential.note && <p class="credentials__meta">{credential.note}</p>}
+          </li>
+        ))
+      }
+    </ul>
+  </AboutSection>
+
+  <AboutSection id="engineering-principles" heading={t.principles.heading}>
+    <div class="about__stack">
+      <p class="principles__statement">{t.principles.statement}</p>
+      <TermList items={t.principles.items} />
+    </div>
+  </AboutSection>
+</div>
+
+<style>
+  .about {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .about__opening {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .about__lede {
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+    margin-block-start: var(--space-2);
+  }
+
+  .about__paragraph {
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-muted);
+  }
+
+  .about__stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .about__subheading {
+    font-size: var(--text-md);
+    letter-spacing: var(--tracking-normal);
+  }
+
+  /* Second and later subheadings open a new block, so they need the space a
+     `gap` alone does not give them. */
+  .about__subheading:not(:first-child) {
+    margin-block-start: var(--space-5);
+  }
+
+  .about__label {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  /* -----------------------------------------------------------------------
+   * Career snapshot (PRD §14)
+   * -------------------------------------------------------------------- */
+
+  .career {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .career__tier {
+    display: grid;
+    /* The label column is sized to the longest label and then stops growing,
+       so the three tiers align without a fixed pixel width. */
+    grid-template-columns: minmax(6rem, max-content) 1fr;
+    gap: var(--space-1) var(--space-5);
+  }
+
+  .career__label {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    padding-block-start: 0.15em;
+  }
+
+  .career__item {
+    grid-column: 2;
+    margin: 0;
+    line-height: var(--leading-snug);
+  }
+
+  @media (width < 32rem) {
+    .career__tier {
+      grid-template-columns: 1fr;
+    }
+
+    .career__label,
+    .career__item {
+      grid-column: 1;
+      grid-row: auto;
+    }
+  }
+
+  /* -----------------------------------------------------------------------
+   * Research and education (PRD §15)
+   * -------------------------------------------------------------------- */
+
+  .research__venue {
+    font-weight: var(--weight-semibold);
+  }
+
+  .research__paper {
+    line-height: var(--leading-snug);
+  }
+
+  .research__paper cite {
+    color: var(--color-text-muted);
+  }
+
+  .research__degree {
+    font-weight: var(--weight-semibold);
+  }
+
+  .research__institution {
+    color: var(--color-text-muted);
+  }
+
+  /* -----------------------------------------------------------------------
+   * Credentials (PRD §16)
+   * -------------------------------------------------------------------- */
+
+  .credentials {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin: 0;
+  }
+
+  .credentials__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .credentials__name {
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+  }
+
+  .credentials__meta {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* -----------------------------------------------------------------------
+   * Principles (PRD §17)
+   * -------------------------------------------------------------------- */
+
+  .principles__statement {
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+    margin-block-end: var(--space-2);
+  }
+</style>
