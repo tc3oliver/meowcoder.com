@@ -1,10 +1,10 @@
 ---
 id: TASK-8
 title: MCD-4 — 首頁
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-08-08 06:46'
-updated_date: '2026-08-08 06:58'
+updated_date: '2026-08-08 15:24'
 labels: []
 dependencies:
   - TASK-4
