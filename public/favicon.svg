@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="meowcoder.com">
+  <!--
+    Wordmark initial in the site's accent ink blue on the warm neutral surface,
+    using the same values as `--color-bg` and `--color-accent` in
+    src/styles/tokens.css. Kept to two flat colors and one letterform: PRD §25
+    rules out decorative marks, gradients, and imagery.
+
+    `prefers-color-scheme` mirrors the light-dark() pairs the stylesheet uses,
+    so the tab icon follows the theme the page renders in.
+  -->
+  <style>
+    .bg { fill: #faf8f5; }
+    .fg { fill: #1d4e89; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #14130f; }
+      .fg { fill: #8fb6e8; }
+    }
+  </style>
+  <rect class="bg" width="32" height="32" rx="6" />
+  <path
+    class="fg"
+    d="M7 23V9h3.4l5.6 8.7L21.6 9H25v14h-3.1v-8.8L16.9 22h-1.8l-5-8.8V23H7z"
+  />
+</svg>

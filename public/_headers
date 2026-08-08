@@ -16,11 +16,18 @@
 # HSTS is deliberately absent. PRD §32 enables it only after deployment
 # verification, which is MCD-13.
 #
-# Adding analytics (PRD §33) will require widening `script-src` and
-# `connect-src` to the chosen endpoint. Update this file in the same change.
+# `static.cloudflareinsights.com` is Cloudflare Web Analytics, which the zone
+# injects itself — the build emits no reference to it. It is cookieless and
+# collects no personal data, and it supplies the page-view and language signals
+# PRD §33 asks for. The outbound-click and case-study-engagement signals in §33
+# need custom events, which Web Analytics does not support; that gap is
+# recorded in TASK-11 rather than solved by adding a heavier vendor.
+#
+# Without these two entries the injected beacon is blocked, which shows up as a
+# console error and a CSP violation in Lighthouse's Best Practices audit.
 
 /*
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; manifest-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; upgrade-insecure-requests
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Cross-Origin-Opener-Policy: same-origin

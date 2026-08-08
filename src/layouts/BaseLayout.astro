@@ -47,6 +47,12 @@ const alternates = alternatesFor(route);
     }
     <meta name="color-scheme" content="light dark" />
 
+    {
+      /* Declaring the icon stops browsers probing `/favicon.ico`, which the
+    site does not serve and which Lighthouse counts as a console error. */
+    }
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
     <title>{title}</title>
     <meta name="description" content={description} />
 
