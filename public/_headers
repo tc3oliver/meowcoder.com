@@ -20,9 +20,9 @@
 # nobody can fix from the server side.
 #
 # `includeSubDomains` covers every host under meowcoder.com, so it was only
-# added after checking that each one already serves valid TLS: study (200),
-# shouri (200), and www (301 to the apex). Any future subdomain inherits the
-# same requirement — it must be HTTPS from the moment it exists.
+# added after confirming that every one of them already serves valid TLS. Any
+# future subdomain inherits the same requirement — it must be HTTPS from the
+# moment it exists.
 #
 # `preload` is deliberately absent. Preloading bakes the domain into browser
 # binaries, and removal takes months, so it is a separate decision from the
