@@ -166,6 +166,19 @@ describe('accessibility baseline', () => {
   it('never removes an outline without replacing it', () => {
     expect(GLOBAL_CSS).not.toMatch(/outline:\s*(none|0)\s*;/);
   });
+
+  /*
+   * A regression guard, not a preference. An inline `code` holding a long file
+   * path has no break opportunity, so it sets the page's minimum width and
+   * every element on the page inherits a horizontal scroll — which is how the
+   * AI Coding Skills case study broke at 390px before MCD-13's QA pass.
+   *
+   * `anywhere` specifically: `break-word` wraps the visible text but leaves the
+   * intrinsic minimum width intact, so the page still overflows.
+   */
+  it('lets inline code wrap so a long path cannot widen the page', () => {
+    expect(GLOBAL_CSS).toMatch(/:not\(pre\)\s*>\s*code\)?\s*\{[^}]*overflow-wrap:\s*anywhere/);
+  });
 });
 
 /* -------------------------------------------------------------------------

@@ -131,6 +131,18 @@ button {
   font-size: 0.9em;
 }
 
+/* Inline code often holds a file path or an identifier with no space in it,
+   and a long one has no break opportunity: on a narrow screen it sets the
+   page's minimum width and every other element inherits the horizontal scroll.
+   `anywhere` rather than `break-word` because only `anywhere` shrinks the
+   intrinsic minimum, which is what the overflow is measured against.
+
+   Code inside `pre` is excluded — a block scrolls in its own box, and breaking
+   its lines would change what the code says. */
+:where(:not(pre) > code) {
+  overflow-wrap: anywhere;
+}
+
 :where(hr) {
   border: none;
   border-top: var(--border-width) solid var(--color-border);
