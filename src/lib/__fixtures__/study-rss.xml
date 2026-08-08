@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!--
+  Excerpt of the live https://study.meowcoder.com/index.xml (Hugo 0.154.5, RSS 2.0),
+  captured 2026-08-08. Preserved verbatim from upstream:
+    - the misconfigured http://localhost:9996 origin on every <link> and <guid>;
+    - <language>zh-tw</language>, the only language metadata the feed carries;
+    - the absence of any <category> element.
+  Changed from upstream: item bodies truncated, and item order scrambled so that
+  date ordering is proven rather than inherited from the feed.
+-->
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>首頁 on MeowCoder Lab</title>
+        <link>http://localhost:9996/</link>
+        <description>Recent content in 首頁 on MeowCoder Lab</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-tw</language>
+        <lastBuildDate>Sat, 08 Aug 2026 00:50:00 +0800</lastBuildDate>
+        <atom:link href="http://localhost:9996/index.xml" rel="self" type="application/rss+xml"/>
+        <item>
+            <title>記憶的不可逆性：為什麼 LLM Agent 的壓縮記憶可能比遺忘更危險</title>
+            <link>http://localhost:9996/posts/260630-reclaim-evaluation-lossy-memory/</link>
+            <pubDate>Tue, 30 Jun 2026 00:00:00 +0000</pubDate>
+            <guid>http://localhost:9996/posts/260630-reclaim-evaluation-lossy-memory/</guid>
+            <description>&lt;p&gt;Body intentionally truncated: PRD §9.6 forbids reproducing article content, so the parser must never read this.&lt;/p&gt;</description>
+        </item>
+        <item>
+            <title>下一代 AI Lab 的護城河，可能不是模型架構</title>
+            <link>http://localhost:9996/posts/260808-deepseek-v4-flash-post-training-moat/</link>
+            <pubDate>Sat, 08 Aug 2026 00:50:00 +0800</pubDate>
+            <guid>http://localhost:9996/posts/260808-deepseek-v4-flash-post-training-moat/</guid>
+            <description>&lt;p&gt;Body intentionally truncated: PRD §9.6 forbids reproducing article content, so the parser must never read this.&lt;/p&gt;</description>
+        </item>
+        <item>
+            <title>Agent 原生雲基礎設施：為什麼互聯網正在為機器重建</title>
+            <link>http://localhost:9996/posts/260601-agent-native-cloud-infra/</link>
+            <pubDate>Mon, 01 Jun 2026 00:00:00 +0000</pubDate>
+            <guid>http://localhost:9996/posts/260601-agent-native-cloud-infra/</guid>
+            <description>&lt;p&gt;Body intentionally truncated: PRD §9.6 forbids reproducing article content, so the parser must never read this.&lt;/p&gt;</description>
+        </item>
+        <item>
+            <title>Agentic AI 安全治理全解：從威脅分類到企業落地 Roadmap</title>
+            <link>http://localhost:9996/posts/2026-07-02-agentic-ai-security-governance/</link>
+            <pubDate>Thu, 02 Jul 2026 18:00:00 +0800</pubDate>
+            <guid>http://localhost:9996/posts/2026-07-02-agentic-ai-security-governance/</guid>
+            <description>&lt;p&gt;Body intentionally truncated: PRD §9.6 forbids reproducing article content, so the parser must never read this.&lt;/p&gt;</description>
+        </item>
+        <item>
+            <title>Reality: The Final Eval — Andon Labs 的真實世界 AI 評估框架</title>
+            <link>http://localhost:9996/posts/260605-andon-labs-reality-final-eval/</link>
+            <pubDate>Fri, 05 Jun 2026 00:00:00 +0000</pubDate>
+            <guid>http://localhost:9996/posts/260605-andon-labs-reality-final-eval/</guid>
+            <description>&lt;p&gt;Body intentionally truncated: PRD §9.6 forbids reproducing article content, so the parser must never read this.&lt;/p&gt;</description>
+        </item>
+        <item>
+            <title>StraTA：策略導向的 Agentic RL 訓練方法 — 從 Reactive Agent 到 Strategy-Guided Execution</title>
+            <link>http://localhost:9996/posts/260617-strata-strategic-trajectory-abstraction/</link>
+            <pubDate>Wed, 17 Jun 2026 00:00:00 +0000</pubDate>
+            <guid>http://localhost:9996/posts/260617-strata-strategic-trajectory-abstraction/</guid>
+            <description>&lt;p&gt;Body intentionally truncated: PRD §9.6 forbids reproducing article content, so the parser must never read this.&lt;/p&gt;</description>
+        </item>
+    </channel>
+</rss>
