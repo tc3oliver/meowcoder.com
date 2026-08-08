@@ -10,8 +10,23 @@
  *
  * Everything runs at build time. Nothing here reaches the browser, there is no
  * database or CMS backing the synchronization (PRD §28), and no title is ever
- * machine-translated (PRD §7) — `localizedTitle` only ever picks between
- * titles the feed itself published.
+ * machine-translated (PRD §7).
+ *
+ * ## Which title a page shows
+ *
+ * {@link resolveTitle} picks one of three, in order:
+ *
+ *   1. a curated display title for that locale, from {@link CURATED_TITLES} —
+ *      hand-written, never generated;
+ *   2. the title the feed itself declared for that locale, via `xml:lang`;
+ *   3. the title as Study published it.
+ *
+ * {@link CURATED_TITLES} is empty at rest, so today every English page falls
+ * through to step 3 and shows the original Chinese title — which is PRD §7
+ * exactly: "show original article title if no English title is available; do
+ * not machine-translate article titles at runtime." What is new is that the
+ * result says which language it landed in, so the homepage can mark a Chinese
+ * title as Chinese (v5 brief §9) rather than presenting it as English.
  *
  * ## Failure is a normal case, not an exception
  *
@@ -51,8 +66,12 @@ import { STUDY_URL } from './external';
  */
 export const STUDY_FEED_URL = import.meta.env.PUBLIC_STUDY_FEED_URL ?? `${STUDY_URL}/index.xml`;
 
-/** PRD §9.6 asks for the latest 3–5 posts; 5 is the top of that range. */
-export const DEFAULT_POST_LIMIT = 5;
+/**
+ * The v5 brief §9 narrows PRD §9.6's "latest 3–5 posts" to exactly 3: the
+ * section now shares a two-column row with Research, and three entries is what
+ * balances it.
+ */
+export const DEFAULT_POST_LIMIT = 3;
 
 /** A hung upstream must not hold the build open indefinitely. */
 export const DEFAULT_TIMEOUT_MS = 10_000;
@@ -71,6 +90,16 @@ export interface StudyPost {
    * {@link localizedTitle} over reading this directly.
    */
   title: string;
+  /**
+   * The language {@link StudyPost.title} is written in, when the feed says so —
+   * from `xml:lang` on the title or the feed's own `<language>`.
+   *
+   * Absent when the feed declares no language, which is the honest answer: the
+   * language is then unknown rather than English. Consumers should not guess
+   * from the characters; {@link resolveTitle} reports this onward as
+   * `isForeignLanguage: false` so an unlabelled title is never mislabelled.
+   */
+  titleLocale?: Locale;
   /**
    * Titles indexed by the locale the feed declared them in, via `xml:lang` on
    * the title or the feed's own `<language>`.
@@ -117,16 +146,102 @@ export interface StudyFeedOptions {
 }
 
 /**
+ * Hand-written display titles, keyed by canonical post URL then by locale.
+ *
+ * Study publishes Chinese-only titles, so the English homepage shows Chinese
+ * ones. The v5 brief §9 allows an optional `displayTitleEn` to improve that
+ * post by post — a person reads the article and writes an English title for
+ * it. Nothing here is generated: PRD §7 forbids machine translation at build
+ * time as firmly as at runtime, and an empty map is a perfectly good state.
+ *
+ * To curate one post, add its {@link StudyPost.url} — the address the homepage
+ * already links to, copied verbatim including the trailing slash — and the
+ * locales you wrote a title for:
+ *
+ * ```ts
+ * export const CURATED_TITLES: CuratedTitles = {
+ *   [`${STUDY_URL}/posts/260808-deepseek-v4-flash-post-training-moat/`]: {
+ *     en: "The next AI lab's moat may not be model architecture",
+ *   },
+ * };
+ * ```
+ *
+ * The URL is the key because it is the one identifier that survives an edited
+ * title, and because it is verifiable by hand: paste it into a browser and you
+ * see the post you are titling. A key that matches no post is inert — it is
+ * never rendered and never an error — so a curated entry outliving its post
+ * costs nothing.
+ */
+export type CuratedTitles = Readonly<Record<string, Partial<Record<Locale, string>>>>;
+
+export const CURATED_TITLES: CuratedTitles = {};
+
+/**
+ * A title chosen for one locale, together with what it actually is.
+ *
+ * The language matters to the presentation layer: the v5 brief §9 asks the
+ * English homepage to preserve original Chinese titles and mark them as
+ * Chinese. That mark is a decision about the resolved text, not about the
+ * post, so it is answered here rather than left for a component to infer.
+ */
+export interface ResolvedTitle {
+  /** The text to render. */
+  text: string;
+  /** The language `text` is in. Absent when nothing declared one. */
+  locale?: Locale;
+  /**
+   * Whether `text` is in a known language other than the one asked for — the
+   * signal for a language badge.
+   *
+   * False when the language is unknown, so a badge is only ever shown on
+   * evidence.
+   */
+  isForeignLanguage: boolean;
+}
+
+/**
+ * Resolve the title to show in a given locale, and say what it turned out to
+ * be.
+ *
+ * Precedence is curated override → the title the feed declared for that locale
+ * → the original published title. The last step is exactly PRD §7: "show
+ * original article title if no English title is available; do not
+ * machine-translate article titles at runtime." There is no translation step
+ * anywhere in this module — a curated title is written by a person and the
+ * fallback is the whole of the rest.
+ *
+ * `curated` is injectable for the same reason `fetchImpl` is: a test names its
+ * own overrides instead of reaching into the shipped constant.
+ */
+export function resolveTitle(
+  post: StudyPost,
+  locale: Locale,
+  curated: CuratedTitles = CURATED_TITLES,
+): ResolvedTitle {
+  const override = curated[post.url]?.[locale];
+  if (override) return { text: override, locale, isForeignLanguage: false };
+
+  const declared = post.titleByLocale[locale];
+  if (declared) return { text: declared, locale, isForeignLanguage: false };
+
+  return {
+    text: post.title,
+    ...(post.titleLocale ? { locale: post.titleLocale } : {}),
+    isForeignLanguage: post.titleLocale !== undefined && post.titleLocale !== locale,
+  };
+}
+
+/**
  * The title to show in a given locale.
  *
- * Falls back to the original published title when the feed offers nothing in
- * that locale, which is exactly PRD §7: "show original article title if no
- * English title is available; do not machine-translate article titles at
- * runtime." There is no translation step anywhere in this module — the
- * fallback is the whole mechanism.
+ * The text half of {@link resolveTitle}, for callers with nothing to decide.
  */
-export function localizedTitle(post: StudyPost, locale: Locale): string {
-  return post.titleByLocale[locale] ?? post.title;
+export function localizedTitle(
+  post: StudyPost,
+  locale: Locale,
+  curated: CuratedTitles = CURATED_TITLES,
+): string {
+  return resolveTitle(post, locale, curated).text;
 }
 
 /** Element name without its namespace prefix, so `a:entry` matches `entry`. */
@@ -183,25 +298,36 @@ function inheritedLang(element: XmlElement): string | undefined {
  * An entry normally has one title. Repeated titles distinguished by
  * `xml:lang` are how a bilingual feed would express itself, and are indexed
  * here so that support arrives with the feed rather than after it.
+ *
+ * The first title is also the primary one, and its declared language is
+ * carried out separately: it is what tells a page rendering the fallback which
+ * language it is actually showing.
  */
 function collectTitles(
   entry: XmlElement,
   feedLang: string | undefined,
-): { title: string; titleByLocale: Partial<Record<Locale, string>> } | undefined {
+): Pick<StudyPost, 'title' | 'titleLocale' | 'titleByLocale'> | undefined {
   const titleByLocale: Partial<Record<Locale, string>> = {};
   let primary: string | undefined;
+  let primaryLocale: Locale | undefined;
 
   for (const element of childElements(entry, 'title')) {
     const text = element.text.trim();
     if (!text) continue;
 
-    primary ??= text;
-
     const locale = toLocale(inheritedLang(element) ?? feedLang);
+
+    if (primary === undefined) {
+      primary = text;
+      primaryLocale = locale;
+    }
+
     if (locale) titleByLocale[locale] ??= text;
   }
 
-  return primary ? { title: primary, titleByLocale } : undefined;
+  return primary
+    ? { title: primary, ...(primaryLocale ? { titleLocale: primaryLocale } : {}), titleByLocale }
+    : undefined;
 }
 
 /**

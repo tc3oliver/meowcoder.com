@@ -24,11 +24,14 @@ import RSS_FEED from './__fixtures__/study-rss.xml?raw';
 import { STUDY_URL } from './external';
 import {
   clearStudyFeedCache,
+  CURATED_TITLES,
   DEFAULT_POST_LIMIT,
   getStudyPosts,
   localizedTitle,
   parseStudyFeed,
+  resolveTitle,
   STUDY_FEED_URL,
+  type CuratedTitles,
 } from './study-feed';
 
 /** A fetch that answers every request with one canned response. */
@@ -84,6 +87,7 @@ describe('parseStudyFeed, RSS 2.0', () => {
       'date',
       'title',
       'titleByLocale',
+      'titleLocale',
       'url',
     ]);
   });
@@ -101,6 +105,29 @@ describe('parseStudyFeed, RSS 2.0', () => {
 
     expect(first?.title).toBe('下一代 AI Lab 的護城河，可能不是模型架構');
     expect(first?.titleByLocale).toEqual({ zh: '下一代 AI Lab 的護城河，可能不是模型架構' });
+  });
+
+  it('records the language the original title is written in', () => {
+    // The v5 brief §9 asks the English homepage to mark Chinese titles as
+    // Chinese. That mark is only defensible if the feed said so, and here it
+    // did — via the channel <language>.
+    for (const post of parseStudyFeed(RSS_FEED)) {
+      expect(post.titleLocale).toBe('zh');
+    }
+  });
+
+  it('leaves the title language unset when the feed declares none', () => {
+    // Silence is not English. An undeclared language stays unknown so that
+    // nothing downstream badges a guess.
+    const unlabelled = `<?xml version="1.0"?><rss version="2.0"><channel>
+      <item><title>Kept</title><link>/posts/kept/</link>
+        <pubDate>Sat, 08 Aug 2026 00:00:00 +0000</pubDate></item>
+    </channel></rss>`;
+
+    const [post] = parseStudyFeed(unlabelled);
+
+    expect(post?.titleLocale).toBeUndefined();
+    expect(post?.titleByLocale).toEqual({});
   });
 });
 
@@ -176,6 +203,153 @@ describe('localizedTitle', () => {
   });
 });
 
+/** The Chinese-only post the English homepage has to cope with. */
+function chineseOnlyPost() {
+  const [post] = parseStudyFeed(RSS_FEED);
+  if (!post) throw new Error('fixture regression: the RSS fixture has no posts');
+  return post;
+}
+
+/** The one fixture entry that publishes both languages itself. */
+function bilingualPost() {
+  const post = parseStudyFeed(ATOM_FEED)[1];
+  if (!post) throw new Error('fixture regression: the Atom fixture lost its bilingual entry');
+  return post;
+}
+
+describe('CURATED_TITLES', () => {
+  it('ships empty, so no post is silently retitled', () => {
+    // The override is a curation surface, not a translation table (PRD §7).
+    // Shipping it empty is what keeps the default behaviour "show what Study
+    // published" rather than "show whatever someone once typed here".
+    expect(CURATED_TITLES).toEqual({});
+  });
+
+  it('changes nothing while it is empty', () => {
+    // The regression guard for the whole feature: with no entries curated, every
+    // title resolves exactly as it did before the override existed.
+    for (const post of [...parseStudyFeed(RSS_FEED), ...parseStudyFeed(ATOM_FEED)]) {
+      for (const locale of ['en', 'zh'] as const) {
+        expect(localizedTitle(post, locale)).toBe(post.titleByLocale[locale] ?? post.title);
+        expect(localizedTitle(post, locale, {})).toBe(localizedTitle(post, locale));
+      }
+    }
+  });
+});
+
+describe('resolveTitle, curated overrides', () => {
+  it('prefers a curated title over the original', () => {
+    // The v5 brief §9 case: a person read the article and wrote an English
+    // title for it, so the English page stops showing Chinese.
+    const post = chineseOnlyPost();
+    const curated: CuratedTitles = {
+      [post.url]: { en: "The next AI lab's moat may not be model architecture" },
+    };
+
+    expect(resolveTitle(post, 'en', curated)).toEqual({
+      text: "The next AI lab's moat may not be model architecture",
+      locale: 'en',
+      isForeignLanguage: false,
+    });
+  });
+
+  it('prefers a curated title over one the feed declared', () => {
+    // Curation is the top of the precedence order, not a fallback below the
+    // feed: a hand-written title is the more deliberate of the two.
+    const post = bilingualPost();
+    const curated: CuratedTitles = { [post.url]: { en: 'Strategy-Guided Agents, curated' } };
+
+    expect(localizedTitle(post, 'en', curated)).toBe('Strategy-Guided Agents, curated');
+    expect(localizedTitle(post, 'zh', curated)).toBe('從 Reactive Agent 到 Strategy-Guided Agent');
+  });
+
+  it('curates one locale without disturbing the other', () => {
+    const post = chineseOnlyPost();
+    const curated: CuratedTitles = { [post.url]: { en: 'An English display title' } };
+
+    expect(localizedTitle(post, 'zh', curated)).toBe(post.title);
+  });
+
+  it('falls back to the original when this post is not curated', () => {
+    // A map covering some posts must leave the rest exactly as they were.
+    const curated: CuratedTitles = {
+      'https://study.meowcoder.com/posts/some-other-post/': { en: 'Unrelated' },
+    };
+    const post = chineseOnlyPost();
+
+    expect(localizedTitle(post, 'en', curated)).toBe(post.title);
+  });
+
+  it('falls back when the post is curated in the other locale only', () => {
+    const post = chineseOnlyPost();
+    const curated: CuratedTitles = { [post.url]: { zh: '中文覆寫' } };
+
+    expect(localizedTitle(post, 'en', curated)).toBe(post.title);
+  });
+
+  it('ignores an entry whose URL matches no post', () => {
+    // Curated entries outlive the posts they name; a stale one must be inert
+    // rather than an error, so nobody has to prune the map to keep builds green.
+    const curated: CuratedTitles = { 'https://study.meowcoder.com/posts/gone/': { en: 'Gone' } };
+
+    expect(parseStudyFeed(RSS_FEED).map((post) => localizedTitle(post, 'en', curated))).toEqual(
+      parseStudyFeed(RSS_FEED).map((post) => post.title),
+    );
+  });
+});
+
+describe('resolveTitle, language of the rendered title', () => {
+  it('reports a Chinese title shown on an English page as foreign', () => {
+    // This is what earns the language badge in MCD-20: the text really is
+    // Chinese, and the feed said so.
+    expect(resolveTitle(chineseOnlyPost(), 'en')).toEqual({
+      text: '下一代 AI Lab 的護城河，可能不是模型架構',
+      locale: 'zh',
+      isForeignLanguage: true,
+    });
+  });
+
+  it('reports the same title on the Chinese page as native', () => {
+    expect(resolveTitle(chineseOnlyPost(), 'zh')).toMatchObject({
+      locale: 'zh',
+      isForeignLanguage: false,
+    });
+  });
+
+  it('reports a feed-declared English title as native English', () => {
+    expect(resolveTitle(bilingualPost(), 'en')).toEqual({
+      text: 'From Reactive Agent to Strategy-Guided Agent',
+      locale: 'en',
+      isForeignLanguage: false,
+    });
+  });
+
+  it('claims no language when the feed declared none', () => {
+    // Unknown is not foreign. Badging on a guess would be worse than not
+    // badging, so the flag stays false and the locale stays absent.
+    const unlabelled = `<?xml version="1.0"?><rss version="2.0"><channel>
+      <item><title>Untagged title</title><link>/posts/untagged/</link>
+        <pubDate>Sat, 08 Aug 2026 00:00:00 +0000</pubDate></item>
+    </channel></rss>`;
+    const [post] = parseStudyFeed(unlabelled);
+
+    expect(post && resolveTitle(post, 'en')).toEqual({
+      text: 'Untagged title',
+      isForeignLanguage: false,
+    });
+  });
+
+  it('gives localizedTitle the same text it resolves', () => {
+    // `localizedTitle` is the text half of `resolveTitle`; WritingSection.astro
+    // still calls it with two arguments and must keep seeing the same string.
+    for (const post of [...parseStudyFeed(RSS_FEED), ...parseStudyFeed(ATOM_FEED)]) {
+      for (const locale of ['en', 'zh'] as const) {
+        expect(localizedTitle(post, locale)).toBe(resolveTitle(post, locale).text);
+      }
+    }
+  });
+});
+
 describe('parseStudyFeed, unusable input', () => {
   it('rejects malformed XML', () => {
     expect(() => parseStudyFeed('<rss><channel><item></rss>')).toThrow();
@@ -202,27 +376,28 @@ describe('parseStudyFeed, unusable input', () => {
 });
 
 describe('getStudyPosts, feed reachable', () => {
-  it('returns the latest five posts by default', () => {
-    // PRD §9.6 asks for 3-5; the fixture holds 6, so the cut is observable.
-    expect(DEFAULT_POST_LIMIT).toBe(5);
+  it('returns the latest three posts by default', () => {
+    // The v5 brief §9 narrows PRD §9.6's 3-5 to exactly 3; the fixture holds 6,
+    // so the cut is observable.
+    expect(DEFAULT_POST_LIMIT).toBe(3);
   });
 
-  it('limits a six-item feed to the default five', async () => {
+  it('limits a six-item feed to the default three', async () => {
     const feed = await getStudyPosts({ fetchImpl: fetchReturning(RSS_FEED), feedUrl: 'a' });
 
     expect(feed.ok).toBe(true);
-    expect(feed.posts).toHaveLength(5);
+    expect(feed.posts).toHaveLength(3);
     expect(feed.reason).toBeUndefined();
   });
 
-  it('honours an explicit limit', async () => {
+  it('honours an explicit limit above the default', async () => {
     const feed = await getStudyPosts({
-      limit: 3,
+      limit: 5,
       fetchImpl: fetchReturning(RSS_FEED),
       feedUrl: 'b',
     });
 
-    expect(feed.posts).toHaveLength(3);
+    expect(feed.posts).toHaveLength(5);
   });
 
   it('requests the Study feed derived from the ecosystem constant', async () => {
@@ -250,11 +425,12 @@ describe('getStudyPosts, feed reachable', () => {
   it('lets two consumers share one read at different lengths', async () => {
     const fetchImpl = fetchReturning(RSS_FEED);
 
-    const five = await getStudyPosts({ fetchImpl, feedUrl: 'd' });
-    const three = await getStudyPosts({ limit: 3, fetchImpl, feedUrl: 'd' });
+    const six = await getStudyPosts({ limit: 6, fetchImpl, feedUrl: 'd' });
+    const three = await getStudyPosts({ fetchImpl, feedUrl: 'd' });
 
     expect(fetchImpl).toHaveBeenCalledTimes(1);
-    expect(three.posts).toEqual(five.posts.slice(0, 3));
+    expect(six.posts).toHaveLength(6);
+    expect(three.posts).toEqual(six.posts.slice(0, 3));
   });
 
   it('reports an empty feed as healthy, not as a failure', async () => {
