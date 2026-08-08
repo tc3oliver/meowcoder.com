@@ -1,0 +1,100 @@
+---
+/**
+ * Site footer shell (MCD-2).
+ *
+ * Same contract as `Header.astro`: structure and styling only, with every
+ * string injected by the caller so MCD-3 can supply the localized `footer`
+ * dictionary. The link row matches the shape PRD §9.8 describes (a single row
+ * of destinations above the wordmark) without committing to its contents here.
+ */
+
+interface FooterLink {
+  href: string;
+  label: string;
+  /** Off-site destination: opts the link into the safe `rel` treatment. */
+  external?: boolean;
+}
+
+interface Props {
+  /** Accessible name for the footer navigation landmark. */
+  navLabel?: string;
+  links?: FooterLink[];
+}
+
+const { navLabel, links = [] } = Astro.props;
+
+const hasMeta = Astro.slots.has('meta');
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    {
+      links.length > 0 && (
+        <nav class="site-footer__nav" aria-label={navLabel}>
+          <ul class="site-footer__list" role="list">
+            {links.map((link) => (
+              <li>
+                <a
+                  class="site-footer__link"
+                  href={link.href}
+                  rel={link.external ? 'noopener noreferrer' : undefined}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+
+    {
+      hasMeta && (
+        <p class="site-footer__meta">
+          <slot name="meta" />
+        </p>
+      )
+    }
+
+    <slot />
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    /* `margin-block-start: auto` is unnecessary — `.site-main` already absorbs
+       the spare height — so the footer only needs its own separation. */
+    border-block-start: var(--border-width) solid var(--color-border);
+    background-color: var(--color-bg);
+  }
+
+  .site-footer__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-block: var(--space-7);
+  }
+
+  .site-footer__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-5);
+    margin: 0;
+  }
+
+  .site-footer__link {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .site-footer__link:hover {
+    color: var(--color-text);
+  }
+
+  .site-footer__meta {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+</style>
