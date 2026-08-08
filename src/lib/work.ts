@@ -26,6 +26,21 @@ const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SLUG_MESSAGE = 'must be lowercase words joined by single hyphens, e.g. "ai-coding-skills"';
 
 /**
+ * One row of project metadata, rendered beside the case study (doc-2 §12).
+ *
+ * Label and value are both localized, because a metadata row is a statement
+ * about the project in the reader's language, not a translation key. Values are
+ * plain text: the sidebar summarizes, and the evidence links stay in the
+ * article where doc-2 §12 requires them to remain visible.
+ */
+const workMetaRowSchema = z.strictObject({
+  /** Localized row label, e.g. `Status`. */
+  label: z.string().min(1),
+  /** Localized row value, e.g. `Live · in test period`. */
+  value: z.string().min(1),
+});
+
+/**
  * Required metadata for one localized Work entry.
  *
  * Strict on purpose: an unknown key is almost always a misspelled required one
@@ -37,8 +52,26 @@ export const workEntrySchema = z.strictObject({
   title: z.string().min(1),
   /** Localized category line, e.g. `Product · AI Systems` (PRD §10). */
   type: z.string().min(1),
-  /** Localized one-line summary. Drives the index card and the description. */
+  /** Localized one-line summary. Describes the case study; drives the description. */
   summary: z.string().min(1),
+  /**
+   * Localized outcome sentence for the Work index (doc-2 §11).
+   *
+   * Where `summary` says what the project *is*, this says what it *achieved* —
+   * the one sentence a large index entry leads with. Optional, and an entry
+   * without it falls back to `summary`, which is what the index rendered before
+   * the field existed. `assertWorkContentIsConsistent` checks that both
+   * translations agree on whether it is declared.
+   */
+  outcome: z.string().min(1).optional(),
+  /**
+   * Localized evidence label for the Work index (doc-2 §11).
+   *
+   * A short line naming what can be checked in public — not the links
+   * themselves, which doc-2 §12 keeps inside the case study. Same optionality
+   * and same cross-locale rule as `outcome`.
+   */
+  evidence: z.string().min(1).optional(),
   /** URL segment: `/work/<slug>/` and `/zh/work/<slug>/`. */
   slug: z.string().regex(SLUG_PATTERN, `slug ${SLUG_MESSAGE}`),
   /** Which localized file this is. Must match the directory it lives in. */
@@ -50,6 +83,15 @@ export const workEntrySchema = z.strictObject({
   translationKey: z.string().regex(SLUG_PATTERN, `translationKey ${SLUG_MESSAGE}`),
   /** Index position, ascending. PRD §10 lists Shouri before AI Coding Skills. */
   order: z.number().int().nonnegative(),
+  /**
+   * Project metadata for the detail-page sidebar, in display order (doc-2 §12).
+   *
+   * Optional: a case study without it renders a sidebar carrying the `type` row
+   * and the section navigation, which is a complete sidebar rather than a
+   * degraded one. `assertWorkContentIsConsistent` checks that both translations
+   * declare the same number of rows.
+   */
+  meta: z.array(workMetaRowSchema).optional(),
   /** Withheld from the index and from route generation while `true`. */
   draft: z.boolean().default(false),
 });
@@ -94,6 +136,14 @@ function expectedPath(data: WorkEntryData): string {
  *    Chinese to be a complete localized experience, not a partial one.
  * 4. `order` and `draft` agree across locales. Otherwise the two indexes would
  *    disagree on what exists, or in what sequence.
+ * 5. Every translation declares the same number of `meta` rows. The values are
+ *    localized and cannot be compared, but a row present in one locale and
+ *    missing in the other is a half-translated sidebar — the same defect rule 3
+ *    rejects for the case study as a whole.
+ * 6. Every translation agrees on whether `outcome` and `evidence` are declared,
+ *    for the same reason: the text is localized and incomparable, but one index
+ *    leading with an outcome sentence while the other falls back to the summary
+ *    is the two locales showing different things.
  */
 export function assertWorkContentIsConsistent(entries: readonly WorkEntry[]): void {
   // Sort first so the *same* broken content always reports the same error,
@@ -157,6 +207,30 @@ export function assertWorkContentIsConsistent(entries: readonly WorkEntry[]): vo
             `translationKey "${translationKey}" disagrees on "${field}": ` +
               `"${reference.id}" has ${String(reference.data[field])} but ` +
               `"${entry.id}" has ${String(entry.data[field])}`,
+          );
+        }
+      }
+
+      const expectedRows = reference.data.meta?.length ?? 0;
+      const rows = entry.data.meta?.length ?? 0;
+      if (rows !== expectedRows) {
+        fail(
+          `translationKey "${translationKey}" disagrees on "meta": ` +
+            `"${reference.id}" declares ${expectedRows} row(s) but "${entry.id}" ` +
+            `declares ${rows}; both translations must describe the same metadata`,
+        );
+      }
+
+      // The presence analogue of the `meta` rule above, for the index fields.
+      for (const field of ['outcome', 'evidence'] as const) {
+        const expected = reference.data[field] !== undefined;
+        const declared = entry.data[field] !== undefined;
+        if (declared !== expected) {
+          const [has, lacks] = expected ? [reference.id, entry.id] : [entry.id, reference.id];
+          fail(
+            `translationKey "${translationKey}" disagrees on "${field}": ` +
+              `"${has}" declares it but "${lacks}" does not; both translations ` +
+              `must give the Work index the same fields`,
           );
         }
       }

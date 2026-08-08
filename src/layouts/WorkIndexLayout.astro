@@ -1,15 +1,45 @@
 ---
 /**
- * Work index (MCD-5, PRD §10).
+ * Work index (MCD-21, doc-2 §11).
  *
  * The counterpart to `WorkLayout`: one structure driving both `/work/` and
  * `/zh/work/`, so the two indexes cannot drift into listing different things
  * in different shapes.
  *
+ * doc-2 §11 replaces what this page used to be — a text list of type, linked
+ * title, and summary — with two large project entries. Two is the whole list on
+ * purpose: doc-1 §10 admits only work that can be publicly inspected, so the
+ * page is not padded out into a card wall and no third project is invented to
+ * balance a row.
+ *
+ * Each entry carries its position, type, title, one outcome sentence, a
+ * concise evidence label, and the link to its case study. Two rules shape the
+ * markup:
+ *
+ * - **One link per entry.** The link is the `View Case Study` action, and the
+ *   project's own title is appended to it out of sight, so a screen reader
+ *   reading a list of links hears two distinct destinations instead of the same
+ *   phrase twice. Nothing wraps the entry, so there is no nested interactive
+ *   element and the whole 1160px block is not one giant tab stop.
+ * - **Shouri gets the largest visual area**, as doc-2 §11 requires. It is the
+ *   only entry whose visual spans the full content width; the other entry's
+ *   diagram sits in a narrower second column from 64rem up. The difference is
+ *   the layout's, not a size written onto an image.
+ *
+ * Neither visual is new. The screenshot is the asset the homepage already
+ * shows, through Astro's `<Image>` so it keeps build-time optimization and the
+ * explicit dimensions that cost no layout shift; the workflow figure is
+ * `WorkflowDiagram.astro`, reused unchanged with this page's own localized
+ * stage names.
+ *
  * Entries arrive already filtered and ordered by `workEntriesForLocale`; this
  * layout only renders them.
  */
 
+import { Image } from 'astro:assets';
+
+import { shouriScreenshot } from '../components/home/shouri-screenshot';
+import WorkflowDiagram from '../components/WorkflowDiagram.astro';
 import type { Locale } from '../i18n/locales';
 import { work } from '../i18n/pages/work';
 import { localizePath, workDetailRoute } from '../lib/i18n';
@@ -24,10 +54,29 @@ interface Props {
 const { locale, entries } = Astro.props;
 
 const t = work[locale];
+
+/**
+ * Which visual belongs to which case study.
+ *
+ * Keyed by slug because that is what the pairing actually is: a fact about two
+ * specific projects, not something an entry could declare about itself — the
+ * screenshot is an asset in this repository and the diagram is a component, and
+ * neither is expressible in frontmatter. A case study not named here renders as
+ * copy alone, which is the same shape the index had before this redesign.
+ */
+const VISUALS: Readonly<Record<string, 'screenshot' | 'workflow'>> = {
+  shouri: 'screenshot',
+  'ai-coding-skills': 'workflow',
+};
+
+/** `01`, `02` — the position doc-2 §11 numbers each entry by. */
+function position(index: number): string {
+  return String(index + 1).padStart(2, '0');
+}
 ---
 
 <SiteShell locale={locale} route="/work" title={t.title} description={t.description}>
-  <div class="container container--reading">
+  <div class="container">
     <header class="work-index__header">
       <h1>{t.heading}</h1>
       <p class="work-index__intro">{t.intro}</p>
@@ -38,17 +87,57 @@ const t = work[locale];
         <p class="work-index__empty">{t.empty}</p>
       ) : (
         <ul class="work-index" role="list">
-          {entries.map((entry) => (
-            <li class="work-index__item">
-              <p class="work-index__type">{entry.data.type}</p>
-              <h2 class="work-index__title">
-                <a href={localizePath(locale, workDetailRoute(entry.data.slug))}>
-                  {entry.data.title}
-                </a>
-              </h2>
-              <p class="work-index__summary">{entry.data.summary}</p>
-            </li>
-          ))}
+          {entries.map((entry, index) => {
+            const visual = VISUALS[entry.data.slug];
+
+            return (
+              <li class:list={['work-entry', visual === 'screenshot' && 'work-entry--featured']}>
+                <div class="work-entry__copy">
+                  <p class="work-entry__label">
+                    {/* Decoration: the list already carries the ordering, so
+                        announcing "zero one" before the type would repeat it
+                        as a number nobody asked for. */}
+                    <span class="work-entry__position" aria-hidden="true">
+                      {position(index)}
+                    </span>
+                    {entry.data.type}
+                  </p>
+                  <h2 class="work-entry__title">{entry.data.title}</h2>
+                  <p class="work-entry__outcome">{entry.data.outcome ?? entry.data.summary}</p>
+                  {entry.data.evidence && <p class="work-entry__evidence">{entry.data.evidence}</p>}
+                  <a
+                    class="work-entry__cta"
+                    href={localizePath(locale, workDetailRoute(entry.data.slug))}
+                  >
+                    {t.caseStudyCta}
+                    <span class="visually-hidden"> — {entry.data.title}</span>
+                  </a>
+                </div>
+
+                {visual === 'screenshot' && shouriScreenshot && (
+                  <figure class="work-entry__figure">
+                    <Image
+                      src={shouriScreenshot}
+                      alt={t.visuals.shouri.alt}
+                      widths={[640, 960, 1280, 1536]}
+                      sizes="(min-width: 76.25rem) 1160px, 100vw"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </figure>
+                )}
+
+                {visual === 'workflow' && (
+                  <WorkflowDiagram
+                    caption={t.visuals.aiCodingSkills.caption}
+                    start={t.visuals.aiCodingSkills.start}
+                    steps={t.visuals.aiCodingSkills.steps}
+                    end={t.visuals.aiCodingSkills.end}
+                  />
+                )}
+              </li>
+            );
+          })}
         </ul>
       )
     }
@@ -56,8 +145,12 @@ const t = work[locale];
 </SiteShell>
 
 <style>
+  /* The page is the full content width now, but its prose is not: the heading
+     and the intro stay on the reading measure so widening the shell buys the
+     entries room without stretching a paragraph across 1160px. */
   .work-index__header {
-    margin-block-end: var(--space-8);
+    max-width: var(--width-reading);
+    margin-block-end: var(--space-9);
   }
 
   .work-index__intro {
@@ -69,34 +162,117 @@ const t = work[locale];
 
   .work-index {
     display: grid;
-    gap: var(--space-8);
+    gap: var(--space-9);
     margin: 0;
   }
 
-  .work-index__type,
-  .work-index__summary {
-    color: var(--color-text-muted);
+  /* A hairline between two entries this large. With only two of them, the gap
+     alone leaves it ambiguous where one ends and the next begins. */
+  .work-entry + .work-entry {
+    padding-block-start: var(--space-9);
+    border-block-start: var(--border-width) solid var(--color-border);
   }
 
-  .work-index__type {
-    margin-block-end: var(--space-2);
+  /* One column by default, copy before visual — the order a phone shows and the
+     order a screen reader hears, with no `order` juggling to keep them equal. */
+  .work-entry {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-7);
+  }
+
+  .work-entry__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    max-width: var(--width-reading);
+  }
+
+  /* The position and the type are one label above the title, not two lines of
+     metadata: the numeral is what gives an entry its "01 / 02" identity, and it
+     only reads that way sitting against the category it belongs to. */
+  .work-entry__label {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    color: var(--color-text-muted);
     font-size: var(--text-sm);
   }
 
-  .work-index__summary {
-    margin-block-start: var(--space-3);
+  .work-entry__position {
+    font-family: var(--font-mono);
+    letter-spacing: var(--tracking-wide);
+  }
+
+  /* Monospace and muted, the treatment this site gives a row of labels rather
+     than a sentence — it is what can be checked, not another claim. */
+  .work-entry__evidence {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    letter-spacing: var(--tracking-normal);
+    /* A label naming a host or a package has no break opportunity in it, and
+       one unbreakable token would set the page's minimum width at 390px. */
+    overflow-wrap: anywhere;
+  }
+
+  .work-entry__outcome {
+    font-size: var(--text-lg);
     line-height: var(--leading-relaxed);
   }
 
-  /* The whole title is the link; nothing else in the card competes with it. */
-  .work-index__title a {
-    color: inherit;
+  /* Same weight the outline actions elsewhere on the site carry: the border is
+     the only thing defining the control, so it owes WCAG 1.4.11 its 3:1. */
+  .work-entry__cta {
+    display: inline-flex;
+    margin-block-start: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
     text-decoration: none;
   }
 
-  .work-index__title a:hover {
+  .work-entry__cta:hover {
+    border-color: var(--color-accent);
     color: var(--color-accent);
-    text-decoration: underline;
+  }
+
+  /* doc-2 §11: the featured project holds the largest visual area on the page.
+     No `max-width` — this figure is the full content width, which is wider than
+     anything else here and wider than the reading measure its copy sits on. */
+  .work-entry__figure {
+    margin: 0;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-color: var(--color-surface);
+  }
+
+  /* The rendered box is the column, not the asset's own 1536px. Astro still
+     writes `width` and `height` onto the tag, so the aspect ratio is known
+     before the bytes arrive and the image reserves its own space. */
+  .work-entry__figure :global(img) {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+
+  /* From 64rem the second entry runs its diagram beside the copy rather than
+     under it. That is what keeps the two entries visually unequal by layout:
+     one visual spans 1160px, the other is a column of about a third of that.
+     Below the breakpoint both stack, which is also the 390px case. */
+  @media (min-width: 64rem) {
+    .work-entry:not(.work-entry--featured) {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: start;
+      gap: var(--space-8);
+    }
   }
 
   .work-index__empty {

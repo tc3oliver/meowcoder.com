@@ -82,6 +82,48 @@ describe('workEntrySchema', () => {
   it('rejects a non-integer order', () => {
     expect(workEntrySchema.safeParse({ ...VALID_FRONTMATTER, order: 1.5 }).success).toBe(false);
   });
+
+  // The sidebar is optional per case study (doc-2 §12), so an entry that
+  // declares no metadata rows must stay valid rather than force empty ones.
+  it('accepts an entry with no sidebar metadata', () => {
+    expect(workEntrySchema.parse(VALID_FRONTMATTER).meta).toBeUndefined();
+  });
+
+  it('accepts sidebar metadata rows in declaration order', () => {
+    const meta = [
+      { label: 'Status', value: 'Live' },
+      { label: 'Plans', value: 'Free open' },
+    ];
+
+    expect(workEntrySchema.parse({ ...VALID_FRONTMATTER, meta }).meta).toEqual(meta);
+  });
+
+  it.each([
+    ['a missing value', [{ label: 'Status' }]],
+    ['an empty label', [{ label: '', value: 'Live' }]],
+    ['an unknown key', [{ label: 'Status', value: 'Live', href: 'https://example.com' }]],
+  ])('rejects a metadata row with %s', (_case, meta) => {
+    expect(workEntrySchema.safeParse({ ...VALID_FRONTMATTER, meta }).success).toBe(false);
+  });
+
+  // The Work index leads each entry with these two (doc-2 §11), and falls back
+  // to `summary` for an entry that declares neither — so they stay optional.
+  it.each(['outcome', 'evidence'] as const)('accepts an entry with no %s', (field) => {
+    expect(workEntrySchema.parse(VALID_FRONTMATTER)[field]).toBeUndefined();
+  });
+
+  it.each(['outcome', 'evidence'] as const)('keeps %s as written', (field) => {
+    const value = 'Live, with the evidence published alongside it.';
+
+    expect(workEntrySchema.parse({ ...VALID_FRONTMATTER, [field]: value })[field]).toBe(value);
+  });
+
+  it.each(['outcome', 'evidence'] as const)(
+    'rejects an empty %s rather than render one',
+    (field) => {
+      expect(workEntrySchema.safeParse({ ...VALID_FRONTMATTER, [field]: '' }).success).toBe(false);
+    },
+  );
 });
 
 describe('assertWorkContentIsConsistent', () => {
@@ -137,6 +179,49 @@ describe('assertWorkContentIsConsistent', () => {
     const entries = [entry({ locale: 'en' }), entry({ locale: 'zh', ...override })];
 
     expect(() => assertWorkContentIsConsistent(entries)).toThrow(new RegExp(`"${field}"`));
+  });
+
+  // Values are localized and cannot be compared, but a row count that differs
+  // means one locale's sidebar states a fact the other's does not.
+  it('rejects translations that disagree on how many metadata rows exist', () => {
+    const entries = [
+      entry({ locale: 'en', meta: [{ label: 'Status', value: 'Live' }] }),
+      entry({ locale: 'zh' }),
+    ];
+
+    expect(() => assertWorkContentIsConsistent(entries)).toThrow(/"meta"/);
+  });
+
+  // Same defect as the row count above, one field up: one locale's index would
+  // lead with an outcome sentence while the other fell back to its summary.
+  it.each(['outcome', 'evidence'] as const)(
+    'rejects translations where only one declares %s',
+    (field) => {
+      const entries = [
+        entry({ locale: 'en', [field]: 'Live, and checkable.' }),
+        entry({ locale: 'zh' }),
+      ];
+
+      expect(() => assertWorkContentIsConsistent(entries)).toThrow(new RegExp(`"${field}"`));
+    },
+  );
+
+  it('accepts translations whose index fields differ only in language', () => {
+    const entries = [
+      entry({ locale: 'en', outcome: 'Live, and checkable.', evidence: 'example.com' }),
+      entry({ locale: 'zh', outcome: '已上線，且可查證。', evidence: 'example.com' }),
+    ];
+
+    expect(() => assertWorkContentIsConsistent(entries)).not.toThrow();
+  });
+
+  it('accepts translations whose metadata rows differ only in language', () => {
+    const entries = [
+      entry({ locale: 'en', meta: [{ label: 'Status', value: 'Live' }] }),
+      entry({ locale: 'zh', meta: [{ label: '狀態', value: '已上線' }] }),
+    ];
+
+    expect(() => assertWorkContentIsConsistent(entries)).not.toThrow();
   });
 
   it('reports the same failure whatever order the loader returns entries in', () => {

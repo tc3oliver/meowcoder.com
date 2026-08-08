@@ -22,9 +22,14 @@ export const getStaticPaths = (async () => {
 
 const { entry } = Astro.props;
 
-const { Content } = await render(entry);
+/*
+ * `headings` is the same pass that produced `Content`, so the section
+ * navigation in `WorkLayout` links to ids that are certain to exist in the
+ * markup below it (MCD-22).
+ */
+const { Content, headings } = await render(entry);
 ---
 
-<WorkLayout locale={locale} entry={entry.data}>
+<WorkLayout locale={locale} entry={entry.data} headings={headings}>
   <Content />
 </WorkLayout>

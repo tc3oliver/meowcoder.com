@@ -2,11 +2,22 @@
 title: 'AI Coding Skills'
 type: 'Open Source · Agent Engineering'
 summary: 'Published workflow skills that give coding agents an explicit requirement boundary, just-in-time implementation plans, and evidence-based completion.'
+outcome: 'Published under MIT and installable into a project as an agent skill or a Claude Code plugin — and it is the process this site was built with.'
+evidence: 'github.com/tc3oliver/skills · backlog-workflow 1.2.0, with its own unit tests'
 slug: 'ai-coding-skills'
 locale: 'en'
 translationKey: 'ai-coding-skills'
 order: 1
 draft: false
+meta:
+  - label: 'Version'
+    value: 'backlog-workflow 1.2.0'
+  - label: 'License'
+    value: 'MIT · bundled skills keep their own'
+  - label: 'Requires'
+    value: 'Backlog.md CLI · Python 3'
+  - label: 'Install'
+    value: 'Agent skill or Claude Code plugin'
 ---
 
 ## Problem
@@ -55,25 +66,68 @@ with a file-shaped answer.
 
 Four layers, each with exactly one owner:
 
-```text
-PRD / Specification    product intent
-        ↓
-backlog-workflow       development policy and orchestration
-        ↓
-Backlog.md             tasks, status, dependencies, evidence
-        ↓
-Coding agent           implementation → validation → PR → CI → review → merge
-```
+<figure class="state-flow">
+<ol class="state-flow__steps" role="list">
+<li class="state-flow__step">
+<span class="state-flow__name">PRD / Specification</span>
+<span class="state-flow__detail">Where product intent is written down.</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Owns</span>What the product should do</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">backlog-workflow</span>
+<span class="state-flow__detail">The one layer here that is my own work.</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Owns</span>Execution modes, boundaries, completion conditions</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Backlog.md</span>
+<span class="state-flow__detail">Used as published, not reimplemented.</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Owns</span>Task schema, lifecycle, dependencies, evidence</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Coding agent</span>
+<span class="state-flow__detail">Runs one task at a time.</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Owns</span>Implementation, validation, PR, CI, review, merge</span>
+</li>
+</ol>
+<figcaption class="state-flow__caption">Each layer owns exactly one thing and reads down, never up. A task cannot rewrite the requirement above it, and the agent cannot redefine the policy it runs under.</figcaption>
+</figure>
 
-`backlog-workflow` deliberately does not reimplement Backlog.md. Backlog.md owns
-the task schema, lifecycle, Acceptance Criteria, Definition of Done,
-Implementation Plan, notes, dependencies, and its CLI and JSON interfaces; its
-canonical instructions stay the single source of truth for all of that. The
-workflow adds only what Backlog.md has no opinion on: execution modes,
-requirement authority, approval boundaries, blocker policy, completion
-conditions, and deterministic task selection.
+<div class="decision">
 
-Installing it into a project writes a small, versioned surface:
+### Sit on top of Backlog.md rather than reimplement it
+
+**Why** — Backlog.md already owns the task schema, lifecycle, Acceptance
+Criteria, Definition of Done, Implementation Plan, notes, dependencies, and its
+CLI and JSON interfaces. Reimplementing any of that would create a second source
+of truth for it, and its canonical instructions stay authoritative instead.
+
+**Consequence** — The workflow may add only what Backlog.md has no opinion on:
+execution modes, requirement authority, approval boundaries, blocker policy,
+completion conditions, and deterministic task selection.
+
+</div>
+
+The lifecycle those layers govern runs in seven stages, and most of this page is
+about the boundaries between them:
+
+1. **Requirement** — requirement-driven development: a requirement source owns
+   product intent, and a task may not quietly reinterpret it.
+2. **Task decomposition** — Backlog.md integration: the requirement becomes
+   tasks, dependencies, and Acceptance Criteria, and nothing else.
+3. **Just-in-time planning** — the Implementation Plan is written at execution,
+   against the repository as it exists at that moment.
+4. **Implementation** — explicit execution boundaries, in manual or autonomous
+   execution: one named task, and only what the requirement covers.
+5. **Validation** — validation gates run the project's own detected commands,
+   never an invented one.
+6. **Evidence** — evidence-based completion: recorded in the task, or the task
+   is not done.
+7. **Delivery** — PR, CI, review, merge.
+
+Managing the agent instruction files all seven stages depend on is the
+collection's second skill, and has its own section below.
+
+Installing the workflow into a project writes a small, versioned surface:
 
 ```text
 .agent-workflow/
@@ -90,14 +144,24 @@ Installing it into a project writes a small, versioned surface:
 └── grilling/
 ```
 
-Installation runs project discovery rather than assuming a stack. The Backlog.md
-CLI invocation, default branch, requirement sources, and the setup, format,
-lint, typecheck, test, and build commands are detected and written into
-`PROJECT.md`, which then becomes project-owned. A command the project does not
-have is recorded as `not detected`, and the agent is required to report it as
-unavailable rather than substitute one that looks plausible. `upgrade` later
-refreshes the workflow-managed files while leaving that project-owned
-configuration, the requirements, and existing tasks untouched.
+<div class="decision">
+
+### Detect the project's commands, and record the missing ones as missing
+
+**Why** — A lint or build command that merely looks plausible is exactly how a
+run gets reported as passing against a check the project does not have.
+
+**Consequence** — Installation discovers the Backlog.md CLI invocation, the
+default branch, the requirement sources, and the setup, format, lint, typecheck,
+test, and build commands, and writes them into `PROJECT.md`, which is
+project-owned from then on. A command the project does not have is written down
+as `not detected`, and the agent is required to report it unavailable rather
+than substitute one that looks right.
+
+</div>
+
+A later `upgrade` refreshes the workflow-managed files while leaving that
+project-owned configuration, the requirements, and existing tasks untouched.
 
 ## Requirement / Backlog Separation
 
@@ -107,16 +171,22 @@ introduce, remove, or reinterpret a requirement, and a conflict has to be
 resolved in the authoritative source before implementation continues.
 
 Every task therefore carries a `Requirement source` field naming the document or
-decision record it derives from. Where a decision is reached in conversation
-rather than in a document, the policy forces the split explicitly:
+decision record it derives from.
 
-- a choice confined to one task's implementation stays in that task's record;
-- a choice that binds future tasks, or that a `Requirement source` would
-  otherwise have nothing to cite, must first become a decision record —
-  Context, Decision, Consequences — before any task depending on it is created.
+<div class="decision">
 
-That rule is what keeps "the agent settled this at some point" from quietly
-becoming a requirement.
+### A choice that binds future tasks becomes a decision record first
+
+**Why** — Without that rule, "the agent settled this at some point" quietly
+becomes a requirement, and a `Requirement source` ends up citing a conversation
+nobody can read.
+
+**Consequence** — A choice confined to one task's implementation stays in that
+task's record. A choice that binds future tasks, or that a `Requirement source`
+would otherwise have nothing to cite, must first become a decision record —
+Context, Decision, Consequences — before any task depending on it is created.
+
+</div>
 
 Before a task may enter an active status it passes a Task Ready Gate covering
 requirement source, goal, scope, out of scope, stable constraints,
@@ -129,39 +199,60 @@ determined from repository evidence is not.
 
 Decomposition and implementation planning are separated on purpose:
 
-```text
-/backlog-plan
-    ↓ define WHAT: tasks, dependencies, Acceptance Criteria
+<figure class="state-flow">
+<ol class="state-flow__steps" role="list">
+<li class="state-flow__step">
+<span class="state-flow__name">/backlog-plan</span>
+<span class="state-flow__detail">Align the requirement, then decompose it. Reports the decomposition and stops.</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Defines WHAT</span>Tasks, dependencies, Acceptance Criteria</span>
+<span class="state-flow__part"><span class="state-flow__part-label">May not</span>Write an Implementation Plan, decide function-level design, write product code, set anything active</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">/backlog-run TASK-ID</span>
+<span class="state-flow__detail">Research the codebase as it exists right now, then commit to an approach.</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Defines HOW</span>The Implementation Plan, recorded before any code is written</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Then</span>Implementation, validation, evidence</span>
+</li>
+</ol>
+<figcaption class="state-flow__caption">What to build is settled at decomposition. How to build it is settled at execution, against the repository as it actually is by then.</figcaption>
+</figure>
 
-/backlog-run TASK-ID
-    ↓ research the current codebase
-    ↓ decide HOW, record it, then implement
-```
+<div class="decision">
 
-`/backlog-plan` aligns the requirement and decomposes it into tasks, and is
-explicitly forbidden from producing an Implementation Plan, deciding
-function-level design, writing product code, or setting anything active. It
-reports the decomposition and stops.
+### Write the Implementation Plan at execution, not at decomposition
 
-The Implementation Plan is written just in time by `/backlog-run`, against the
-repository as it exists at execution. A plan written at decomposition time
-describes a codebase that has since moved: by the time a task near the end of a
-backlog is reached, an approach proposed weeks earlier is routinely wrong about
-files that no longer exist. Recording the plan before coding stays mandatory —
-the workflow moves _when_ it is written, not _whether_.
+**Why** — A plan written at decomposition time describes a codebase that has
+since moved. By the time a task near the end of a backlog is reached, an
+approach proposed weeks earlier is routinely wrong about files that no longer
+exist.
+
+**Consequence** — `/backlog-plan` is forbidden from producing an Implementation
+Plan at all, and `/backlog-run` writes one against the repository in front of
+it. Recording the plan before coding stays mandatory: the workflow moves _when_
+it is written, not _whether_.
+
+</div>
 
 ## Execution Boundaries
 
 `/backlog-run TASK-ID` executes exactly one named task and stops. It does not
 select the next one.
 
-The approval boundary is stated rather than left to the agent's judgment.
-Invoking `/backlog-run TASK-ID` authorizes that task through just-in-time
-planning, implementation, and validation, so the agent records its plan and
-proceeds instead of pausing to have its own plan approved. This is a deliberate
-override of the upstream recommendation to wait for plan approval, and it is
-narrow: what the agent still may not do is decide something the requirement does
-not cover.
+<div class="decision">
+
+### Invoking the task is the approval
+
+**Why** — The approval boundary should be stated rather than left to the
+agent's judgment. Invoking `/backlog-run TASK-ID` authorizes that task through
+just-in-time planning, implementation, and validation, so the agent records its
+plan and proceeds instead of pausing to have its own plan approved.
+
+**Trade-off** — This is a deliberate override of the upstream recommendation to
+wait for plan approval, and it removes the human checkpoint between the plan and
+the code. The boundary is drawn narrowly to compensate: what the agent still may
+not do is decide something the requirement does not cover.
+
+</div>
 
 Stopping is restricted to six conditions:
 
@@ -175,10 +266,19 @@ Stopping is restricted to six conditions:
 6. a newly discovered critical defect whose safe resolution materially exceeds
    the task's scope.
 
-Implementation patterns, code navigation, task-scoped refactoring, test fixes,
-and reversible engineering choices are explicitly _not_ blockers. An agent that
-stops for those is as unusable as one that never stops, so the list is written
-in both directions.
+<div class="decision">
+
+### Write the blocker list in both directions
+
+**Why** — An agent that stops for implementation patterns, code navigation,
+task-scoped refactoring, test fixes, or reversible engineering choices is as
+unusable as one that never stops.
+
+**Consequence** — Those are named in the policy as explicitly _not_ blockers,
+alongside the six conditions that are. The list says what to stop for and what
+to keep going through.
+
+</div>
 
 Scope discipline belongs to the same boundary: unrelated cleanup is not mixed
 into a task, cleanup required for correctness is, and broad cleanup discovered
@@ -195,12 +295,21 @@ A task may be marked `Done` only when four conditions hold:
 
 Writing code satisfies none of them on its own.
 
-Two details make this enforceable rather than aspirational. First, the four
-conditions are bound into each task's native Definition of Done as checkable
-items, and both execution skills re-read the task before coding and append any
-missing item — so a task created before the policy existed, or created outside
-the workflow, cannot bypass it. Second, a check the project does not have is
-recorded as unavailable or not applicable instead of being invented, which
+<div class="decision">
+
+### Bind the four conditions into each task's own Definition of Done
+
+**Why** — A policy that lives only in a workflow document is bypassed by any
+task that predates it or was created outside it.
+
+**Consequence** — The four conditions become checkable items in each task's
+native Definition of Done, and both execution skills re-read the task before
+coding and append any item that is missing.
+
+</div>
+
+The other half of making this enforceable is refusing to invent checks: a check
+the project does not have is recorded as unavailable or not applicable, which
 removes the incentive to manufacture a passing-looking log.
 
 ## Manual vs Autonomous Mode
@@ -223,22 +332,40 @@ tasks whose blocking dependencies are incomplete, apply priority, break ties on
 the lowest numeric task ID, execute one task, finalize it completely, then
 re-query. No in-memory queue survives a completed task.
 
-The two modes differ in exactly one respect: what happens at an unresolved
-product decision. Manual mode asks, through a structured one-question-at-a-time
-interview, and records the outcome. Automatic mode never asks — it records the
-evidence in the task, reports it blocked, and stops. It may still make
-reversible engineering decisions that repository evidence supports.
+<div class="decision">
+
+### At an unresolved product decision, automatic mode stops instead of choosing
+
+**Why** — The two modes differ in exactly one respect, and this is it. Manual
+mode can ask, through a structured one-question-at-a-time interview, and record
+the outcome. Automatic mode has nobody to ask.
+
+**Consequence** — Automatic mode never asks: it records the evidence in the
+task, reports it blocked, and stops. It may still make reversible engineering
+decisions that repository evidence supports.
+
+</div>
 
 Parallelism is a further opt-in. `automatic.max_parallel_tasks` defaults to `1`,
 which is exactly the sequential flow above. Raising it runs that many
 independent, dependency-ready tasks at once, each isolated in its own
-`git worktree`. Selection and claiming stay single-threaded — every task in a
-batch is set active sequentially _before_ any work starts, so two agents can
-never claim the same task — and the batch merges back in ascending task-ID order
-once all of it has finished. A merge conflict blocks only the task it happened
-on: that task moves back out of `Done` with the conflict recorded as blocker
-evidence and its worktree left in place for inspection, while the rest of the
-batch merges normally.
+`git worktree`.
+
+<div class="decision">
+
+### Claim the whole batch before any of it starts
+
+**Why** — Selection and claiming stay single-threaded even when execution does
+not. Every task in a batch is set active sequentially _before_ any work starts,
+so two agents can never claim the same task.
+
+**Consequence** — The batch merges back in ascending task-ID order once all of
+it has finished, and a merge conflict blocks only the task it happened on: that
+task moves back out of `Done` with the conflict recorded as blocker evidence and
+its worktree left in place for inspection, while the rest of the batch merges
+normally.
+
+</div>
 
 ## Trade-offs
 
@@ -270,13 +397,14 @@ directory trees that went stale, progress notes from three months ago, rules
 that apply to only one subdirectory, and unverifiable requests like "write good
 code" — and all of it loads into context on every single task.
 
-`audit-claude-md` is the secondary public skill in the collection and addresses
-that directly. It reviews every rule individually — every paragraph and bullet,
-with multi-requirement bullets split into atomic rules first — and gives each
-one exactly one disposition: keep it at the root; move it to a narrower path;
-extract it into a skill; move it into real documentation; rewrite it; delete it;
-or flag it as an enforcement gap, where a hard prohibition exists only as prose
-and a hook, CI check, or linter belongs instead.
+`audit-claude-md` is the secondary public skill in the collection, and it is
+where instruction design and the long-term maintainability of those files are
+addressed directly. It reviews every rule individually — every paragraph and
+bullet, with multi-requirement bullets split into atomic rules first — and gives
+each one exactly one disposition: keep it at the root; move it to a narrower
+path; extract it into a skill; move it into real documentation; rewrite it;
+delete it; or flag it as an enforcement gap, where a hard prohibition exists only
+as prose and a hook, CI check, or linter belongs instead.
 
 Three design decisions carry the weight. It acts on each rule rather than
 returning a list of suggestions. Extracting to a skill or a document is
@@ -298,6 +426,8 @@ be confused with uncommitted work of yours.
 
 All of it lives in one public repository:
 
+<div class="evidence">
+
 - [`github.com/tc3oliver/skills`](https://github.com/tc3oliver/skills) — the
   collection, MIT licensed.
 - [`backlog-workflow/`](https://github.com/tc3oliver/skills/blob/main/backlog-workflow/README.md)
@@ -307,7 +437,11 @@ All of it lives in one public repository:
   (`python3 -m unittest discover -s tests`,
   `python3 scripts/validate_package.py`).
 - [`audit-claude-md/`](https://github.com/tc3oliver/skills/blob/main/audit-claude-md/README.md)
-  — the instruction auditor described above.
+  — the instruction auditor described above: context quality, instruction
+  design, progressive disclosure, and the maintainability of coding-agent
+  instructions.
+
+</div>
 
 It installs either as agent skills (`npx skills add tc3oliver/skills`) or as a
 Claude Code plugin (`/plugin marketplace add tc3oliver/skills`).

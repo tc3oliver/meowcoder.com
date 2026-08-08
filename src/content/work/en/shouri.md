@@ -2,11 +2,22 @@
 title: 'Shouri / 收理'
 type: 'Product · AI Systems'
 summary: 'An AI-powered information organizer for capturing webpages, files and media, then turning them into structured, searchable knowledge.'
+outcome: 'Live with the Free plan open, on an architecture that persists the original before any AI call — so a failed organization run has nothing to destroy.'
+evidence: 'shouri.app · pricing, privacy, terms, and refund policy all published'
 slug: 'shouri'
 locale: 'en'
 translationKey: 'shouri'
 order: 0
 draft: false
+meta:
+  - label: 'Status'
+    value: 'Live · test period'
+  - label: 'Plans'
+    value: 'Free open · Pro published at NT$199/month'
+  - label: 'Interface'
+    value: 'Traditional Chinese · Google sign-in'
+  - label: 'Distribution'
+    value: 'Web app, installable to the home screen'
 ---
 
 ## Problem
@@ -31,33 +42,42 @@ destroy the other.
 Three principles, stated in product terms and enforced in the data model rather
 than in the interface.
 
-**Save first.** The original is persisted before any AI call. Text is written to
-the database, uploaded files to storage. The item reaches a saved state the user
-can walk away from before organization is offered at all.
+**Save first.** The original is persisted before any AI call. The item reaches a
+saved state the user can walk away from before organization is offered at all.
 
 **Explicit AI.** AI organization is off by default and runs only after the user
-turns it on. Consent is requested the first time organization is actually used,
-not bundled into registration, and nothing is sent for processing before that.
-It can be switched off again at any point, and content already saved is
-unaffected.
+turns it on, and nothing is sent for processing before that. It can be switched
+off again at any point, and content already saved is unaffected.
 
-**Recoverable architecture.** Source content and AI-derived fields are stored
-separately. A failed extraction or a poor organization run does not delete or
-overwrite the saved item, and a correction the user makes survives the next run.
+**Recoverable architecture.** A failed extraction or a poor organization run does
+not delete or overwrite the saved item.
 
 ## Architecture
 
 An item moves through three observable states, and the boundaries between them
-are the architecture:
+are the architecture.
 
-1. **Saved.** The original is durable — text in the database, an uploaded file
-   in private object storage. Nothing has been sent anywhere yet.
-2. **Organizing.** Usable content is extracted and sent for AI processing, which
-   returns a title, summary, key points, a classification, tags, and
-   subject-specific fields.
-3. **Organized.** Derived fields are stored alongside the original, not inside
-   it. The item becomes searchable, correctable, shareable, and eligible for
-   Review.
+<figure class="state-flow">
+<ol class="state-flow__steps" role="list">
+<li class="state-flow__step">
+<span class="state-flow__name">Saved</span>
+<span class="state-flow__detail">The original is durable. Nothing has been sent anywhere yet.</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Source</span>Text in the database, an uploaded file in private object storage</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Organizing</span>
+<span class="state-flow__detail">Usable content is extracted from the original and sent for AI processing.</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Source</span>Read, never replaced</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Organized</span>
+<span class="state-flow__detail">The item becomes searchable, correctable, shareable, and eligible for Review.</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Source</span>The original, unchanged</span>
+<span class="state-flow__part state-flow__part--derived"><span class="state-flow__part-label">AI-derived</span>Title, summary, key points, classification, tags, subject fields</span>
+</li>
+</ol>
+<figcaption class="state-flow__caption">A solid outline is content the user saved; a dashed outline is content a model produced. Derived fields are stored alongside the original, not inside it — which is why a failed extraction has nothing to destroy, and why any item can be organized again.</figcaption>
+</figure>
 
 Properties that follow from that split:
 
@@ -70,42 +90,84 @@ Properties that follow from that split:
 - Items are private by default. The one exception is a share link the user
   creates: an unguessable URL that anyone holding it can read.
 
-What this page does not describe is the stack, the hosting arrangement, or which
-AI provider is used. The product's own public documentation names third parties
-by category, and this case study stays at the same level.
-
 ## Engineering Decisions
 
 Each decision below is paired with the constraint it protects and what it costs.
 
-**Persist before processing, not after.** This rules out the failure mode where
-a capture is lost because a downstream extraction failed. The cost is that a
-saved item can sit unorganized indefinitely, which is part of why the Review
-queue exists.
+<div class="decision">
 
-**Ask for AI consent at the moment of use.** Collecting it during registration
-would have been simpler to implement and would have removed a prompt from the
-moment of use. Asking the first time organization is actually used ties the
-decision to something the user is doing on purpose.
+### Persist before processing, not after
 
-**Store derived fields separately rather than mutating the record.** Reprocessing
-is then always safe, because there is nothing to lose by running it again.
+**Why** — It rules out the failure mode where a capture is lost because a
+downstream extraction failed.
 
-**User corrections win.** Edits to classification, tags, and subject fields are
-final and are not overwritten by the next organization run. Without that rule,
-the system would silently undo the user's work every time it reprocessed an item,
-and correcting anything would stop being worth the effort.
+**Trade-off** — A saved item can sit unorganized indefinitely, which is part of
+why the Review queue exists.
 
-**Show the cost before spending it.** Organization is metered in AI credits and
-priced by content length, so the cost of one item is not obvious in advance. Each
-item displays its estimated cost and waits for the user to accept it.
+</div>
 
-**Cap the analysis, not the content.** When an item exceeds the per-item analysis
-limit of the current plan, that run stops at the limit. The excess is not
-discarded — the original is retained in full — so a later run on a higher limit
-can go further.
+<div class="decision">
 
-**Keep session and device tokens only as hashes**, so that disclosure of the
+### Ask for AI consent at the moment of use
+
+**Why** — Asking the first time organization is actually used ties the decision
+to something the user is doing on purpose.
+
+**Trade-off** — Collecting it during registration would have been simpler to
+implement and would have removed a prompt from the moment of use.
+
+</div>
+
+<div class="decision">
+
+### Store derived fields separately rather than mutating the record
+
+**Why** — Reprocessing is then always safe, because there is nothing to lose by
+running it again.
+
+**Consequence** — An item is two things at once: an original that never changes,
+and a derived layer that any later run may replace in full.
+
+</div>
+
+<div class="decision">
+
+### User corrections win
+
+**Why** — Without that rule, the system would silently undo the user's work every
+time it reprocessed an item, and correcting anything would stop being worth the
+effort.
+
+**Trade-off** — Edits to classification, tags, and subject fields are final, so a
+later run cannot improve a field the user has already touched.
+
+</div>
+
+<div class="decision">
+
+### Show the cost before spending it
+
+**Why** — Organization is metered in AI credits and priced by content length, so
+the cost of one item is not obvious in advance.
+
+**Trade-off** — Each item displays its estimated cost and waits for the user to
+accept it, which puts a confirmation step in front of every run.
+
+</div>
+
+<div class="decision">
+
+### Cap the analysis, not the content
+
+**Why** — The original is retained in full, so a later run on a higher limit can
+go further.
+
+**Trade-off** — When an item exceeds the per-item analysis limit of the current
+plan, that run stops at the limit and the item is organized only that far.
+
+</div>
+
+Session and device tokens are kept only as hashes, so that disclosure of the
 database does not by itself grant access to accounts.
 
 ## AI Processing
@@ -238,10 +300,11 @@ What is public and inspectable today:
 - The product is in a test period, with a limited offer for early registrations.
 
 Operating figures — user counts, processing volume, latency, accuracy — are not
-published, and this page cites none. Everything above can be verified from the
-product and its public documents.
+published, and this page cites none.
 
 ## Evidence
+
+<div class="evidence">
 
 - **Product** — [shouri.app](https://shouri.app)
 - **Plans and credits** — [shouri.app/pricing](https://shouri.app/pricing)
@@ -250,8 +313,11 @@ product and its public documents.
 - **Refund and cancellation policy** —
   [shouri.app/refund](https://shouri.app/refund)
 
+</div>
+
 Every claim on this page maps to observable product behaviour or to a clause in
 those documents. Deliberately absent: the implementation stack, named providers
-and models, infrastructure detail, and operating metrics. None of that is
-publicly documented, and a case study is not the right place for it to appear
-first.
+and models, infrastructure detail, and operating metrics. The product's own
+public documentation names third parties by category and publishes no operating
+figures, and this case study stays at the same level — none of that is publicly
+documented, and a case study is not the right place for it to appear first.

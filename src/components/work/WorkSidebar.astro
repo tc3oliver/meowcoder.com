@@ -1,0 +1,113 @@
+---
+/**
+ * Case-study sidebar (MCD-22, doc-2 §12).
+ *
+ * Two things a reader wants without leaving their place in the article: what
+ * this project is, and what the article covers. Both are restrained by
+ * construction — the metadata rows come from the entry's own frontmatter, and
+ * the section list comes from the article's headings, so neither can grow into
+ * a second navigation system.
+ *
+ * Placed before the article in the DOM. On a narrow screen that is exactly
+ * where it should read — facts and contents, then the piece — and on a wide one
+ * it moves to the second grid column without the visual order and the focus
+ * order disagreeing.
+ */
+
+import type { MarkdownHeading } from 'astro';
+
+import type { WorkPageStrings } from '../../i18n/pages/work';
+import type { WorkEntryData } from '../../lib/work';
+import SectionNav from './SectionNav.astro';
+
+interface Props {
+  entry: WorkEntryData;
+  headings: readonly MarkdownHeading[];
+  t: WorkPageStrings;
+}
+
+const { entry, headings, t } = Astro.props;
+
+/*
+ * `type` is required of every entry and `meta` is not, so the first row is
+ * always present: a case study that declares no metadata still gets a sidebar
+ * that says what it is.
+ */
+const rows = [{ label: t.typeLabel, value: entry.type }, ...(entry.meta ?? [])];
+---
+
+<aside class="work-aside" aria-label={t.asideLabel}>
+  <div class="work-aside__inner">
+    <dl class="work-aside__meta">
+      {
+        rows.map((row) => (
+          <div class="work-aside__row">
+            <dt>{row.label}</dt>
+            <dd>{row.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <SectionNav headings={headings} label={t.sectionsLabel} labelId="work-sections" />
+  </div>
+</aside>
+
+<style>
+  /* Hairlines above and below rather than a card: PRD §25 separates with thin
+     rules and whitespace. */
+  .work-aside {
+    border-block: var(--border-width) solid var(--color-border);
+    padding-block: var(--space-5);
+  }
+
+  .work-aside__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  /* Rows pair a label with a value, so each pair is one grid item and the two
+     lines cannot be separated by a column break. `minmax(10rem, 1fr)` gives two
+     columns at 390px and one in the desktop sidebar, with no breakpoint. */
+  .work-aside__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: var(--space-4) var(--space-5);
+  }
+
+  .work-aside__row dt {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .work-aside__row dd {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+
+  @media (min-width: 70rem) {
+    .work-aside {
+      /* In the second column the rule that reads as separation is the vertical
+         one, so the horizontal pair is dropped rather than added to. */
+      border-block: none;
+      border-inline-start: var(--border-width) solid var(--color-border);
+      padding-block: 0;
+      padding-inline-start: var(--space-5);
+    }
+
+    .work-aside__inner {
+      /* Follows the reader down the article. The offset matches the shell's
+         `scroll-padding-top`, so a heading landing from a section link sits
+         level with the sidebar rather than under it. */
+      position: sticky;
+      inset-block-start: var(--space-6);
+      gap: var(--space-6);
+    }
+
+    .work-aside__meta {
+      gap: var(--space-3);
+    }
+  }
+</style>
