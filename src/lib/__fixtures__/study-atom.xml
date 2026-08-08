@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Synthetic Atom feed. Study publishes RSS today (see study-rss.xml), so this
+  fixture exists to pin the second dialect the parser claims to support, plus
+  the metadata shapes that only Atom can express:
+    - `xml:lang` on the feed, inherited by entries that do not override it;
+    - a second <title xml:lang="en"> — the bilingual metadata PRD §28 anticipates;
+    - <category term=.. label=..> as attributes rather than element text;
+    - a relative href, and rel="alternate" chosen over rel="edit";
+    - an entry with no date at all, which must be dropped rather than rendered blank.
+-->
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="zh-Hant">
+    <title>MeowCoder Lab</title>
+    <link rel="self" href="https://study.meowcoder.com/atom.xml"/>
+    <updated>2026-08-08T00:50:00+08:00</updated>
+
+    <entry>
+        <title>從 Reactive Agent 到 Strategy-Guided Agent</title>
+        <title xml:lang="en">From Reactive Agent to Strategy-Guided Agent</title>
+        <link rel="edit" href="https://study.meowcoder.com/admin/1/"/>
+        <link rel="alternate" href="/posts/strategy-guided-agent/"/>
+        <category term="ai-agents" label="AI Agents"/>
+        <published>2026-06-17T00:00:00Z</published>
+        <updated>2026-06-18T09:30:00Z</updated>
+        <content type="html">&lt;p&gt;Body intentionally truncated.&lt;/p&gt;</content>
+    </entry>
+
+    <entry>
+        <title>MCP 知識系統的邊界</title>
+        <link rel="alternate" href="http://localhost:9996/posts/mcp-knowledge-boundaries/"/>
+        <category term="mcp"/>
+        <updated>2026-07-02T18:00:00+08:00</updated>
+    </entry>
+
+    <entry xml:lang="en">
+        <title>Undated draft that must not be published</title>
+        <link rel="alternate" href="/posts/undated/"/>
+    </entry>
+</feed>
