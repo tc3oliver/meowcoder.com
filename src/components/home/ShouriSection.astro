@@ -43,8 +43,8 @@ const { screenshot } = t.shouri;
           <Image
             src={shouriScreenshot}
             alt={screenshot.alt}
-            widths={[640, 960, 1160]}
-            sizes="(min-width: 72rem) 1160px, 100vw"
+            widths={[480, 720, 1440]}
+            sizes="(min-width: 48rem) 720px, 100vw"
             loading="lazy"
             decoding="async"
           />
@@ -97,8 +97,15 @@ const { screenshot } = t.shouri;
     line-height: var(--leading-relaxed);
   }
 
+  /* Held to the reading measure, the same width as `.shouri__summary` above
+     it. The design system lets a figure span the full content width, but this
+     section is text-led: a 1160px image directly under a 720px paragraph reads
+     as two columns that do not line up. Keeping both at one width also stops
+     the screenshot from becoming the largest thing on the homepage, which
+     PRD §9.2 does not ask for — it asks for one screenshot, not a hero. */
   .shouri__figure {
     margin: 0;
+    max-width: var(--width-reading);
     border: var(--border-width) solid var(--color-border);
     border-radius: var(--radius-lg);
     overflow: hidden;

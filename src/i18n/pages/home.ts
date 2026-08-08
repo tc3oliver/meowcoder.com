@@ -175,7 +175,7 @@ export const home = {
       summary:
         'An AI-powered information organizer for capturing webpages, files and media, then turning them into structured, searchable knowledge.',
       screenshot: {
-        alt: 'The Shouri web app. Behind, a saved cooking video sits beside the structured recipe it was turned into — ingredients, quantities, and tags. In front, a learning path tracks progress through a five-unit plan.',
+        alt: 'Shouri on desktop and phone. The web app works through a five-unit learning path; behind it the product page shows a saved cooking video beside the structured recipe it became. Two phone screens show the saved library and that recipe broken into summary, ingredients, and steps.',
       },
       principlesHeading: 'Product principles',
       principles: [
@@ -316,7 +316,7 @@ export const home = {
       heading: 'Shouri / 收理',
       summary: '以 AI 驅動的資訊整理工具，能收下網頁、檔案與影音，再整理成結構化、可搜尋的知識。',
       screenshot: {
-        alt: '收理的網頁應用。後方是一段收下的料理影片，與整理後的結構化食譜並列，包含材料、份量與標籤；前方是追蹤五個單元進度的學習路徑。',
+        alt: '收理在桌機與手機上的畫面。網頁應用正進行五個單元的學習路線；後方的產品頁把一段收下的料理影片與整理後的結構化食譜並列。兩個手機畫面則是收藏庫，以及拆成摘要、材料與步驟的同一份食譜。',
       },
       principlesHeading: '產品原則',
       principles: [
