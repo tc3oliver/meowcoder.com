@@ -4,7 +4,7 @@ title: MCD-1a — Cloudflare Pages staging 環境
 status: In Progress
 assignee: []
 created_date: '2026-08-08 14:21'
-updated_date: '2026-08-08 16:15'
+updated_date: '2026-08-08 16:51'
 labels: []
 dependencies:
   - TASK-1
@@ -80,11 +80,11 @@ meowcoder.com 具備可用的 Cloudflare staging 環境，每次推送 main 都�
 - [x] #3 wrangler 已釘為 devDependency，部署不依賴 npx 取用浮動版本
 - [x] #4 npx wrangler deploy --dry-run 通過，且未提示安裝 adapter 或執行 astro add cloudflare
 - [x] #5 public/ 底下的檔案經 npm run build 後原樣出現在 dist/，確立 _headers 與 _redirects 的路徑
-- [ ] #6 Cloudflare 專案的 NODE_VERSION 與 .nvmrc（22.12.0）一致
+- [x] #6 Cloudflare 專案的 NODE_VERSION 與 .nvmrc（22.12.0）一致
 - [ ] #7 推送至 main 會自動觸發 Cloudflare 建置並成功完成
-- [ ] #8 staging URL 回應 HTTP 200 並正常提供已建置的網站
-- [ ] #9 Cloudflare API token 與 account ID 未進入儲存庫或 CI artifact
-- [ ] #10 staging URL 與部署方式已記錄於 .agent-workflow/PROJECT.md
+- [x] #8 staging URL 回應 HTTP 200 並正常提供已建置的網站
+- [x] #9 Cloudflare API token 與 account ID 未進入儲存庫或 CI artifact
+- [x] #10 staging URL 與部署方式已記錄於 .agent-workflow/PROJECT.md
 <!-- AC:END -->
 
 ## Definition of Done
@@ -143,4 +143,35 @@ static-first 架構，也會破壞 MCD-2 的零 JavaScript 深色模式、MCD-3 
 AC #6～#10 需要 Cloudflare 端的建置結果與 staging URL：NODE_VERSION 是否與
 .nvmrc 一致、推送是否自動觸發、staging URL 是否回應 200、憑證未入庫的最終確認、
 以及把 URL 記入 PROJECT.md。本次推送會觸發一次 Cloudflare 建置，取得結果後補完。
+
+## 部署驗證（staging 與正式網域）
+
+staging URL: https://meowcoder-com.tc3oliver.workers.dev — 10 個路由全部 HTTP 200。
+
+網域綁定已由站長完成，早於 MCD-13 的預定順序。經 Cloudflare edge IP
+（--resolve meowcoder.com:443:104.21.5.150）繞過本機 DNS 快取實測：
+
+- 10 個路由（含四個案例研究詳細頁）全部 HTTP 200
+- `server: cloudflare`、`cf-ray` 存在，確認由 Worker 提供
+- title 為 `Oliver Yu — AI Systems Engineer & System Architect`、
+  canonical 為 `https://meowcoder.com/`，與建置產出相符
+- 零動態標頭（無 x-powered-by、無 set-cookie），確認純靜態
+
+NS 已轉至 Cloudflare（damiete.ns.cloudflare.com、perla.ns.cloudflare.com）。
+`study` 與 `mail` 在 Cloudflare 權威回應中皆為 1.34.19.234，即正確設為
+DNS only（灰雲）指向原伺服器，未被代理。MX 與兩筆 TXT（google-site-verification、
+_dmarc）仍存在。
+
+AC #6（NODE_VERSION 與 .nvmrc 一致）由建置成功本身證明：Astro 7 要求
+Node >= 22.12.0，在 Node 20 會直接拒絕建置。
+
+## 執行中發現
+
+Cloudflare 對本 zone 自動注入了一份 managed `/robots.txt`（Content Signals
+Policy，AI 爬蟲授權宣告），`dist/` 內並無此檔。該檔**不阻擋搜尋索引**。
+`/sitemap.xml` 為 404，屬 MCD-11 範圍。MCD-11 若於 `public/robots.txt`
+放置自有檔案，將覆蓋 Cloudflare 的 managed 版本。
+
+舊 WordPress 介面已不可存取：`/wp-admin/` 與 `/wp-login.php` 皆回 404
+（PRD §32；同時滿足 TASK-13 AC #7 的驗證條件）。
 <!-- SECTION:NOTES:END -->

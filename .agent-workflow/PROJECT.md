@@ -40,7 +40,9 @@ Run them in the CI order defined by PRD §23: install → format/lint → typech
 - Cloudflare project settings: build command `npm run build`, deploy command
   `npx wrangler deploy`, environment variable `NODE_VERSION` = `22.12.0`.
 - Pushing to `main` triggers a Cloudflare build automatically.
-- Staging URL: `not yet recorded` — fill in once the first deploy succeeds.
+- Staging URL: `https://meowcoder-com.tc3oliver.workers.dev`
+- The Cloudflare build runner has outbound network access — the build-time Study
+  feed read (MCD-9) resolves there, so the homepage ships real posts.
 - **Never install `@astrojs/cloudflare` or run `astro add cloudflare`.** Without
   `wrangler.jsonc`, wrangler framework-detects the project and converts it to
   SSR, which breaks the static-first architecture PRD §26 requires. This has
