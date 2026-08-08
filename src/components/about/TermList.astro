@@ -1,0 +1,40 @@
+---
+/**
+ * A compact list of short terms (MCD-8).
+ *
+ * Used for PRD §13's engineering domains and PRD §17's principles. Both are
+ * lists of bare terms, and both are deliberately text-only: PRD §25 rules out
+ * technology imagery, and PRD §13 asks the page to communicate depth without
+ * turning into a résumé wall — so each term gets a hairline outline and nothing
+ * else. No proficiency bar, no rating, no vendor mark.
+ */
+
+interface Props {
+  items: readonly string[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="term-list" role="list">
+  {items.map((item) => <li class="term-list__item">{item}</li>)}
+</ul>
+
+<style>
+  .term-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    margin: 0;
+  }
+
+  .term-list__item {
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-full);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+</style>
