@@ -4,7 +4,7 @@ title: MCD-10 — 開源品質
 status: Done
 assignee: []
 created_date: '2026-08-08 06:43'
-updated_date: '2026-08-08 14:33'
+updated_date: '2026-08-08 14:41'
 labels: []
 dependencies:
   - TASK-1
@@ -227,6 +227,28 @@ $ npm run build
 ## 文件同步
 
 本專案無 Requirement Matrix 文件；PRD（doc-1）為需求來源且本任務未變更任何需求，因此不需同步。README 即為本任務的文件產出本身。
+
+## 批次合併後的修正（由 orchestrator 於 main 上處理）
+
+AC #4（CI 連結檢查）在本任務 worktree 內的驗證是**假綠**，合併後才暴露。
+
+原指令 `linkinator dist README.md LICENSE-CONTENT.md --recurse --markdown --silent`
+同時傳入目錄與 markdown 檔，linkinator 的 static server root 會落在 repo 根目錄而非
+`dist/`，導致 `dist/index.html` 內的絕對路徑（`/`、`/_astro/*.css`）全部解析錯誤。
+
+在本任務的 worktree 中之所以通過，是因為當時 `dist/index.html` 仍是 MCD-1 的純佔位頁，
+沒有 CSS 資產也沒有絕對連結，等於沒有可壞的連結可測。TASK-2 的設計系統合併進來後，
+index.html 開始輸出 `href="/"` 與 `/_astro/index.*.css`，linkcheck 立刻回報 2 個 404。
+
+修正：拆成兩個指令，站台掃描以 `--server-root dist` 並將路徑指定為相對於該 root 的
+`index.html`；markdown 另外掃描。
+
+- `linkcheck:site`: `linkinator index.html --server-root dist --recurse --silent`
+- `linkcheck:docs`: `linkinator README.md LICENSE-CONTENT.md --markdown --silent`
+
+反向驗證（確認不是又一個假綠）：於 `dist/index.html` 插入 `<a href="/definitely-missing/">`
+後重跑，輸出 `[404] definitely-missing/` 與 `ERROR: Detected 1 broken links`；
+`astro build` 重建後回復 `Successfully scanned 4 links` 與 `6 links`。
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
