@@ -1,0 +1,134 @@
+---
+/**
+ * Site header shell (MCD-2).
+ *
+ * Structure and styling only. Every user-facing string arrives through props or
+ * slots so MCD-3 can wire the typed `nav` dictionary in without touching this
+ * file. Nothing is hard-coded, and nothing renders when its content is absent —
+ * an empty `<nav>` or an unlabeled brand link would be an accessibility defect,
+ * not a neutral placeholder.
+ *
+ * No client-side JavaScript: the navigation wraps on narrow viewports instead
+ * of collapsing behind a scripted menu button (PRD §26, §29).
+ */
+
+interface NavItem {
+  href: string;
+  label: string;
+  /** Marks the entry for the page currently being viewed. */
+  current?: boolean;
+}
+
+interface Props {
+  /** Destination of the brand link; locale-aware once MCD-3 lands. */
+  homeHref?: string;
+  /** Accessible name for the navigation landmark, from the locale dictionary. */
+  navLabel?: string;
+  navItems?: NavItem[];
+}
+
+const { homeHref = '/', navLabel, navItems = [] } = Astro.props;
+
+const hasBrand = Astro.slots.has('brand');
+const hasActions = Astro.slots.has('actions');
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    {
+      hasBrand && (
+        <a class="site-header__brand" href={homeHref}>
+          <slot name="brand" />
+        </a>
+      )
+    }
+
+    {
+      navItems.length > 0 && (
+        <nav class="site-header__nav" aria-label={navLabel}>
+          <ul class="site-header__list" role="list">
+            {navItems.map((item) => (
+              <li>
+                <a
+                  class="site-header__link"
+                  href={item.href}
+                  aria-current={item.current ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+
+    {
+      hasActions && (
+        <div class="site-header__actions">
+          <slot name="actions" />
+        </div>
+      )
+    }
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-block-end: var(--border-width) solid var(--color-border);
+    background-color: var(--color-bg);
+  }
+
+  .site-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-6);
+    padding-block: var(--space-4);
+  }
+
+  .site-header__brand {
+    margin-inline-end: auto;
+    color: var(--color-text);
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-tight);
+    text-decoration: none;
+  }
+
+  .site-header__brand:hover {
+    color: var(--color-accent);
+  }
+
+  .site-header__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-5);
+    margin: 0;
+  }
+
+  .site-header__link {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .site-header__link:hover {
+    color: var(--color-text);
+  }
+
+  /* The current page reads as current without relying on color alone. */
+  .site-header__link[aria-current='page'] {
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+    text-decoration: underline;
+    text-underline-offset: 0.35em;
+  }
+
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+</style>

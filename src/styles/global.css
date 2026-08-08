@@ -1,0 +1,255 @@
+/**
+ * Global baseline (MCD-2, PRD §25, §29).
+ *
+ * Reset, base typography, the responsive shell, focus visibility, and the
+ * reduced-motion contract. Everything here reads from `tokens.css`; no color,
+ * size, or width is written literally.
+ */
+
+@import './tokens.css';
+
+/* -------------------------------------------------------------------------
+ * Reset
+ * ---------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  /* Stop iOS from inflating text in landscape, which would break the tuned
+     type scale. */
+  -webkit-text-size-adjust: 100%;
+  /* Anchor targets land with breathing room instead of hugging the viewport
+     edge. */
+  scroll-padding-top: var(--space-6);
+}
+
+body {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-regular);
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Lists that carry structure rather than enumeration. `role="list"` keeps them
+   announced as lists in Safari once the markers are removed. */
+:where(ul, ol)[role='list'] {
+  list-style: none;
+  padding: 0;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* -------------------------------------------------------------------------
+ * Typography — strong hierarchy from size, weight, and spacing alone
+ * ---------------------------------------------------------------------- */
+
+:where(h1, h2, h3, h4, h5, h6) {
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+
+:where(h1) {
+  font-size: var(--text-3xl);
+}
+
+:where(h2) {
+  font-size: var(--text-2xl);
+}
+
+:where(h3) {
+  font-size: var(--text-xl);
+}
+
+:where(h4) {
+  font-size: var(--text-lg);
+  letter-spacing: var(--tracking-normal);
+}
+
+:where(h5, h6) {
+  font-size: var(--text-md);
+  letter-spacing: var(--tracking-normal);
+}
+
+:where(p, li) {
+  text-wrap: pretty;
+}
+
+:where(small) {
+  font-size: var(--text-sm);
+}
+
+:where(code, kbd, samp, pre) {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+:where(hr) {
+  border: none;
+  border-top: var(--border-width) solid var(--color-border);
+  margin-block: var(--space-7);
+}
+
+:where(a) {
+  color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+:where(a:hover) {
+  color: var(--color-accent-strong);
+}
+
+/* -------------------------------------------------------------------------
+ * Focus — one visible ring for every focusable element (PRD §29)
+ *
+ * `--color-focus` is verified at ≥3:1 against every surface token, and the
+ * offset keeps the ring legible even on same-colored controls.
+ * ---------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
+/* -------------------------------------------------------------------------
+ * Shell
+ * ---------------------------------------------------------------------- */
+
+.container {
+  width: 100%;
+  max-width: var(--width-content);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Reading measure for long-form text, per PRD §25. Applied inside a
+   `.container` so prose stays narrow while figures and tables can still use
+   the full content width. */
+.container--reading,
+.prose {
+  max-width: var(--width-reading);
+}
+
+.prose > * + * {
+  margin-block-start: var(--space-4);
+}
+
+.prose :where(h2, h3, h4) {
+  margin-block-start: var(--space-7);
+}
+
+.prose :where(p, li) {
+  line-height: var(--leading-relaxed);
+  color: var(--color-text);
+}
+
+.site-main {
+  /* Absorbs the leftover height so the footer sits at the bottom of short
+     pages without being fixed. */
+  flex: 1 0 auto;
+  padding-block: var(--space-section);
+}
+
+/* Reveals itself on keyboard focus only; a pointer user never sees it. */
+.skip-link {
+  position: absolute;
+  z-index: 10;
+  inset-block-start: var(--space-3);
+  inset-inline-start: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  /* Clipped rather than `display: none` so it stays in the focus order. */
+  clip-path: inset(50%);
+}
+
+.skip-link:focus {
+  clip-path: none;
+}
+
+/* Available to any component that needs an accessible-but-invisible label. */
+.visually-hidden:not(:focus):not(:active) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------------------------------
+ * Reduced motion (PRD §29)
+ *
+ * Two layers: the tokens collapse so token-driven transitions disappear at the
+ * source, and the catch-all neutralizes any animation declared without them.
+ * ---------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
