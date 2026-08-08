@@ -1,0 +1,57 @@
+name: Scheduled rebuild
+
+# The Study feed is read at build time (PRD §28), so a new article only reaches
+# the homepage when the site is rebuilt. Nothing else triggers that between
+# pushes, which would leave new writing invisible indefinitely.
+#
+# Daily is deliberate: ~30 builds a month against Cloudflare's 500-build free
+# tier, and a personal site's publishing cadence does not justify tighter.
+#
+# GitHub cron is UTC. 21:00 UTC is 05:00 the next day in Taipei (UTC+8), so a
+# piece published during the day is live by the following morning.
+#
+# Note: GitHub disables scheduled workflows in repositories with no activity for
+# 60 days. If the feed ever stops updating, check that first.
+
+on:
+  schedule:
+    - cron: '0 21 * * *'
+  # Lets a new article be pulled in immediately without waiting for the cron.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scheduled-rebuild
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # The same command CI and Cloudflare use. A second build path would be a
+      # second thing to keep correct.
+      - name: Build
+        run: npm run build
+
+      # Deploys the built output through the existing wrangler.jsonc, which
+      # declares assets only and no `main` — see decision-4.
+      - name: Deploy
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

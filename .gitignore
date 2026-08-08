@@ -27,6 +27,9 @@ id_ed25519*
 
 # Local agent runtime state — must not enter the public repository (decision-1)
 .omc/
+# Task, decision, and PRD records. Kept local, not published (decision-8);
+# .agent-workflow/ and .claude/skills/ stay tracked as the public design.
+backlog/
 # Machine-local approvals and env; .claude/skills/** stays tracked per decision-1
 .claude/settings.local.json
 .claude/settings.local.*

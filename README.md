@@ -64,6 +64,17 @@ Every push and pull request against `main` runs the checks above, plus a
 the full git history. Dependency and GitHub Actions updates arrive as weekly
 Dependabot pull requests; Actions are pinned to commit SHAs.
 
+A separate scheduled workflow rebuilds and redeploys the site once a day. The
+homepage reads the writing feed at build time, so without it new articles would
+not appear between pushes. It can also be run on demand from the Actions tab.
+
+It needs two repository secrets:
+
+| Secret                  | Purpose                              |
+| ----------------------- | ------------------------------------ |
+| `CLOUDFLARE_API_TOKEN`  | Deploy permission, scoped to Workers |
+| `CLOUDFLARE_ACCOUNT_ID` | The account the Worker belongs to    |
+
 ## Contributing
 
 External contributions are **not** solicited. This repository exists to run and

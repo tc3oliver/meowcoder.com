@@ -39,7 +39,10 @@ Run them in the CI order defined by PRD §23: install → format/lint → typech
   **no `main`**, which is what makes it a static-asset-only Worker.
 - Cloudflare project settings: build command `npm run build`, deploy command
   `npx wrangler deploy`, environment variable `NODE_VERSION` = `22.12.0`.
-- Pushing to `main` triggers a Cloudflare build automatically.
+- Pushing to `main` triggers a Cloudflare build automatically (verified).
+- `.github/workflows/scheduled-rebuild.yml` rebuilds daily at 21:00 UTC
+  (05:00 Taipei) so build-time feed content stays current. Requires the
+  `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets.
 - Staging URL: `https://meowcoder-com.tc3oliver.workers.dev`
 - The Cloudflare build runner has outbound network access — the build-time Study
   feed read (MCD-9) resolves there, so the homepage ships real posts.
