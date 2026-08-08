@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { LOCALES } from '../i18n/locales';
+import { GITHUB_URL, ORCID_URL, SHOURI_URL, STUDY_URL } from './external';
 import { ROUTES, alternatesFor, localizeUrl } from './i18n';
 import { SITE_URL } from './site';
 
@@ -116,6 +117,86 @@ describe('every built page', () => {
 
       for (const attrs of scripts) {
         expect(attrs, `${file} emits an executable script`).toContain('application/ld+json');
+      }
+    }
+  });
+});
+
+describe('footer link row (PRD §9.8)', () => {
+  /*
+   * PRD §9.8 fixes both the membership and the order of this row:
+   *
+   *   GitHub · Study · ORCID · Shouri · Site Source
+   *
+   * It is asserted against `dist/` rather than against `SiteShell`'s array
+   * because the point is that every page actually carries all five — a route
+   * that bypassed `SiteShell` would pass a source-level check and fail here.
+   */
+  const EXPECTED = [
+    GITHUB_URL,
+    STUDY_URL,
+    ORCID_URL,
+    SHOURI_URL,
+    'https://github.com/tc3oliver/meowcoder.com',
+  ];
+
+  it('carries the five destinations in order on every page', () => {
+    for (const file of pageFiles()) {
+      const hrefs = [...read(file).matchAll(/class="site-footer__link"\s+href="([^"]+)"/g)].map(
+        (m) => m[1],
+      );
+
+      expect(hrefs, `${file} footer row`).toEqual(EXPECTED);
+    }
+  });
+
+  it('marks every destination as off-site', () => {
+    for (const file of pageFiles()) {
+      const links = [...read(file).matchAll(/<a\s+class="site-footer__link"[^>]*>/g)].map(
+        (m) => m[0],
+      );
+
+      for (const link of links) {
+        expect(link, `${file} footer link is missing the safe rel`).toContain(
+          'rel="noopener noreferrer"',
+        );
+      }
+    }
+  });
+});
+
+describe('Person structured data', () => {
+  /*
+   * ORCID is what makes the `Person` node resolvable to a real researcher
+   * rather than a name, so it is asserted separately from the rest of `sameAs`.
+   *
+   * The node is parsed rather than string-matched against the page: ORCID is
+   * also a footer link on every route, so a substring check would stay green
+   * with `sameAs` empty.
+   */
+  function personNodes(html: string): Record<string, unknown>[] {
+    return [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+      .flatMap((m) => {
+        // A block holds either one node or an array of them — the homepage
+        // ships `Person` and `WebSite` together.
+        const parsed: unknown = JSON.parse(m[1]);
+        return (Array.isArray(parsed) ? parsed : [parsed]) as Record<string, unknown>[];
+      })
+      .filter((node) => node['@type'] === 'Person');
+  }
+
+  it('describes the person once on each homepage', () => {
+    // The identity graph is anchored on the homepage; interior routes reference
+    // it by `@id` instead of restating it.
+    for (const file of ['index.html', 'zh/index.html']) {
+      expect(personNodes(read(file)), `${file}`).toHaveLength(1);
+    }
+  });
+
+  it('claims the ORCID record as the same person', () => {
+    for (const file of pageFiles()) {
+      for (const person of personNodes(read(file))) {
+        expect(person.sameAs, `${file} Person.sameAs omits ORCID`).toContain(ORCID_URL);
       }
     }
   });

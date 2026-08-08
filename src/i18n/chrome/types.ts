@@ -37,18 +37,17 @@ export interface ChromeDictionary {
    * The footer link row PRD §9.8 specifies, plus its landmark name.
    *
    * It lives in chrome rather than in a page dictionary because it is the same
-   * row on every route. PRD §9.8 lists five destinations — GitHub, Study,
-   * ORCID, Shouri, Site Source — and ORCID is deliberately absent here: PRD §6,
-   * §8, and §9.8 all name it without stating an address anywhere, and
-   * `src/lib/external.ts` records the same gap. Guessing an ORCID iD would
-   * attribute someone else's research record, so the entry is added once the
-   * real one is confirmed.
+   * row on every route. PRD §9.8 lists five destinations and this type carries
+   * all five; the row's order is `SiteShell`'s to fix, and
+   * `metadata.test.ts` asserts the built pages against PRD §9.8 directly.
    */
   footer: {
     ariaLabel: string;
     /** Product names, left untranslated per PRD §7. */
     github: string;
     study: string;
+    /** The research identity (PRD §6) — an initialism, not translated. */
+    orcid: string;
     shouri: string;
     /** The public meowcoder.com repository — secondary evidence (PRD §24). */
     siteSource: string;

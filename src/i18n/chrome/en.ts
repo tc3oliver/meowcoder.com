@@ -20,6 +20,7 @@ export const chromeEn = {
     ariaLabel: 'Footer',
     github: 'GitHub',
     study: 'Study',
+    orcid: 'ORCID',
     shouri: 'Shouri',
     siteSource: 'Site Source',
   },

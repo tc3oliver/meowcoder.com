@@ -25,6 +25,7 @@ export const chromeZh = {
     // Property names, left untranslated per PRD §7.
     github: 'GitHub',
     study: 'Study',
+    orcid: 'ORCID',
     shouri: 'Shouri',
     siteSource: '網站原始碼',
   },

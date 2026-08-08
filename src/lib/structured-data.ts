@@ -12,7 +12,7 @@
 
 import { home } from '../i18n/pages/home';
 import { LOCALE_TAG, type Locale } from '../i18n/locales';
-import { GITHUB_URL, SHOURI_URL, STUDY_URL } from './external';
+import { GITHUB_URL, ORCID_URL, SHOURI_URL, STUDY_URL } from './external';
 import { localizeUrl } from './i18n';
 import { SITE_URL } from './site';
 
@@ -22,13 +22,12 @@ export type JsonLd = Record<string, unknown>;
 /**
  * Profiles that identify the same person elsewhere.
  *
- * ORCID belongs here — PRD §6 names it as the research identity — but the PRD
- * states no ORCID iD anywhere, and a guessed one would assert someone else's
- * research record. It is added when the real identifier is known (MCD-4 has the
- * same gap for the footer link).
+ * ORCID is the one entry consumers treat as an authoritative identifier rather
+ * than just another profile, which is why it leads. The publication DOI is not
+ * here: `sameAs` is for identities of this person, and a DOI identifies a work.
  */
 function sameAs(): string[] {
-  return [GITHUB_URL, STUDY_URL, SHOURI_URL];
+  return [ORCID_URL, GITHUB_URL, STUDY_URL, SHOURI_URL];
 }
 
 export function personSchema(locale: Locale): JsonLd {

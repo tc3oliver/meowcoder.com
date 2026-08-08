@@ -13,7 +13,7 @@ import Header from '../components/Header.astro';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import { chrome } from '../i18n/chrome';
 import type { Locale } from '../i18n/locales';
-import { GITHUB_URL, SHOURI_URL, STUDY_URL } from '../lib/external';
+import { GITHUB_URL, ORCID_URL, SHOURI_URL, STUDY_URL } from '../lib/external';
 import { localizePath, type Route } from '../lib/i18n';
 import BaseLayout from './BaseLayout.astro';
 
@@ -57,15 +57,17 @@ const navItems = [
 const SITE_SOURCE_URL = 'https://github.com/tc3oliver/meowcoder.com';
 
 /*
- * The footer link row, in the order PRD §9.8 lists it. ORCID is the one
- * destination PRD §9.8 names that is missing: no ORCID iD appears anywhere in
- * the PRD, and inventing one would credit another researcher's record. It is
- * added when the real identifier is confirmed — see the note on
- * `ChromeDictionary.footer`.
+ * The footer link row, in the exact order PRD §9.8 lists it:
+ *
+ *   GitHub · Study · ORCID · Shouri · Site Source
+ *
+ * This array is the only place that order is decided, and `metadata.test.ts`
+ * asserts it against every built page.
  */
 const footerLinks = [
   { href: GITHUB_URL, label: t.footer.github, external: true },
   { href: STUDY_URL, label: t.footer.study, external: true },
+  { href: ORCID_URL, label: t.footer.orcid, external: true },
   { href: SHOURI_URL, label: t.footer.shouri, external: true },
   { href: SITE_SOURCE_URL, label: t.footer.siteSource, external: true },
 ];
