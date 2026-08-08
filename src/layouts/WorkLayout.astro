@@ -1,0 +1,100 @@
+---
+/**
+ * Work detail page (MCD-5, PRD §10).
+ *
+ * One layout for both locales. `/work/[slug].astro` and
+ * `/zh/work/[slug].astro` differ only in which locale constant they pass, so a
+ * case study cannot render differently in English than it does in Chinese.
+ *
+ * The rendered Markdown arrives through the default slot rather than being
+ * rendered here, which keeps this layout free of `astro:content` and lets it be
+ * reasoned about as plain markup.
+ */
+
+import { chrome } from '../i18n/chrome';
+import type { Locale } from '../i18n/locales';
+import { work } from '../i18n/pages/work';
+import { localizePath, workDetailRoute } from '../lib/i18n';
+import type { WorkEntryData } from '../lib/work';
+import SiteShell from './SiteShell.astro';
+
+interface Props {
+  locale: Locale;
+  entry: WorkEntryData;
+}
+
+const { locale, entry } = Astro.props;
+
+const t = work[locale];
+
+/*
+ * Same shape as every dictionary title (`Work — Oliver Yu`), composed rather
+ * than translated: the case-study title is already localized in the content
+ * file, and the wordmark is a proper name PRD §7 leaves untranslated.
+ */
+const title = `${entry.title} — ${chrome[locale].brand}`;
+---
+
+<SiteShell
+  locale={locale}
+  route={workDetailRoute(entry.slug)}
+  title={title}
+  description={entry.summary}
+>
+  <article class="container container--reading work">
+    <header class="work__header">
+      <dl class="work__meta">
+        <dt>{t.typeLabel}</dt>
+        <dd>{entry.type}</dd>
+      </dl>
+      <h1>{entry.title}</h1>
+      <p class="work__summary">{entry.summary}</p>
+    </header>
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    <footer class="work__footer">
+      <a href={localizePath(locale, '/work')}>{t.backToIndex}</a>
+    </footer>
+  </article>
+</SiteShell>
+
+<style>
+  .work__header {
+    margin-block-end: var(--space-7);
+  }
+
+  /* A label/value pair rather than a styled string, so the metadata stays
+     machine-readable and the label needs no locale-specific punctuation. */
+  .work__meta {
+    display: flex;
+    gap: var(--space-2);
+    margin-block-end: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .work__meta dt::after {
+    content: ':';
+  }
+
+  .work__meta dd {
+    margin: 0;
+  }
+
+  .work__summary {
+    margin-block-start: var(--space-3);
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-muted);
+  }
+
+  .work__footer {
+    margin-block-start: var(--space-7);
+    padding-block-start: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+    font-size: var(--text-sm);
+  }
+</style>

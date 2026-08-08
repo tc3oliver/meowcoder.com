@@ -20,7 +20,24 @@ import { absoluteUrl } from './site';
  */
 export const ROUTES = ['/', '/work', '/about'] as const;
 
-export type Route = (typeof ROUTES)[number];
+/** The fixed pages. Every one of them exists in every locale. */
+export type StaticRoute = (typeof ROUTES)[number];
+
+/**
+ * A Work detail page (MCD-5).
+ *
+ * The slug is locale-independent by design: the language switch rewrites only
+ * the locale prefix, so `/work/shouri` and `/zh/work/shouri` are the same route
+ * seen from two locales. `src/lib/work.ts` enforces that at build time.
+ */
+export type WorkDetailRoute = `/work/${string}`;
+
+export type Route = StaticRoute | WorkDetailRoute;
+
+/** The route for one case study, from its slug. */
+export function workDetailRoute(slug: string): WorkDetailRoute {
+  return `/work/${slug}`;
+}
 
 /** Site-relative path for a route in a given locale. */
 export function localizePath(locale: Locale, route: Route): string {

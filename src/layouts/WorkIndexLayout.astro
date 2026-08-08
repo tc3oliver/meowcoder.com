@@ -1,0 +1,105 @@
+---
+/**
+ * Work index (MCD-5, PRD §10).
+ *
+ * The counterpart to `WorkLayout`: one structure driving both `/work/` and
+ * `/zh/work/`, so the two indexes cannot drift into listing different things
+ * in different shapes.
+ *
+ * Entries arrive already filtered and ordered by `workEntriesForLocale`; this
+ * layout only renders them.
+ */
+
+import type { Locale } from '../i18n/locales';
+import { work } from '../i18n/pages/work';
+import { localizePath, workDetailRoute } from '../lib/i18n';
+import type { WorkEntry } from '../lib/work';
+import SiteShell from './SiteShell.astro';
+
+interface Props {
+  locale: Locale;
+  entries: readonly WorkEntry[];
+}
+
+const { locale, entries } = Astro.props;
+
+const t = work[locale];
+---
+
+<SiteShell locale={locale} route="/work" title={t.title} description={t.description}>
+  <div class="container container--reading">
+    <header class="work-index__header">
+      <h1>{t.heading}</h1>
+      <p class="work-index__intro">{t.intro}</p>
+    </header>
+
+    {
+      entries.length === 0 ? (
+        <p class="work-index__empty">{t.empty}</p>
+      ) : (
+        <ul class="work-index" role="list">
+          {entries.map((entry) => (
+            <li class="work-index__item">
+              <p class="work-index__type">{entry.data.type}</p>
+              <h2 class="work-index__title">
+                <a href={localizePath(locale, workDetailRoute(entry.data.slug))}>
+                  {entry.data.title}
+                </a>
+              </h2>
+              <p class="work-index__summary">{entry.data.summary}</p>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</SiteShell>
+
+<style>
+  .work-index__header {
+    margin-block-end: var(--space-8);
+  }
+
+  .work-index__intro {
+    margin-block-start: var(--space-3);
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-muted);
+  }
+
+  .work-index {
+    display: grid;
+    gap: var(--space-8);
+    margin: 0;
+  }
+
+  .work-index__type,
+  .work-index__summary {
+    color: var(--color-text-muted);
+  }
+
+  .work-index__type {
+    margin-block-end: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .work-index__summary {
+    margin-block-start: var(--space-3);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* The whole title is the link; nothing else in the card competes with it. */
+  .work-index__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .work-index__title a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .work-index__empty {
+    color: var(--color-text-muted);
+  }
+</style>
