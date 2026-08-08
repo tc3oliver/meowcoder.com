@@ -1,13 +1,16 @@
 /**
  * Design system guarantees (MCD-2).
  *
- * The visual result of a stylesheet is judged by eye, but three of its
+ * The visual result of a stylesheet is judged by eye, but several of its
  * properties are not judgement calls — they are arithmetic or a text search,
- * and a reviewer cannot check them reliably by reading hex codes:
+ * and a reviewer cannot check them reliably by reading hex codes or the two
+ * ends of a `clamp()`:
  *
  *   1. every semantic color pair clears WCAG AA (PRD §29);
  *   2. the shell widths stay inside the ranges PRD §25 fixes;
- *   3. none of the visual elements PRD §25 forbids appear in the source.
+ *   3. the type scale and section rhythm hit doc-2 §4's target sizes;
+ *   4. the section eyebrow is a separate element from its heading (doc-2 §16);
+ *   5. none of the visual elements PRD §25 forbids appear in the source.
  *
  * Computing them here means editing a token re-derives the answer instead of
  * re-asserting the comment next to it.
@@ -15,6 +18,7 @@
 
 import { describe, expect, it } from 'vitest';
 
+import HOME_SECTION from '../components/home/HomeSection.astro?raw';
 import GLOBAL_CSS from './global.css?raw';
 import TOKENS_CSS from './tokens.css?raw';
 
@@ -147,6 +151,152 @@ describe('shell widths', () => {
     const width = readPixelToken(TOKENS_CSS, 'width-reading');
     expect(width).toBeGreaterThanOrEqual(680);
     expect(width).toBeLessThanOrEqual(760);
+  });
+});
+
+/* -------------------------------------------------------------------------
+ * Type scale and section rhythm (doc-2 §4)
+ *
+ * Every fluid token is a `clamp(min, preferred, max)` whose bounds are what a
+ * ~390px phone and a desktop actually render — the preferred term only chooses
+ * the path between them. So asserting the two bounds is asserting the two
+ * sizes doc-2 §4 gives a number for, which reading the token by eye cannot do.
+ * ---------------------------------------------------------------------- */
+
+const ROOT_FONT_SIZE = 16;
+
+/**
+ * The rendered range of a length token, in pixels: `[min, max]` for a
+ * `clamp()`, and the same value twice for a fixed `rem` step.
+ */
+function readRemRange(css: string, name: string): { min: number; max: number } {
+  const declaration = css.match(new RegExp(`--${name}:\\s*([^;]+);`));
+  expect(declaration, `missing token --${name}`).not.toBeNull();
+  const value = declaration![1].trim();
+
+  // The preferred term is matched as "no comma" rather than skipped, so a
+  // token written with a comma-bearing function inside fails loudly here
+  // instead of being read as a different token's bounds.
+  const fluid = value.match(/^clamp\(\s*([\d.]+)rem\s*,[^,]+,\s*([\d.]+)rem\s*\)$/);
+  if (fluid) {
+    return { min: Number(fluid[1]) * ROOT_FONT_SIZE, max: Number(fluid[2]) * ROOT_FONT_SIZE };
+  }
+
+  const fixed = value.match(/^([\d.]+)rem$/);
+  expect(
+    fixed,
+    `token --${name} is neither a rem length nor a clamp() of rem lengths`,
+  ).not.toBeNull();
+  const px = Number(fixed![1]) * ROOT_FONT_SIZE;
+  return { min: px, max: px };
+}
+
+describe('type scale (doc-2 §4)', () => {
+  it('gives the hero name a 64–72px display step', () => {
+    const display = readRemRange(TOKENS_CSS, 'text-display');
+    expect(display.max).toBeGreaterThanOrEqual(64);
+    expect(display.max).toBeLessThanOrEqual(72);
+  });
+
+  it('sizes h2 at 36–44px', () => {
+    const h2 = readRemRange(TOKENS_CSS, 'text-2xl');
+    expect(h2.max).toBeGreaterThanOrEqual(36);
+    expect(h2.max).toBeLessThanOrEqual(44);
+    expect(GLOBAL_CSS).toMatch(/:where\(h2\)\s*\{[^}]*font-size:\s*var\(--text-2xl\)/);
+  });
+
+  it('sets body type at 17–19px', () => {
+    const body = readRemRange(TOKENS_CSS, 'text-base');
+    expect(body.min).toBeGreaterThanOrEqual(17);
+    expect(body.max).toBeLessThanOrEqual(19);
+  });
+
+  /*
+   * The display step is the reason this matters: 68px of heading on a 390px
+   * screen would set the page's minimum width from a single unbreakable word.
+   * Each fluid step has to shrink, and the largest of them has to shrink to
+   * something a phone can hold.
+   */
+  it('scales every fluid step down for a 390px screen', () => {
+    const fluid = [...TOKENS_CSS.matchAll(/--(text-[\w-]+):\s*clamp\(/g)].map(([, name]) => name);
+    expect(fluid.length).toBeGreaterThan(0);
+
+    for (const name of fluid) {
+      const step = readRemRange(TOKENS_CSS, name);
+      expect(step.min, `--${name} does not scale down`).toBeLessThan(step.max);
+    }
+
+    expect(readRemRange(TOKENS_CSS, 'text-display').min).toBeLessThanOrEqual(48);
+  });
+
+  it('keeps the scale ordered so a heading never outsizes the one above it', () => {
+    const ordered = ['text-base', 'text-md', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl'];
+    const maxima = ordered.map((name) => readRemRange(TOKENS_CSS, name).max);
+    expect(maxima).toEqual([...maxima].sort((a, b) => a - b));
+    expect(new Set(maxima).size).toBe(maxima.length);
+    expect(readRemRange(TOKENS_CSS, 'text-display').max).toBeGreaterThan(maxima.at(-1)!);
+  });
+});
+
+describe('section rhythm (doc-2 §4)', () => {
+  it('spaces sections 72–88px apart on mobile and 112–144px on desktop', () => {
+    const rhythm = readRemRange(TOKENS_CSS, 'space-section');
+    expect(rhythm.min).toBeGreaterThanOrEqual(72);
+    expect(rhythm.min).toBeLessThanOrEqual(88);
+    expect(rhythm.max).toBeGreaterThanOrEqual(112);
+    expect(rhythm.max).toBeLessThanOrEqual(144);
+  });
+
+  /*
+   * `--space-section` used to double as the shell's own padding, so raising it
+   * to the rhythm above would have inflated the band under the header too.
+   * The two are separate tokens now, and this holds them apart.
+   */
+  it('keeps the shell band on its own token', () => {
+    const page = readRemRange(TOKENS_CSS, 'space-page');
+    expect(page.max).toBeLessThan(readRemRange(TOKENS_CSS, 'space-section').max);
+    expect(GLOBAL_CSS).toMatch(/\.site-main\s*\{[^}]*padding-block:\s*var\(--space-page\)/);
+  });
+
+  it('gives a homepage section that rhythm', () => {
+    expect(HOME_SECTION).toMatch(
+      /\.home-section\s*\{[^}]*padding-block-start:\s*var\(--space-section\)/,
+    );
+  });
+});
+
+/* -------------------------------------------------------------------------
+ * Eyebrow and heading are separate typographic elements (doc-2 §16)
+ *
+ * The eyebrow used to be a `display: block` span inside the `<h2>`. Both
+ * halves of that are the defect: nested, it joins the heading's accessible
+ * name, and 精選產品 / Shouri reads as one phrase rather than a label above a
+ * title. A rendered-size check cannot catch a regression here, but the
+ * structure can.
+ * ---------------------------------------------------------------------- */
+
+describe('homepage section eyebrow', () => {
+  const markup = HOME_SECTION.slice(
+    HOME_SECTION.indexOf('<section'),
+    HOME_SECTION.indexOf('<style>'),
+  );
+
+  it('renders the eyebrow before the heading, not inside it', () => {
+    expect(markup).toMatch(/<p class="home-section__eyebrow">[\s\S]*<h2/);
+    const heading = markup.match(/<h2[^>]*>([\s\S]*?)<\/h2>/);
+    expect(heading, 'no <h2> in the section markup').not.toBeNull();
+    expect(heading![1]).not.toMatch(/[<>]/);
+  });
+
+  it('leaves the section named by its heading alone', () => {
+    expect(markup).toMatch(/<section[^>]*aria-labelledby=\{id\}/);
+    expect(markup).toMatch(/<h2[^>]*id=\{id\}/);
+  });
+
+  it('separates the two by more than a heading line box would', () => {
+    expect(HOME_SECTION).toMatch(
+      /\.home-section__eyebrow\s*\{[^}]*margin-block-end:\s*var\(--space-([4-9]|1\d)\)/,
+    );
   });
 });
 

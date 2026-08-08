@@ -37,15 +37,29 @@
 
   /* Fluid scale. The clamp() midpoints grow with the viewport between the
      mobile and desktop ends of the shell, so headings stay proportional
-     without breakpoint-specific overrides. */
+     without breakpoint-specific overrides.
+
+     Each step's lower bound is what a 390px screen gets, and the upper bound is
+     reached around the content width — so widening the scale for desktop, as
+     the steps below do, cannot change what a phone renders and cannot make a
+     narrow screen overflow. */
   --text-xs: 0.8125rem;
   --text-sm: 0.9375rem;
-  --text-base: 1.0625rem;
+  --text-base: 1.0625rem; /* 17px — doc-2 §4: body 17–19px */
   --text-md: 1.1875rem;
   --text-lg: clamp(1.25rem, 1.16rem + 0.45vw, 1.4375rem);
   --text-xl: clamp(1.4375rem, 1.29rem + 0.73vw, 1.75rem);
-  --text-2xl: clamp(1.75rem, 1.52rem + 1.14vw, 2.25rem);
-  --text-3xl: clamp(2.125rem, 1.76rem + 1.82vw, 2.9375rem);
+  --text-2xl: clamp(1.75rem, 1.41rem + 1.41vw, 2.5rem); /* 28 → 40px */
+  --text-3xl: clamp(2.125rem, 1.7rem + 2.05vw, 3.25rem); /* 34 → 52px */
+
+  /* The display step, above the scale rather than part of it (doc-2 §4).
+
+     It exists for the one element per page that is the page's focal point — on
+     the homepage, the name in the hero. The numbered steps are sized to sit in
+     running text and in headings that share a page with other headings; this
+     one is not, and giving it its own name keeps it from being reached for by
+     habit. Nothing inherits it: a component opts in. */
+  --text-display: clamp(2.5rem, 1.73rem + 3.15vw, 4.25rem); /* 40 → 68px */
 
   --leading-tight: 1.15;
   --leading-snug: 1.3;
@@ -80,9 +94,18 @@
   --space-11: 6.5rem;
   --space-12: 8rem;
 
-  /* Section rhythm scales with the viewport so mobile does not waste a screen
-     of empty space while desktop still breathes. */
-  --space-section: clamp(3rem, 2rem + 5vw, 6.5rem);
+  /* Two different jobs, kept as two tokens because doc-2 §4 gives them
+     different numbers.
+
+     `--space-page` is the band between the site chrome and the page body.
+     `--space-section` is the rhythm between consecutive sections of one page:
+     it is the whitespace that does the work a card border would otherwise do,
+     which is why it is so much larger than any numbered step.
+
+     Both scale with the viewport so mobile does not waste a screen of empty
+     space while desktop still breathes. */
+  --space-page: clamp(3rem, 2rem + 5vw, 6.5rem);
+  --space-section: clamp(4.5rem, 2.97rem + 6.29vw, 8rem); /* 72 → 128px */
 
   /* ---------------------------------------------------------------------
    * Layout — PRD §25 fixes both widths.

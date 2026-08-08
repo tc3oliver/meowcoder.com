@@ -89,6 +89,10 @@ button {
  * Typography — strong hierarchy from size, weight, and spacing alone
  * ---------------------------------------------------------------------- */
 
+/* `--text-display` is deliberately absent from the rules below. It is opted
+   into by the single focal element on a page — the hero name — not inherited by
+   an element type, so a second `h1` cannot pick it up by accident. */
+
 :where(h1, h2, h3, h4, h5, h6) {
   font-weight: var(--weight-semibold);
   line-height: var(--leading-tight);
@@ -196,8 +200,29 @@ button {
   margin-block-start: var(--space-4);
 }
 
-.prose :where(h2, h3, h4) {
-  margin-block-start: var(--space-7);
+/* A section boundary the eye can find while scrolling. The heading keeps its
+   scale step from the type system — the separation is rhythm plus one hairline,
+   not a larger font, so a case study with ten sections does not turn into ten
+   competing titles. */
+.prose :where(h2) {
+  margin-block-start: var(--space-9);
+  padding-block-start: var(--space-5);
+  border-block-start: var(--border-width) solid var(--color-border);
+}
+
+/* The first heading follows the page header, which already supplies the break. */
+.prose > :where(h2):first-child {
+  margin-block-start: 0;
+  padding-block-start: 0;
+  border-block-start: none;
+}
+
+.prose :where(h3) {
+  margin-block-start: var(--space-6);
+}
+
+.prose :where(h4) {
+  margin-block-start: var(--space-5);
 }
 
 .prose :where(p, li) {
@@ -205,11 +230,193 @@ button {
   color: var(--color-text);
 }
 
+/* Only the lists Markdown produces. A list carrying an explicit `role` is a
+   structure a component or a content block laid out itself — the state diagram
+   below is one — and inherited item spacing would fight its own. */
+.prose :where(ul, ol):not([role='list']) {
+  padding-inline-start: var(--space-5);
+}
+
+.prose :where(ul, ol):not([role='list']) > :where(li) + :where(li) {
+  margin-block-start: var(--space-2);
+}
+
+/* -------------------------------------------------------------------------
+ * Case-study registers (MCD-22, doc-2 §12)
+ *
+ * A case study carries four kinds of content, and a reader deciding where to
+ * spend attention needs to tell them apart before reading a word: running
+ * explanation (the default above), architecture (`.state-flow`), engineering
+ * decisions (`.decision`), and evidence (`.evidence`).
+ *
+ * They live here rather than in a component's scoped `<style>` because the
+ * markup they style is authored in the Markdown content files and arrives
+ * through a slot, where a component's scope hash never reaches it. Astro
+ * components cannot be used in `.md`; a raw HTML wrapper with blank lines
+ * around its contents keeps the Markdown inside it parsed, which is what lets a
+ * decision block still hold links and emphasis.
+ *
+ * `src/content/work/README.md` documents the markup each one expects.
+ * ---------------------------------------------------------------------- */
+
+/* --- Architecture: one state diagram, drawn in boxes and rules ---------- */
+
+.prose .state-flow {
+  margin-block-start: var(--space-6);
+  padding-block: var(--space-6);
+  border-block: var(--border-width) solid var(--color-border);
+}
+
+.prose .state-flow__steps {
+  display: flex;
+  flex-direction: column;
+  /* 3rem, so the connector below sits exactly on the 1.5rem midpoint whichever
+     way the steps are laid out. */
+  gap: var(--space-8);
+}
+
+.prose .state-flow__step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+}
+
+/* The connector sits in the gap above each step but the first. A pseudo-element
+   rather than markup, so the content files carry states and not arrows. */
+.prose .state-flow__step + .state-flow__step::before {
+  content: '↓';
+  position: absolute;
+  inset-block-start: calc(-1 * var(--space-5));
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  color: var(--color-text-muted);
+  line-height: 1;
+}
+
+.prose .state-flow__name {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+}
+
+.prose .state-flow__detail {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--color-text-muted);
+}
+
+/* What the state actually holds. The distinction the diagram exists to make —
+   content the user saved versus content a model produced — is carried by border
+   style and by the label inside each part, never by color alone. */
+.prose .state-flow__part {
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--color-text-muted);
+}
+
+.prose .state-flow__part--derived {
+  border-style: dashed;
+}
+
+.prose .state-flow__part-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+
+.prose .state-flow__caption {
+  margin-block-start: var(--space-5);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-muted);
+}
+
+/* One state per line on a phone; a row once there is width for three columns.
+   The step boxes never set a minimum width, so nothing can push the page
+   sideways at either size. */
+@media (min-width: 40rem) {
+  .prose .state-flow__steps {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .prose .state-flow__step {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .prose .state-flow__step + .state-flow__step::before {
+    content: '→';
+    inset-block-start: 50%;
+    inset-inline-start: calc(-1 * var(--space-5));
+  }
+}
+
+/* --- Decisions: Decision / Why / Trade-off ------------------------------ */
+
+.prose .decision {
+  margin-block-start: var(--space-6);
+  padding-inline-start: var(--space-5);
+  border-inline-start: calc(var(--border-width) * 2) solid var(--color-border-strong);
+}
+
+/* The decision itself is the heading, so it reads at a glance and lands in the
+   document outline. A step below `h3`'s default: these are entries in a list of
+   decisions, not sections of the article. */
+.prose .decision > :where(h3) {
+  margin-block-start: 0;
+  font-size: var(--text-lg);
+  letter-spacing: var(--tracking-normal);
+}
+
+.prose .decision > :where(p) {
+  margin-block-start: var(--space-3);
+}
+
+/* The `Why` / `Trade-off` lead-in. Weight and color do the work: PRD §7 serves
+   Traditional Chinese as a first-class locale, and uppercasing or letter-spacing
+   a label does nothing to Chinese text. */
+.prose .decision > :where(p) > :where(strong):first-child {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+}
+
+/* --- Evidence: the links that let a reader check the article ------------ */
+
+.prose .evidence {
+  margin-block-start: var(--space-6);
+  padding-block: var(--space-5);
+  border-block: var(--border-width) solid var(--color-border);
+}
+
+.prose .evidence :where(li) {
+  font-size: var(--text-md);
+}
+
+.prose .evidence :where(li) + :where(li) {
+  margin-block-start: var(--space-3);
+}
+
+.prose .evidence :where(a) {
+  font-weight: var(--weight-medium);
+}
+
 .site-main {
   /* Absorbs the leftover height so the footer sits at the bottom of short
      pages without being fixed. */
   flex: 1 0 auto;
-  padding-block: var(--space-section);
+  /* The band around the page body, not the rhythm between its sections — see
+     the note on both tokens in `tokens.css`. */
+  padding-block: var(--space-page);
 }
 
 /* Reveals itself on keyboard focus only; a pointer user never sees it. */
