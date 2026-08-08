@@ -15,7 +15,9 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "typecheck": "astro check",
-    "linkcheck": "linkinator dist README.md LICENSE-CONTENT.md --recurse --markdown --silent",
+    "linkcheck": "npm run linkcheck:site && npm run linkcheck:docs",
+    "linkcheck:site": "linkinator index.html --server-root dist --recurse --silent",
+    "linkcheck:docs": "linkinator README.md LICENSE-CONTENT.md --markdown --silent",
     "test": "vitest run"
   },
   "devDependencies": {
