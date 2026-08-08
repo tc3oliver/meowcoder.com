@@ -4,10 +4,9 @@ title: MCD-11 — SEO、無障礙與效能
 status: To Do
 assignee: []
 created_date: '2026-08-08 06:47'
-updated_date: '2026-08-08 14:21'
+updated_date: '2026-08-08 17:00'
 labels: []
 dependencies:
-  - TASK-8
   - TASK-6
   - TASK-9
   - TASK-10
