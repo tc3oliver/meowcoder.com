@@ -1,21 +1,19 @@
 ---
 /**
- * English Work index (MCD-3 shell). The content collection, entries, and detail
- * layout arrive in MCD-5.
+ * English Work index (MCD-5).
+ *
+ * Adding a case study never touches this file — it reads whatever the `work`
+ * collection contains.
  */
 
-import { work } from '../../i18n/pages/work';
-import SiteShell from '../../layouts/SiteShell.astro';
+import { getCollection } from 'astro:content';
+
+import WorkIndexLayout from '../../layouts/WorkIndexLayout.astro';
+import { workEntriesForLocale } from '../../lib/work';
 
 const locale = 'en' as const;
-const t = work[locale];
+
+const entries = workEntriesForLocale(await getCollection('work'), locale);
 ---
 
-<SiteShell locale={locale} route="/work" title={t.title} description={t.description}>
-  <div class="container">
-    <div class="prose">
-      <h1>{t.heading}</h1>
-      <p>{t.intro}</p>
-    </div>
-  </div>
-</SiteShell>
+<WorkIndexLayout locale={locale} entries={entries} />

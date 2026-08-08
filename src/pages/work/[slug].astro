@@ -1,0 +1,30 @@
+---
+/**
+ * English Work detail page (MCD-5).
+ *
+ * Every published English entry becomes `/work/<slug>/`. Adding a case study
+ * adds a route; this file does not change.
+ */
+
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+
+import WorkLayout from '../../layouts/WorkLayout.astro';
+import { workEntriesForLocale } from '../../lib/work';
+
+const locale = 'en' as const;
+
+export const getStaticPaths = (async () => {
+  const entries = workEntriesForLocale(await getCollection('work'), 'en');
+
+  return entries.map((entry) => ({ params: { slug: entry.data.slug }, props: { entry } }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+
+const { Content } = await render(entry);
+---
+
+<WorkLayout locale={locale} entry={entry.data}>
+  <Content />
+</WorkLayout>
