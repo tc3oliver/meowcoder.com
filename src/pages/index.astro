@@ -1,0 +1,21 @@
+---
+import { absoluteUrl } from '../lib/site';
+
+const canonical = absoluteUrl('/');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="canonical" href={canonical} />
+    <title>meowcoder.com</title>
+  </head>
+  <body>
+    <main>
+      <h1>meowcoder.com</h1>
+      <p>Repository bootstrap (MCD-1). Content ships in later tasks.</p>
+    </main>
+  </body>
+</html>

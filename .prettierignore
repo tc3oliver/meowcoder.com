@@ -1,0 +1,15 @@
+dist/
+.astro/
+node_modules/
+package-lock.json
+
+# Backlog.md and workflow artifacts are CLI-managed; formatting them would fight
+# the tooling that owns their layout.
+backlog/
+.agent-workflow/
+.claude/
+.omc/
+
+# Installer-managed content blocks; reformatting causes backlog-workflow audit drift.
+AGENTS.md
+CLAUDE.md
