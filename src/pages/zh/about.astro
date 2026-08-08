@@ -1,8 +1,12 @@
 ---
 /**
- * Traditional Chinese About page (MCD-3 shell). Content arrives in MCD-8.
+ * Traditional Chinese About page (MCD-8, PRD §13–§17).
+ *
+ * A complete localized page, not English content with translated labels
+ * (PRD §7): every string comes from the `zh` side of the About dictionary.
  */
 
+import AboutContent from '../../components/about/AboutContent.astro';
 import { about } from '../../i18n/pages/about';
 import SiteShell from '../../layouts/SiteShell.astro';
 
@@ -11,10 +15,5 @@ const t = about[locale];
 ---
 
 <SiteShell locale={locale} route="/about" title={t.title} description={t.description}>
-  <div class="container">
-    <div class="prose">
-      <h1>{t.heading}</h1>
-      <p>{t.intro}</p>
-    </div>
-  </div>
+  <AboutContent t={t} />
 </SiteShell>
