@@ -7,9 +7,10 @@
 - Project: meowcoder
 - Adoption mode: existing
 - Task prefix: task
-- Default branch: not detected (repository not yet git-initialized; MCD-1 initializes it)
+- Default branch: `main`
 - Target repository: `github.com/tc3oliver/meowcoder.com` (see `decision-1`)
 - Backlog CLI: `npx backlog.md`
+- Runtime: Node.js `>=22.12.0` (pinned in `.nvmrc`; required by Astro 7)
 
 ## Requirement sources
 
@@ -19,17 +20,29 @@
 
 ## Validation commands
 
-- Setup: `not detected`
-- Format: `not detected`
-- Lint: `not detected`
-- Typecheck: `not detected`
-- Tests: `not detected`
-- Build: `not detected`
+- Setup: `npm install`
+- Format: `npm run format:check` (rewrite in place with `npm run format`)
+- Lint: `npm run lint`
+- Typecheck: `npm run typecheck`
+- Tests: `npm test`
+- Build: `npm run build`
+
+Run them in the CI order defined by PRD §23: install → format/lint → typecheck
+→ build → test.
 
 ## Project-specific constraints
 
 - Preserve repository rules from applicable `CLAUDE.md`, `AGENTS.md`, and `.claude/rules/` files.
 - Add only constraints supported by repository evidence.
+- Node.js 22.12+ is required. `nvm` default is set to 22; a shell started before
+  that change may still resolve Node 20 from an inherited `PATH`, and Astro 7
+  will refuse to run. Verify with `node -v` before building.
+- The repository is currently **private**. Making it public is MCD-13 scope and
+  requires confirming no PRD §20 material is committed — note that `backlog/`
+  (including `doc-1`, the full PRD) is tracked here per `decision-1`.
+- Never commit PRD §20 material: `.env` files, API tokens, Cloudflare
+  credentials, analytics secrets, private keys, WordPress backups, résumé PDFs,
+  private contact information, or internal company documents.
 
 ## Documentation synchronization
 
