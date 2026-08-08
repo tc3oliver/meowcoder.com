@@ -1,0 +1,25 @@
+---
+/**
+ * JSON-LD emitter (MCD-11, PRD §30).
+ *
+ * `application/ld+json` is a data block, not executable script — browsers do
+ * not run it, and the strict `script-src` in `public/_headers` does not need an
+ * exception for it.
+ *
+ * `set:html` is used rather than interpolation because Astro would otherwise
+ * HTML-escape the JSON and break the parser. The payload is built from the
+ * project's own typed dictionaries, never from user input.
+ */
+
+import type { JsonLd } from '../lib/structured-data';
+
+interface Props {
+  schemas: JsonLd[];
+}
+
+const { schemas } = Astro.props;
+
+const json = JSON.stringify(schemas.length === 1 ? schemas[0] : schemas);
+---
+
+<script type="application/ld+json" is:inline set:html={json} />

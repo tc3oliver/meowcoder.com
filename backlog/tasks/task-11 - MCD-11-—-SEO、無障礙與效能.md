@@ -1,10 +1,10 @@
 ---
 id: TASK-11
 title: MCD-11 — SEO、無障礙與效能
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-08-08 06:47'
-updated_date: '2026-08-08 17:00'
+updated_date: '2026-08-08 17:02'
 labels: []
 dependencies:
   - TASK-6
@@ -98,3 +98,46 @@ ordinal: 11000
 - [ ] #3 Documentation and Requirement Matrix are synchronized when applicable
 - [ ] #4 Validation evidence is recorded in the task
 <!-- DOD:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. sitemap：加入 @astrojs/sitemap，設定 i18n（en 為預設、zh 對應 zh-Hant），
+   產出 sitemap-index.xml 與 sitemap-0.xml，涵蓋全部 10 個路由。
+
+2. robots.txt：於 public/robots.txt 明確允許索引並宣告 Sitemap 位址。
+   這會覆蓋 Cloudflare 目前自動注入的 managed robots.txt（該檔僅對 AI 爬蟲表態，
+   不含 sitemap 指引）。
+
+3. 結構化資料（PRD §30）：新增 src/components/StructuredData.astro，以 JSON-LD 輸出
+   - Person（首頁，含 name、jobTitle、url、sameAs 指向 GitHub / Study / Shouri）
+   - WebSite（首頁，含 inLanguage 對應該語系）
+   - SoftwareApplication（Shouri 作品詳細頁）
+   語系感知：每個語系使用該語系的頁面內容（PRD §30 最後一句）。
+   ORCID 與 JISA 網址未知，sameAs 不含這兩項，待 TASK-8 素材補齊後再加。
+
+4. 安全標頭（PRD §32）：於 public/_headers 設定
+   Content-Security-Policy（對齊實際相依：無外部腳本、無 inline script）、
+   X-Content-Type-Options、Referrer-Policy、Permissions-Policy、
+   X-Frame-Options、Cross-Origin-Opener-Policy。
+   HSTS 不在此啟用，保留給 MCD-13（decision-4 與 PRD §32）。
+
+5. canonical / hreflang / OG 全站稽核：以腳本走訪 dist/ 全部 10 個 HTML，
+   驗證每頁的 canonical 自我指向、三組 hreflang 完整、OG 齊備，
+   並將結果寫成可重跑的測試 src/lib/metadata.test.ts。
+
+6. 無障礙：檢查語意化結構、標題階層（目前 h1×1、h2×6、h3×8、h4×2）、
+   鍵盤操作、focus 可見性、對比（MCD-2 已有對比測試，此處複驗）、
+   alt 文字（目前無圖片，Shouri 截圖到位後需補）。
+
+7. 圖片最佳化：目前儲存庫無任何圖片資產，此項於 Shouri 截圖到位前無對象，
+   記錄為現況不適用，並在 TASK-8 AC #3 收斂時一併處理。
+
+8. Lighthouse 實測：本機無瀏覽器，於 /tmp 安裝 lighthouse 與 chromium
+   （不進專案 devDependencies，避免乾淨 clone 多背 150MB，PRD §23），
+   對正式網域的英文與中文首頁、About、Work 路由實測四項分數並記錄。
+
+9. 分析埋點（PRD §33）：需選定方案。Cloudflare Web Analytics 免費且無 cookie，
+   但不支援自訂事件，無法涵蓋 §33 要求的五種外連點擊與案例研究互動。
+   此為需站長決定的選型問題，於實作前提出，不自行選定付費或自架方案。
+<!-- SECTION:PLAN:END -->
