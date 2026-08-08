@@ -13,8 +13,20 @@
 # stale and break styling. The exposure is limited: no user input reaches the
 # page, and script execution is already denied.
 #
-# HSTS is deliberately absent. PRD §32 enables it only after deployment
-# verification, which is MCD-13.
+# HSTS is enabled here at MCD-13, which is the point PRD §32 allows: after the
+# deployment is verified, not before. A browser that sees this header refuses
+# plaintext for a year and cannot be talked out of it, so turning it on early —
+# while TLS or a subdomain might still be wrong — locks visitors out of a site
+# nobody can fix from the server side.
+#
+# `includeSubDomains` covers every host under meowcoder.com, so it was only
+# added after checking that each one already serves valid TLS: study (200),
+# shouri (200), and www (301 to the apex). Any future subdomain inherits the
+# same requirement — it must be HTTPS from the moment it exists.
+#
+# `preload` is deliberately absent. Preloading bakes the domain into browser
+# binaries, and removal takes months, so it is a separate decision from the
+# header itself and not one this task needs.
 #
 # `static.cloudflareinsights.com` is Cloudflare Web Analytics, which the zone
 # injects itself — the build emits no reference to it. It is cookieless and
@@ -28,6 +40,7 @@
 
 /*
   Content-Security-Policy: default-src 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; manifest-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Cross-Origin-Opener-Policy: same-origin
