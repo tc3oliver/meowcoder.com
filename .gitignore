@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+
+# Environment and secrets (PRD §20, §32)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local agent runtime state — must not enter the public repository (decision-1)
+.omc/
+
+# Editor and OS
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Tooling caches
+coverage/
+.eslintcache
