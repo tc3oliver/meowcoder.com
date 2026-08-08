@@ -1,20 +1,18 @@
 ---
 /**
- * Traditional Chinese Work index (MCD-3 shell). Entries arrive in MCD-5.
+ * Traditional Chinese Work index (MCD-5).
+ *
+ * Identical to the English index apart from the locale constant.
  */
 
-import { work } from '../../../i18n/pages/work';
-import SiteShell from '../../../layouts/SiteShell.astro';
+import { getCollection } from 'astro:content';
+
+import WorkIndexLayout from '../../../layouts/WorkIndexLayout.astro';
+import { workEntriesForLocale } from '../../../lib/work';
 
 const locale = 'zh' as const;
-const t = work[locale];
+
+const entries = workEntriesForLocale(await getCollection('work'), locale);
 ---
 
-<SiteShell locale={locale} route="/work" title={t.title} description={t.description}>
-  <div class="container">
-    <div class="prose">
-      <h1>{t.heading}</h1>
-      <p>{t.intro}</p>
-    </div>
-  </div>
-</SiteShell>
+<WorkIndexLayout locale={locale} entries={entries} />
