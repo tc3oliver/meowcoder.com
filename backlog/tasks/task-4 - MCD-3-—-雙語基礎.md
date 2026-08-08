@@ -1,10 +1,10 @@
 ---
 id: TASK-4
 title: MCD-3 — 雙語基礎
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-08-08 06:44'
-updated_date: '2026-08-08 06:56'
+updated_date: '2026-08-08 14:45'
 labels: []
 dependencies:
   - TASK-2
@@ -87,3 +87,49 @@ ordinal: 4000
 - [ ] #3 Documentation and Requirement Matrix are synchronized when applicable
 - [ ] #4 Validation evidence is recorded in the task
 <!-- DOD:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. src/i18n/locales.ts：定義 Locale 型別（'en' | 'zh'）、LOCALES、DEFAULT_LOCALE = 'en'、
+   每個 locale 的 hreflang 標籤（en → "en"、zh → "zh-Hant"）與 html lang 值。
+
+2. src/lib/i18n.ts：純函式，全部在 build time 執行。
+   - localePathPrefix(locale)：en → ''、zh → '/zh'
+   - localizePath(locale, route)：將與語言無關的 route（'/', '/work', '/about'）
+     轉為該語系的實際路徑
+   - alternatesFor(route)：產出 canonical、hreflang=en、hreflang=zh-Hant、
+     x-default（指向英文）所需的完整 URL 清單，統一透過 site.ts 的 absoluteUrl
+   全部搭配單元測試。
+
+3. 字典切分（AC #6）——分兩層，依「是否共用」而非依語言切：
+   - src/i18n/chrome/{types,en,zh}.ts：導覽、頁尾、skip link、語言切換標籤。
+     這些本來就跨頁共用，放共用檔是正確的。
+   - src/i18n/pages/{home,about,work}.ts：每頁一個檔，內含該頁的 en 與 zh 兩份，
+     型別為 Record<Locale, PageMeta>，強制兩語系 key 結構一致（AC #2）。
+     新增一個頁面 = 新增一個檔案，不需修改任何共用字典檔（AC #6）。
+
+4. src/components/LanguageSwitcher.astro：以 route 計算對應語系的 URL，
+   當前語系標為 aria-current。純連結，無 client-side JavaScript（AC #5、#7）。
+
+5. 擴充 src/layouts/BaseLayout.astro：新增 locale 與 route props，
+   輸出 canonical、三個 hreflang（en、zh-Hant、x-default）、以及在地化的
+   og:title / og:description / og:url / og:locale / twitter:card（AC #4、#10）。
+   沿用 TASK-2 既有的 head slot 與 lang prop，不改動其設計系統契約。
+
+6. 頁面：src/pages/{index,about,work/index}.astro 與
+   src/pages/zh/{index,about,work/index}.astro，共六個路由。
+   共用一個 SiteShell 包裝元件，把 chrome 字典接進 Header/Footer，
+   導覽項目嚴格依 PRD §8：Oliver Yu（品牌）、Work、Writing 外連、About、
+   GitHub 外連、EN/中文；不得出現 §8 禁止的頂層項目（AC #8、#9）。
+   內容維持頁殼佔位，實際內容屬 MCD-4 起。
+
+7. 測試：src/lib/i18n.test.ts 涵蓋 localizePath、alternatesFor 的
+   對應解析（AC #3 的語言切換邏輯）；src/i18n/dictionary.test.ts 以
+   遞迴比對確認 en 與 zh 的 key 結構完全一致，並斷言導覽項目符合 §8
+   且未出現 §9 的禁用項目。
+
+8. 建置後驗證產出的 HTML：六個路由各自的 canonical / hreflang / OG 標籤正確，
+   且 dist/ 內不含任何翻譯用的 client-side script（AC #7）。
+   依 PRD §23 順序跑 format:check → lint → typecheck → build → linkcheck → test。
+<!-- SECTION:PLAN:END -->
