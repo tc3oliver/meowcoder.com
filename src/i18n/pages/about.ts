@@ -92,7 +92,7 @@ export const about = {
             'Built iOS, mobile, and web applications, establishing a foundation in product delivery and connected experiences.',
         },
         {
-          period: '2017–2020',
+          period: '2018–2020',
           name: 'Software Engineering',
           description:
             'Expanded into backend services, cloud integration, enterprise workflows, and end-to-end software delivery.',
@@ -217,7 +217,7 @@ export const about = {
           description: '以 iOS、行動與 Web 應用開發為主，建立產品交付與連網應用的工程基礎。',
         },
         {
-          period: '2017–2020',
+          period: '2018–2020',
           name: '軟體工程',
           description: '工作範圍延伸至後端服務、雲端整合、企業流程與端到端軟體交付。',
         },
