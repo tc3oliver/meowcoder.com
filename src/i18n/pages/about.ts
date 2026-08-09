@@ -86,7 +86,7 @@ export const about = {
       label: '10+ Years',
       stages: [
         {
-          period: '2014–2016',
+          period: '2014–2017',
           name: 'Application Engineering',
           description:
             'Built iOS, mobile, and web applications, establishing a foundation in product delivery and connected experiences.',
@@ -212,7 +212,7 @@ export const about = {
       label: '10+ 年',
       stages: [
         {
-          period: '2014–2016',
+          period: '2014–2017',
           name: '應用程式工程',
           description: '以 iOS、行動與 Web 應用開發為主，建立產品交付與連網應用的工程基礎。',
         },
