@@ -1,53 +1,67 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="meowcoder.com">
   <!--
-    The MeowCoder mark: a cat face built from two coding brackets. Drawn in the
-    site's accent ink blue on the warm neutral surface, using the same values as
-    `--color-bg` and `--color-accent` in src/styles/tokens.css.
+    The MeowCoder mark: a cat face built from two coding brackets. Drawn with
+    the same values as `--color-bg` and `--color-accent` in src/styles/tokens.css.
 
     The source asset (`meowcoder-mark.svg`) paints with `currentColor`. That is
     right for an inlined mark, but a favicon has no inherited text color to
     resolve against — browsers render it standalone — so both palettes are
     declared explicitly here instead.
 
-    `prefers-color-scheme` mirrors the `light-dark()` pairs the stylesheet uses,
-    so the tab icon follows the theme the page renders in.
+    Figure and ground are inverted relative to the wordmark, and that inversion
+    is the whole point of this file. A favicon is read at 16px against a tab
+    strip, where the mark's own proportions stop working: at that size the
+    bracket strokes fall near one device pixel and antialias into a smudge, and
+    the five shapes are disconnected — there is no head outline holding them
+    together — so a pale tile carrying 13% ink reads as an empty square rather
+    than as a cat. Filling the tile with the accent instead makes the icon
+    legible as a solid colored block first and resolves into the mark second,
+    which is the order a tab strip actually gets read in.
 
-    The artwork occupies y 10–86 in its own 128 grid, which sits high; the
-    `translate` below re-centres it optically inside the rounded square.
+    Everything here is sized for that: strokes at 13 (≈1.6px at 16px), larger
+    ears and nose, and artwork spanning x 13.5–114.5 so the tile keeps a margin
+    inside its own corner radius.
+
+    `prefers-color-scheme` mirrors the `light-dark()` pairs the stylesheet uses.
+    Both palettes are saturated tiles rather than one light and one dark, so the
+    icon stays visible whichever way the browser paints its chrome.
+
+    The artwork sits high in its own 128 grid; the `translate` below re-centres
+    it optically inside the rounded square.
   -->
   <style>
-    .bg { fill: #faf8f5; }
-    .fg { fill: #1d4e89; }
-    .stroke { stroke: #1d4e89; }
+    .tile { fill: #1d4e89; }
+    .mark { fill: #faf8f5; }
+    .stroke { stroke: #faf8f5; }
     @media (prefers-color-scheme: dark) {
-      .bg { fill: #14130f; }
-      .fg { fill: #8fb6e8; }
-      .stroke { stroke: #8fb6e8; }
+      .tile { fill: #8fb6e8; }
+      .mark { fill: #14130f; }
+      .stroke { stroke: #14130f; }
     }
   </style>
 
-  <rect class="bg" width="128" height="128" rx="24" />
+  <rect class="tile" width="128" height="128" rx="24" />
 
-  <g transform="translate(0 16)">
-    <g class="fg">
+  <g transform="translate(0 13)">
+    <g class="mark">
       <!-- Cat ears -->
-      <path d="M24 38 L32 10 L54 30 Z" />
-      <path d="M74 30 L96 10 L104 38 Z" />
+      <path d="M22 46 L30 12 L58 34 Z" />
+      <path d="M70 34 L98 12 L106 46 Z" />
 
       <!-- Nose -->
-      <path d="M51 70 L77 70 L64 86 Z" />
+      <path d="M50 72 L78 72 L64 90 Z" />
     </g>
 
     <!-- Coding brackets / cheeks -->
     <g
       class="stroke"
       fill="none"
-      stroke-width="9"
+      stroke-width="13"
       stroke-linecap="square"
       stroke-linejoin="miter"
     >
-      <path d="M42 51 L14 66 L42 81" />
-      <path d="M86 51 L114 66 L86 81" />
+      <path d="M44 52 L20 68 L44 84" />
+      <path d="M84 52 L108 68 L84 84" />
     </g>
   </g>
 </svg>
