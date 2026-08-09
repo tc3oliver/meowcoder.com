@@ -21,6 +21,22 @@ const { t } = Astro.props;
 
   <AboutSection id="career" heading={t.career.heading} prominence="strong">
     <CareerProgression career={t.career} id="career-progression" />
+
+    <div class="current-focus">
+      <h3>{t.currentFocus.heading}</h3>
+      <p class="current-focus__description">{t.currentFocus.description}</p>
+      <figure class="current-focus__figure">
+        <img
+          src="/images/ai-rd.gif"
+          alt={t.currentFocus.alt}
+          width="2090"
+          height="1402"
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption>{t.currentFocus.caption}</figcaption>
+      </figure>
+    </div>
   </AboutSection>
 
   <AboutSection id="engineering-focus" heading={t.focus.heading}>
@@ -120,9 +136,49 @@ const { t } = Astro.props;
 
   .about__paragraph,
   .focus-item p,
-  .research__detail {
+  .research__detail,
+  .current-focus__description,
+  .current-focus__figure figcaption {
     color: var(--color-text-muted);
     line-height: var(--leading-relaxed);
+  }
+
+  .current-focus {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-block-start: var(--space-8);
+    padding-block-start: var(--space-6);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .current-focus h3 {
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+  }
+
+  .current-focus__description {
+    max-width: var(--width-reading);
+  }
+
+  .current-focus__figure {
+    margin-block-start: var(--space-3);
+  }
+
+  .current-focus__figure img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: #fff;
+  }
+
+  .current-focus__figure figcaption {
+    max-width: var(--width-reading);
+    margin-block-start: var(--space-3);
+    font-size: var(--text-sm);
   }
 
   .focus-grid {

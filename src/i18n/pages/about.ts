@@ -19,6 +19,12 @@ export interface AboutStrings extends PageStrings {
     cta: string;
     href: string;
   };
+  currentFocus: {
+    heading: string;
+    description: string;
+    alt: string;
+    caption: string;
+  };
   focus: {
     heading: string;
     items: readonly {
@@ -78,6 +84,14 @@ export const about = {
         'My scope progressed from application and enterprise engineering to platform architecture and the delivery of production AI systems.',
       cta: 'Explore Professional Engineering Experience',
       href: '/work/professional-engineering/',
+    },
+    currentFocus: {
+      heading: 'Current Focus — Enterprise AI Systems',
+      description:
+        'My current work focuses on enterprise AI systems that connect engineering knowledge, coding agents, model infrastructure, security validation, and continuous evaluation.',
+      alt: 'Conceptual architecture of an AI-driven R&D platform connecting enterprise context, agentic development, engineering knowledge, model gateway, and evaluation.',
+      caption:
+        'This conceptual architecture illustrates how I approach AI-driven R&D platforms at a system level.',
     },
     focus: {
       heading: 'Engineering Focus',
@@ -169,6 +183,13 @@ export const about = {
       summary: '從應用程式與企業系統開發，逐步延伸至平台架構與 AI 系統工程。',
       cta: '查看專業工程經歷',
       href: '/zh/work/professional-engineering/',
+    },
+    currentFocus: {
+      heading: '目前方向 — 企業 AI 系統',
+      description:
+        '目前專注於企業 AI 系統，整合工程知識、Coding Agent、模型基礎架構、安全驗證與持續評估。',
+      alt: 'AI 驅動研發平台概念架構，整合企業情境、Agentic Development、工程知識、模型閘道與評估機制。',
+      caption: '這張概念架構圖呈現我對 AI 驅動研發平台的系統層級設計方式。',
     },
     focus: {
       heading: '工程專長',
