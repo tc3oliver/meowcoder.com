@@ -75,8 +75,8 @@ describe('credential wording', () => {
   it('uses the source credential name without Specialist Level', () => {
     expect(about.en.credentials.items[0]?.name).toBe('AI應用規劃師（機器學習）— 中級能力鑑定');
     expect(about.zh.credentials.items[0]?.name).toBe('AI應用規劃師（機器學習）－中級能力鑑定');
-    expect(about.en.credentials.items[0]?.note).toBe('Valid through 2030');
-    expect(about.zh.credentials.items[0]?.note).toBe('效期至 2030 年');
+    expect(about.en.credentials.items[0]?.note).toBeUndefined();
+    expect(about.zh.credentials.items[0]?.note).toBeUndefined();
   });
 });
 

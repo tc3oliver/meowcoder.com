@@ -130,7 +130,6 @@ export const about = {
         {
           name: 'AI應用規劃師（機器學習）— 中級能力鑑定',
           meta: 'Ministry of Economic Affairs, Taiwan · 2025',
-          note: 'Valid through 2030',
         },
         {
           name: 'Microsoft AI-900',
@@ -215,7 +214,6 @@ export const about = {
         {
           name: 'AI應用規劃師（機器學習）－中級能力鑑定',
           meta: '經濟部 · 2025',
-          note: '效期至 2030 年',
         },
         {
           name: 'Microsoft AI-900',
