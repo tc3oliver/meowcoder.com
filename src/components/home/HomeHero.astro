@@ -17,9 +17,8 @@
  * full-screen splash: the next section has to be reachable within about one
  * screen. Two things hold that. The name is the one element on the page that
  * takes `--text-display`, so the scale does the work a taller block would
- * otherwise do; and the hero adds no bottom padding, leaving the gap to
- * Featured Product as exactly the `--space-section` that section already
- * carries.
+ * otherwise do. A compact bottom inset keeps its actions away from the next
+ * section's rule; Featured Product owns the larger opening rhythm after it.
  */
 
 import type { Locale } from '../../i18n/locales';
@@ -76,6 +75,7 @@ const statementStart =
        The extra width keeps the Traditional Chinese line from breaking inside
        its final technical term at desktop and tablet sizes. */
     max-width: min(52rem, 100%);
+    padding-block-end: var(--space-6);
   }
 
   .hero__role {

@@ -69,11 +69,9 @@ const { locale, t, posts, externalIndicator } = Astro.props;
   .home {
     display: flex;
     flex-direction: column;
-    /* No gap. Each section owns the whitespace above it through
-       `--space-section` — on `HomeSection`, or directly for the two that do
-       not render through it — so a flex gap here would stack on top of that
-       and push the rhythm past doc-2 §4's 72–88px mobile / 112–144px desktop
-       band. The hero follows the same rule and carries no bottom padding. */
+    /* No gap. Each section owns the whitespace around its separator: a compact
+       end padding keeps the preceding action or visual off the rule, while
+       `--space-section` provides the larger opening rhythm after it. */
     gap: 0;
   }
 </style>
