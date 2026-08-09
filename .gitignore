@@ -47,5 +47,6 @@ Thumbs.db
 
 # Tooling caches and logs
 coverage/
+.lighthouseci/
 .eslintcache
 *.log

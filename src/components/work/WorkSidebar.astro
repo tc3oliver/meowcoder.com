@@ -57,8 +57,7 @@ const rows = [{ label: t.typeLabel, value: entry.type }, ...(entry.meta ?? [])];
   /* Hairlines above and below rather than a card: PRD §25 separates with thin
      rules and whitespace. */
   .work-aside {
-    border-block: var(--border-width) solid var(--color-border);
-    padding-block: var(--space-5);
+    min-width: 0;
   }
 
   .work-aside__inner {

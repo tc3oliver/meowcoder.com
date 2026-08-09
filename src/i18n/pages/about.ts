@@ -59,7 +59,7 @@ const PUBLICATION_URL = 'https://doi.org/10.1016/j.jisa.2026.104422';
 
 export const about = {
   en: {
-    title: 'About — Oliver Yu',
+    title: 'About Oliver Yu — AI Systems Engineer & System Architect',
     description:
       'Oliver Yu is an AI systems engineer and system architect with 10+ years of experience across software, cloud, architecture, security, and AI systems.',
     eyebrow: 'About Oliver',
@@ -151,7 +151,7 @@ export const about = {
     },
   },
   zh: {
-    title: '關於我 — Oliver Yu',
+    title: '關於 Oliver Yu — AI 系統工程師與系統架構師',
     description:
       'Oliver Yu 是 AI 系統工程師與系統架構師，具 10+ 年軟體、雲端、架構、資安與 AI 系統工程經驗。',
     eyebrow: '關於 Oliver',

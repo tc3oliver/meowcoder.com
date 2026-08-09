@@ -361,6 +361,71 @@ button {
   }
 }
 
+/* --- Execution modes: two flows with the same completion discipline ------ */
+
+.prose .mode-flow {
+  display: grid;
+  gap: var(--space-5);
+  margin-block-start: var(--space-6);
+  padding-block: var(--space-6);
+  border-block: var(--border-width) solid var(--color-border);
+}
+
+.prose .mode-flow__track {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.prose .mode-flow__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.prose .mode-flow__steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.prose .mode-flow__steps li {
+  position: relative;
+  min-width: 0;
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  overflow-wrap: anywhere;
+}
+
+.prose .mode-flow__steps li:not(:last-child)::after {
+  content: '↓';
+  display: block;
+  position: absolute;
+  inset-block-end: calc(-1 * var(--space-3));
+  inset-inline-start: 50%;
+  translate: -50% 50%;
+  color: var(--color-text-muted);
+}
+
+.prose .mode-flow__caption {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 40rem) {
+  .prose .mode-flow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-7);
+  }
+
+  .prose .mode-flow__caption {
+    grid-column: 1 / -1;
+  }
+}
+
 /* --- Decisions: Decision / Why / Trade-off ------------------------------ */
 
 .prose .decision {

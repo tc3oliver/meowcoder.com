@@ -19,12 +19,14 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { LOCALE_TAG, OG_LOCALE, type Locale } from '../i18n/locales';
 import { alternatesFor, localizeUrl, type Route } from '../lib/i18n';
+import { socialPreview, type SocialPreview } from '../lib/social';
 
 interface Props {
   locale: Locale;
   route: Route;
   title: string;
   description: string;
+  socialImage?: SocialPreview;
   /** Localized skip-link text. Omitted means no skip link is rendered. */
   skipLinkLabel?: string;
 }
@@ -33,6 +35,7 @@ const { locale, route, title, description, skipLinkLabel } = Astro.props;
 
 const canonical = localizeUrl(locale, route);
 const alternates = alternatesFor(route);
+const preview = Astro.props.socialImage ?? socialPreview(locale);
 ---
 
 <!doctype html>
@@ -67,7 +70,15 @@ const alternates = alternatesFor(route);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={OG_LOCALE[locale]} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={preview.src} />
+    <meta property="og:image:width" content={String(preview.width)} />
+    <meta property="og:image:height" content={String(preview.height)} />
+    <meta property="og:image:alt" content={preview.alt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={preview.src} />
+    <meta name="twitter:image:alt" content={preview.alt} />
 
     <slot name="head" />
   </head>

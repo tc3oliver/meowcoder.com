@@ -308,15 +308,31 @@ removes the incentive to manufacture a passing-looking log.
 
 ## Manual vs Autonomous Mode
 
-The default mode is manual. Autonomous execution must be explicitly invoked,
-with separate entry points for decomposition, one-task execution, and continuous
-execution:
+The default mode is manual. Autonomous execution must be explicitly invoked
+rather than enabled as a global setting.
 
-- `/backlog-plan <requirement>` — aligns the requirement and decomposes it into
-  tasks. No product code, no Implementation Plan.
-- `/backlog-run <TASK-ID>` — executes exactly one named task, then stops.
-- `/backlog-auto [TASK-ID]` — continuous execution, and only on explicit
-  invocation.
+<figure class="mode-flow" aria-label="Manual and autonomous execution flows">
+<div class="mode-flow__track">
+<span class="mode-flow__label">Manual</span>
+<ol class="mode-flow__steps" role="list">
+<li>Decompose requirement</li>
+<li>Run named task</li>
+<li>Validate and stop</li>
+</ol>
+</div>
+<div class="mode-flow__track">
+<span class="mode-flow__label">Autonomous</span>
+<ol class="mode-flow__steps" role="list">
+<li>Select ready task</li>
+<li>Complete and validate</li>
+<li>Query again</li>
+</ol>
+</div>
+<figcaption class="mode-flow__caption">Manual mode handles one named task. Autonomous mode re-queries after each completed task until no work is executable or a blocker is reached.</figcaption>
+</figure>
+
+`/backlog-plan` handles decomposition, `/backlog-run` executes a named task, and
+`/backlog-auto` starts continuous execution.
 
 Autonomous selection reads structured task data, filters for dependency-ready
 work, and applies priority and task ID to produce a deterministic order. It

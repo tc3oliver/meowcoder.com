@@ -92,6 +92,47 @@ describe('every built page', () => {
       const ogUrl = /<meta property="og:url" content="([^"]+)"/.exec(html)?.[1];
       const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
       expect(ogUrl, `${file} og:url disagrees with canonical`).toBe(canonical);
+
+      for (const property of ['og:image', 'og:image:width', 'og:image:height', 'og:image:alt']) {
+        expect(html, `${file} is missing ${property}`).toContain(`property="${property}"`);
+      }
+
+      const ogImage = /<meta property="og:image" content="([^"]+)"/.exec(html)?.[1];
+      expect(ogImage, `${file} og:image must be absolute`).toMatch(
+        new RegExp(`^${SITE_URL}/og/.+-(en|zh)\\.png$`),
+      );
+      expect(html, `${file} has the wrong social image width`).toContain(
+        'property="og:image:width" content="1200"',
+      );
+      expect(html, `${file} has the wrong social image height`).toContain(
+        'property="og:image:height" content="630"',
+      );
+
+      expect(html, `${file} must use a large Twitter card`).toContain(
+        'name="twitter:card" content="summary_large_image"',
+      );
+      for (const name of [
+        'twitter:title',
+        'twitter:description',
+        'twitter:image',
+        'twitter:image:alt',
+      ]) {
+        expect(html, `${file} is missing ${name}`).toContain(`name="${name}"`);
+      }
+      const twitterImage = /<meta name="twitter:image" content="([^"]+)"/.exec(html)?.[1];
+      expect(twitterImage, `${file} Twitter and Open Graph images disagree`).toBe(ogImage);
+    }
+  });
+
+  it('references social preview assets that exist in the build', () => {
+    for (const file of pageFiles()) {
+      const html = read(file);
+      const imageUrl = /<meta property="og:image" content="[^"]+\/([^/"]+\.png)"/.exec(html)?.[1];
+
+      expect(imageUrl, `${file} has no social preview filename`).toBeDefined();
+      expect(existsSync(join(DIST, 'og', imageUrl!)), `${file} social preview is missing`).toBe(
+        true,
+      );
     }
   });
 

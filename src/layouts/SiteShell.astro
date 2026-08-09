@@ -16,6 +16,7 @@ import { chrome } from '../i18n/chrome';
 import type { Locale } from '../i18n/locales';
 import { GITHUB_URL, ORCID_URL, SHOURI_URL, STUDY_URL } from '../lib/external';
 import { localizePath, type Route } from '../lib/i18n';
+import type { SocialPreview } from '../lib/social';
 import BaseLayout from './BaseLayout.astro';
 
 interface Props {
@@ -23,9 +24,10 @@ interface Props {
   route: Route;
   title: string;
   description: string;
+  socialImage?: SocialPreview;
 }
 
-const { locale, route, title, description } = Astro.props;
+const { locale, route, title, description, socialImage } = Astro.props;
 
 const t = chrome[locale];
 
@@ -79,6 +81,7 @@ const footerLinks = [
   route={route}
   title={title}
   description={description}
+  socialImage={socialImage}
   skipLinkLabel={t.skipLink}
 >
   {/* Lets a page add its own `<head>` content — JSON-LD, for instance. */}

@@ -58,6 +58,14 @@ jobs:
       - name: Test
         run: npm test
 
+      # GitHub-hosted Ubuntu runners include Chrome. Lighthouse serves the
+      # generated static site locally and runs each representative page three
+      # times to reduce one-off measurement noise.
+      - name: Lighthouse CI
+        run: npm run lighthouse
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+
   secret-scan:
     runs-on: ubuntu-latest
     timeout-minutes: 10

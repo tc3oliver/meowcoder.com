@@ -231,11 +231,29 @@ meta:
 
 ## 手動模式與自動模式
 
-預設採手動模式；自動執行必須由使用者明確啟動，而不是全域開關。三個入口分別負責需求拆解、單一任務執行與連續自動執行：
+預設採手動模式；自動執行必須由使用者明確啟動，而不是全域開關。
 
-- `/backlog-plan <需求>`——對齊需求並拆成任務。不寫產品程式碼，不產出 Implementation Plan。
-- `/backlog-run <TASK-ID>`——只執行指定的那一個任務，然後停止。
-- `/backlog-auto [TASK-ID]`——連續執行，而且只在被明確呼叫時才啟動。
+<figure class="mode-flow" aria-label="手動模式與自動模式的執行流程">
+<div class="mode-flow__track">
+<span class="mode-flow__label">手動模式</span>
+<ol class="mode-flow__steps" role="list">
+<li>拆解需求</li>
+<li>執行指定任務</li>
+<li>驗證並停止</li>
+</ol>
+</div>
+<div class="mode-flow__track">
+<span class="mode-flow__label">自動模式</span>
+<ol class="mode-flow__steps" role="list">
+<li>選取可執行任務</li>
+<li>完成並驗證</li>
+<li>重新查詢</li>
+</ol>
+</div>
+<figcaption class="mode-flow__caption">手動模式一次處理一項指定任務；自動模式完成一項後重新查詢，直到沒有可執行任務或遇到阻塞。</figcaption>
+</figure>
+
+`/backlog-plan` 負責需求拆解，`/backlog-run` 執行指定任務，`/backlog-auto` 則啟動連續執行。
 
 自動模式從結構化資料選取可執行且相依條件已滿足的任務，再依優先順序與任務 ID 產生可重現的執行順序；每完成一項就重新查詢，不保留記憶中的佇列。
 

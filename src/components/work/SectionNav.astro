@@ -33,7 +33,24 @@ const sections = headings.filter((heading) => heading.depth === 2);
 
 {
   sections.length > 0 && (
-    <nav class="section-nav" aria-labelledby={labelId}>
+    <details class="section-nav-mobile">
+      <summary>{label}</summary>
+      <nav aria-label={label}>
+        <ol class="section-nav__list" role="list">
+          {sections.map((section) => (
+            <li>
+              <a href={`#${section.slug}`}>{section.text}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </details>
+  )
+}
+
+{
+  sections.length > 0 && (
+    <nav class="section-nav-desktop" aria-labelledby={labelId}>
       <p class="section-nav__label" id={labelId}>
         {label}
       </p>
@@ -49,6 +66,27 @@ const sections = headings.filter((heading) => heading.depth === 2);
 }
 
 <style>
+  .section-nav-mobile {
+    border-block: var(--border-width) solid var(--color-border);
+  }
+
+  .section-nav-mobile summary {
+    min-height: 2.75rem;
+    padding-block: var(--space-3);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+  }
+
+  .section-nav-mobile nav {
+    padding-block-end: var(--space-4);
+  }
+
+  .section-nav-desktop {
+    display: none;
+  }
+
   .section-nav__label {
     font-size: var(--text-xs);
     font-weight: var(--weight-semibold);
@@ -67,6 +105,7 @@ const sections = headings.filter((heading) => heading.depth === 2);
   }
 
   .section-nav__list a {
+    overflow-wrap: anywhere;
     color: var(--color-text-muted);
     text-decoration: none;
   }
@@ -79,6 +118,14 @@ const sections = headings.filter((heading) => heading.depth === 2);
   /* Matches the sidebar breakpoint in `WorkLayout.astro`: once the sidebar is a
      column of its own, the list becomes a column too. */
   @media (min-width: 70rem) {
+    .section-nav-mobile {
+      display: none;
+    }
+
+    .section-nav-desktop {
+      display: block;
+    }
+
     .section-nav__list {
       flex-direction: column;
       gap: var(--space-3);

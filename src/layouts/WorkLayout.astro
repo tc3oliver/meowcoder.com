@@ -25,6 +25,7 @@ import type { Locale } from '../i18n/locales';
 import { work } from '../i18n/pages/work';
 import { localizePath, workDetailRoute } from '../lib/i18n';
 import { shouriSchema } from '../lib/structured-data';
+import { socialPreview } from '../lib/social';
 import type { WorkEntryData } from '../lib/work';
 import SiteShell from './SiteShell.astro';
 
@@ -48,7 +49,24 @@ const isExperience = entry.kind === 'experience';
  * than translated: the case-study title is already localized in the content
  * file, and the wordmark is a proper name PRD §7 leaves untranslated.
  */
-const title = `${entry.title} — ${chrome[locale].brand}`;
+const detailTitles = {
+  en: {
+    shouri: 'Shouri / 收理 — AI Information Organizer | Oliver Yu',
+    'ai-coding-skills': 'AI Coding Skills — Agent Engineering | Oliver Yu',
+    'professional-engineering': 'Professional Engineering Experience — Oliver Yu',
+  },
+  zh: {
+    shouri: 'Shouri / 收理 — AI 資訊整理工具 | Oliver Yu',
+    'ai-coding-skills': 'AI Coding Skills — Agent 工程 | Oliver Yu',
+    'professional-engineering': '專業工程經歷 — Oliver Yu',
+  },
+} as const;
+
+const title =
+  detailTitles[locale][entry.slug as keyof (typeof detailTitles)[typeof locale]] ??
+  `${entry.title} — ${chrome[locale].brand}`;
+const previewName =
+  entry.slug === 'shouri' || entry.slug === 'ai-coding-skills' ? entry.slug : 'default';
 
 /*
  * PRD §30 asks for a `SoftwareApplication`/`Product` node for Shouri
@@ -64,6 +82,7 @@ const schemas = entry.slug === 'shouri' ? [shouriSchema(locale)] : [];
   route={workDetailRoute(entry.slug)}
   title={title}
   description={entry.summary}
+  socialImage={socialPreview(locale, previewName)}
 >
   {schemas.length > 0 && <StructuredData slot="head" schemas={schemas} />}
   <article class:list={['container', 'work', isExperience && 'work--experience']}>

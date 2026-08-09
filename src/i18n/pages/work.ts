@@ -56,7 +56,7 @@ export interface WorkPageStrings extends PageStrings {
 
 export const work = {
   en: {
-    title: 'Work — Oliver Yu',
+    title: 'Selected Work — Oliver Yu',
     description:
       'Selected work spanning product engineering, open source, and 10+ years of professional experience in systems, architecture, and AI.',
     heading: 'Work',
@@ -99,7 +99,7 @@ export const work = {
     backToIndex: 'Back to all work',
   },
   zh: {
-    title: '作品 — Oliver Yu',
+    title: '精選作品 — Oliver Yu',
     description: '工程作品選集，包括產品工程、開源實作，以及 10+ 年系統、架構與 AI 工程經歷。',
     heading: '作品',
     intro: '產品工程、開源實作與專業工程經歷，呈現系統設計、架構決策與工程範疇的演進。',
