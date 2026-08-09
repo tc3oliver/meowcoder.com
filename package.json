@@ -16,7 +16,7 @@
     "lint": "eslint .",
     "typecheck": "astro check",
     "linkcheck": "npm run linkcheck:site && npm run linkcheck:docs",
-    "linkcheck:site": "linkinator index.html --server-root dist --recurse --silent --skip \"^https://meowcoder\\.com\"",
+    "linkcheck:site": "linkinator ./ --server-root dist --recurse --silent --skip \"^https://meowcoder\\.com\"",
     "linkcheck:docs": "linkinator README.md LICENSE-CONTENT.md --markdown --silent",
     "test": "vitest run"
   },

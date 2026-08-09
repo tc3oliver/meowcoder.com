@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="meowcoder.com">
   <!--
     The MeowCoder mark: a cat face built from two coding brackets. Drawn with
-    the same values the `color-bg` and `color-accent` custom properties hold in
-    src/styles/tokens.css. (Those names are written without their leading double
+    the same near-black and warm-white values used by the site. (The custom
+    property names are written without their leading double
     hyphen on purpose. A double hyphen cannot appear inside an XML comment, and
     an SVG served as an image is parsed as strict XML, so one such pair anywhere
     in this file makes the whole icon fail to render. See favicon.test.ts.)
@@ -12,36 +12,27 @@
     resolve against — browsers render it standalone — so both palettes are
     declared explicitly here instead.
 
-    Figure and ground are inverted relative to the wordmark, and that inversion
-    is the whole point of this file. A favicon is read at 16px against a tab
+    Figure and ground are inverted relative to the wordmark. A favicon is read
+    at 16px against a tab
     strip, where the mark's own proportions stop working: at that size the
     bracket strokes fall near one device pixel and antialias into a smudge, and
     the five shapes are disconnected — there is no head outline holding them
     together — so a pale tile carrying 13% ink reads as an empty square rather
-    than as a cat. Filling the tile with the accent instead makes the icon
-    legible as a solid colored block first and resolves into the mark second,
-    which is the order a tab strip actually gets read in.
+    than as a cat. A solid near-black tile makes the icon legible as a block
+    first and lets the white mark resolve second, which is the order a tab strip
+    actually gets read in.
 
     Everything here is sized for that: strokes at 13 (≈1.6px at 16px), larger
     ears and nose, and artwork spanning x 13.5–114.5 so the tile keeps a margin
     inside its own corner radius.
 
-    `prefers-color-scheme` mirrors the `light-dark()` pairs the stylesheet uses.
-    Both palettes are saturated tiles rather than one light and one dark, so the
-    icon stays visible whichever way the browser paints its chrome.
-
     The artwork sits high in its own 128 grid; the `translate` below re-centres
     it optically inside the rounded square.
   -->
   <style>
-    .tile { fill: #1d4e89; }
+    .tile { fill: #14130f; }
     .mark { fill: #faf8f5; }
     .stroke { stroke: #faf8f5; }
-    @media (prefers-color-scheme: dark) {
-      .tile { fill: #8fb6e8; }
-      .mark { fill: #14130f; }
-      .stroke { stroke: #14130f; }
-    }
   </style>
 
   <rect class="tile" width="128" height="128" rx="24" />
