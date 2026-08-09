@@ -1,7 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="meowcoder.com">
   <!--
     The MeowCoder mark: a cat face built from two coding brackets. Drawn with
-    the same values as `--color-bg` and `--color-accent` in src/styles/tokens.css.
+    the same values the `color-bg` and `color-accent` custom properties hold in
+    src/styles/tokens.css. (Those names are written without their leading double
+    hyphen on purpose. A double hyphen cannot appear inside an XML comment, and
+    an SVG served as an image is parsed as strict XML, so one such pair anywhere
+    in this file makes the whole icon fail to render. See favicon.test.ts.)
 
     The source asset (`meowcoder-mark.svg`) paints with `currentColor`. That is
     right for an inlined mark, but a favicon has no inherited text color to
