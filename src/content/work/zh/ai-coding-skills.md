@@ -1,8 +1,9 @@
 ---
 title: 'AI Coding Skills'
 type: '開源 · Agent 工程'
-summary: '公開發佈的開發工作流程 skill：為 coding agent 建立明確的需求邊界、即時撰寫的實作計畫，以及以證據為準的完成條件。'
-outcome: '以 MIT 授權公開發佈，可作為 agent skill 或 Claude Code plugin 安裝進專案；這個網站本身就是用它開發的。'
+summary: '一套開源的開發工作流程 skill，協助 coding agent 對齊需求、在執行前建立符合當下情境的實作計畫、依專案情境驗證，並按明確條件完成工作。'
+outcome: '採 MIT 授權，可作為 agent skill 或 Claude Code plugin 安裝，也是本站採用的開發流程。'
+indexMeta: 'MIT · backlog-workflow 1.2.0 · 附單元測試'
 evidence: 'github.com/tc3oliver/skills · backlog-workflow 1.2.0，附有自己的單元測試'
 slug: 'ai-coding-skills'
 locale: 'zh'
@@ -28,7 +29,7 @@ meta:
 
 [AI Coding Skills](https://github.com/tc3oliver/skills) 是我用來約束這段流程的公開 skill 集合。做法不是把 prompt 寫得更漂亮，而是把邊界寫進有版本控制的檔案裡，讓 agent 動手之前必須先讀過——同一套規則因此適用於每一個任務，也能延續到新的對話。
 
-集合中的主要作品是 `backlog-workflow`：一層安裝進專案、疊在 [Backlog.md](https://backlog.md) 之上的開發政策與協作層。
+集合中的主要作品是 `backlog-workflow`：一套安裝進專案、建立在 [Backlog.md](https://backlog.md) 之上的開發政策與協作層。
 
 ## Coding Agent 的失效模式
 
@@ -39,9 +40,9 @@ meta:
 - 實作計畫在規劃與執行之間過期；
 - 產品行為在實作過程中被悄悄重新詮釋；
 - 有相依關係的工作被以錯誤順序執行；
-- 驗證指令用猜的，而不是查證過的；
+- 驗證指令用猜的，而不是依專案實際設定；
 - 文件沒有同步更新；
-- 任務在沒有證據的情況下被標記完成；
+- 任務在尚未符合完成條件時就被標記完成；
 - 該停下來的地方，自動執行仍繼續往前跑。
 
 這些都不是模型能力不足造成的，換一個更強的模型也不會消失。每一項都是缺少一道邊界，因此它是工程問題，而工程問題的答案可以寫成檔案。
@@ -55,45 +56,45 @@ meta:
 <li class="state-flow__step">
 <span class="state-flow__name">PRD / 規格</span>
 <span class="state-flow__detail">產品意圖寫在這裡。</span>
-<span class="state-flow__part"><span class="state-flow__part-label">擁有</span>產品該做什麼</span>
+<span class="state-flow__part"><span class="state-flow__part-label">負責</span>定義產品需求</span>
 </li>
 <li class="state-flow__step">
 <span class="state-flow__name">backlog-workflow</span>
 <span class="state-flow__detail">這四層裡唯一由我自己撰寫的一層。</span>
-<span class="state-flow__part"><span class="state-flow__part-label">擁有</span>執行模式、各項邊界、完成條件</span>
+<span class="state-flow__part"><span class="state-flow__part-label">負責</span>執行模式、各項邊界、完成條件</span>
 </li>
 <li class="state-flow__step">
 <span class="state-flow__name">Backlog.md</span>
 <span class="state-flow__detail">照它原本的樣子使用，不重寫一套。</span>
-<span class="state-flow__part"><span class="state-flow__part-label">擁有</span>任務 schema、生命週期、相依關係、證據</span>
+<span class="state-flow__part"><span class="state-flow__part-label">負責</span>任務 Schema、生命週期、相依關係、完成紀錄</span>
 </li>
 <li class="state-flow__step">
 <span class="state-flow__name">Coding agent</span>
 <span class="state-flow__detail">一次只執行一個任務。</span>
-<span class="state-flow__part"><span class="state-flow__part-label">擁有</span>實作、驗證、PR、CI、審查、合併</span>
+<span class="state-flow__part"><span class="state-flow__part-label">負責</span>實作、驗證、PR、CI、審查、合併</span>
 </li>
 </ol>
-<figcaption class="state-flow__caption">每一層只擁有一件事，而且只往下讀、不往上寫。任務不能改寫它上面的需求，agent 也不能重新定義自己執行時所依循的政策。</figcaption>
+<figcaption class="state-flow__caption">各層職責彼此分離，只往下讀取、不往上改寫。任務不能改寫上層需求，Agent 也不能重新定義執行時所依循的政策。</figcaption>
 </figure>
 
 <div class="decision">
 
-### 疊在 Backlog.md 之上，而不是重寫一套
+### 建立在 Backlog.md 之上，而不是重新實作
 
-**原因** — 任務 schema、生命週期、Acceptance Criteria、Definition of Done、Implementation Plan、筆記、相依關係，以及 CLI 與 JSON 介面，Backlog.md 都已經擁有了。重寫其中任何一項，等於為它多造一個真實來源；它的官方指令因此仍是唯一權威。
+**原因** — Backlog.md 已定義任務 Schema、生命週期、Acceptance Criteria、Definition of Done、Implementation Plan、筆記、相依關係，以及 CLI 與 JSON 介面。重新實作其中任何一項，都會形成第二套真實來源；因此仍以官方規格為準。
 
-**結果** — 這層只能補上 Backlog.md 沒有立場的部分：執行模式、需求權威、核准邊界、阻塞政策、完成條件，以及可重現的任務選取規則。
+**結果** — 這一層只補充 Backlog.md 未定義的部分：執行模式、需求權威、核准邊界、阻塞政策、完成條件，以及可重現的任務選取規則。
 
 </div>
 
-這幾層所治理的任務生命週期共有七個階段，而這頁其餘的篇幅，大多是在講階段之間的那幾道邊界：
+這幾層共同形成七個任務階段：
 
 1. **需求** — 需求驅動開發：產品意圖由需求來源擁有，任務不得無聲地重新詮釋它。
 2. **任務拆解** — 與 Backlog.md 整合：需求變成任務、相依關係與 Acceptance Criteria，除此之外什麼都不做。
-3. **即時規劃** — Implementation Plan 在執行當下才寫，對照的是那一刻真實的程式碼。
-4. **實作** — 明確的執行邊界，手動或自動執行皆然：一次一個指定的任務，而且只做需求涵蓋的事。
-5. **驗證** — 驗證關卡跑的是專案自己被偵測出來的指令，絕不是憑空發明的指令。
-6. **證據** — 以證據為準的完成條件：證據寫進任務裡，否則這個任務就不算完成。
+3. **執行時規劃** — Implementation Plan 在任務執行時才建立，並以當下的程式碼為準。
+4. **實作** — 明確的執行邊界，手動或自動執行皆然：一次一個指定的任務，而且只做需求明確列出的事。
+5. **驗證** — 驗證關卡執行從專案實際偵測出的指令，不自行假設。
+6. **完成** — 依明確條件判定，並將驗證結果記錄在任務中。
 7. **交付** — PR、CI、審查、合併。
 
 至於這七個階段共同仰賴的那些 agent 指令檔要怎麼維護，是集合中第二個 skill 的職責，後面有專門的一節。
@@ -117,7 +118,7 @@ meta:
 
 <div class="decision">
 
-### 指令用探查的，沒有的就記成沒有
+### 實際偵測專案指令，不自行假設
 
 **原因** — 一個「看起來很合理」的 lint 或 build 指令，正是「跑了專案根本沒有的檢查、還回報通過」的來源。
 
@@ -129,13 +130,13 @@ meta:
 
 ## 需求與 Backlog 的分離
 
-需求來源擁有產品意圖；Backlog.md 擁有任務拆解、狀態與證據。這兩者不允許混在一起：任務不得無聲地新增、移除或重新詮釋任何需求，遇到衝突必須先回到權威來源解決，才能繼續實作。
+需求來源負責定義產品意圖；Backlog.md 負責任務拆解、狀態與完成紀錄。兩者彼此分離：任務不得自行新增、移除或重新詮釋需求，遇到衝突時必須先回到權威來源處理，才能繼續實作。
 
 因此每個任務都帶著一個 `Requirement source` 欄位，明確指出它源自哪一份文件或哪一筆決策紀錄。
 
 <div class="decision">
 
-### 會綁住後續任務的選擇，先寫成決策紀錄
+### 會影響後續任務的決策，先留下決策紀錄
 
 **原因** — 少了這條規則，「agent 當時就這樣決定了」會在事後悄悄變成一項需求，而 `Requirement source` 最後只能指向一段沒有人讀得到的對話。
 
@@ -143,7 +144,7 @@ meta:
 
 </div>
 
-任務要進入進行中的狀態之前，還得通過一道 Task Ready Gate，涵蓋需求來源、目標、範圍、不在範圍、穩定限制、相依、可客觀驗證的 Acceptance Criteria、驗證方法、測試需求，以及安全性、資料、API、文件、遷移等各項影響。缺少產品意圖構成阻塞；能從儲存庫證據判斷出來的工程細節則不構成。
+任務要進入進行中的狀態之前，還得通過一道 Task Ready Gate，包含需求來源、目標、範圍、不在範圍、穩定限制、相依、明確的 Acceptance Criteria、驗證方法、測試需求，以及安全性、資料、API、文件、遷移等各項影響。缺少產品意圖構成阻塞；能從儲存庫判斷的工程細節則不構成。
 
 ## Just-in-Time 實作計畫
 
@@ -161,7 +162,7 @@ meta:
 <span class="state-flow__name">/backlog-run TASK-ID</span>
 <span class="state-flow__detail">研究此刻真實的程式碼，然後才決定做法。</span>
 <span class="state-flow__part"><span class="state-flow__part-label">定義「怎麼做」</span>Implementation Plan，在寫下任何程式碼之前先記錄</span>
-<span class="state-flow__part"><span class="state-flow__part-label">接著</span>實作、驗證、證據</span>
+<span class="state-flow__part"><span class="state-flow__part-label">接著</span>實作、驗證、完成</span>
 </li>
 </ol>
 <figcaption class="state-flow__caption">「做什麼」在拆解階段就定案；「怎麼做」留到執行當下才定案，對照的是那時候真實的程式碼。</figcaption>
@@ -183,9 +184,9 @@ meta:
 
 <div class="decision">
 
-### 呼叫任務本身就是核准
+### 執行指令本身即代表核准該任務
 
-**原因** — 核准邊界應該明文規定，而不是交給 agent 自行拿捏。呼叫 `/backlog-run TASK-ID` 本身就等於授權這個任務走完即時規劃、實作與驗證，所以 agent 寫下計畫後直接往下做，不會再為了「請核准我自己的計畫」而停一次。
+**原因** — 核准邊界應明確定義，而不是交由 Agent 自行判斷。呼叫 `/backlog-run TASK-ID` 即代表授權該任務完成執行時規劃、實作與驗證；Agent 記錄計畫後可直接執行，不必再次要求核准。
 
 **取捨** — 這是對上游建議做法的一次明確覆寫，也等於拿掉了計畫與程式碼之間那一道人工檢查點。作為代價，邊界被畫得很窄：agent 仍然不得決定需求沒有涵蓋的事。
 
@@ -202,7 +203,7 @@ meta:
 
 <div class="decision">
 
-### 阻塞清單要雙向寫
+### 明確定義哪些情況構成阻塞
 
 **原因** — 為了實作寫法、程式碼導覽、任務範圍內的重構、修測試，或可回復的工程選擇就停下來的 agent，和永遠不停的 agent 一樣不能用。
 
@@ -212,20 +213,20 @@ meta:
 
 範圍紀律屬於同一道邊界：不相干的清理不併進任務，為了正確性而必須做的清理則屬於範圍內，執行途中發現的大規模清理另開一個任務。
 
-## 驗證與證據
+## 驗證與完成
 
 任務要被標記為 `Done`，必須四項條件同時成立：
 
 1. Acceptance Criteria 全數通過；
 2. 適用的測試、lint、typecheck 與 build 通過；
 3. 文件與需求矩陣已同步；
-4. 任務紀錄中留有驗證證據。
+4. 驗證結果已記錄在任務中。
 
 只把程式碼寫完，一項都不算滿足。
 
 <div class="decision">
 
-### 把這四項條件寫進每個任務原生的 Definition of Done
+### 把四項條件寫進任務本身的 Definition of Done
 
 **原因** — 只寫在工作流程文件裡的政策，任何一個早於它、或繞過它建立的任務都能迴避。
 
@@ -253,7 +254,7 @@ meta:
 
 **原因** — 兩種模式真正的差別只有這一處。手動模式可以問——用一次一題的結構化訪談把決策攤開，再把結論記錄下來；自動模式沒有人可以問。
 
-**結果** — 自動模式從不問：它把證據寫進任務、回報阻塞，然後停止。它仍然可以做出有儲存庫證據支持、且可回復的工程決定。
+**結果** — 自動模式從不問：它把現有資訊寫進任務、回報阻塞，然後停止。它仍然可以根據儲存庫內容，做出可回復的工程決定。
 
 </div>
 
@@ -261,35 +262,35 @@ meta:
 
 <div class="decision">
 
-### 整批任務先認領完，才開始動工
+### 先鎖定整批任務，再開始執行
 
 **原因** — 即使執行是平行的，選取與認領仍維持單線：同一批任務會在任何工作開始**之前**逐一被設為進行中，所以兩個 agent 不可能認領到同一個任務。
 
-**結果** — 整批做完之後，再依任務 ID 由小到大依序合併回去；合併衝突只會阻塞它發生的那一個任務——該任務會被移出 `Done`，衝突寫進阻塞證據，worktree 原地保留供檢查，同批其餘任務照常合併。
+**結果** — 整批做完之後，再依任務 ID 由小到大依序合併回去；合併衝突只會阻塞它發生的那一個任務——該任務會被移出 `Done`，衝突記錄在任務中，worktree 原地保留供檢查，同批其餘任務照常合併。
 
 </div>
 
 ## 取捨
 
-成本是真的存在，值得直說。
+這套流程也有明確成本：
 
-- **每個任務的固定開銷。** 對齊需求、寫即時計畫、留下證據、寫最終摘要——對一行的修正來說，這套儀式太重。工作流程自己的指引就是：提問、查資料、顯而易見的機械式修改，根本不要建立任務。
-- **刻意做窄。** 它綁定 Backlog.md 與支援 slash command 的 agent，需要 Backlog.md CLI 與 Python 3。它不是通用的 agent 框架，而正是這份窄，才讓政策具體到可以被執行。
-- **指令檔會吃掉 context。** 所有規則都在工作開始前被載入，這正是集合中第二個 skill 存在的理由：沒有人維護的指令集，最後只會變成昂貴的雜訊。
-- **平行執行可能白做工。** 落在不同模組的獨立任務很適合平行；很可能改到同一批檔案的任務，代價就是合併衝突。文件裡的建議是先從 `2` 開始，觀察衝突發生的頻率再決定要不要往上加。
-- **可重現優先於聰明。** 「先看優先順序、再取最小任務 ID」不是最聰明的排序，但它是可重現的排序；當執行者本身就是不確定的，可重現更重要。
+- **每個任務的固定開銷。** 需求對齊、執行時規劃、驗證紀錄與最終摘要，對單行修正而言可能過重。因此提問、資料查詢與明確的機械式修改不必建立任務。
+- **刻意限制適用範圍。** 它綁定 Backlog.md 與支援 Slash Command 的 Agent，需要 Backlog.md CLI 與 Python 3。它不是通用 Agent 框架，明確的範圍讓政策能被具體執行。
+- **指令檔會占用 Context。** 所有規則都會在工作開始前載入，因此需要集合中的第二個 Skill 定期維護；未經維護的指令集會持續增加不必要的 Context 成本。
+- **平行執行可能產生重工。** 位於不同模組的獨立任務適合平行執行；若多項任務可能修改同一批檔案，則容易產生合併衝突。建議從 `2` 個平行任務開始，再依衝突頻率調整。
+- **優先確保可重現性。** 「先依優先順序，再取最小任務 ID」未必是最靈活的排序，但結果可以重現；當執行者本身具有不確定性時，可重現性更重要。
 
 ## Context 品質 — audit-claude-md
 
 `backlog-workflow` 仰賴 agent 每次任務都會讀的指令檔，而這份仰賴本身也有它的失效模式。`CLAUDE.md` 會逐漸堆積早已過期的目錄樹、三個月前的進度筆記、其實只適用於某一個子目錄的規則，以及像「把程式碼寫好」這種無從驗證的要求——而這些全部都會在每一個任務載入 context。
 
-`audit-claude-md` 是集合中的次要公開作品，指令設計與這些檔案的長期可維護性就是在這裡處理的。它逐條檢視每一項規則——每一個段落、每一個條列項目，遇到一個條列項目塞了好幾項要求時，先拆成原子規則再判斷——並對每一條只給一個處置：保留在根目錄、搬到更窄的路徑範圍、抽成 skill、移進正式文件、改寫、刪除，或標記為強制落差，也就是某條硬性禁令目前只以文字存在，實際上該由 hook、CI 檢查或 linter 來把關。
+`audit-claude-md` 是集合中的次要公開作品，負責改善指令設計與檔案的長期可維護性。它逐條檢視每一項規則；若單一項目包含多項要求，會先拆成原子規則再判斷。每一條規則只會得到一種處置：保留在根目錄、移至更精確的路徑範圍、抽成 Skill、移進正式文件、改寫、刪除，或標記為強制執行缺口。強制執行缺口指的是某項硬性規則目前只存在於文字中，實際上應由 Hook、CI 檢查或 Linter 強制執行。
 
-有三個設計決定撐起它的價值。第一，它直接動手處理每一條規則，而不是交回一份建議清單。第二，抽成 skill 或移進文件就是漸進揭露——細節離開恆常載入的 context，改放到 agent 只有在需要時才會載入的位置；而且它明文拒絕用 `@file` 匯入來假裝縮短，因為被匯入的檔案一樣會進入啟動時的 context。第三，刪除刻意保守：「在程式碼裡找得到」本身不構成刪除理由，凡是看起來像重要隱性知識、卻無法從儲存庫查證的內容，一律保留並列出來交給人判斷。
+有三個設計決定撐起它的價值。第一，它直接動手處理每一條規則，而不是交回一份建議清單。第二，抽成 skill 或移進文件就是漸進揭露——細節離開恆常載入的 context，改放到 agent 只有在需要時才會載入的位置；而且它明文拒絕用 `@file` 匯入來假裝縮短，因為被匯入的檔案一樣會進入啟動時的 context。第三，刪除刻意保守：「在程式碼裡找得到」本身不構成刪除理由，凡是看起來像重要隱性知識、卻無法從儲存庫確認的內容，一律保留並列出來交給人判斷。
 
 它的寫入範圍被限制在指令檔上。`AGENTS.md` 與其他 agent 的指令檔只讀不寫，僅用來偵測互相衝突的規則，並把衝突列出來交給人處理。它只能由使用者主動呼叫，因為它會修改檔案；而且動手前會先看 `git status`，避免它產生的 diff 與你手邊未提交的修改混在一起。
 
-## GitHub 證據
+## 開源實作
 
 以上全部都在同一個公開儲存庫裡：
 
@@ -303,7 +304,7 @@ meta:
 
 安裝方式可以是 agent skill（`npx skills add tc3oliver/skills`），也可以是 Claude Code plugin（`/plugin marketplace add tc3oliver/skills`）。
 
-這套工作流程不只是發佈出來而已——這個網站本身就是用它開發的。網站的原始碼儲存庫 `github.com/tc3oliver/meowcoder.com` 是次要的工程證據；主要的開源作品是這個 skill 集合。
+這套工作流程不只公開發佈，也實際用於本站開發。skill 集合是主要的開源專案；網站原始碼則呈現它在正式專案中的使用方式。
 
 ## 出處與授權
 

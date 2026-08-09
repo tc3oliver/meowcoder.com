@@ -77,6 +77,8 @@ const workEntryShape = z.strictObject({
    * translations agree on whether it is declared.
    */
   outcome: z.string().min(1).optional(),
+  /** Quiet supporting metadata shown on the Work index. */
+  indexMeta: z.string().min(1).optional(),
   /**
    * Localized evidence label for the Work index (doc-2 §11).
    *
@@ -207,7 +209,8 @@ function expectedPath(data: WorkEntryData): string {
  *    localized and cannot be compared, but a row present in one locale and
  *    missing in the other is a half-translated sidebar — the same defect rule 3
  *    rejects for the case study as a whole.
- * 6. Every translation agrees on whether `outcome` is declared, for the same
+ * 6. Every translation agrees on whether `outcome` and `indexMeta` are
+ *    declared, for the same
  *    reason: the text is localized and incomparable, but one index leading with
  *    an outcome sentence while the other falls back to the summary is the two
  *    locales showing different things. `evidence` needs no rule of its own —
@@ -290,18 +293,18 @@ export function assertWorkContentIsConsistent(entries: readonly WorkEntry[]): vo
         );
       }
 
-      // The presence analogue of the `meta` rule above, for the one index field
-      // an entry may freely declare or omit. `evidence` is not checked here
-      // because `kind` above already determines it for both translations.
-      const expected = reference.data.outcome !== undefined;
-      const declared = entry.data.outcome !== undefined;
-      if (declared !== expected) {
-        const [has, lacks] = expected ? [reference.id, entry.id] : [entry.id, reference.id];
-        fail(
-          `translationKey "${translationKey}" disagrees on "outcome": ` +
-            `"${has}" declares it but "${lacks}" does not; both translations ` +
-            `must give the Work index the same fields`,
-        );
+      // Presence must stay in sync even though values are localized.
+      for (const field of ['outcome', 'indexMeta'] as const) {
+        const expected = reference.data[field] !== undefined;
+        const declared = entry.data[field] !== undefined;
+        if (declared !== expected) {
+          const [has, lacks] = expected ? [reference.id, entry.id] : [entry.id, reference.id];
+          fail(
+            `translationKey "${translationKey}" disagrees on "${field}": ` +
+              `"${has}" declares it but "${lacks}" does not; both translations ` +
+              `must give the Work index the same fields`,
+          );
+        }
       }
     }
   }

@@ -41,6 +41,7 @@ interface Props {
 const { locale, entry, headings = [] } = Astro.props;
 
 const t = work[locale];
+const isExperience = entry.kind === 'experience';
 
 /*
  * Same shape as every dictionary title (`Work — Oliver Yu`), composed rather
@@ -65,13 +66,25 @@ const schemas = entry.slug === 'shouri' ? [shouriSchema(locale)] : [];
   description={entry.summary}
 >
   {schemas.length > 0 && <StructuredData slot="head" schemas={schemas} />}
-  <article class="container work">
+  <article class:list={['container', 'work', isExperience && 'work--experience']}>
     <header class="work__header">
       <h1>{entry.title}</h1>
       <p class="work__summary">{entry.summary}</p>
+      {
+        isExperience && entry.meta && (
+          <dl class="work__header-meta" aria-label={t.experienceOverviewLabel}>
+            {entry.meta.map((row) => (
+              <div class="work__header-meta-row">
+                <dt>{row.label}</dt>
+                <dd>{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )
+      }
     </header>
 
-    <WorkSidebar entry={entry} headings={headings} t={t} />
+    {!isExperience && <WorkSidebar entry={entry} headings={headings} t={t} />}
 
     <div class="work__body">
       <div class="prose">
@@ -79,6 +92,7 @@ const schemas = entry.slug === 'shouri' ? [shouriSchema(locale)] : [];
       </div>
 
       <footer class="work__footer">
+        {isExperience && <a href={localizePath(locale, '/about')}>{t.aboutOliver}</a>}
         <a href={localizePath(locale, '/work')}>{t.backToIndex}</a>
       </footer>
     </div>
@@ -111,11 +125,42 @@ const schemas = entry.slug === 'shouri' ? [shouriSchema(locale)] : [];
     color: var(--color-text-muted);
   }
 
+  .work__header-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-7);
+    margin-block-start: var(--space-5);
+    padding-block-start: var(--space-4);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .work__header-meta-row {
+    min-width: min(100%, 11rem);
+  }
+
+  .work__header-meta dt {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .work__header-meta dd {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+
   .work__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
     margin-block-start: var(--space-9);
     padding-block-start: var(--space-5);
     border-block-start: var(--border-width) solid var(--color-border);
     font-size: var(--text-sm);
+  }
+
+  .work--experience .work__body {
+    max-width: 48.75rem;
   }
 
   /*
@@ -152,6 +197,16 @@ const schemas = entry.slug === 'shouri' ? [shouriSchema(locale)] : [];
     .work :global(.work-aside) {
       grid-column: 2;
       grid-row: 1 / span 2;
+    }
+
+    .container.work--experience {
+      grid-template-columns: minmax(0, 48.75rem);
+      max-width: 48.75rem;
+    }
+
+    .work--experience .work__body {
+      grid-column: 1;
+      grid-row: 2;
     }
   }
 </style>

@@ -287,14 +287,14 @@ export const home = {
       eyebrow: 'Open Source',
       heading: 'AI Coding Skills',
       statement:
-        'Versioned workflows for requirement alignment, just-in-time planning, validation, and evidence-based completion.',
+        'Versioned workflows for requirement alignment, just-in-time planning, validation, and explicit completion criteria.',
       skills: ['backlog-workflow', 'audit-claude-md'],
       workflow: {
         caption:
-          'The workflow: a requirement is planned, executed and validated, and ends in evidence.',
+          'The workflow: a requirement is planned, executed, validated, and completed against explicit criteria.',
         start: 'Requirement',
         steps: ['Plan', 'Execute', 'Validate'],
-        end: 'Evidence',
+        end: 'Complete',
       },
       caseStudyCta: { label: 'View Case Study' },
       cta: { label: 'GitHub' },
@@ -327,7 +327,7 @@ export const home = {
     description:
       '擁有 10+ 年軟體工程經驗的 AI 系統工程師與系統架構師，專注於 AI 系統、開發者工具、模型基礎架構與正式產品開發。',
     heading: 'Oliver Yu',
-    intro: '打造可實際落地的 AI 系統，聚焦開發者工作流程、知識檢索與模型基礎架構。',
+    intro: '設計與打造可投入實際使用的 AI 系統，聚焦開發者工作流程、知識檢索與模型基礎架構。',
     hero: {
       // PRD §9.1 keeps the role line and `Taiwan` in English in the Chinese
       // hero; both are standalone lines, so neither mixes languages.
@@ -339,7 +339,7 @@ export const home = {
     shouri: {
       eyebrow: '精選產品',
       heading: 'Shouri / 收理',
-      summary: '先完整保存，再依需要交給 AI 整理；原始內容始終保留作為可信來源。',
+      summary: '先完整保存，再依需要交給 AI 整理；原始內容始終保留，不會被 AI 整理結果覆蓋。',
       screenshot: {
         alt: '收理在桌機與手機上的畫面。網頁應用正進行五個單元的學習路線；後方的產品頁把一段收下的料理影片與整理後的結構化食譜並列。兩個手機畫面則是收藏庫，以及拆成摘要、材料與步驟的同一份食譜。',
       },
@@ -349,11 +349,11 @@ export const home = {
       principles: ['Save First', 'Explicit AI', 'Recoverable by Design'],
       // Word for word the label Open Source uses for the same action, so the
       // two case-study links on the homepage cannot read as different things.
-      caseStudyCta: { label: '閱讀案例研究' },
+      caseStudyCta: { label: '查看完整案例' },
       cta: { label: '前往 Shouri' },
     },
     expertise: {
-      heading: '工程重點領域',
+      heading: '工程專長',
       pillars: [
         {
           name: 'AI 與 Agent 系統',
@@ -366,7 +366,7 @@ export const home = {
         {
           name: 'LLM 基礎架構',
           description: '模型服務、推論最佳化、效能量測與穩定性。',
-          evidence: { label: '閱讀發表於 Study 的公開分析' },
+          evidence: { label: '閱讀 Study 上的公開分析' },
         },
         {
           name: '軟體架構',
@@ -377,17 +377,17 @@ export const home = {
     openSource: {
       eyebrow: '開源',
       heading: 'AI Coding Skills',
-      statement: '版本化的工作流程，涵蓋需求對齊、即時規劃、驗證，以及用證據判定完成。',
+      statement: '版本化工作流程，整合需求對齊、執行時規劃、驗證與明確的完成條件。',
       // The skill names are repository names, so they read the same in both
       // locales; the component joins them with a middot (doc-2 §7).
       skills: ['backlog-workflow', 'audit-claude-md'],
       workflow: {
-        caption: '工作流程：需求經過規劃、執行與驗證，最後以證據收尾。',
+        caption: '工作流程：需求經過規劃、執行與驗證，最後依明確條件完成。',
         start: '需求',
         steps: ['規劃', '執行', '驗證'],
-        end: '證據',
+        end: '完成',
       },
-      caseStudyCta: { label: '閱讀案例研究' },
+      caseStudyCta: { label: '查看完整案例' },
       cta: { label: 'GitHub' },
     },
     research: {
@@ -410,7 +410,7 @@ export const home = {
     experience: {
       heading: '10+ 年工程經驗',
       progression: '軟體工程 → 系統架構 → AI 系統',
-      summary: '經歷涵蓋企業軟體、雲端、資安、行動／網頁應用與 AI。',
+      summary: '經歷涵蓋企業軟體、雲端、資安、行動／網頁應用與 AI 系統。',
       cta: { label: '關於 Oliver' },
     },
   },

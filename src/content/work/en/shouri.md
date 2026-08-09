@@ -1,9 +1,10 @@
 ---
 title: 'Shouri / 收理'
 type: 'Product · AI Systems'
-summary: 'An AI-powered information organizer for capturing webpages, files and media, then turning them into structured, searchable knowledge.'
-outcome: 'Live with the Free plan open, on an architecture that persists the original before any AI call — so a failed organization run has nothing to destroy.'
-evidence: 'shouri.app · pricing, privacy, terms, and refund policy all published'
+summary: 'An AI-powered organizer that preserves webpages, files, and media before turning them into structured, searchable knowledge.'
+outcome: 'Live with the Free plan open. Originals are preserved before AI processing, keeping capture independent from organization.'
+indexMeta: 'Save First · Explicit AI · Recoverable by Design'
+evidence: 'shouri.app · Product, plans, privacy, terms, and refund policy'
 slug: 'shouri'
 locale: 'en'
 translationKey: 'shouri'
@@ -34,8 +35,8 @@ Two design choices common in AI-assisted tools make that worse:
 - **Derived text written over the source.** Once a summary replaces the page,
   there is nothing left to re-derive from when the model gets it wrong.
 
-Shouri treats capture and organization as two separate jobs, so neither one can
-destroy the other.
+Shouri treats capture and organization as separate stages, so a failure in one
+never affects the other.
 
 ## Product Principles
 
@@ -76,7 +77,7 @@ are the architecture.
 <span class="state-flow__part state-flow__part--derived"><span class="state-flow__part-label">AI-derived</span>Title, summary, key points, classification, tags, subject fields</span>
 </li>
 </ol>
-<figcaption class="state-flow__caption">A solid outline is content the user saved; a dashed outline is content a model produced. Derived fields are stored alongside the original, not inside it — which is why a failed extraction has nothing to destroy, and why any item can be organized again.</figcaption>
+<figcaption class="state-flow__caption">A solid outline represents saved source content; a dashed outline represents model-generated content. Derived fields are stored separately, so a failed extraction never affects the saved source and any item can be organized again.</figcaption>
 </figure>
 
 Properties that follow from that split:
@@ -216,8 +217,8 @@ retrieval structure rather than readable prose.
   persist across reprocessing.
 - **Review is a prioritized queue, not a reverse-chronological list.** It
   surfaces items that failed processing, items about to expire, items never
-  organized, and items not opened for a long time — the four states in which a
-  collection quietly rots.
+  organized, and items not opened for a long time — the four states most likely
+  to need attention.
 - **Export is part of retrieval.** An account's items and organization results
   can be exported at any time, and every exported item points at the download
   location of its original file.
@@ -242,8 +243,8 @@ the same object as one saved on the desktop.
 
 ## Production Considerations
 
-Operating the service is a larger problem than building it, and most of the
-operational model is stated publicly rather than left implicit.
+Production operation includes metering, quotas, storage, data lifecycle, and
+recovery from billing failures.
 
 **Metering.** Organization consumes AI credits proportional to content length.
 Processing time, outcome, credit usage, and service cost are recorded per job,
@@ -299,10 +300,7 @@ What is public and inspectable today:
   against the product's actual behaviour.
 - The product is in a test period, with a limited offer for early registrations.
 
-Operating figures — user counts, processing volume, latency, accuracy — are not
-published, and this page cites none.
-
-## Evidence
+## Product Information
 
 <div class="evidence">
 
@@ -315,9 +313,5 @@ published, and this page cites none.
 
 </div>
 
-Every claim on this page maps to observable product behaviour or to a clause in
-those documents. Deliberately absent: the implementation stack, named providers
-and models, infrastructure detail, and operating metrics. The product's own
-public documentation names third parties by category and publishes no operating
-figures, and this case study stays at the same level — none of that is publicly
-documented, and a case study is not the right place for it to appear first.
+These links provide the current product, plan, privacy, terms, and refund
+information for Shouri.

@@ -23,7 +23,7 @@ const VALID_FRONTMATTER = {
 
 /** The doc-2 §21 entry: an experience entry declares no evidence, ever. */
 const VALID_EXPERIENCE_FRONTMATTER = {
-  title: 'Professional Systems & AI Engineering',
+  title: 'Professional Engineering Experience',
   type: 'Professional Experience · 10+ Years',
   summary: 'More than a decade of engineering experience.',
   kind: 'experience',
@@ -147,6 +147,12 @@ describe('workEntrySchema', () => {
     const value = 'Live, with the evidence published alongside it.';
 
     expect(workEntrySchema.parse({ ...VALID_FRONTMATTER, [field]: value })[field]).toBe(value);
+  });
+
+  it('keeps quiet index metadata as written', () => {
+    const indexMeta = 'Mobile · Enterprise · Cloud · Architecture · AI';
+
+    expect(workEntrySchema.parse({ ...VALID_FRONTMATTER, indexMeta }).indexMeta).toBe(indexMeta);
   });
 
   it.each(['outcome', 'evidence'] as const)(
@@ -316,6 +322,15 @@ describe('assertWorkContentIsConsistent', () => {
     ];
 
     expect(() => assertWorkContentIsConsistent(entries)).toThrow(/"outcome"/);
+  });
+
+  it('rejects translations where only one declares index metadata', () => {
+    const entries = [
+      experienceEntry({ locale: 'en', indexMeta: 'Mobile · Enterprise · AI' }),
+      experienceEntry({ locale: 'zh' }),
+    ];
+
+    expect(() => assertWorkContentIsConsistent(entries)).toThrow(/"indexMeta"/);
   });
 
   it('accepts translations whose index fields differ only in language', () => {

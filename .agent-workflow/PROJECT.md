@@ -22,6 +22,7 @@
 - `doc-2` (`backlog/docs/specifications/doc-2 - MeowCoder-Site-Redesign-v5-—-Senior-Engineer-Portfolio-Brief.md`) — the v5 redesign brief. Authoritative for the homepage IA and copy, Shouri/Open Source/Engineering Focus/Research+Writing sections, the Work index, both case studies, About, the credential correction, and the visual scale. Supersedes the `doc-1` sections its §2 table lists; everything else in `doc-1` stays in force.
 - `decision-9` — records that `doc-2` supersedes those `doc-1` sections and that `doc-1` is not rewritten.
 - `decision-10` — `Site Source` stays in the footer: the repository is public and the link resolves (HTTP 200), so the v5 brief's 404 premise does not hold. `doc-1` §9.8 is unchanged.
+- `doc-3` (`backlog/docs/doc-3 - Professional-Engineering-Experience-Content-Revision.md`) — authoritative for the revised bilingual Professional Engineering Experience Work entry and detail-page content, progression layout, and removal of defensive public-evidence language. Supersedes conflicting Professional Experience presentation and copy requirements in `doc-2` §21.
 
 ## Validation commands
 

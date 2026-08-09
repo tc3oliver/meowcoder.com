@@ -1,8 +1,9 @@
 ---
 title: 'AI Coding Skills'
 type: 'Open Source · Agent Engineering'
-summary: 'Published workflow skills that give coding agents an explicit requirement boundary, just-in-time implementation plans, and evidence-based completion.'
-outcome: 'Published under MIT and installable into a project as an agent skill or a Claude Code plugin — and it is the process this site was built with.'
+summary: 'Open-source workflow skills that help coding agents align requirements, create just-in-time implementation plans, apply repository-specific validation, and complete work against explicit criteria.'
+outcome: 'Released under MIT, installable as an agent skill or Claude Code plugin, and used to build this site.'
+indexMeta: 'MIT · backlog-workflow 1.2.0 · Unit Tested'
 evidence: 'github.com/tc3oliver/skills · backlog-workflow 1.2.0, with its own unit tests'
 slug: 'ai-coding-skills'
 locale: 'en'
@@ -55,12 +56,12 @@ of its stages exists to close:
 - dependent work is executed in the wrong order;
 - validation commands are guessed rather than verified;
 - documentation is left unsynchronized;
-- tasks are marked complete without evidence;
+- tasks are marked complete without meeting the defined conditions;
 - autonomous execution continues where it should have stopped.
 
 None of these is a model-capability problem, and none is fixed by a stronger
-model. Each one is a missing boundary, which makes it an engineering problem
-with a file-shaped answer.
+model. Each is a missing process boundary that can be enforced through
+versioned project files.
 
 ## Workflow Architecture
 
@@ -81,7 +82,7 @@ Four layers, each with exactly one owner:
 <li class="state-flow__step">
 <span class="state-flow__name">Backlog.md</span>
 <span class="state-flow__detail">Used as published, not reimplemented.</span>
-<span class="state-flow__part"><span class="state-flow__part-label">Owns</span>Task schema, lifecycle, dependencies, evidence</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Owns</span>Task schema, lifecycle, dependencies, completion records</span>
 </li>
 <li class="state-flow__step">
 <span class="state-flow__name">Coding agent</span>
@@ -94,21 +95,20 @@ Four layers, each with exactly one owner:
 
 <div class="decision">
 
-### Sit on top of Backlog.md rather than reimplement it
+### Build on Backlog.md rather than reimplement it
 
 **Why** — Backlog.md already owns the task schema, lifecycle, Acceptance
 Criteria, Definition of Done, Implementation Plan, notes, dependencies, and its
 CLI and JSON interfaces. Reimplementing any of that would create a second source
 of truth for it, and its canonical instructions stay authoritative instead.
 
-**Consequence** — The workflow may add only what Backlog.md has no opinion on:
+**Consequence** — The workflow may add only what Backlog.md does not define:
 execution modes, requirement authority, approval boundaries, blocker policy,
 completion conditions, and deterministic task selection.
 
 </div>
 
-The lifecycle those layers govern runs in seven stages, and most of this page is
-about the boundaries between them:
+The lifecycle those layers govern runs in seven stages:
 
 1. **Requirement** — requirement-driven development: a requirement source owns
    product intent, and a task may not quietly reinterpret it.
@@ -120,8 +120,8 @@ about the boundaries between them:
    execution: one named task, and only what the requirement covers.
 5. **Validation** — validation gates run the project's own detected commands,
    never an invented one.
-6. **Evidence** — evidence-based completion: recorded in the task, or the task
-   is not done.
+6. **Completion** — explicit completion criteria, with validation results
+   recorded in the task.
 7. **Delivery** — PR, CI, review, merge.
 
 Managing the agent instruction files all seven stages depend on is the
@@ -166,7 +166,7 @@ project-owned configuration, the requirements, and existing tasks untouched.
 ## Requirement / Backlog Separation
 
 Requirement sources own product intent. Backlog.md owns decomposition, status,
-and evidence. The workflow does not let the two merge: a task may not silently
+and completion records. The workflow does not let the two merge: a task may not silently
 introduce, remove, or reinterpret a requirement, and a conflict has to be
 resolved in the authoritative source before implementation continues.
 
@@ -193,7 +193,7 @@ requirement source, goal, scope, out of scope, stable constraints,
 dependencies, objectively verifiable Acceptance Criteria, validation method,
 test requirements, and security, data, API, documentation, and migration
 impact. Missing product intent is a blocker. Engineering detail that can be
-determined from repository evidence is not.
+determined from the repository is not.
 
 ## JIT Planning
 
@@ -211,7 +211,7 @@ Decomposition and implementation planning are separated on purpose:
 <span class="state-flow__name">/backlog-run TASK-ID</span>
 <span class="state-flow__detail">Research the codebase as it exists right now, then commit to an approach.</span>
 <span class="state-flow__part"><span class="state-flow__part-label">Defines HOW</span>The Implementation Plan, recorded before any code is written</span>
-<span class="state-flow__part"><span class="state-flow__part-label">Then</span>Implementation, validation, evidence</span>
+<span class="state-flow__part"><span class="state-flow__part-label">Then</span>Implementation, validation, completion</span>
 </li>
 </ol>
 <figcaption class="state-flow__caption">What to build is settled at decomposition. How to build it is settled at execution, against the repository as it actually is by then.</figcaption>
@@ -284,14 +284,14 @@ Scope discipline belongs to the same boundary: unrelated cleanup is not mixed
 into a task, cleanup required for correctness is, and broad cleanup discovered
 during execution becomes a separate task.
 
-## Validation & Evidence
+## Validation & Completion
 
 A task may be marked `Done` only when four conditions hold:
 
 1. Acceptance Criteria all pass;
 2. required applicable tests, lint, typecheck, and build pass;
 3. documentation and the Requirement Matrix are synchronized;
-4. the task record contains validation evidence.
+4. validation results are recorded in the task.
 
 Writing code satisfies none of them on its own.
 
@@ -340,9 +340,9 @@ re-query. No in-memory queue survives a completed task.
 mode can ask, through a structured one-question-at-a-time interview, and record
 the outcome. Automatic mode has nobody to ask.
 
-**Consequence** — Automatic mode never asks: it records the evidence in the
-task, reports it blocked, and stops. It may still make reversible engineering
-decisions that repository evidence supports.
+**Consequence** — Automatic mode never asks: it records the available context in
+the task, reports it blocked, and stops. It may still make reversible engineering
+decisions supported by the repository.
 
 </div>
 
@@ -361,7 +361,7 @@ so two agents can never claim the same task.
 
 **Consequence** — The batch merges back in ascending task-ID order once all of
 it has finished, and a merge conflict blocks only the task it happened on: that
-task moves back out of `Done` with the conflict recorded as blocker evidence and
+task moves back out of `Done` with the conflict recorded as a blocker and
 its worktree left in place for inspection, while the rest of the batch merges
 normally.
 
@@ -372,7 +372,7 @@ normally.
 The costs are real and worth stating plainly.
 
 - **Per-task overhead.** Requirement alignment, a just-in-time plan, recorded
-  evidence, and a final summary is a great deal of ceremony for a one-line fix.
+  validation results, and a final summary is a great deal of ceremony for a one-line fix.
   The workflow's own guidance is to skip task creation entirely for questions,
   lookups, and obvious mechanical edits.
 - **Narrow by design.** It targets Backlog.md and a slash-command agent, and
@@ -422,7 +422,7 @@ conflict, which are reported for a human to resolve. It is user-invoked only,
 because it edits files, and it checks `git status` first so its own diff cannot
 be confused with uncommitted work of yours.
 
-## GitHub Evidence
+## Open Source Implementation
 
 All of it lives in one public repository:
 
@@ -446,10 +446,9 @@ All of it lives in one public repository:
 It installs either as agent skills (`npx skills add tc3oliver/skills`) or as a
 Claude Code plugin (`/plugin marketplace add tc3oliver/skills`).
 
-The workflow is not only published — it is the process this site was built
-with. The site's source repository, `github.com/tc3oliver/meowcoder.com`, is
-secondary engineering evidence; the skills collection is the primary open-source
-work.
+The workflow is not only published — it is also the process used to build this
+site. The skills collection is the primary open-source project; the site's source
+repository shows how it is applied in a production project.
 
 ## Attribution
 

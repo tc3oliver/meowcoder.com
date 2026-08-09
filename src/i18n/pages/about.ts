@@ -157,10 +157,10 @@ export const about = {
     eyebrow: '關於 Oliver',
     heading: 'Oliver Yu',
     role: 'AI 系統工程師 · 系統架構師',
-    intro: '來自台灣，具 10+ 年軟體工程經驗。',
+    intro: '具 10+ 年軟體工程經驗，目前在台灣工作。',
     summary: [
-      '技術背景涵蓋企業系統、雲端平台、行動與 Web 應用、軟體安全、機器學習與 AI 系統。',
-      '目前專注於 AI 基礎架構、Agent 開發系統、知識系統與正式環境中的 AI 應用。',
+      '技術背景包括企業系統、雲端平台、行動與 Web 應用、軟體安全、機器學習與 AI 系統。',
+      '目前專注於 AI 基礎架構、Coding Agent、知識系統，以及 AI 應用的產品化與落地。',
     ],
     career: {
       heading: '職涯歷程',
@@ -171,7 +171,7 @@ export const about = {
       href: '/zh/work/professional-engineering/',
     },
     focus: {
-      heading: '工程重點',
+      heading: '工程專長',
       items: [
         {
           name: 'AI 系統',
@@ -186,7 +186,7 @@ export const about = {
           description: '雲端基礎架構、DevOps、CI/CD、可靠性與軟體品質。',
         },
         {
-          name: '資安與應用程式工程',
+          name: '資安與應用開發',
           description: '資安、隱私、Web／行動應用與正式軟體系統。',
         },
       ],
@@ -209,7 +209,7 @@ export const about = {
       institution: '國立臺灣海洋大學',
     },
     credentials: {
-      heading: '精選證照',
+      heading: '專業證照',
       items: [
         {
           name: 'AI應用規劃師（機器學習）－中級能力鑑定',
@@ -224,7 +224,7 @@ export const about = {
     principles: {
       heading: '工程原則',
       statement: '可靠的 AI 系統，靠的不只是夠強的模型。',
-      items: ['可追溯', '可測試', '可觀測', '權限感知', '可替換', '可復原'],
+      items: ['可追溯', '可測試', '可觀測', '權限受控', '可替換', '可復原'],
     },
   },
 } satisfies AboutDictionary;

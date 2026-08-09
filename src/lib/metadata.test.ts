@@ -122,6 +122,58 @@ describe('every built page', () => {
   });
 });
 
+describe('professional engineering experience routes', () => {
+  const pages = {
+    en: {
+      index: 'work/index.html',
+      detail: 'work/professional-engineering/index.html',
+      title: 'Professional Engineering Experience',
+      stages: ['Application Engineering', 'Enterprise Systems &amp; Architecture', 'AI Systems'],
+    },
+    zh: {
+      index: 'zh/work/index.html',
+      detail: 'zh/work/professional-engineering/index.html',
+      title: '專業工程經歷',
+      stages: ['應用程式工程', '企業系統與系統架構', 'AI 系統'],
+    },
+  } as const;
+
+  it('ships the revised title on both the Work index and detail page', () => {
+    for (const page of Object.values(pages)) {
+      expect(read(page.index)).toContain(page.title);
+      expect(read(page.detail)).toMatch(new RegExp(`<h1[^>]*>${page.title}</h1>`));
+    }
+  });
+
+  it('ships exactly three synthesized stages in each locale', () => {
+    for (const page of Object.values(pages)) {
+      const html = read(page.detail);
+      const headings = [...html.matchAll(/<h2[^>]*>(.*?)<\/h2>/g)].map((match) => match[1]);
+
+      expect(headings).toEqual(page.stages);
+    }
+  });
+
+  it('keeps language switching on the equivalent detail route', () => {
+    for (const page of Object.values(pages)) {
+      const html = read(page.detail);
+
+      expect(html).toContain('href="/work/professional-engineering/"');
+      expect(html).toContain('href="/zh/work/professional-engineering/"');
+    }
+  });
+
+  it('does not ship the removed defensive labels', () => {
+    const html = Object.values(pages)
+      .flatMap((page) => [read(page.index), read(page.detail)])
+      .join('\n');
+
+    expect(html).not.toContain('No public link');
+    expect(html).not.toContain('無公開連結');
+    expect(html).not.toContain('任職期間的工作，僅以概括方式描述');
+  });
+});
+
 describe('footer link row (PRD §9.8)', () => {
   /*
    * PRD §9.8 fixes both the membership and the order of this row:

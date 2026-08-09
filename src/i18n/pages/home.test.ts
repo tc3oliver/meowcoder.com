@@ -239,7 +239,7 @@ describe('requirement wording', () => {
 
   it('quotes the doc-2 §5 hero statement verbatim in Chinese', () => {
     expect(home.zh.intro).toBe(
-      '打造可實際落地的 AI 系統，聚焦開發者工作流程、知識檢索與模型基礎架構。',
+      '設計與打造可投入實際使用的 AI 系統，聚焦開發者工作流程、知識檢索與模型基礎架構。',
     );
     // doc-2 §5 keeps the role line and `Taiwan` in English in both locales.
     expect(home.zh.hero.role).toBe('AI Systems Engineer · System Architect');
@@ -256,7 +256,7 @@ describe('requirement wording', () => {
     // doc-2 §6 writes both languages out in full, so neither is a translation
     // decision left to this file.
     expect(home.zh.shouri.summary).toBe(
-      '先完整保存，再依需要交給 AI 整理；原始內容始終保留作為可信來源。',
+      '先完整保存，再依需要交給 AI 整理；原始內容始終保留，不會被 AI 整理結果覆蓋。',
     );
   });
 
@@ -289,7 +289,9 @@ describe('requirement wording', () => {
   it('quotes the doc-2 §10 credibility strip verbatim in Chinese', () => {
     expect(home.zh.experience.heading).toBe('10+ 年工程經驗');
     expect(home.zh.experience.progression).toBe('軟體工程 → 系統架構 → AI 系統');
-    expect(home.zh.experience.summary).toBe('經歷涵蓋企業軟體、雲端、資安、行動／網頁應用與 AI。');
+    expect(home.zh.experience.summary).toBe(
+      '經歷涵蓋企業軟體、雲端、資安、行動／網頁應用與 AI 系統。',
+    );
     expect(home.zh.experience.cta.label).toBe('關於 Oliver');
   });
 

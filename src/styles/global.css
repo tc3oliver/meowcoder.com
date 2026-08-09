@@ -421,13 +421,27 @@ button {
  * domains a theme spans, and the shape of a career — and both are set quiet.
  * ---------------------------------------------------------------------- */
 
-/* The domains a theme covers, read before its narrative rather than after it.
-   Small and muted, so it reads as a label on the section and never competes
-   with the heading above it. */
-.prose .theme-domains {
+/* Stage scope and selected domains are supporting metadata, not inventories. */
+.prose .stage-metadata,
+.prose .stage-domains {
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
   color: var(--color-text-muted);
+}
+
+.prose .stage-metadata {
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.prose .stage-domains {
+  margin-block-start: var(--space-4);
+}
+
+.prose .stage-domains > :where(span) {
+  display: block;
+  margin-block-end: var(--space-1);
+  font-size: var(--text-xs);
 }
 
 /* The career progression: stages and arrows, drawn in text. No asset, no
@@ -470,6 +484,24 @@ button {
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
   color: var(--color-text-muted);
+}
+
+@media (width < 48rem) {
+  .prose .progression__stages {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .prose .progression__stage {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .prose .progression__stage:not(:last-child)::after {
+    rotate: 90deg;
+  }
 }
 
 .site-main {

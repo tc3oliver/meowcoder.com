@@ -16,25 +16,17 @@ export interface WorkPageStrings extends PageStrings {
    * is appended from the entry's own title, so the label itself stays generic.
    */
   caseStudyCta: string;
-  /**
-   * The same link on the professional-experience entry (doc-2 §21).
-   *
-   * A separate label rather than the same one, because the two lead to
-   * different kinds of thing: `caseStudyCta` opens a project a reader can then
-   * go and verify in public, and this one opens an account of work that cannot
-   * be verified that way.
-   */
+  /** The professional-experience entry uses a destination-specific action. */
   experienceCta: string;
-  /**
-   * What stands where a case study prints its evidence label (doc-2 §21).
-   *
-   * decision-11 makes the missing public link the point rather than a gap, so
-   * the index says so in the same slot and the same treatment the other entries
-   * use to name what can be checked. It describes the entry's kind, which is
-   * the same statement for every experience entry, so it is page chrome rather
-   * than something a content file restates.
-   */
-  noEvidence: string;
+  /** Compact career progression shown on the Work index experience entry. */
+  experienceProgression: {
+    label: string;
+    stages: readonly string[];
+  };
+  /** Additional destination on the professional-experience detail page. */
+  aboutOliver: string;
+  /** Accessible name for experience metadata shown in the detail-page header. */
+  experienceOverviewLabel: string;
   /**
    * Labels for the two visuals doc-2 §11 gives the index, keyed by the case
    * study each belongs to. They describe presentation rather than the projects,
@@ -66,7 +58,7 @@ export const work = {
   en: {
     title: 'Work — Oliver Yu',
     description:
-      'Selected engineering work: product execution, open source, more than a decade of professional systems and AI engineering, and the decisions behind them.',
+      'Selected work spanning product engineering, open source, and 10+ years of professional experience in systems, architecture, and AI.',
     heading: 'Work',
     /*
      * doc-2 §21 supersedes PRD §10's "only work that can be publicly inspected"
@@ -75,56 +67,65 @@ export const work = {
      * version once one entry has none and says so.
      */
     intro:
-      'The problem, the architecture, the decisions, and — where the work is public — the evidence behind them.',
-    empty: 'No case studies are published yet.',
-    caseStudyCta: 'View Case Study',
+      'Selected work across product engineering, open source, and professional experience—focused on systems, architecture, and how engineering scope develops in practice.',
+    empty: 'No work is published yet.',
+    caseStudyCta: 'View Full Case Study',
     experienceCta: 'Explore Experience',
-    noEvidence: 'No public link · employer work, described in general terms',
+    experienceProgression: {
+      label: 'Career progression',
+      stages: ['Mobile / Web', 'Enterprise & Cloud', 'Architecture', 'AI Systems'],
+    },
+    aboutOliver: 'About Oliver',
+    experienceOverviewLabel: 'Experience overview',
     visuals: {
       // The same asset the homepage shows, so it is the same description. It is
       // restated rather than imported because the Work index does not depend on
       // the homepage's dictionary, and an image's alt text belongs with the page
       // that renders it.
       shouri: {
-        alt: 'Shouri on desktop and phone. The web app works through a five-unit learning path; behind it the product page shows a saved cooking video beside the structured recipe it became. Two phone screens show the saved library and that recipe broken into summary, ingredients, and steps.',
+        alt: 'Shouri shown across desktop and mobile. The desktop views show a learning path and a saved cooking video organized into a structured recipe; the mobile views show the saved library and recipe details.',
       },
       aiCodingSkills: {
         caption:
-          'The workflow: a requirement is planned, executed and validated, and ends in evidence.',
+          'The workflow moves from a requirement through planning, execution, and validation to completion.',
         start: 'Requirement',
         steps: ['Plan', 'Execute', 'Validate'],
-        end: 'Evidence',
+        end: 'Complete',
       },
     },
     typeLabel: 'Type',
-    asideLabel: 'About this case study',
-    sectionsLabel: 'Sections',
-    backToIndex: 'All work',
+    asideLabel: 'Project details and contents',
+    sectionsLabel: 'Contents',
+    backToIndex: 'Back to all work',
   },
   zh: {
     title: '作品 — Oliver Yu',
-    description:
-      '工程作品選集：產品執行、開源專案、超過 10 年的系統與 AI 工程經歷，以及背後的工程決策。',
+    description: '工程作品選集，包括產品工程、開源實作，以及 10+ 年系統、架構與 AI 工程經歷。',
     heading: '作品',
-    intro: '問題、架構、工程決策，以及在作品可公開檢視時，對應的證據。',
-    empty: '目前尚未發佈案例研究。',
-    caseStudyCta: '閱讀案例研究',
-    experienceCta: '深入了解經歷',
-    noEvidence: '無公開連結 · 任職期間的工作，僅以概括方式描述',
+    intro: '產品工程、開源實作與專業工程經歷，呈現系統設計、架構決策與工程範疇的演進。',
+    empty: '目前尚無作品內容。',
+    caseStudyCta: '查看完整案例',
+    experienceCta: '查看工程歷程',
+    experienceProgression: {
+      label: '職涯進程',
+      stages: ['行動 / Web', '企業與雲端', '系統架構', 'AI 系統'],
+    },
+    aboutOliver: '關於 Oliver',
+    experienceOverviewLabel: '工程經歷摘要',
     visuals: {
       shouri: {
-        alt: '收理在桌機與手機上的畫面。網頁應用正進行五個單元的學習路線；後方的產品頁把一段收下的料理影片與整理後的結構化食譜並列。兩個手機畫面則是收藏庫，以及拆成摘要、材料與步驟的同一份食譜。',
+        alt: '收理的桌機與行動版畫面。桌機畫面呈現學習路線，以及由料理影片整理出的結構化食譜；行動版畫面呈現收藏庫與食譜內容。',
       },
       aiCodingSkills: {
-        caption: '工作流程：需求經過規劃、執行與驗證，最後以證據收尾。',
+        caption: '工作流程從需求開始，經過規劃、執行與驗證，最後完成交付。',
         start: '需求',
         steps: ['規劃', '執行', '驗證'],
-        end: '證據',
+        end: '完成',
       },
     },
     typeLabel: '類型',
-    asideLabel: '關於這則案例研究',
-    sectionsLabel: '章節',
-    backToIndex: '所有作品',
+    asideLabel: '專案資訊與內容',
+    sectionsLabel: '內容',
+    backToIndex: '返回作品列表',
   },
 } satisfies Record<Locale, WorkPageStrings>;
