@@ -236,7 +236,7 @@ export const about = {
         },
       ],
       summary:
-        '自 2017 年開始參與 AI 應用，並隨著工程職責擴展，逐步延伸至系統架構、技術領導與企業 AI 系統。',
+        '自 2017 年開始參與 AI 應用，並隨著工程職責擴展，逐步延伸至系統架構、技術領導與企業 AI\u00a0系統。',
       cta: '查看專業工程經歷',
       href: '/zh/work/professional-engineering/',
     },
