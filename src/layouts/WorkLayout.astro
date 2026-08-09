@@ -188,9 +188,9 @@ const schemas =
   }
 
   /*
-   * 70rem is the first width at which the two columns fit without squeezing the
-   * measure: 720px of article + a 4rem gutter + a 15rem sidebar is 1008px, and
-   * `.container` offers about 1052px there. Below it, a sidebar could only be
+   * 72rem is the first width at which the two columns fit without squeezing the
+   * measure: 760px of article + a 4rem gutter + a 15rem sidebar is 1064px, and
+   * `.container` offers about 1084px there. Below it, a sidebar could only be
    * bought by taking width from the article, which is the wrong trade on a
    * page whose job is reading.
    *
@@ -198,7 +198,7 @@ const schemas =
    * the measure, which is what keeps both outer edges — article and sidebar —
    * flush with the site header and footer above and below them.
    */
-  @media (min-width: 70rem) {
+  @media (min-width: 72rem) {
     .container.work {
       grid-template-columns: minmax(0, 1fr) minmax(0, 15rem);
       column-gap: var(--space-9);
