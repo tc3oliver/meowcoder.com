@@ -42,7 +42,6 @@ export interface AboutStrings extends PageStrings {
     record: string;
     paper: string;
     detail: string;
-    publishedAs: string;
     areasLabel: string;
     areas: readonly string[];
     cta: string;
@@ -153,7 +152,6 @@ export const about = {
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
       detail:
         'Co-authored research on leakage-resilient certificate-based encryption designed to remain secure under continual key leakage.',
-      publishedAs: 'Published as Tsung-Han Yu',
       areasLabel: 'Research topics',
       areas: [
         'Leakage-Resilient Cryptography',
@@ -275,7 +273,6 @@ export const about = {
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
       detail: '共同研究抗洩漏憑證式加密，透過金鑰更新機制提升系統在持續金鑰洩漏情境下的安全性。',
-      publishedAs: '論文發表姓名：Tsung-Han Yu',
       areasLabel: '研究主題',
       areas: ['抗洩漏密碼學', '憑證式加密', '側通道安全', '等值測試'],
       cta: '查看論文',

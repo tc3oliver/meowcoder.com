@@ -27,7 +27,6 @@ describe.each(BY_LOCALE)('About content (%s)', (_locale, t: AboutStrings) => {
     expect(t.research.venue).toContain('2026');
     expect(t.research.record).toBe('Volume 99 · Article 104422');
     expect(t.research.href).toBe('https://doi.org/10.1016/j.jisa.2026.104422');
-    expect(t.research.publishedAs).toContain('Tsung-Han Yu');
   });
 
   it('keeps low-value course completions and inflated credential wording out', () => {

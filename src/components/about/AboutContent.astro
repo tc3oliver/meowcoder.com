@@ -58,7 +58,6 @@ const { t } = Astro.props;
       <p class="research__record">{t.research.record}</p>
       <h3 class="research__paper"><cite>{t.research.paper}</cite></h3>
       <p class="research__detail">{t.research.detail}</p>
-      <p class="research__identity">{t.research.publishedAs}</p>
       <ul class="metadata-list" role="list" aria-label={t.research.areasLabel}>
         {t.research.areas.map((area) => <li>{area}</li>)}
       </ul>
@@ -138,7 +137,6 @@ const { t } = Astro.props;
   .about__paragraph,
   .focus-item p,
   .research__detail,
-  .research__identity,
   .current-focus__description,
   .current-focus__figure figcaption {
     color: var(--color-text-muted);
@@ -232,10 +230,6 @@ const { t } = Astro.props;
 
   .research__paper cite {
     font-style: normal;
-  }
-
-  .research__identity {
-    font-size: var(--text-sm);
   }
 
   .metadata-list {
