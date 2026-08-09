@@ -112,7 +112,7 @@ locale and missing in the other is a half-translated sidebar.
 ```yaml
 meta:
   - label: 'Status'
-    value: 'Live · test period'
+    value: 'Live · Testing'
   - label: 'Plans'
     value: 'Free open · Pro published at NT$199/month'
 ```

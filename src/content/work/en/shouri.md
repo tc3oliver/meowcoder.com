@@ -14,7 +14,7 @@ meta:
   - label: 'Scope'
     value: 'Product Design · System Architecture · Full-stack Engineering · AI · Operations'
   - label: 'Status'
-    value: 'Live · test period'
+    value: 'Live · Testing'
   - label: 'Interface'
     value: 'Traditional Chinese · Google sign-in'
   - label: 'Distribution'
