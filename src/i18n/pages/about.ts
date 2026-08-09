@@ -14,7 +14,11 @@ export interface AboutStrings extends PageStrings {
   career: {
     heading: string;
     label: string;
-    stages: readonly string[];
+    stages: readonly {
+      period: string;
+      name: string;
+      description: string;
+    }[];
     summary: string;
     cta: string;
     href: string;
@@ -38,6 +42,7 @@ export interface AboutStrings extends PageStrings {
     record: string;
     paper: string;
     detail: string;
+    publishedAs: string;
     areasLabel: string;
     areas: readonly string[];
     cta: string;
@@ -79,9 +84,34 @@ export const about = {
     career: {
       heading: 'Career',
       label: '10+ Years',
-      stages: ['Software Engineering', 'System Architecture', 'AI Systems'],
+      stages: [
+        {
+          period: '2014–2016',
+          name: 'Application Engineering',
+          description:
+            'Built iOS, mobile, and web applications, establishing a foundation in product delivery and connected experiences.',
+        },
+        {
+          period: '2017–2020',
+          name: 'Software Engineering',
+          description:
+            'Expanded into backend services, cloud integration, enterprise workflows, and end-to-end software delivery.',
+        },
+        {
+          period: '2020–2025',
+          name: 'System Architecture & Technical Leadership',
+          description:
+            'Took ownership of system architecture, engineering practices, project delivery, mentoring, and cross-system integration.',
+        },
+        {
+          period: '2025–Present',
+          name: 'AI Systems',
+          description:
+            'Focused on enterprise AI systems, coding agents, knowledge systems, model infrastructure, security validation, and continuous evaluation.',
+        },
+      ],
       summary:
-        'My scope progressed from application and enterprise engineering to platform architecture and the delivery of production AI systems.',
+        'Engineering scope expanded from application delivery to architecture, technical leadership, and enterprise AI systems.',
       cta: 'Explore Professional Engineering Experience',
       href: '/work/professional-engineering/',
     },
@@ -123,6 +153,7 @@ export const about = {
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
       detail:
         'Co-authored research on leakage-resilient certificate-based encryption designed to remain secure under continual key leakage.',
+      publishedAs: 'Published as Tsung-Han Yu',
       areasLabel: 'Research topics',
       areas: [
         'Leakage-Resilient Cryptography',
@@ -179,8 +210,30 @@ export const about = {
     career: {
       heading: '職涯歷程',
       label: '10+ 年',
-      stages: ['軟體工程', '系統架構', 'AI 系統'],
-      summary: '從應用程式與企業系統開發，逐步延伸至平台架構與 AI 系統工程。',
+      stages: [
+        {
+          period: '2014–2016',
+          name: '應用程式工程',
+          description: '以 iOS、行動與 Web 應用開發為主，建立產品交付與連網應用的工程基礎。',
+        },
+        {
+          period: '2017–2020',
+          name: '軟體工程',
+          description: '工作範圍延伸至後端服務、雲端整合、企業流程與端到端軟體交付。',
+        },
+        {
+          period: '2020–2025',
+          name: '系統架構與技術領導',
+          description: '負責系統架構、工程流程、專案交付、技術經驗傳承與跨系統整合。',
+        },
+        {
+          period: '2025–至今',
+          name: 'AI 系統',
+          description:
+            '聚焦企業 AI 系統、Coding Agent、知識系統、模型基礎架構、安全驗證與持續評估。',
+        },
+      ],
+      summary: '工程職責從應用程式交付，逐步延伸至系統架構、技術領導與企業 AI 系統。',
       cta: '查看專業工程經歷',
       href: '/zh/work/professional-engineering/',
     },
@@ -219,6 +272,7 @@ export const about = {
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
       detail: '共同研究抗洩漏憑證式加密，透過金鑰更新機制提升系統在持續金鑰洩漏情境下的安全性。',
+      publishedAs: '論文發表姓名：Tsung-Han Yu',
       areasLabel: '研究主題',
       areas: ['抗洩漏密碼學', '憑證式加密', '側通道安全', '等值測試'],
       cta: '查看論文',

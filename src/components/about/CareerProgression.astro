@@ -20,7 +20,11 @@ const { career, id } = Astro.props;
               →
             </span>
           )}
-          <span>{stage}</span>
+          <div class="progression__stage-content">
+            <p class="progression__period">{stage.period}</p>
+            <h3>{stage.name}</h3>
+            <p class="progression__description">{stage.description}</p>
+          </div>
         </li>
       ))
     }
@@ -48,24 +52,53 @@ const { career, id } = Astro.props;
   }
 
   .progression__stages {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    gap: var(--space-5);
     width: 100%;
     margin: 0;
   }
 
   .progression__stage {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-5);
     min-width: 0;
-    font-size: clamp(var(--text-md), 2.6vw, var(--text-lg));
+  }
+
+  .progression__stage-content {
+    min-width: 0;
+  }
+
+  .progression__stage:first-child .progression__stage-content {
+    grid-column: 1 / -1;
+  }
+
+  .progression__period {
+    margin-block-end: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
     font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-wide);
+  }
+
+  .progression__stage h3 {
+    font-size: var(--text-md);
     line-height: var(--leading-snug);
   }
 
+  .progression__description {
+    margin-block-start: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
   .progression__arrow {
+    margin-block-start: var(--space-6);
     color: var(--color-text-muted);
     font-weight: var(--weight-normal);
   }
@@ -94,19 +127,22 @@ const { career, id } = Astro.props;
 
   @media (width < 48rem) {
     .progression__stages {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--space-2);
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-5);
     }
 
     .progression__stage {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--space-2);
+      grid-template-columns: 1.5rem minmax(0, 1fr);
+      gap: var(--space-3);
     }
 
     .progression__arrow {
       rotate: 90deg;
+      margin-block-start: 0;
+    }
+
+    .progression__stage:first-child .progression__stage-content {
+      grid-column: 2;
     }
   }
 </style>

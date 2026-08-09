@@ -1,6 +1,6 @@
 ---
 title: 'Shouri / 收理'
-type: 'Product · AI Systems'
+type: 'Independent Product · AI Systems'
 summary: 'An AI-powered organizer that preserves webpages, files, and media before turning them into structured, searchable knowledge.'
 outcome: 'An end-to-end product implementation spanning content capture, source preservation, AI structuring, retrieval, mobile integration, and production operations.'
 indexMeta: 'Save First · Explicit AI · Recoverable by Design'
@@ -11,15 +11,15 @@ translationKey: 'shouri'
 order: 0
 draft: false
 meta:
-  - label: 'Scope'
-    value: 'Product Design · System Architecture · Full-stack Engineering · AI · Operations'
   - label: 'Status'
-    value: 'Live · Testing'
+    value: 'Public Beta'
   - label: 'Interface'
     value: 'Traditional Chinese · Google sign-in'
   - label: 'Distribution'
     value: 'Web app, installable to the home screen'
 ---
+
+Independently designed, built, and operated by Oliver Yu.
 
 ## Problem
 

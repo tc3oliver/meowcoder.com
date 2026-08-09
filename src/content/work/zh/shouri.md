@@ -1,6 +1,6 @@
 ---
 title: 'Shouri / 收理'
-type: '產品 · AI 系統'
+type: '獨立產品 · AI 系統'
 summary: '先完整保存網頁、檔案與媒體，再由 AI 整理成結構化、可搜尋的知識。'
 outcome: '從內容擷取、原始資料保存與 AI 結構化整理，到檢索、行動裝置整合與正式環境維運的完整產品實作。'
 indexMeta: '先保存 · 明確啟用 AI · 可復原設計'
@@ -11,15 +11,15 @@ translationKey: 'shouri'
 order: 0
 draft: false
 meta:
-  - label: '負責範圍'
-    value: '產品設計 · 系統架構 · 全端開發 · AI 整合 · 上線維運'
   - label: '狀態'
-    value: '已上線 · 測試期間'
+    value: '公開測試'
   - label: '介面'
     value: '繁體中文 · Google 登入'
   - label: '發佈方式'
     value: '網頁應用，可加入主畫面'
 ---
+
+由 Oliver Yu 獨立設計、開發與營運。
 
 ## 問題
 

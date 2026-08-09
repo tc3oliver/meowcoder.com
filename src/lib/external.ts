@@ -13,6 +13,12 @@ export const STUDY_URL = 'https://study.meowcoder.com';
 /** Implementation and open source proof (PRD §6). */
 export const GITHUB_URL = 'https://github.com/tc3oliver';
 
+/** Professional profile, confirmed against the public résumé. */
+export const LINKEDIN_URL = 'https://www.linkedin.com/in/oliver-yu-a554a9286';
+
+/** Direct contact address. */
+export const EMAIL_URL = 'mailto:tc3oliver@gmail.com';
+
 /** Product proof (PRD §6). */
 export const SHOURI_URL = 'https://shouri.app';
 

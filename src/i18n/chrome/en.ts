@@ -19,9 +19,11 @@ export const chromeEn = {
   footer: {
     ariaLabel: 'Footer',
     github: 'GitHub',
+    linkedin: 'LinkedIn',
     study: 'Study',
     orcid: 'ORCID',
     shouri: 'Shouri',
+    email: 'Email',
     siteSource: 'Site Source',
   },
 } satisfies ChromeDictionary;

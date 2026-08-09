@@ -22,20 +22,18 @@ interface Props {
   headings: readonly MarkdownHeading[];
   /** Localized heading over the list. */
   label: string;
-  /** Id for that heading; the nav's `aria-labelledby` target. */
-  labelId: string;
 }
 
-const { headings, label, labelId } = Astro.props;
+const { headings, label } = Astro.props;
 
 const sections = headings.filter((heading) => heading.depth === 2);
 ---
 
 {
   sections.length > 0 && (
-    <details class="section-nav-mobile">
-      <summary>{label}</summary>
-      <nav aria-label={label}>
+    <nav class="section-nav" aria-label={label}>
+      <details>
+        <summary>{label}</summary>
         <ol class="section-nav__list" role="list">
           {sections.map((section) => (
             <li>
@@ -43,55 +41,23 @@ const sections = headings.filter((heading) => heading.depth === 2);
             </li>
           ))}
         </ol>
-      </nav>
-    </details>
-  )
-}
-
-{
-  sections.length > 0 && (
-    <nav class="section-nav-desktop" aria-labelledby={labelId}>
-      <p class="section-nav__label" id={labelId}>
-        {label}
-      </p>
-      <ol class="section-nav__list" role="list">
-        {sections.map((section) => (
-          <li>
-            <a href={`#${section.slug}`}>{section.text}</a>
-          </li>
-        ))}
-      </ol>
+      </details>
     </nav>
   )
 }
 
 <style>
-  .section-nav-mobile {
+  .section-nav {
     border-block: var(--border-width) solid var(--color-border);
   }
 
-  .section-nav-mobile summary {
+  .section-nav summary {
     min-height: 2.75rem;
     padding-block: var(--space-3);
     color: var(--color-text);
     font-size: var(--text-sm);
     font-weight: var(--weight-semibold);
     cursor: pointer;
-  }
-
-  .section-nav-mobile nav {
-    padding-block-end: var(--space-4);
-  }
-
-  .section-nav-desktop {
-    display: none;
-  }
-
-  .section-nav__label {
-    font-size: var(--text-xs);
-    font-weight: var(--weight-semibold);
-    color: var(--color-text-muted);
-    margin-block-end: var(--space-3);
   }
 
   /* Narrow screens get a wrapping row: ten section names read as a compact
@@ -102,6 +68,7 @@ const sections = headings.filter((heading) => heading.depth === 2);
     flex-wrap: wrap;
     gap: var(--space-2) var(--space-4);
     font-size: var(--text-sm);
+    padding-block-end: var(--space-4);
   }
 
   .section-nav__list a {
@@ -118,17 +85,35 @@ const sections = headings.filter((heading) => heading.depth === 2);
   /* Matches the sidebar breakpoint in `WorkLayout.astro`: once the sidebar is a
      column of its own, the list becomes a column too. */
   @media (min-width: 70rem) {
-    .section-nav-mobile {
-      display: none;
+    .section-nav {
+      border-block: 0;
     }
 
-    .section-nav-desktop {
+    .section-nav summary {
       display: block;
+      min-height: auto;
+      margin-block-end: var(--space-3);
+      padding: 0;
+      color: var(--color-text-muted);
+      font-size: var(--text-xs);
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .section-nav summary::marker {
+      content: '';
+    }
+
+    /* Keep one set of section links in the DOM. On desktop the sidebar exposes
+       that list directly even though the mobile disclosure remains closed. */
+    .section-nav details:not([open]) > .section-nav__list {
+      display: flex;
     }
 
     .section-nav__list {
       flex-direction: column;
       gap: var(--space-3);
+      padding-block-end: 0;
       /* Long section names wrap inside the column rather than widening it. */
       text-wrap: pretty;
     }

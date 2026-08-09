@@ -13,7 +13,7 @@ This is the implementation of one real site, not a portfolio template.
 - TypeScript
 - CSS
 - Astro Content Collections / MDX
-- Cloudflare Pages
+- Cloudflare Workers Static Assets
 - GitHub Actions
 
 ## Development

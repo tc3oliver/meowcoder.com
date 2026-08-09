@@ -45,10 +45,12 @@ export interface ChromeDictionary {
     ariaLabel: string;
     /** Product names, left untranslated per PRD §7. */
     github: string;
+    linkedin: string;
     study: string;
     /** The research identity (PRD §6) — an initialism, not translated. */
     orcid: string;
     shouri: string;
+    email: string;
     /** The public meowcoder.com repository — secondary evidence (PRD §24). */
     siteSource: string;
   };

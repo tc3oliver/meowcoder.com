@@ -5,7 +5,15 @@ import { join } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { LOCALES } from '../i18n/locales';
-import { GITHUB_URL, ORCID_URL, SHOURI_URL, STUDY_URL } from './external';
+import {
+  EMAIL_URL,
+  GITHUB_URL,
+  LINKEDIN_URL,
+  ORCID_URL,
+  PUBLICATION_URL,
+  SHOURI_URL,
+  STUDY_URL,
+} from './external';
 import { ROUTES, alternatesFor, localizeUrl } from './i18n';
 import { SITE_URL } from './site';
 
@@ -227,9 +235,11 @@ describe('footer link row (PRD §9.8)', () => {
    */
   const EXPECTED = [
     GITHUB_URL,
+    LINKEDIN_URL,
     STUDY_URL,
     ORCID_URL,
     SHOURI_URL,
+    EMAIL_URL,
     'https://github.com/tc3oliver/meowcoder.com',
   ];
 
@@ -291,6 +301,68 @@ describe('Person structured data', () => {
       for (const person of personNodes(read(file))) {
         expect(person.sameAs, `${file} Person.sameAs omits ORCID`).toContain(ORCID_URL);
       }
+    }
+  });
+
+  it('identifies the bilingual professional name and only identity profiles', () => {
+    for (const file of ['index.html', 'zh/index.html']) {
+      const [person] = personNodes(read(file));
+
+      expect(person.alternateName, `${file} alternate names`).toEqual(['游宗翰', 'Tsung-Han Yu']);
+      expect(person.sameAs, `${file} identity profiles`).toEqual([
+        GITHUB_URL,
+        LINKEDIN_URL,
+        STUDY_URL,
+        ORCID_URL,
+      ]);
+      expect(person.sameAs, `${file} must not identify a product as the person`).not.toContain(
+        SHOURI_URL,
+      );
+    }
+  });
+});
+
+describe('work and publication structured data', () => {
+  function nodes(html: string): Record<string, unknown>[] {
+    return [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].flatMap(
+      (match) => {
+        const parsed: unknown = JSON.parse(match[1]);
+        return (Array.isArray(parsed) ? parsed : [parsed]) as Record<string, unknown>[];
+      },
+    );
+  }
+
+  it('describes the publication on both About pages', () => {
+    for (const file of ['about/index.html', 'zh/about/index.html']) {
+      const articles = nodes(read(file)).filter((node) => node['@type'] === 'ScholarlyArticle');
+
+      expect(articles, `${file}`).toHaveLength(1);
+      expect(articles[0]).toMatchObject({
+        url: PUBLICATION_URL,
+        identifier: PUBLICATION_URL,
+        datePublished: '2026',
+        pagination: '104422',
+        author: { '@id': `${SITE_URL}/#person` },
+      });
+      expect(articles[0].headline).toContain('leakage-resilient certificate-based encryption');
+    }
+  });
+
+  it('describes AI Coding Skills as source code on both detail pages', () => {
+    for (const file of [
+      'work/ai-coding-skills/index.html',
+      'zh/work/ai-coding-skills/index.html',
+    ]) {
+      const sourceCode = nodes(read(file)).filter((node) => node['@type'] === 'SoftwareSourceCode');
+
+      expect(sourceCode, `${file}`).toHaveLength(1);
+      expect(sourceCode[0]).toMatchObject({
+        name: 'AI Coding Skills',
+        codeRepository: 'https://github.com/tc3oliver/skills',
+        version: '1.2.0',
+        license: 'https://opensource.org/license/mit',
+        author: { '@id': `${SITE_URL}/#person` },
+      });
     }
   });
 });

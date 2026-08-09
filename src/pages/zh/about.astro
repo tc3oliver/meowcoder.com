@@ -7,13 +7,16 @@
  */
 
 import AboutContent from '../../components/about/AboutContent.astro';
+import StructuredData from '../../components/StructuredData.astro';
 import { about } from '../../i18n/pages/about';
 import SiteShell from '../../layouts/SiteShell.astro';
+import { publicationSchema } from '../../lib/structured-data';
 
 const locale = 'zh' as const;
 const t = about[locale];
 ---
 
 <SiteShell locale={locale} route="/about" title={t.title} description={t.description}>
+  <StructuredData slot="head" schemas={[publicationSchema(locale)]} />
   <AboutContent t={t} />
 </SiteShell>

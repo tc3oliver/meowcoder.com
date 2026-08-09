@@ -24,9 +24,11 @@ export const chromeZh = {
     ariaLabel: '頁尾',
     // Property names, left untranslated per PRD §7.
     github: 'GitHub',
+    linkedin: 'LinkedIn',
     study: 'Study',
     orcid: 'ORCID',
     shouri: 'Shouri',
+    email: 'Email',
     siteSource: '網站原始碼',
   },
 } satisfies ChromeDictionary;

@@ -15,7 +15,7 @@ describe.each(BY_LOCALE)('About content (%s)', (_locale, t: AboutStrings) => {
   it('builds the requested career and evidence structure', () => {
     expect(t.role).toBeTruthy();
     expect(t.summary).toHaveLength(2);
-    expect(t.career.stages).toHaveLength(3);
+    expect(t.career.stages).toHaveLength(4);
     expect(t.career.href).toMatch(/^\/(zh\/)?work\/professional-engineering\/$/);
     expect(t.focus.items).toHaveLength(4);
     expect(t.research.areas).toHaveLength(4);
@@ -27,6 +27,7 @@ describe.each(BY_LOCALE)('About content (%s)', (_locale, t: AboutStrings) => {
     expect(t.research.venue).toContain('2026');
     expect(t.research.record).toBe('Volume 99 · Article 104422');
     expect(t.research.href).toBe('https://doi.org/10.1016/j.jisa.2026.104422');
+    expect(t.research.publishedAs).toContain('Tsung-Han Yu');
   });
 
   it('keeps low-value course completions and inflated credential wording out', () => {

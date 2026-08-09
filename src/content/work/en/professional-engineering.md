@@ -36,7 +36,7 @@ This stage established end-to-end delivery across client applications and the
 services behind them, expanding responsibility from a single platform to APIs,
 backend services, and cloud integration.
 
-<p class="stage-domains"><span>Selected domains</span> Smart Home · Web Platforms</p>
+<p class="stage-domains"><span>Representative Systems</span> Mobile / Web · Smart Home · Connected Products</p>
 
 ## Enterprise Systems & Architecture
 
@@ -50,7 +50,11 @@ The focus shifted from individual applications to the design and delivery of
 integrated systems, including identity and access, reliability, security, CI/CD,
 and production operations.
 
-<p class="stage-domains"><span>Selected domains</span> Enterprise Workflow · System Integration</p>
+<p class="stage-domains"><span>Representative Systems</span> Enterprise Workflow · Public-sector Systems · Healthcare Platforms · Cloud / Security / CI/CD</p>
+
+**Technical Leadership** — Architecture ownership, engineering standards, CI/CD
+and quality practices, project delivery, mentoring, and technical knowledge
+sharing.
 
 ## AI Systems
 
@@ -63,4 +67,4 @@ capabilities integrated into products and developer workflows.
 The engineering scope includes the systems around the model—validation, access
 control, observability, concurrency, and production user workflows.
 
-<p class="stage-domains"><span>Selected domains</span> Meeting Intelligence · Natural-language Data Query</p>
+<p class="stage-domains"><span>Representative Systems</span> Conversational AI · Meeting Intelligence · Natural-language Data Query · Privacy-oriented Computer Vision · Coding Agents · Knowledge Systems · LLM Infrastructure</p>

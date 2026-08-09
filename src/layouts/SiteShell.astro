@@ -14,7 +14,14 @@ import Header from '../components/Header.astro';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import { chrome } from '../i18n/chrome';
 import type { Locale } from '../i18n/locales';
-import { GITHUB_URL, ORCID_URL, SHOURI_URL, STUDY_URL } from '../lib/external';
+import {
+  EMAIL_URL,
+  GITHUB_URL,
+  LINKEDIN_URL,
+  ORCID_URL,
+  SHOURI_URL,
+  STUDY_URL,
+} from '../lib/external';
 import { localizePath, type Route } from '../lib/i18n';
 import type { SocialPreview } from '../lib/social';
 import BaseLayout from './BaseLayout.astro';
@@ -69,9 +76,11 @@ const SITE_SOURCE_URL = 'https://github.com/tc3oliver/meowcoder.com';
  */
 const footerLinks = [
   { href: GITHUB_URL, label: t.footer.github, external: true },
+  { href: LINKEDIN_URL, label: t.footer.linkedin, external: true },
   { href: STUDY_URL, label: t.footer.study, external: true },
   { href: ORCID_URL, label: t.footer.orcid, external: true },
   { href: SHOURI_URL, label: t.footer.shouri, external: true },
+  { href: EMAIL_URL, label: t.footer.email, external: true },
   { href: SITE_SOURCE_URL, label: t.footer.siteSource, external: true },
 ];
 ---
