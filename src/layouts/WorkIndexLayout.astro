@@ -21,10 +21,9 @@
  *   destinations instead of the same phrase repeated. Nothing wraps the entry,
  *   so there is no nested interactive element and the whole 1160px block is not
  *   one giant tab stop.
- * - **Shouri gets the largest visual area**, as doc-2 §11 requires. It is the
- *   only entry whose visual spans the full content width; the diagram entry
- *   sits in a narrower second column from 64rem up. The difference is the
- *   layout's, not a size written onto an image.
+ * - **Shouri gets the largest visual area**, as doc-2 §11 requires. Its visual
+ *   is wider than the reading measure without filling the entire content shell;
+ *   the diagram entry sits in a narrower second column from 64rem up.
  *
  * Neither visual is new. The screenshot is the asset the homepage already
  * shows, through Astro's `<Image>` so it keeps build-time optimization and the
@@ -146,8 +145,8 @@ function position(index: number): string {
                     <Image
                       src={shouriScreenshot}
                       alt={t.visuals.shouri.alt}
-                      widths={[640, 960, 1280, 1536]}
-                      sizes="(min-width: 76.25rem) 1160px, 100vw"
+                      widths={[640, 960, 1000, 1280, 1536]}
+                      sizes="(min-width: 66.5rem) 1000px, 100vw"
                       loading="lazy"
                       decoding="async"
                     />
@@ -318,11 +317,13 @@ function position(index: number): string {
     }
   }
 
-  /* doc-2 §11: the featured project holds the largest visual area on the page.
-     No `max-width` — this figure is the full content width, which is wider than
-     anything else here and wider than the reading measure its copy sits on. */
+  /* The featured project remains the largest visual on the page, but the
+     1000px cap keeps its jump from the 760px copy measure proportional. */
   .work-entry__figure {
+    width: 100%;
+    max-width: 62.5rem;
     margin: 0;
+    margin-inline: auto;
     border: var(--border-width) solid var(--color-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -340,8 +341,8 @@ function position(index: number): string {
 
   /* From 64rem the diagram entry runs its figure beside the copy rather than
      under it. That is what keeps the two illustrated entries visually unequal
-     by layout: one visual spans 1160px, the other is a column of about a third
-     of that. Below the breakpoint both stack, which is also the 390px case.
+     by layout: one visual spans up to 1000px, the other is a column of about a
+     third of that. Below the breakpoint both stack, which is also the 390px case.
 
      Keyed on the entry that has a diagram rather than on "not the featured
      one", so the experience entry — which has no visual at all — is not given
