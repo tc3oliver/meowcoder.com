@@ -1,44 +1,7 @@
 ---
-/**
- * The About page body (MCD-25, doc-2 §14).
- *
- * Both locales render through this one component so the English and Chinese
- * pages cannot drift apart in structure, section order, or markup — only the
- * strings differ.
- *
- * doc-2 §14 replaced the earlier stack of equal-weight sections with a curated
- * composition, which is what the markup below builds:
- *
- *   opening (narrative) + career progression
- *
- *   Engineering Background        Research
- *   Education                     Credentials
- *
- *   Engineering Principles
- *
- * The opening is the only prose on the page, so it alone is held to the
- * reading measure; the paired sections take the full content width and split
- * it. Below 48rem the pairs collapse into one column in source order, so the
- * page still reads background → research → education → credentials. The
- * pairing keeps credentials low on the page, where PRD §16 wants them, without
- * spending a full-width row on two short entries.
- *
- * Two omissions are deliberate:
- *
- *   - The publication and ORCID are cited as text, not linked. Both addresses
- *     are known now (`src/lib/external.ts`), but the reader is one row away
- *     from either: the ORCID link is in the footer of this very page, and the
- *     homepage Research section carries the DOI as its CTA. Repeating them
- *     inside a citation would add link weight without adding a destination.
- *   - There is no résumé download. PRD §14 and §20 keep the original résumé out
- *     of the public repository entirely, and doc-2 §14 rules out growing this
- *     page into a full CV wall.
- */
-
 import type { AboutStrings } from '../../i18n/pages/about';
 import AboutSection from './AboutSection.astro';
 import CareerProgression from './CareerProgression.astro';
-import TermList from './TermList.astro';
 
 interface Props {
   t: AboutStrings;
@@ -49,45 +12,54 @@ const { t } = Astro.props;
 
 <div class="container about">
   <header class="about__opening">
+    <p class="about__eyebrow">{t.eyebrow}</p>
     <h1>{t.heading}</h1>
+    <p class="about__role">{t.role}</p>
     <p class="about__lede">{t.intro}</p>
     {t.summary.map((paragraph) => <p class="about__paragraph">{paragraph}</p>)}
   </header>
 
-  <CareerProgression career={t.career} id="career-progression" />
+  <AboutSection id="career" heading={t.career.heading} prominence="strong">
+    <CareerProgression career={t.career} id="career-progression" />
+  </AboutSection>
 
-  <div class="about__composition">
-    <AboutSection id="engineering-background" heading={t.background.heading}>
-      <TermList items={t.background.items} />
-    </AboutSection>
+  <AboutSection id="engineering-focus" heading={t.focus.heading}>
+    <div class="focus-grid">
+      {
+        t.focus.items.map((item) => (
+          <article class="focus-item">
+            <h3>{item.name}</h3>
+            <p>{item.description}</p>
+          </article>
+        ))
+      }
+    </div>
+  </AboutSection>
 
-    <AboutSection id="research" heading={t.research.heading}>
-      <div class="about__stack">
-        <p class="research__venue">{t.research.venue}</p>
-        <p class="research__paper"><cite>{t.research.paper}</cite></p>
-        {
-          /* The contribution in plain terms. doc-2 §9 took IND-CCA / OW-CCA off
-            the homepage — more than homepage credibility needs — and placed it
-            here, where a reader has already chosen to go deeper. */
-        }
-        <p class="research__detail">{t.research.detail}</p>
-        <p class="about__label">{t.research.areasLabel}</p>
-        <TermList items={t.research.areas} />
-      </div>
-    </AboutSection>
+  <AboutSection id="research" heading={t.research.heading} prominence="strong">
+    <div class="research">
+      <p class="research__venue">{t.research.venue}</p>
+      <p class="research__record">{t.research.record}</p>
+      <h3 class="research__paper"><cite>{t.research.paper}</cite></h3>
+      <p class="research__detail">{t.research.detail}</p>
+      <ul class="metadata-list" role="list" aria-label={t.research.areasLabel}>
+        {t.research.areas.map((area) => <li>{area}</li>)}
+      </ul>
+      <a class="about-link" href={t.research.href} rel="external">
+        {t.research.cta}<span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </AboutSection>
 
+  <div class="about__credentials-row">
     <AboutSection id="education" heading={t.education.heading}>
-      <div class="about__stack">
+      <div class="education">
         <p class="education__degree">{t.education.degree}</p>
         <p class="education__institution">{t.education.institution}</p>
       </div>
     </AboutSection>
 
     <AboutSection id="selected-credentials" heading={t.credentials.heading}>
-      {
-        /* Text entries only. PRD §16 rules out a display built from vendor
-          marks, and course-completion certificates are not listed here at all. */
-      }
       <ul class="credentials" role="list">
         {
           t.credentials.items.map((credential) => (
@@ -103,9 +75,11 @@ const { t } = Astro.props;
   </div>
 
   <AboutSection id="engineering-principles" heading={t.principles.heading}>
-    <div class="about__stack">
+    <div class="principles">
       <p class="principles__statement">{t.principles.statement}</p>
-      <TermList items={t.principles.items} />
+      <ul class="principles__list" role="list">
+        {t.principles.items.map((item) => <li>{item}</li>)}
+      </ul>
     </div>
   </AboutSection>
 </div>
@@ -120,10 +94,22 @@ const { t } = Astro.props;
   .about__opening {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
-    /* Prose keeps the reading measure even though the page around it is now
-       the full content width — PRD §25. */
+    gap: var(--space-3);
     max-width: var(--width-reading);
+  }
+
+  .about__eyebrow,
+  .research__record {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .about__role {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
   }
 
   .about__lede {
@@ -132,78 +118,117 @@ const { t } = Astro.props;
     margin-block-start: var(--space-2);
   }
 
-  .about__paragraph {
-    line-height: var(--leading-relaxed);
+  .about__paragraph,
+  .focus-item p,
+  .research__detail {
     color: var(--color-text-muted);
+    line-height: var(--leading-relaxed);
   }
 
-  /* -----------------------------------------------------------------------
-   * Curated composition (doc-2 §14)
-   * -------------------------------------------------------------------- */
-
-  .about__composition {
+  .focus-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-7) var(--space-9);
+    border-block-end: var(--border-width) solid var(--color-border);
   }
 
-  /* One column below the breakpoint, in source order. */
-  @media (width < 48rem) {
-    .about__composition {
-      grid-template-columns: minmax(0, 1fr);
-    }
+  .focus-item {
+    min-width: 0;
+    padding: var(--space-5) 0;
+    border-block-start: var(--border-width) solid var(--color-border);
   }
 
-  .about__stack {
+  .focus-item:nth-child(odd) {
+    padding-inline-end: var(--space-7);
+  }
+
+  .focus-item:nth-child(even) {
+    padding-inline-start: var(--space-7);
+    border-inline-start: var(--border-width) solid var(--color-border);
+  }
+
+  .focus-item h3 {
+    font-size: var(--text-md);
+    margin-block-end: var(--space-2);
+  }
+
+  .research {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: var(--space-3);
+    max-width: var(--width-reading);
   }
-
-  .about__label {
-    color: var(--color-text-muted);
-    font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
-  }
-
-  /* -----------------------------------------------------------------------
-   * Research (PRD §15, doc-2 §9)
-   * -------------------------------------------------------------------- */
 
   .research__venue {
     font-weight: var(--weight-semibold);
   }
 
   .research__paper {
+    font-size: clamp(var(--text-lg), 3vw, var(--text-xl));
     line-height: var(--leading-snug);
+    margin-block: var(--space-2);
   }
 
   .research__paper cite {
-    color: var(--color-text-muted);
+    font-style: normal;
   }
 
-  .research__detail {
-    line-height: var(--leading-relaxed);
+  .metadata-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
     color: var(--color-text-muted);
-    margin-block-start: var(--space-1);
+    font-size: var(--text-sm);
+    margin-block-start: var(--space-2);
   }
 
-  /* -----------------------------------------------------------------------
-   * Education (PRD §15)
-   * -------------------------------------------------------------------- */
+  .metadata-list li:not(:last-child)::after {
+    content: '·';
+    margin-inline-start: var(--space-3);
+  }
 
-  .education__degree {
+  .about-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.75rem;
+    margin-block-start: var(--space-2);
+    color: var(--color-text);
     font-weight: var(--weight-semibold);
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 0.3em;
   }
 
-  .education__institution {
+  .about-link:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .about__credentials-row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--space-9);
+  }
+
+  .education,
+  .credentials__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .education__degree,
+  .credentials__name {
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    overflow-wrap: anywhere;
+  }
+
+  .education__institution,
+  .credentials__meta {
     color: var(--color-text-muted);
+    font-size: var(--text-sm);
   }
-
-  /* -----------------------------------------------------------------------
-   * Credentials (PRD §16)
-   * -------------------------------------------------------------------- */
 
   .credentials {
     display: flex;
@@ -212,34 +237,54 @@ const { t } = Astro.props;
     margin: 0;
   }
 
-  .credentials__item {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
+  .principles {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: var(--space-8);
+    align-items: start;
   }
-
-  .credentials__name {
-    font-weight: var(--weight-medium);
-    line-height: var(--leading-snug);
-    /* The English page's first credential is a Chinese certificate name
-       (doc-2 §15). It must wrap like any other text — no truncation, no clamp,
-       and no assumption that this field is Latin. */
-    overflow-wrap: break-word;
-  }
-
-  .credentials__meta {
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-  }
-
-  /* -----------------------------------------------------------------------
-   * Principles (PRD §17)
-   * -------------------------------------------------------------------- */
 
   .principles__statement {
     font-size: var(--text-md);
     line-height: var(--leading-relaxed);
-    max-width: var(--width-reading);
-    margin-block-end: var(--space-2);
+  }
+
+  .principles__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0;
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .principles__list li {
+    padding: var(--space-3) var(--space-2);
+    border-block-end: var(--border-width) solid var(--color-border);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+
+  @media (width < 48rem) {
+    .focus-grid,
+    .about__credentials-row,
+    .principles {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .focus-item:nth-child(odd),
+    .focus-item:nth-child(even) {
+      padding-inline: 0;
+      border-inline-start: 0;
+    }
+
+    .about__credentials-row,
+    .principles {
+      gap: var(--space-7);
+    }
+  }
+
+  @media (width < 30rem) {
+    .principles__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 </style>

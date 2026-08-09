@@ -13,12 +13,16 @@ interface Props {
   /** Id for the heading; also the section's `aria-labelledby` target. */
   id: string;
   heading: string;
+  prominence?: 'default' | 'strong';
 }
 
-const { id, heading } = Astro.props;
+const { id, heading, prominence = 'default' } = Astro.props;
 ---
 
-<section class="about-section" aria-labelledby={id}>
+<section
+  class:list={['about-section', { 'about-section--strong': prominence === 'strong' }]}
+  aria-labelledby={id}
+>
   <h2 class="about-section__heading" id={id}>{heading}</h2>
   <slot />
 </section>
@@ -40,5 +44,9 @@ const { id, heading } = Astro.props;
     font-size: var(--text-lg);
     letter-spacing: var(--tracking-normal);
     margin-block-end: var(--space-5);
+  }
+
+  .about-section--strong .about-section__heading {
+    font-size: var(--text-xl);
   }
 </style>

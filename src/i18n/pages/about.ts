@@ -1,102 +1,51 @@
 import type { Locale } from '../locales';
 import type { PageStrings } from './types';
 
-/**
- * About page content (MCD-8, PRD §13–§17).
- *
- * The About page is the one place where professional depth, research, and
- * credentials live (PRD §8 keeps them out of the primary navigation), so its
- * copy is structured rather than free prose: the sections below are fixed by
- * the PRD, and giving each one a typed shape is what makes a missing or
- * mismatched translation a compile error instead of a review comment.
- *
- * Two content rules constrain everything here and are worth stating once:
- *
- *   - PRD §11 — employer work appears only at a safe abstraction level. No
- *     internal project name, repository, infrastructure detail, private
- *     measurement, or customer ever appears in these strings.
- *   - PRD §34 — no locale mixes languages inside one prose block. Proper nouns
- *     (Oliver Yu, the journal name, the paper title, Microsoft AI-900, the
- *     scheme name LR-CBEET, the security notions IND-CCA and OW-CCA) and
- *     established technical terms (AI, DevOps, Agent, Azure) are the stated
- *     exceptions and are therefore left untranslated in the Chinese copy.
- */
-
-/**
- * One rung of the doc-2 §14 career progression.
- *
- * `label` is the rung itself — the three read as
- * `Software Engineering → System Architecture → AI Systems`. `detail` is the
- * one line of substance under it, and it names domains only: PRD §11 keeps
- * employers, internal projects, and dates out, because this is a progression,
- * not an employment history.
- */
-export interface CareerStage {
-  label: string;
-  detail: string;
-}
-
-/** A PRD §16 credential. `note` carries validity when the PRD states one. */
 export interface Credential {
   name: string;
-  /** Issuer and year, or the exam's subject when that is all the PRD gives. */
   meta: string;
   note?: string;
 }
 
 export interface AboutStrings extends PageStrings {
-  /**
-   * PRD §13's opening runs to three paragraphs. The first is the identity
-   * statement, which is exactly what `PageStrings.intro` is for and stays
-   * there; these are the second and third.
-   */
+  eyebrow: string;
+  role: string;
   summary: readonly string[];
-  /** PRD §13 Engineering Background: domains as plain text, never as logos. */
-  background: {
-    heading: string;
-    items: readonly string[];
-  };
-  /**
-   * doc-2 §14 career progression. It sits with the opening rather than under
-   * its own `h2`, so `label` names the block without competing with the
-   * section headings below it.
-   */
   career: {
+    heading: string;
     label: string;
-    stages: readonly CareerStage[];
+    stages: readonly string[];
+    summary: string;
+    cta: string;
+    href: string;
   };
-  /** PRD §15. Concise credibility signals, not a publication list. */
+  focus: {
+    heading: string;
+    items: readonly {
+      name: string;
+      description: string;
+    }[];
+  };
   research: {
     heading: string;
     venue: string;
-    /** Publication title — a proper noun, so it is never translated. */
+    record: string;
     paper: string;
-    /**
-     * What the paper actually contributes. doc-2 §9 moves this off the
-     * homepage — IND-CCA / OW-CCA is more than homepage credibility needs —
-     * and states that it belongs here instead.
-     */
     detail: string;
     areasLabel: string;
     areas: readonly string[];
+    cta: string;
+    href: string;
   };
-  /** PRD §15. Its own cell in the doc-2 §14 composition, beside Credentials. */
   education: {
     heading: string;
     degree: string;
     institution: string;
   };
-  /**
-   * PRD §16. Only the two the PRD recommends; course completions are not here.
-   * The AI Application Planner entry's `name` is corrected per doc-2 §15 — the
-   * Chinese certificate name is the source of truth and appears (as a proper
-   * noun) in both locale strings, worded differently only in punctuation.
-   */
   credentials: {
     heading: string;
     items: readonly Credential[];
   };
-  /** PRD §17. Kept on About rather than as a large homepage section. */
   principles: {
     heading: string;
     statement: string;
@@ -104,69 +53,71 @@ export interface AboutStrings extends PageStrings {
   };
 }
 
-/**
- * `AboutStrings extends PageStrings`, so this dictionary still satisfies the
- * shared `PageDictionary` contract that `SiteShell` and the SEO metadata read.
- */
 export type AboutDictionary = Record<Locale, AboutStrings>;
+
+const PUBLICATION_URL = 'https://doi.org/10.1016/j.jisa.2026.104422';
 
 export const about = {
   en: {
     title: 'About — Oliver Yu',
     description:
-      'Engineering background, research, credentials, and the principles behind how I build software.',
-    heading: 'About',
-    intro:
-      'I am an AI systems engineer and system architect based in Taiwan, with more than 10 years of software engineering experience.',
+      'Oliver Yu is an AI systems engineer and system architect with 10+ years of experience across software, cloud, architecture, security, and AI systems.',
+    eyebrow: 'About Oliver',
+    heading: 'Oliver Yu',
+    role: 'AI Systems Engineer · System Architect',
+    intro: '10+ years of software engineering experience, based in Taiwan.',
     summary: [
       'My background spans enterprise systems, cloud platforms, mobile and web applications, software security, machine learning, and AI systems.',
-      'Today, my work focuses on building reliable AI infrastructure, agentic developer systems, knowledge platforms, and production AI applications.',
+      'I now focus on AI infrastructure, agentic developer systems, knowledge systems, and production AI applications.',
     ],
-    background: {
-      heading: 'Engineering Background',
-      items: [
-        'AI Systems',
-        'System Architecture',
-        'Security & Privacy',
-        'Backend & Integration',
-        'Cloud & DevOps',
-        'Web / Mobile',
-        'Software Quality',
-        'Machine Learning',
-      ],
-    },
     career: {
-      label: 'Career progression',
-      stages: [
+      heading: 'Career',
+      label: '10+ Years',
+      stages: ['Software Engineering', 'System Architecture', 'AI Systems'],
+      summary:
+        'My scope progressed from application and enterprise engineering to platform architecture and the delivery of production AI systems.',
+      cta: 'Explore Professional Engineering Experience',
+      href: '/work/professional-engineering/',
+    },
+    focus: {
+      heading: 'Engineering Focus',
+      items: [
         {
-          label: 'Software Engineering',
-          detail: 'Mobile and web applications, then enterprise systems',
+          name: 'AI Systems',
+          description: 'Agent systems, knowledge retrieval, LLM infrastructure, and applied AI.',
         },
         {
-          label: 'System Architecture',
-          detail: 'Cloud and platform engineering, technical leadership',
+          name: 'System Architecture',
+          description:
+            'Backend services, enterprise systems, integration, and platform architecture.',
         },
         {
-          label: 'AI Systems',
-          detail: 'Architecture and delivery of AI systems that run in production',
+          name: 'Cloud & Software Delivery',
+          description: 'Cloud infrastructure, DevOps, CI/CD, reliability, and software quality.',
+        },
+        {
+          name: 'Security & Application Engineering',
+          description: 'Security, privacy, web and mobile applications, and production software.',
         },
       ],
     },
     research: {
       heading: 'Research',
-      venue: 'Journal of Information Security and Applications — 2026',
+      venue: 'Journal of Information Security and Applications · 2026',
+      record: 'Volume 99 · Article 104422',
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
       detail:
-        'The paper proposes LR-CBEET, combining equality testing with resistance to side-channel leakage through key-update mechanisms, with formal analysis under IND-CCA and OW-CCA security notions.',
-      areasLabel: 'Research areas',
+        'Co-authored research on leakage-resilient certificate-based encryption designed to remain secure under continual key leakage.',
+      areasLabel: 'Research topics',
       areas: [
-        'Leakage-resilient cryptography',
-        'Certificate-based encryption',
-        'Equality testing',
-        'Side-channel leakage',
-        'Formal security analysis',
+        'Leakage-Resilient Cryptography',
+        'Certificate-Based Encryption',
+        'Side-Channel Security',
+        'Equality Testing',
       ],
+      cta: 'View Publication',
+      href: PUBLICATION_URL,
     },
     education: {
       heading: 'Education',
@@ -177,9 +128,6 @@ export const about = {
       heading: 'Selected Credentials',
       items: [
         {
-          // doc-2 §15: the source certificate reads AI應用規劃師（機器學習）－中級能力鑑定
-          // ("Intermediate Level"), not "Specialist Level". The Chinese certificate name is
-          // a proper noun and the preferred English-page representation per doc-2 §15.
           name: 'AI應用規劃師（機器學習）— 中級能力鑑定',
           meta: 'Ministry of Economic Affairs, Taiwan · 2025',
           note: 'Valid through 2030',
@@ -205,43 +153,56 @@ export const about = {
   },
   zh: {
     title: '關於我 — Oliver Yu',
-    description: '工程背景、研究、專業證照，以及我建構軟體時所依循的原則。',
-    heading: '關於我',
-    intro: '我是來自台灣的 AI 系統工程師與系統架構師，累積超過十年的軟體工程經驗。',
+    description:
+      'Oliver Yu 是 AI 系統工程師與系統架構師，具 10+ 年軟體、雲端、架構、資安與 AI 系統工程經驗。',
+    eyebrow: '關於 Oliver',
+    heading: 'Oliver Yu',
+    role: 'AI 系統工程師 · 系統架構師',
+    intro: '來自台灣，具 10+ 年軟體工程經驗。',
     summary: [
-      '我的技術背景橫跨企業系統、雲端平台、行動與網頁應用、軟體安全、機器學習與 AI 系統。',
-      '現在的工作重心，是打造可靠的 AI 基礎架構、以 Agent 為核心的開發者系統、知識平台，以及能實際上線的 AI 應用。',
+      '技術背景涵蓋企業系統、雲端平台、行動與 Web 應用、軟體安全、機器學習與 AI 系統。',
+      '目前專注於 AI 基礎架構、Agent 開發系統、知識系統與正式環境中的 AI 應用。',
     ],
-    background: {
-      heading: '工程背景',
-      items: [
-        'AI 系統',
-        '系統架構',
-        '資安與隱私',
-        '後端與系統整合',
-        '雲端與 DevOps',
-        '網頁與行動應用',
-        '軟體品質',
-        '機器學習',
-      ],
-    },
     career: {
-      label: '職涯歷程',
-      stages: [
-        { label: '軟體工程', detail: '從行動與網頁應用，一路做到企業系統' },
-        { label: '系統架構', detail: '雲端與平台工程、技術領導' },
-        { label: 'AI 系統', detail: 'AI 系統的架構設計與正式上線' },
+      heading: '職涯歷程',
+      label: '10+ 年',
+      stages: ['軟體工程', '系統架構', 'AI 系統'],
+      summary: '從應用程式與企業系統開發，逐步延伸至平台架構與正式環境中的 AI 系統。',
+      cta: '查看專業工程經歷',
+      href: '/zh/work/professional-engineering/',
+    },
+    focus: {
+      heading: '工程重點',
+      items: [
+        {
+          name: 'AI 系統',
+          description: 'Agent 系統、知識檢索、LLM 基礎架構與 AI 應用。',
+        },
+        {
+          name: '系統架構',
+          description: '後端服務、企業系統、系統整合與平台架構。',
+        },
+        {
+          name: '雲端與軟體交付',
+          description: '雲端基礎架構、DevOps、CI/CD、可靠性與軟體品質。',
+        },
+        {
+          name: '資安與應用程式工程',
+          description: '資安、隱私、Web／行動應用與正式軟體系統。',
+        },
       ],
     },
     research: {
       heading: '研究',
-      venue: 'Journal of Information Security and Applications — 2026',
+      venue: 'Journal of Information Security and Applications · 2026',
+      record: 'Volume 99 · Article 104422',
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
-      detail:
-        '論文提出 LR-CBEET，以金鑰更新機制把等值測試與側通道洩漏防護結合起來，並在 IND-CCA 與 OW-CCA 安全性定義下完成形式化分析。',
-      areasLabel: '研究領域',
-      areas: ['抗洩漏密碼學', '憑證式加密', '等值測試', '側通道洩漏', '形式化安全性分析'],
+      detail: '共同研究抗洩漏憑證式加密，透過金鑰更新機制提升系統在持續金鑰洩漏情境下的安全性。',
+      areasLabel: '研究主題',
+      areas: ['抗洩漏密碼學', '憑證式加密', '側通道安全', '等值測試'],
+      cta: '查看論文',
+      href: PUBLICATION_URL,
     },
     education: {
       heading: '學歷',
@@ -249,17 +210,16 @@ export const about = {
       institution: '國立臺灣海洋大學',
     },
     credentials: {
-      heading: '專業證照',
+      heading: '精選證照',
       items: [
         {
-          // doc-2 §15: quoted verbatim from the source certificate.
           name: 'AI應用規劃師（機器學習）－中級能力鑑定',
           meta: '經濟部 · 2025',
           note: '效期至 2030 年',
         },
         {
           name: 'Microsoft AI-900',
-          meta: 'Azure AI 基礎',
+          meta: 'Azure AI Fundamentals',
         },
       ],
     },
