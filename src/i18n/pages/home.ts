@@ -74,6 +74,8 @@ export interface HomeStrings extends PageStrings {
     facts: readonly string[];
     workCta: string;
     writingCta: string;
+    /** Optional sentence suffix that should remain intact when CJK text wraps. */
+    noBreakSuffix?: string;
   };
   /**
    * doc-2 §6 (PRD §9.2). The one product that proves design → ship → operate,
@@ -248,6 +250,7 @@ export const home = {
       facts: ['10+ Years in Software Engineering', 'Taiwan'],
       workCta: 'View Selected Work',
       writingCta: 'Technical Writing',
+      noBreakSuffix: 'model infrastructure.',
     },
     shouri: {
       eyebrow: 'Featured Product',
@@ -335,6 +338,7 @@ export const home = {
       facts: ['10+ 年軟體工程經驗', 'Taiwan'],
       workCta: '精選作品',
       writingCta: '技術文章',
+      noBreakSuffix: '模型基礎架構。',
     },
     shouri: {
       eyebrow: '精選產品',

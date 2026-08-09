@@ -36,12 +36,23 @@ interface Props {
 }
 
 const { locale, t, externalIndicator } = Astro.props;
+const noBreakSuffix = t.hero.noBreakSuffix;
+const statementStart =
+  noBreakSuffix && t.intro.endsWith(noBreakSuffix)
+    ? t.intro.slice(0, -noBreakSuffix.length)
+    : t.intro;
 ---
 
 <div class="hero">
   <p class="hero__role">{t.hero.role}</p>
   <h1 class="hero__name">{t.heading}</h1>
-  <p class="hero__statement">{t.intro}</p>
+  <p class="hero__statement">
+    {statementStart}{
+      noBreakSuffix && t.intro.endsWith(noBreakSuffix) && (
+        <span class="hero__statement-tail">{noBreakSuffix}</span>
+      )
+    }
+  </p>
 
   <ul class="hero__facts" role="list">
     {t.hero.facts.map((fact) => <li>{fact}</li>)}
@@ -61,9 +72,10 @@ const { locale, t, externalIndicator } = Astro.props;
 
 <style>
   .hero {
-    /* Held to the reading measure so the statement breaks where doc-2 §5
-       writes it, rather than stretching across the full content width. */
-    max-width: var(--width-reading);
+    /* A hero statement can use a slightly wider measure than long-form prose.
+       The extra width keeps the Traditional Chinese line from breaking inside
+       its final technical term at desktop and tablet sizes. */
+    max-width: min(52rem, 100%);
   }
 
   .hero__role {
@@ -86,6 +98,10 @@ const { locale, t, externalIndicator } = Astro.props;
     margin-block-start: var(--space-5);
     font-size: var(--text-md);
     line-height: var(--leading-relaxed);
+  }
+
+  .hero__statement-tail {
+    white-space: nowrap;
   }
 
   .hero__facts {
