@@ -89,29 +89,29 @@ export const about = {
           period: '2014–2017',
           name: 'Application Engineering',
           description:
-            'Built iOS, mobile, and web applications, establishing a foundation in product delivery and connected experiences.',
+            'Built iOS, mobile, and web applications, establishing a foundation in product delivery and beginning applied AI work in 2017.',
         },
         {
           period: '2018–2020',
-          name: 'Software Engineering',
+          name: 'Software Engineering & Applied AI',
           description:
-            'Expanded into backend services, cloud integration, enterprise workflows, and end-to-end software delivery.',
+            'Expanded applied AI alongside backend services, cloud integration, enterprise workflows, and end-to-end software delivery.',
         },
         {
           period: '2020–2025',
-          name: 'System Architecture & Technical Leadership',
+          name: 'System Architecture & AI Integration',
           description:
-            'Took ownership of system architecture, engineering practices, project delivery, mentoring, and cross-system integration.',
+            'Took ownership of system architecture, AI integration, engineering practices, project delivery, mentoring, and cross-system integration.',
         },
         {
           period: '2025–Present',
-          name: 'AI Systems',
+          name: 'Enterprise AI Systems',
           description:
             'Focused on enterprise AI systems, coding agents, knowledge systems, model infrastructure, security validation, and continuous evaluation.',
         },
       ],
       summary:
-        'Engineering scope expanded from application delivery to architecture, technical leadership, and enterprise AI systems.',
+        'AI work began in 2017 and developed alongside a broader progression from application delivery to architecture, technical leadership, and enterprise AI systems.',
       cta: 'Explore Professional Engineering Experience',
       href: '/work/professional-engineering/',
     },
@@ -214,26 +214,29 @@ export const about = {
         {
           period: '2014–2017',
           name: '應用程式工程',
-          description: '以 iOS、行動與 Web 應用開發為主，建立產品交付與連網應用的工程基礎。',
+          description:
+            '以 iOS、行動與 Web 應用開發為主，建立產品交付與連網應用的工程基礎，並於 2017 年開始參與 AI 應用。',
         },
         {
           period: '2018–2020',
-          name: '軟體工程',
-          description: '工作範圍延伸至後端服務、雲端整合、企業流程與端到端軟體交付。',
+          name: '軟體工程與 AI 應用',
+          description:
+            '持續發展 AI 應用，工作範圍也延伸至後端服務、雲端整合、企業流程與端到端軟體交付。',
         },
         {
           period: '2020–2025',
-          name: '系統架構與技術領導',
-          description: '負責系統架構、工程流程、專案交付、技術經驗傳承與跨系統整合。',
+          name: '系統架構與 AI 整合',
+          description: '負責系統架構、AI 整合、工程流程、專案交付、技術經驗傳承與跨系統整合。',
         },
         {
           period: '2025–至今',
-          name: 'AI 系統',
+          name: '企業 AI 系統',
           description:
             '聚焦企業 AI 系統、Coding Agent、知識系統、模型基礎架構、安全驗證與持續評估。',
         },
       ],
-      summary: '工程職責從應用程式交付，逐步延伸至系統架構、技術領導與企業 AI 系統。',
+      summary:
+        '自 2017 年開始參與 AI 應用，並隨著工程職責擴展，逐步延伸至系統架構、技術領導與企業 AI 系統。',
       cta: '查看專業工程經歷',
       href: '/zh/work/professional-engineering/',
     },
