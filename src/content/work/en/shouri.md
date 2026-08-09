@@ -2,7 +2,7 @@
 title: 'Shouri / 收理'
 type: 'Product · AI Systems'
 summary: 'An AI-powered organizer that preserves webpages, files, and media before turning them into structured, searchable knowledge.'
-outcome: 'Live with the Free plan open. Originals are preserved before AI processing, keeping capture independent from organization.'
+outcome: 'An end-to-end product implementation spanning content capture, source preservation, AI structuring, retrieval, mobile integration, and production operations.'
 indexMeta: 'Save First · Explicit AI · Recoverable by Design'
 evidence: 'shouri.app · Product, plans, privacy, terms, and refund policy'
 slug: 'shouri'
@@ -11,10 +11,10 @@ translationKey: 'shouri'
 order: 0
 draft: false
 meta:
+  - label: 'Scope'
+    value: 'Product Design · System Architecture · Full-stack Engineering · AI · Operations'
   - label: 'Status'
     value: 'Live · test period'
-  - label: 'Plans'
-    value: 'Free open · Pro published at NT$199/month'
   - label: 'Interface'
     value: 'Traditional Chinese · Google sign-in'
   - label: 'Distribution'
@@ -178,7 +178,7 @@ subject fields. It accepts URLs, plain text, images, PDFs, audio, and video,
 including several files in one upload.
 
 Output is structured by subject rather than reduced to one generic summary.
-Seven subjects each have their own field shape:
+Seven subjects each have their own structured fields:
 
 - **Recipe** — an ingredient list and steps that can be checked off while
   cooking.
@@ -190,17 +190,12 @@ Seven subjects each have their own field shape:
   approaching events surfaced first.
 - **Product** — specification, seller, and the price at the time it was saved.
 
-Manual and automatic organization are separated by plan. On Free, organization is
-triggered per item against a monthly credit allowance. Pro, published but not yet
-open for subscription, organizes on capture — with PDFs, audio, and video, the
-expensive inputs, still confirmed before processing by default.
+Manual and automatic organization are separated by plan. Higher-cost inputs such
+as PDFs, audio, and video still require confirmation by default. AI analysis,
+storage, and file limits are published and enforced centrally by the product;
+current plan details remain on the Shouri website.
 
-Analysis limits are published per plan. Free analyses up to 20,000 characters of
-web page, text, or video-subtitle content, 10 images, 20 PDF pages, 10 minutes of
-audio, or 3 minutes of uploaded video per item. Pro raises those to 100,000
-characters, 50 images, 100 pages, 60 minutes, and 30 minutes.
-
-Correctness is not claimed. The product states directly that generated titles,
+AI-generated output is not guaranteed to be correct. The product states directly that generated titles,
 summaries, key points, classifications, and tags can be wrong, that the original
 is always kept in full, and that the original is the authority for any judgement
 that matters. User content is not used to train models.
@@ -236,8 +231,7 @@ actually supports.
 - **Desktop web.** Paste a URL or text, or drag in images, PDFs, audio, and
   video — several files at once.
 
-Installation is documented in the product rather than assumed: open the site in
-Safari, use the share button, choose Add to Home Screen, confirm the name. Both
+The product provides installation and setup guidance for each platform. Both
 mobile paths land in the same capture flow, so an item saved from a share menu is
 the same object as one saved on the desktop.
 
@@ -251,13 +245,9 @@ Processing time, outcome, credit usage, and service cost are recorded per job,
 for running and billing the service — explicitly not for advertising or
 profiling.
 
-**Quota behaviour.** Welcome credits expire twelve months after registration; the
-recurring monthly allowance is valid for its period and does not roll over.
-Running out stops new organization only. Existing collections, search, and
-original files are untouched.
-
-**Storage limits are published**: 2 GB with a 50 MB per-file ceiling on Free,
-20 GB and 500 MB on Pro.
+**Plans and resource limits.** AI analysis, storage, and file limits are enforced
+centrally. Running out of credits stops new organization only; existing
+collections, search, and original files are untouched.
 
 **Data lifecycle.** Thirty-day trash, a daily scheduled job for permanent
 deletion including original files, and immediate irreversible account deletion.
@@ -281,24 +271,18 @@ exists.
 statistics.
 
 **Billing failures have a defined repair path.** A successful payment that did
-not activate Pro is repaired by granting the entitlement rather than refunding,
-because the entitlement is what was bought. Duplicate charges are refunded, and
-cancellation is done in the settings page without contacting support.
+not activate Pro is repaired by granting the entitlement; duplicate charges are
+refunded.
 
 ## Result
 
-What is public and inspectable today:
+Shouri now provides a complete product flow from content capture and source
+preservation through AI structuring, full-text retrieval, mobile sharing,
+metering, storage, data lifecycle, and production operations.
 
-- Shouri is live at [shouri.app](https://shouri.app), in Traditional Chinese,
-  with Google sign-in.
-- The Free plan is open. Capture, search, and storage are free, and organization
-  runs per item against a monthly credit allowance.
-- Pro is published at NT$199 per month with its limits stated, and is announced
-  as opening for subscription soon.
-- Terms of service, privacy policy, and a refund and cancellation policy are all
-  published, last updated 3 August 2026, and specific enough to be checked
-  against the product's actual behaviour.
-- The product is in a test period, with a limited offer for early registrations.
+- [shouri.app](https://shouri.app) is publicly available.
+- The working interface covers capture, AI organization, search, Review, and export.
+- Privacy, terms, plans, and data-processing policies are published.
 
 ## Product Information
 

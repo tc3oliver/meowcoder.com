@@ -67,13 +67,13 @@ export const work = {
      * version once one entry has none and says so.
      */
     intro:
-      'Selected work across product engineering, open source, and professional experience—focused on systems, architecture, and how engineering scope develops in practice.',
+      'Selected work across product engineering, open source, and professional experience, with a focus on systems, architecture, and the evolution of engineering scope.',
     empty: 'No work is published yet.',
     caseStudyCta: 'View Full Case Study',
     experienceCta: 'Explore Experience',
     experienceProgression: {
       label: 'Career progression',
-      stages: ['Mobile / Web', 'Enterprise & Cloud', 'Architecture', 'AI Systems'],
+      stages: ['Application Engineering', 'Enterprise Systems & Architecture', 'AI Systems'],
     },
     aboutOliver: 'About Oliver',
     experienceOverviewLabel: 'Experience overview',
@@ -108,7 +108,7 @@ export const work = {
     experienceCta: '查看工程歷程',
     experienceProgression: {
       label: '職涯進程',
-      stages: ['行動 / Web', '企業與雲端', '系統架構', 'AI 系統'],
+      stages: ['應用程式工程', '企業系統與系統架構', 'AI 系統'],
     },
     aboutOliver: '關於 Oliver',
     experienceOverviewLabel: '工程經歷摘要',

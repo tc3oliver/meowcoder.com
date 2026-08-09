@@ -254,17 +254,11 @@ not do is decide something the requirement does not cover.
 
 </div>
 
-Stopping is restricted to six conditions:
-
-1. contradictory product requirements or Acceptance Criteria;
-2. a missing permission, credential, external service, or hardware;
-3. existing uncommitted changes overlapping the task that cannot be safely
-   isolated;
-4. an incomplete task dependency;
-5. an irreversible product, data, or architecture decision with no authoritative
-   source;
-6. a newly discovered critical defect whose safe resolution materially exceeds
-   the task's scope.
+Autonomous execution stops only when it cannot proceed safely—for example,
+because requirements conflict, required access or an external service is
+missing, or an irreversible decision has no authoritative basis. Incomplete
+dependencies, changes that cannot be isolated, and defects that materially
+exceed the task scope are handled as blockers as well.
 
 <div class="decision">
 
@@ -274,9 +268,9 @@ Stopping is restricted to six conditions:
 task-scoped refactoring, test fixes, or reversible engineering choices is as
 unusable as one that never stops.
 
-**Consequence** — Those are named in the policy as explicitly _not_ blockers,
-alongside the six conditions that are. The list says what to stop for and what
-to keep going through.
+**Consequence** — The policy states both the conditions that require a stop and
+the engineering choices that explicitly do not, making the execution boundary
+clear in both directions.
 
 </div>
 
@@ -314,8 +308,9 @@ removes the incentive to manufacture a passing-looking log.
 
 ## Manual vs Autonomous Mode
 
-The default mode is manual, and autonomy is opted into per invocation rather
-than configured globally:
+The default mode is manual. Autonomous execution must be explicitly invoked,
+with separate entry points for decomposition, one-task execution, and continuous
+execution:
 
 - `/backlog-plan <requirement>` — aligns the requirement and decomposes it into
   tasks. No product code, no Implementation Plan.
@@ -323,14 +318,9 @@ than configured globally:
 - `/backlog-auto [TASK-ID]` — continuous execution, and only on explicit
   invocation.
 
-"Continue", "keep going", and "continue development" do not start autonomous
-execution. Only `/backlog-auto` does.
-
-Autonomous selection is deterministic and reads structured data, never parsed
-Markdown: query the task list as JSON, exclude tasks that are not executable and
-tasks whose blocking dependencies are incomplete, apply priority, break ties on
-the lowest numeric task ID, execute one task, finalize it completely, then
-re-query. No in-memory queue survives a completed task.
+Autonomous selection reads structured task data, filters for dependency-ready
+work, and applies priority and task ID to produce a deterministic order. It
+re-queries after every completed task rather than retaining an in-memory queue.
 
 <div class="decision">
 
@@ -346,26 +336,9 @@ decisions supported by the repository.
 
 </div>
 
-Parallelism is a further opt-in. `automatic.max_parallel_tasks` defaults to `1`,
-which is exactly the sequential flow above. Raising it runs that many
-independent, dependency-ready tasks at once, each isolated in its own
-`git worktree`.
-
-<div class="decision">
-
-### Claim the whole batch before any of it starts
-
-**Why** — Selection and claiming stay single-threaded even when execution does
-not. Every task in a batch is set active sequentially _before_ any work starts,
-so two agents can never claim the same task.
-
-**Consequence** — The batch merges back in ascending task-ID order once all of
-it has finished, and a merge conflict blocks only the task it happened on: that
-task moves back out of `Done` with the conflict recorded as a blocker and
-its worktree left in place for inspection, while the rest of the batch merges
-normally.
-
-</div>
+Parallelism is a further opt-in. Independent, dependency-ready tasks run in
+isolated `git worktree` environments, while selection and claiming remain
+sequential to prevent duplicate ownership and preserve deterministic merge order.
 
 ## Trade-offs
 
@@ -452,29 +425,8 @@ repository shows how it is applied in a production project.
 
 ## Attribution
 
-The collection is a personal working set, and the repository says so rather than
-claiming every idea in it originated there.
-
-`backlog-workflow` and `audit-claude-md` are my own work, published under the
-MIT License (`Copyright (c) 2026 tc3oliver`).
-
-The `grilling` skill that `backlog-workflow` installs alongside them is not.
-Its file carries the notice:
-
-> Bundled by backlog-workflow 1.2.0.
-> Based on the `grilling` skill by Matt Pocock, used under the MIT License.
-> The full license text ships alongside this file as LICENSE.
-
-and the repository's own `LICENSE` repeats it:
-
-> This repository bundles the `grilling` skill by Matt Pocock, used under the
-> MIT License. Its full license text is included at
-> `backlog-workflow/templates/project/.claude/skills/grilling/LICENSE` and is
-> installed alongside the skill into target projects.
-
-That full MIT text — `Copyright (c) 2026 Matt Pocock` — travels with the skill
-into every project the workflow is installed into. Three further skills in the
-same repository, `diagnosing-bugs`, `writing-for-agents`, and
-`resolving-merge-conflicts`, are likewise adapted from
-[`mattpocock/skills`](https://github.com/mattpocock/skills) and retain their
-original MIT license and attribution in their own directories.
+`backlog-workflow` and `audit-claude-md` are my own work, released under the MIT License.
+The bundled `grilling` skill is adapted from Matt Pocock, as are
+`diagnosing-bugs`, `writing-for-agents`, and `resolving-merge-conflicts` from
+[`mattpocock/skills`](https://github.com/mattpocock/skills). Each retains its
+original MIT license and attribution in its own directory and installed files.

@@ -140,11 +140,11 @@ meta:
 
 **原因** — 少了這條規則，「agent 當時就這樣決定了」會在事後悄悄變成一項需求，而 `Requirement source` 最後只能指向一段沒有人讀得到的對話。
 
-**結果** — 只影響單一任務實作的選擇，記在那個任務裡就好；會綁住後續任務、或某個 `Requirement source` 否則將無據可引的選擇，必須先建立決策紀錄——寫清楚 Context、Decision、Consequences——之後才能建立任何引用它的任務。
+**結果** — 只影響單一任務的工程選擇記錄在該任務即可；會影響後續任務，或會成為後續需求依據的決策，則必須先建立決策紀錄——寫清楚 Context、Decision、Consequences——之後才能建立任何引用它的任務。
 
 </div>
 
-任務要進入進行中的狀態之前，還得通過一道 Task Ready Gate，包含需求來源、目標、範圍、不在範圍、穩定限制、相依、明確的 Acceptance Criteria、驗證方法、測試需求，以及安全性、資料、API、文件、遷移等各項影響。缺少產品意圖構成阻塞；能從儲存庫判斷的工程細節則不構成。
+任務要進入進行中的狀態之前，還得通過一道 Task Ready Gate，包含需求來源、目標、範圍、不在範圍、既定限制條件、相依、明確的 Acceptance Criteria、驗證方法、測試需求，以及安全性、資料、API、文件、遷移等各項影響。缺少產品意圖構成阻塞；能從儲存庫判斷的工程細節則不構成。
 
 ## Just-in-Time 實作計畫
 
@@ -192,22 +192,15 @@ meta:
 
 </div>
 
-允許停下來的情況只有六種：
-
-1. 產品需求或 Acceptance Criteria 互相矛盾；
-2. 缺少必要的權限、憑證、外部服務或硬體；
-3. 既有未提交的變更與此任務重疊，且無法安全隔離；
-4. 相依任務尚未完成；
-5. 不可逆的產品、資料或架構決策，而沒有權威來源可依據；
-6. 新發現的重大缺陷，安全修復所需的範圍已明顯超出此任務。
+自動執行只會在真正無法安全前進時停下，例如需求互相矛盾、缺少必要權限或外部服務，或遇到沒有權威依據的不可逆決策。相依任務未完成、既有修改無法安全隔離，以及修復範圍明顯超出任務，也會被視為阻塞。
 
 <div class="decision">
 
 ### 明確定義哪些情況構成阻塞
 
-**原因** — 為了實作寫法、程式碼導覽、任務範圍內的重構、修測試，或可回復的工程選擇就停下來的 agent，和永遠不停的 agent 一樣不能用。
+**原因** — 為了實作寫法、程式碼查找與理解、任務範圍內的重構、修測試，或可回復的工程選擇就停下來的 agent，和永遠不停的 agent 一樣不能用。
 
-**結果** — 政策裡除了那六種可以停的條件，也明文列出這些**不算**阻塞的情況。這份清單同時說明什麼時候該停、什麼時候該繼續往前。
+**結果** — 政策同時列出可以停下來，以及**不算**阻塞的情況，明確說明什麼時候該停、什麼時候該繼續往前。
 
 </div>
 
@@ -222,7 +215,7 @@ meta:
 3. 文件與需求矩陣已同步；
 4. 驗證結果已記錄在任務中。
 
-只把程式碼寫完，一項都不算滿足。
+單純完成程式碼實作，並不代表任務完成。
 
 <div class="decision">
 
@@ -238,15 +231,13 @@ meta:
 
 ## 手動模式與自動模式
 
-預設是手動模式，而且要不要自動執行是「每次呼叫時決定」，不是一個全域開關：
+預設採手動模式；自動執行必須由使用者明確啟動，而不是全域開關。三個入口分別負責需求拆解、單一任務執行與連續自動執行：
 
 - `/backlog-plan <需求>`——對齊需求並拆成任務。不寫產品程式碼，不產出 Implementation Plan。
 - `/backlog-run <TASK-ID>`——只執行指定的那一個任務，然後停止。
 - `/backlog-auto [TASK-ID]`——連續執行，而且只在被明確呼叫時才啟動。
 
-「繼續」、「接著做」、「繼續開發」都不會啟動自動執行，只有 `/backlog-auto` 會。
-
-自動模式的任務選取是可重現的，而且讀的是結構化資料，絕不去解析 Markdown：以 JSON 查詢任務清單，排除不可執行的任務與相依未完成的任務，套用優先順序，同分時取數字最小的任務 ID，執行一個任務，完整收尾，然後重新查詢。任務完成後不保留任何記憶中的佇列。
+自動模式從結構化資料選取可執行且相依條件已滿足的任務，再依優先順序與任務 ID 產生可重現的執行順序；每完成一項就重新查詢，不保留記憶中的佇列。
 
 <div class="decision">
 
@@ -258,17 +249,7 @@ meta:
 
 </div>
 
-平行執行則是另一個需要明確開啟的選項。`automatic.max_parallel_tasks` 預設為 `1`，也就是上面那條循序流程。調高之後，會同時執行等量的、彼此獨立且相依已備妥的任務，每個任務各自隔離在自己的 `git worktree` 裡。
-
-<div class="decision">
-
-### 先鎖定整批任務，再開始執行
-
-**原因** — 即使執行是平行的，選取與認領仍維持單線：同一批任務會在任何工作開始**之前**逐一被設為進行中，所以兩個 agent 不可能認領到同一個任務。
-
-**結果** — 整批做完之後，再依任務 ID 由小到大依序合併回去；合併衝突只會阻塞它發生的那一個任務——該任務會被移出 `Done`，衝突記錄在任務中，worktree 原地保留供檢查，同批其餘任務照常合併。
-
-</div>
+平行執行是另一個需要明確開啟的選項。彼此獨立且相依條件已滿足的任務會各自在隔離的 `git worktree` 中執行；任務選取與認領仍採循序處理，確保同一任務不會被重複認領，合併順序也保持可重現。
 
 ## 取捨
 
@@ -308,21 +289,4 @@ meta:
 
 ## 出處與授權
 
-這個集合是我個人日常實際在用的一套 skill，儲存庫本身也是這樣寫的：並沒有宣稱其中每個想法都源自這裡。
-
-`backlog-workflow` 與 `audit-claude-md` 是我自己的作品，以 MIT 授權發佈（`Copyright (c) 2026 tc3oliver`）。
-
-`backlog-workflow` 一併安裝的 `grilling` 則不是。該檔案帶著這段標示：
-
-> Bundled by backlog-workflow 1.2.0.
-> Based on the `grilling` skill by Matt Pocock, used under the MIT License.
-> The full license text ships alongside this file as LICENSE.
-
-儲存庫自己的 `LICENSE` 也重申了一次：
-
-> This repository bundles the `grilling` skill by Matt Pocock, used under the
-> MIT License. Its full license text is included at
-> `backlog-workflow/templates/project/.claude/skills/grilling/LICENSE` and is
-> installed alongside the skill into target projects.
-
-完整的 MIT 授權條文——`Copyright (c) 2026 Matt Pocock`——會隨著這個 skill 一起被安裝進每一個使用此工作流程的專案。同一個儲存庫中另外三個 skill，`diagnosing-bugs`、`writing-for-agents` 與 `resolving-merge-conflicts`，同樣改編自 [`mattpocock/skills`](https://github.com/mattpocock/skills)，並在各自的目錄中保留原有的 MIT 授權與出處標示。
+`backlog-workflow` 與 `audit-claude-md` 是我自己的作品，以 MIT License 發佈。隨工作流程安裝的 `grilling` 改編自 Matt Pocock 的作品；儲存庫中的 `diagnosing-bugs`、`writing-for-agents` 與 `resolving-merge-conflicts` 也改編自 [`mattpocock/skills`](https://github.com/mattpocock/skills)。各項作品都在對應目錄保留原始 MIT License 與出處，並隨安裝內容一併提供。

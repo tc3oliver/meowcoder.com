@@ -166,7 +166,7 @@ export const about = {
       heading: '職涯歷程',
       label: '10+ 年',
       stages: ['軟體工程', '系統架構', 'AI 系統'],
-      summary: '從應用程式與企業系統開發，逐步延伸至平台架構與正式環境中的 AI 系統。',
+      summary: '從應用程式與企業系統開發，逐步延伸至平台架構與 AI 系統工程。',
       cta: '查看專業工程經歷',
       href: '/zh/work/professional-engineering/',
     },
