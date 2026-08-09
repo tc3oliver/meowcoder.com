@@ -103,4 +103,4 @@ jobs:
 
       - name: Scan git history
         run: |
-          "$RUNNER_TEMP/gitleaks" git . --redact --no-banner
+          "$RUNNER_TEMP/gitleaks" git . --log-opts="--all" --redact --no-banner

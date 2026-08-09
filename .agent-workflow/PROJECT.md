@@ -8,21 +8,9 @@
 - Adoption mode: existing
 - Task prefix: task
 - Default branch: `main`
-- Target repository: `github.com/tc3oliver/meowcoder.com` (see `decision-1`)
+- Target repository: `github.com/tc3oliver/meowcoder.com`
 - Backlog CLI: `npx backlog.md`
 - Runtime: Node.js `>=22.12.0` (pinned in `.nvmrc`; required by Astro 7)
-
-## Requirement sources
-
-- `doc-1` (`backlog/docs/specifications/doc-1 - MeowCoder-Personal-Site-Redesign-v4-PRD.md`) — verbatim import of the PRD `meowcoder-personal-site-redesign-plan-v4.md`. Authoritative for product scope, IA, bilingual strategy, content, visual direction, and the MCD-1..13 implementation backlog.
-- `decision-1` (`backlog/decisions/decision-1 - 在現有-backlog-工作目錄中實作-meowcoder.com-網站.md`) — confirms this directory is the permanent local working copy for the site.
-- `decision-2` (`backlog/decisions/decision-2 - 不執行-WordPress-遷移程序，由站長直接刪除舊站.md`) — partially overrides PRD §31 and §38 item 17: the WordPress migration procedure is not executed. `doc-1` text is unchanged; consult this decision before treating §31 as in scope.
-- `decision-3` — Cloudflare staging is split out of MCD-1 into TASK-14.
-- `decision-4` (`backlog/decisions/decision-4 - 以-Cloudflare-Workers-Static-Assets-取代-Cloudflare-Pages-作為託管方式.md`) — overrides the `Cloudflare Pages` wording in PRD §26: hosting is Cloudflare **Workers Static Assets**.
-- `doc-2` (`backlog/docs/specifications/doc-2 - MeowCoder-Site-Redesign-v5-—-Senior-Engineer-Portfolio-Brief.md`) — the v5 redesign brief. Authoritative for the homepage IA and copy, Shouri/Open Source/Engineering Focus/Research+Writing sections, the Work index, both case studies, About, the credential correction, and the visual scale. Supersedes the `doc-1` sections its §2 table lists; everything else in `doc-1` stays in force.
-- `decision-9` — records that `doc-2` supersedes those `doc-1` sections and that `doc-1` is not rewritten.
-- `decision-10` — `Site Source` stays in the footer: the repository is public and the link resolves (HTTP 200), so the v5 brief's 404 premise does not hold. `doc-1` §9.8 is unchanged.
-- `doc-3` (`backlog/docs/doc-3 - Professional-Engineering-Experience-Content-Revision.md`) — authoritative for the revised bilingual Professional Engineering Experience Work entry and detail-page content, progression layout, and removal of defensive public-evidence language. Supersedes conflicting Professional Experience presentation and copy requirements in `doc-2` §21.
 
 ## Validation commands
 
@@ -33,43 +21,31 @@
 - Tests: `npm test`
 - Build: `npm run build`
 
-Run them in the CI order defined by PRD §23: install → format/lint → typecheck
-→ build → test.
+Run them in CI order: install → format/lint → typecheck → build → test.
 
 ## Deployment
 
-- Host: Cloudflare **Workers Static Assets** (see `decision-4`, not Pages).
+- Host: Cloudflare Workers Static Assets.
 - Config: `wrangler.jsonc` declares only `assets.directory = "./dist"`. It has
   **no `main`**, which is what makes it a static-asset-only Worker.
 - Cloudflare project settings: build command `npm run build`, deploy command
   `npx wrangler deploy`, environment variable `NODE_VERSION` = `22.12.0`.
-- Pushing to `main` triggers a Cloudflare build automatically (verified).
+- Pushing to `main` triggers a Cloudflare build automatically.
 - `.github/workflows/scheduled-rebuild.yml` rebuilds daily at 21:00 UTC
-  (05:00 Taipei) so build-time feed content stays current. Requires the
-  `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets.
-- Staging URL: `https://meowcoder-com.tc3oliver.workers.dev`
-- The Cloudflare build runner has outbound network access — the build-time Study
-  feed read (MCD-9) resolves there, so the homepage ships real posts.
-- **Never install `@astrojs/cloudflare` or run `astro add cloudflare`.** Without
-  `wrangler.jsonc`, wrangler framework-detects the project and converts it to
-  SSR, which breaks the static-first architecture PRD §26 requires. This has
-  happened once already; `decision-4` records it.
-- `public/` is copied verbatim into `dist/`. `_headers` (MCD-11 security
-  headers) and `_redirects` (MCD-13) go there.
+  so build-time feed content stays current. Required deployment credentials are
+  stored as repository secrets.
+- Keep the deployment static-first: do not add a Cloudflare SSR adapter while
+  `wrangler.jsonc` is configured for static assets only.
+- `public/` is copied verbatim into `dist/`; deployment headers and redirects
+  are maintained there.
 
 ## Project-specific constraints
 
 - Preserve repository rules from applicable `CLAUDE.md`, `AGENTS.md`, and `.claude/rules/` files.
 - Add only constraints supported by repository evidence.
-- Node.js 22.12+ is required. `nvm` default is set to 22; a shell started before
-  that change may still resolve Node 20 from an inherited `PATH`, and Astro 7
-  will refuse to run. Verify with `node -v` before building.
-- The repository is currently **private**. Making it public is MCD-13 scope and
-  requires confirming no PRD §20 material is committed — note that `backlog/`
-  (including `doc-1`, the full PRD) is tracked here per `decision-1`.
-- Never commit PRD §20 material: `.env` files, API tokens, Cloudflare
-  credentials, analytics secrets, private keys, WordPress backups, résumé PDFs,
-  private contact information, or internal company documents.
+- Node.js 22.12+ is required; verify the active version before running Astro.
+- Never commit secrets, credentials, private keys, backups, personal documents,
+  private contact information, or internal company material.
 
 ## Documentation synchronization
 

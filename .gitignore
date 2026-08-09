@@ -5,32 +5,71 @@ node_modules/
 dist/
 .astro/
 
-# Environment and secrets (PRD §20, §32)
+# Environment, secrets, and authentication material
 .env
 .env.*
 !.env.example
+.envrc
+.direnv/
+.npmrc
+.netrc
+.authinfo
+.ssh/
 *.pem
 *.key
+*.crt
+*.cer
+*.csr
 *.p12
 *.pfx
+*.ppk
+*.jks
+*.keystore
+*.kdbx
 id_rsa*
 id_ed25519*
+credentials.json
+credentials.*.json
+service-account*.json
+service_account*.json
+client_secret*.json
+oauth*.json
+auth.json
+secrets.json
 
-# Cloudflare Wrangler local secrets and state (PRD §20: Cloudflare API credentials)
+# Cloudflare Wrangler local secrets and state
 .dev.vars
-.dev.vars.local
+.dev.vars.*
 .wrangler/
 
-# Personal documents that must never reach the public repository (PRD §14, §20)
+# Databases, backups, and archives
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+*.sql
+*.dump
+*.bak
+*.backup
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.7z
+*.rar
+
+# Personal documents that must never reach the public repository
 *resume*.pdf
 *cv*.pdf
 
-# Local agent runtime state — must not enter the public repository (decision-1)
+# Local agent runtime state
 .omc/
-# Task, decision, and PRD records. Kept local, not published (decision-8);
-# .agent-workflow/ and .claude/skills/ stay tracked as the public design.
+# Local task and planning records
 backlog/
-# Machine-local approvals and env; .claude/skills/** stays tracked per decision-1
+# Machine-local approvals and environment
 .claude/settings.local.json
 .claude/settings.local.*
 
