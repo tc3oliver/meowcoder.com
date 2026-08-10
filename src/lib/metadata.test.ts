@@ -107,7 +107,7 @@ describe('every built page', () => {
 
       const ogImage = /<meta property="og:image" content="([^"]+)"/.exec(html)?.[1];
       expect(ogImage, `${file} og:image must be absolute`).toMatch(
-        new RegExp(`^${SITE_URL}/og/.+-(en|zh)\\.png$`),
+        new RegExp(`^${SITE_URL}/og/.+-(en|zh)(?:-v\\d+)?\\.png$`),
       );
       expect(html, `${file} has the wrong social image width`).toContain(
         'property="og:image:width" content="1200"',

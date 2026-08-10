@@ -5,4 +5,15 @@
   <text x="112" y="318" fill="#1a1815" font-family="Microsoft JhengHei, sans-serif" font-size="76" font-weight="700">Oliver Yu</text>
   <text x="112" y="393" fill="#1a1815" font-family="Microsoft JhengHei, sans-serif" font-size="37" font-weight="500">AI 系統工程師 · 系統架構師</text>
   <text x="112" y="504" fill="#5b564d" font-family="Microsoft JhengHei, sans-serif" font-size="27">10+ 年軟體工程經驗</text>
+  <g transform="translate(760 190) scale(2.5)">
+    <g fill="#1a1815">
+      <path d="M42 38 L50 10 L72 30 Z"/>
+      <path d="M102 30 L124 10 L132 38 Z"/>
+      <path d="M78 70 L96 70 L87 82 Z"/>
+    </g>
+    <g fill="none" stroke="#1d4e89" stroke-width="9" stroke-linecap="square" stroke-linejoin="miter">
+      <path d="M61 51 L31 66 L61 81"/>
+      <path d="M113 51 L143 66 L113 81"/>
+    </g>
+  </g>
 </svg>

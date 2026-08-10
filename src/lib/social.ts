@@ -27,8 +27,10 @@ const ALT: Record<SocialPreviewName, Record<Locale, string>> = {
 };
 
 export function socialPreview(locale: Locale, name: SocialPreviewName = 'default'): SocialPreview {
+  const filename = name === 'default' ? `default-${locale}-v2.png` : `${name}-${locale}.png`;
+
   return {
-    src: absoluteUrl(`/og/${name}-${locale}.png`),
+    src: absoluteUrl(`/og/${filename}`),
     alt: ALT[name][locale],
     width: 1200,
     height: 630,
