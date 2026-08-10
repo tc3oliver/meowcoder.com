@@ -18,6 +18,7 @@ import {
   ORCID_URL,
   PUBLICATION_URL,
   SHOURI_URL,
+  SKILLS_URL,
   STUDY_URL,
 } from './external';
 import { localizeUrl, workDetailRoute } from './i18n';
@@ -94,7 +95,7 @@ export function aiCodingSkillsSchema(locale: Locale, description: string): JsonL
     name: 'AI Coding Skills',
     description,
     url: localizeUrl(locale, workDetailRoute('ai-coding-skills')),
-    codeRepository: 'https://github.com/tc3oliver/skills',
+    codeRepository: SKILLS_URL,
     version: '1.2.0',
     license: 'https://opensource.org/license/mit',
     inLanguage: LOCALE_TAG[locale],

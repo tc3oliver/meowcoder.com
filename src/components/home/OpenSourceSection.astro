@@ -23,7 +23,7 @@
 
 import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
-import { GITHUB_URL } from '../../lib/external';
+import { SKILLS_URL } from '../../lib/external';
 import { localizePath, workDetailRoute } from '../../lib/i18n';
 import WorkflowDiagram from '../WorkflowDiagram.astro';
 import CtaLink from './CtaLink.astro';
@@ -71,7 +71,7 @@ const skills = t.openSource.skills.join(' · ');
     <div class="oss__actions">
       <CtaLink href={caseStudyHref} label={t.openSource.caseStudyCta.label} variant="outline" />
       <CtaLink
-        href={GITHUB_URL}
+        href={SKILLS_URL}
         label={t.openSource.cta.label}
         external
         indicator={externalIndicator}

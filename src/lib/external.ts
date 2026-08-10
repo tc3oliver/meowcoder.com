@@ -13,6 +13,9 @@ export const STUDY_URL = 'https://study.meowcoder.com';
 /** Implementation and open source proof (PRD §6). */
 export const GITHUB_URL = 'https://github.com/tc3oliver';
 
+/** AI Coding Skills source repository. */
+export const SKILLS_URL = 'https://github.com/tc3oliver/skills';
+
 /** Professional profile, confirmed against the public résumé. */
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/oliver-yu-a554a9286';
 
