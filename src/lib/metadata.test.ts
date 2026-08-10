@@ -112,9 +112,8 @@ describe('every built page', () => {
       expect(html, `${file} has the wrong social image width`).toContain(
         'property="og:image:width" content="1200"',
       );
-      const expectedHeight = ogImage?.includes('/default-') ? '1200' : '630';
       expect(html, `${file} has the wrong social image height`).toContain(
-        `property="og:image:height" content="${expectedHeight}"`,
+        'property="og:image:height" content="630"',
       );
 
       expect(html, `${file} must use a large Twitter card`).toContain(

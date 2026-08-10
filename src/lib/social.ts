@@ -6,7 +6,7 @@ export interface SocialPreview {
   src: string;
   alt: string;
   width: 1200;
-  height: 630 | 1200;
+  height: 630;
 }
 
 type SocialPreviewName = 'default' | 'shouri' | 'ai-coding-skills';
@@ -27,13 +27,12 @@ const ALT: Record<SocialPreviewName, Record<Locale, string>> = {
 };
 
 export function socialPreview(locale: Locale, name: SocialPreviewName = 'default'): SocialPreview {
-  const isDefault = name === 'default';
-  const filename = isDefault ? `default-${locale}-v3.png` : `${name}-${locale}.png`;
+  const filename = name === 'default' ? `default-${locale}-v4.png` : `${name}-${locale}.png`;
 
   return {
     src: absoluteUrl(`/og/${filename}`),
     alt: ALT[name][locale],
     width: 1200,
-    height: isDefault ? 1200 : 630,
+    height: 630,
   };
 }
