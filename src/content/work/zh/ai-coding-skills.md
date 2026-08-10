@@ -27,9 +27,9 @@ meta:
 
 把一份規格和一個儲存庫塞進同一個長 prompt，失效的樣子相當固定：需求還沒對齊就開始實作；跑了一個專案根本沒有的 lint 指令，還回報通過；因為模型自己的輸出看起來沒問題，就把工作標記為完成。
 
-[AI Coding Skills](https://github.com/tc3oliver/skills) 是我用來約束這段流程的公開 skill 集合。做法不是把 prompt 寫得更漂亮，而是把邊界寫進有版本控制的檔案裡，讓 agent 動手之前必須先讀過——同一套規則因此適用於每一個任務，也能延續到新的對話。
+<a href="https://github.com/tc3oliver/skills" target="_blank" rel="noopener noreferrer">AI Coding Skills</a> 是我用來約束這段流程的公開 skill 集合。做法不是把 prompt 寫得更漂亮，而是把邊界寫進有版本控制的檔案裡，讓 agent 動手之前必須先讀過——同一套規則因此適用於每一個任務，也能延續到新的對話。
 
-集合中的主要作品是 `backlog-workflow`：一套安裝進專案、建立在 [Backlog.md](https://backlog.md) 之上的開發政策與協作層。
+集合中的主要作品是 `backlog-workflow`：一套安裝進專案、建立在 <a href="https://backlog.md" target="_blank" rel="noopener noreferrer">Backlog.md</a> 之上的開發政策與協作層。
 
 ## Coding Agent 的失效模式
 
@@ -295,9 +295,9 @@ meta:
 
 <div class="evidence">
 
-- [`github.com/tc3oliver/skills`](https://github.com/tc3oliver/skills)——整個 skill 集合，採用 MIT 授權。
-- [`backlog-workflow/`](https://github.com/tc3oliver/skills/blob/main/backlog-workflow/README.md)——版本 `1.2.0`：安裝器與它的專案探查邏輯、工作流程規格範本（`WORKFLOW.md`、`TASK-POLICY.md`、`config.yml`）、三個專案 skill，以及安裝器自己的單元測試與封裝驗證（`python3 -m unittest discover -s tests`、`python3 scripts/validate_package.py`）。
-- [`audit-claude-md/`](https://github.com/tc3oliver/skills/blob/main/audit-claude-md/README.md)——前面提到的指令稽核 skill：context 品質、指令設計、漸進揭露，以及 coding agent 指令檔的可維護性。
+- <a href="https://github.com/tc3oliver/skills" target="_blank" rel="noopener noreferrer"><code>github.com/tc3oliver/skills</code></a>——整個 skill 集合，採用 MIT 授權。
+- <a href="https://github.com/tc3oliver/skills/blob/main/backlog-workflow/README.md" target="_blank" rel="noopener noreferrer"><code>backlog-workflow/</code></a>——版本 `1.2.0`：安裝器與它的專案探查邏輯、工作流程規格範本（`WORKFLOW.md`、`TASK-POLICY.md`、`config.yml`）、三個專案 skill，以及安裝器自己的單元測試與封裝驗證（`python3 -m unittest discover -s tests`、`python3 scripts/validate_package.py`）。
+- <a href="https://github.com/tc3oliver/skills/blob/main/audit-claude-md/README.md" target="_blank" rel="noopener noreferrer"><code>audit-claude-md/</code></a>——前面提到的指令稽核 skill：context 品質、指令設計、漸進揭露，以及 coding agent 指令檔的可維護性。
 
 </div>
 
@@ -307,4 +307,4 @@ meta:
 
 ## 出處與授權
 
-`backlog-workflow` 與 `audit-claude-md` 是我自己的作品，以 MIT License 發佈。隨工作流程安裝的 `grilling` 改編自 Matt Pocock 的作品；儲存庫中的 `diagnosing-bugs`、`writing-for-agents` 與 `resolving-merge-conflicts` 也改編自 [`mattpocock/skills`](https://github.com/mattpocock/skills)。各項作品都在對應目錄保留原始 MIT License 與出處，並隨安裝內容一併提供。
+`backlog-workflow` 與 `audit-claude-md` 是我自己的作品，以 MIT License 發佈。隨工作流程安裝的 `grilling` 改編自 Matt Pocock 的作品；儲存庫中的 `diagnosing-bugs`、`writing-for-agents` 與 `resolving-merge-conflicts` 也改編自 <a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer"><code>mattpocock/skills</code></a>。各項作品都在對應目錄保留原始 MIT License 與出處，並隨安裝內容一併提供。

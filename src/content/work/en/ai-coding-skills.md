@@ -35,14 +35,14 @@ agreed. A lint command the project does not have gets run and reported as
 passing. The work is marked complete because the model's own output looked
 right.
 
-[AI Coding Skills](https://github.com/tc3oliver/skills) is the public collection
+<a href="https://github.com/tc3oliver/skills" target="_blank" rel="noopener noreferrer">AI Coding Skills</a> is the public collection
 of skills I use to constrain that process. The approach is not a better prompt.
 It is putting the boundaries into versioned files the agent has to read before
 it acts, so the same rules apply to every task and survive into a new session.
 
 The primary work in the collection is `backlog-workflow`: a development policy
 and orchestration layer installed into a project on top of
-[Backlog.md](https://backlog.md).
+<a href="https://backlog.md" target="_blank" rel="noopener noreferrer">Backlog.md</a>.
 
 ## Coding-Agent Failure Modes
 
@@ -417,15 +417,15 @@ All of it lives in one public repository:
 
 <div class="evidence">
 
-- [`github.com/tc3oliver/skills`](https://github.com/tc3oliver/skills) — the
+- <a href="https://github.com/tc3oliver/skills" target="_blank" rel="noopener noreferrer"><code>github.com/tc3oliver/skills</code></a> — the
   collection, MIT licensed.
-- [`backlog-workflow/`](https://github.com/tc3oliver/skills/blob/main/backlog-workflow/README.md)
+- <a href="https://github.com/tc3oliver/skills/blob/main/backlog-workflow/README.md" target="_blank" rel="noopener noreferrer"><code>backlog-workflow/</code></a>
   — version `1.2.0`: the installer and its project-discovery logic, the workflow
   specification templates (`WORKFLOW.md`, `TASK-POLICY.md`, `config.yml`), the
   three project skills, and the installer's own unit tests and package validator
   (`python3 -m unittest discover -s tests`,
   `python3 scripts/validate_package.py`).
-- [`audit-claude-md/`](https://github.com/tc3oliver/skills/blob/main/audit-claude-md/README.md)
+- <a href="https://github.com/tc3oliver/skills/blob/main/audit-claude-md/README.md" target="_blank" rel="noopener noreferrer"><code>audit-claude-md/</code></a>
   — the instruction auditor described above: context quality, instruction
   design, progressive disclosure, and the maintainability of coding-agent
   instructions.
@@ -444,5 +444,5 @@ repository shows how it is applied in a production project.
 `backlog-workflow` and `audit-claude-md` are my own work, released under the MIT License.
 The bundled `grilling` skill is adapted from Matt Pocock, as are
 `diagnosing-bugs`, `writing-for-agents`, and `resolving-merge-conflicts` from
-[`mattpocock/skills`](https://github.com/mattpocock/skills). Each retains its
+<a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer"><code>mattpocock/skills</code></a>. Each retains its
 original MIT license and attribution in its own directory and installed files.

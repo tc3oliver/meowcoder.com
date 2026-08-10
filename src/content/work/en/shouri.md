@@ -280,7 +280,7 @@ Shouri now provides a complete product flow from content capture and source
 preservation through AI structuring, full-text retrieval, mobile sharing,
 metering, storage, data lifecycle, and production operations.
 
-- [shouri.app](https://shouri.app) is publicly available.
+- <a href="https://shouri.app" target="_blank" rel="noopener noreferrer">shouri.app</a> is publicly available.
 - The working interface covers capture, AI organization, search, Review, and export.
 - Privacy, terms, plans, and data-processing policies are published.
 
@@ -288,12 +288,12 @@ metering, storage, data lifecycle, and production operations.
 
 <div class="evidence">
 
-- **Product** — [shouri.app](https://shouri.app)
-- **Plans and credits** — [shouri.app/pricing](https://shouri.app/pricing)
-- **Privacy policy** — [shouri.app/privacy](https://shouri.app/privacy)
-- **Terms of service** — [shouri.app/terms](https://shouri.app/terms)
+- **Product** — <a href="https://shouri.app" target="_blank" rel="noopener noreferrer">shouri.app</a>
+- **Plans and credits** — <a href="https://shouri.app/pricing" target="_blank" rel="noopener noreferrer">shouri.app/pricing</a>
+- **Privacy policy** — <a href="https://shouri.app/privacy" target="_blank" rel="noopener noreferrer">shouri.app/privacy</a>
+- **Terms of service** — <a href="https://shouri.app/terms" target="_blank" rel="noopener noreferrer">shouri.app/terms</a>
 - **Refund and cancellation policy** —
-  [shouri.app/refund](https://shouri.app/refund)
+  <a href="https://shouri.app/refund" target="_blank" rel="noopener noreferrer">shouri.app/refund</a>
 
 </div>
 

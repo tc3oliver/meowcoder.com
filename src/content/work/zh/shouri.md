@@ -201,7 +201,7 @@ AI 工具常見的兩種做法會讓情況更糟：
 
 Shouri 已完成從資訊擷取、原始內容保存、AI 結構化整理、全文檢索、行動裝置分享，到額度、儲存、資料生命週期與正式環境維運的一套完整產品流程。
 
-- [shouri.app](https://shouri.app) 已公開上線。
+- <a href="https://shouri.app" target="_blank" rel="noopener noreferrer">shouri.app</a> 已公開上線。
 - 實際產品介面可登入操作，涵蓋內容保存、AI 整理、搜尋、Review 與匯出流程。
 - 隱私、條款、方案與資料處理政策公開。
 
@@ -209,11 +209,11 @@ Shouri 已完成從資訊擷取、原始內容保存、AI 結構化整理、全�
 
 <div class="evidence">
 
-- **產品** — [shouri.app](https://shouri.app)
-- **方案與額度** — [shouri.app/pricing](https://shouri.app/pricing)
-- **隱私政策** — [shouri.app/privacy](https://shouri.app/privacy)
-- **使用條款** — [shouri.app/terms](https://shouri.app/terms)
-- **退款與取消訂閱政策** — [shouri.app/refund](https://shouri.app/refund)
+- **產品** — <a href="https://shouri.app" target="_blank" rel="noopener noreferrer">shouri.app</a>
+- **方案與額度** — <a href="https://shouri.app/pricing" target="_blank" rel="noopener noreferrer">shouri.app/pricing</a>
+- **隱私政策** — <a href="https://shouri.app/privacy" target="_blank" rel="noopener noreferrer">shouri.app/privacy</a>
+- **使用條款** — <a href="https://shouri.app/terms" target="_blank" rel="noopener noreferrer">shouri.app/terms</a>
+- **退款與取消訂閱政策** — <a href="https://shouri.app/refund" target="_blank" rel="noopener noreferrer">shouri.app/refund</a>
 
 </div>
 

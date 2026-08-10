@@ -61,7 +61,12 @@ const { t } = Astro.props;
       <ul class="metadata-list" role="list" aria-label={t.research.areasLabel}>
         {t.research.areas.map((area) => <li>{area}</li>)}
       </ul>
-      <a class="about-link" href={t.research.href} rel="external">
+      <a
+        class="about-link"
+        href={t.research.href}
+        target="_blank"
+        rel="external noopener noreferrer"
+      >
         {t.research.cta}<span aria-hidden="true">↗</span>
       </a>
     </div>
