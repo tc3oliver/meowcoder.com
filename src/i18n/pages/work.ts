@@ -73,7 +73,11 @@ export const work = {
     experienceCta: 'Explore Experience',
     experienceProgression: {
       label: 'Career progression',
-      stages: ['Application Engineering', 'Enterprise Systems & Architecture', 'AI Systems'],
+      stages: [
+        'Application Engineering',
+        'Enterprise Systems & Architecture',
+        'Enterprise AI Systems',
+      ],
     },
     aboutOliver: 'About Oliver',
     experienceOverviewLabel: 'Experience overview',
@@ -108,7 +112,7 @@ export const work = {
     experienceCta: '查看工程歷程',
     experienceProgression: {
       label: '職涯進程',
-      stages: ['應用程式工程', '企業系統與系統架構', 'AI 系統'],
+      stages: ['應用程式工程', '企業系統與系統架構', '企業 AI 系統'],
     },
     aboutOliver: '關於 Oliver',
     experienceOverviewLabel: '工程經歷摘要',

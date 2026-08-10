@@ -177,13 +177,17 @@ describe('professional engineering experience routes', () => {
       index: 'work/index.html',
       detail: 'work/professional-engineering/index.html',
       title: 'Professional Engineering Experience',
-      stages: ['Application Engineering', 'Enterprise Systems &amp; Architecture', 'AI Systems'],
+      stages: [
+        'Application Engineering',
+        'Enterprise Systems &amp; Architecture',
+        'Enterprise AI Systems',
+      ],
     },
     zh: {
       index: 'zh/work/index.html',
       detail: 'zh/work/professional-engineering/index.html',
       title: '專業工程經歷',
-      stages: ['應用程式工程', '企業系統與系統架構', 'AI 系統'],
+      stages: ['應用程式工程', '企業系統與系統架構', '企業 AI 系統'],
     },
   } as const;
 

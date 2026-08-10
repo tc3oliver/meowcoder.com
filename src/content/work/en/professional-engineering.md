@@ -14,16 +14,19 @@ meta:
   - label: 'Experience'
     value: '10+ Years'
   - label: 'Progression'
-    value: 'Application Engineering → Enterprise Systems & Architecture → AI Systems'
+    value: 'Application Engineering → Enterprise Systems & Architecture → Enterprise AI Systems'
 ---
 
-<figure class="progression" aria-label="Career progression from application engineering to AI systems">
+<figure class="progression" aria-label="Career progression from application engineering to enterprise AI systems">
 <ol class="progression__stages" role="list">
 <li class="progression__stage">Application Engineering</li>
 <li class="progression__stage">Enterprise Systems & Architecture</li>
-<li class="progression__stage">AI Systems</li>
+<li class="progression__stage">Enterprise AI Systems</li>
 </ol>
 </figure>
+
+Applied AI work began in 2017 and continued as engineering responsibilities
+expanded into system integration, architecture, and enterprise AI systems.
 
 ## Application Engineering
 
@@ -50,19 +53,24 @@ The focus shifted from individual applications to the design and delivery of
 integrated systems, including identity and access, reliability, security, CI/CD,
 and production operations.
 
+AI capabilities also continued to be integrated into products and enterprise
+workflows during this stage, alongside broader responsibility for system
+architecture and technical leadership.
+
 <p class="stage-domains"><span>Representative Systems</span> Enterprise Workflow · Public-sector Systems · Healthcare Platforms · Cloud / Security / CI/CD</p>
 
 **Technical Leadership** — Architecture ownership, engineering standards, CI/CD
 and quality practices, project delivery, mentoring, and technical knowledge
 sharing.
 
-## AI Systems
+## Enterprise AI Systems
 
 <p class="stage-metadata">Agent · Knowledge · Conversational AI · LLM</p>
 
-More recent work focuses on enterprise AI systems, including coding agents,
-knowledge retrieval, LLM infrastructure, and model serving, with model
-capabilities integrated into products and developer workflows.
+More recently, the primary focus has shifted toward enterprise AI systems,
+including coding agents, knowledge retrieval, LLM infrastructure, and model
+serving, with model capabilities integrated into products and developer
+workflows.
 
 The engineering scope includes the systems around the model—validation, access
 control, observability, concurrency, and production user workflows.

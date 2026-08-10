@@ -14,16 +14,19 @@ meta:
   - label: '年資'
     value: '10+ 年'
   - label: '歷程'
-    value: '應用程式工程 → 企業系統與系統架構 → AI 系統'
+    value: '應用程式工程 → 企業系統與系統架構 → 企業 AI 系統'
 ---
 
-<figure class="progression" aria-label="從應用程式工程延伸至 AI 系統的職涯進程">
+<figure class="progression" aria-label="從應用程式工程延伸至企業 AI 系統的職涯進程">
 <ol class="progression__stages" role="list">
 <li class="progression__stage">應用程式工程</li>
 <li class="progression__stage">企業系統與系統架構</li>
-<li class="progression__stage">AI 系統</li>
+<li class="progression__stage">企業 AI 系統</li>
 </ol>
 </figure>
+
+AI 應用經驗始於 2017 年，並隨著工程職責擴展，逐步延伸至系統整合、
+架構設計與企業 AI 系統。
 
 ## 應用程式工程
 
@@ -46,17 +49,20 @@ meta:
 工作重心也從單一應用的實作，轉向跨系統整合、身分與權限、可靠性、安全性、
 CI/CD 與正式環境營運等整體系統的設計與交付。
 
+這個階段也持續將 AI 能力整合至產品與企業流程，同時承擔更多系統架構與
+技術領導責任。
+
 <p class="stage-domains"><span>代表性系統</span> 企業流程 · 公部門系統 · 醫療平台 · 雲端 / 資安 / CI/CD</p>
 
 **技術領導** — 負責架構決策、工程規範、CI/CD 與品質流程、專案交付，
 以及技術經驗傳承。
 
-## AI 系統
+## 企業 AI 系統
 
 <p class="stage-metadata">Agent · Knowledge · Conversational AI · LLM</p>
 
-近年聚焦企業 AI 系統，包括 Coding Agent、知識檢索、LLM 基礎架構與模型服務，
-並將模型能力整合至實際產品與開發流程。
+近年工作重心進一步集中於企業 AI 系統，包括 Coding Agent、知識檢索、
+LLM 基礎架構與模型服務，並將模型能力整合至實際產品與開發流程。
 
 工程範圍不只在模型，也包括驗證、權限控管、可觀測性、並行處理，
 以及實際的使用者工作流程。
