@@ -98,7 +98,7 @@ export const about = {
         },
         {
           period: '2020–2025',
-          name: 'System Architecture & AI Integration',
+          name: 'System Architecture & Technical Leadership',
           description:
             'Took ownership of system architecture, AI integration, engineering practices, project delivery, mentoring, and cross-system integration.',
         },
@@ -223,7 +223,7 @@ export const about = {
         },
         {
           period: '2020–2025',
-          name: '系統架構與 AI 整合',
+          name: '系統架構與技術領導',
           description: '負責系統架構、AI 整合、工程流程、專案交付、技術經驗傳承與跨系統整合。',
         },
         {
