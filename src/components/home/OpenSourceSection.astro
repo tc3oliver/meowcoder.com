@@ -23,7 +23,7 @@
 
 import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
-import { SKILLS_URL } from '../../lib/external';
+import { SIGNALFORGE_LIVE_URL, SIGNALFORGE_URL, SKILLS_URL } from '../../lib/external';
 import { localizePath, workDetailRoute } from '../../lib/i18n';
 import WorkflowDiagram from '../WorkflowDiagram.astro';
 import CtaLink from './CtaLink.astro';
@@ -37,8 +37,10 @@ interface Props {
 
 const { locale, t, externalIndicator } = Astro.props;
 
-/** The case study's slug — `src/content/work/{en,zh}/ai-coding-skills.md`. */
+/** The case studies' slugs — `src/content/work/{en,zh}/<slug>.md`. */
 const CASE_STUDY_SLUG = 'ai-coding-skills';
+const SIGNALFORGE_SLUG = 'signalforge';
+const signalforgeHref = localizePath(locale, workDetailRoute(SIGNALFORGE_SLUG));
 
 /**
  * The case study in the reader's own locale. Routing goes through the same
@@ -56,39 +58,88 @@ const skills = t.openSource.skills.join(' · ');
 ---
 
 <HomeSection id="open-source" eyebrow={t.openSource.eyebrow} heading={t.openSource.heading}>
-  <div class="oss">
-    <p class="oss__statement">{t.openSource.statement}</p>
+  <div class="oss oss--two">
+    <div class="oss__project">
+      <h3 class="oss__name">{t.openSource.signalforge.heading}</h3>
+      <p class="oss__statement">{t.openSource.signalforge.statement}</p>
+      <p class="oss__skills">{t.openSource.signalforge.meta}</p>
+      <div class="oss__actions">
+        <CtaLink
+          href={SIGNALFORGE_LIVE_URL}
+          label={t.openSource.signalforge.liveCta.label}
+          external
+          indicator={externalIndicator}
+          variant="outline"
+        />
+        <CtaLink
+          href={signalforgeHref}
+          label={t.openSource.signalforge.caseStudyCta.label}
+          variant="outline"
+        />
+        <CtaLink
+          href={SIGNALFORGE_URL}
+          label={t.openSource.signalforge.cta.label}
+          external
+          indicator={externalIndicator}
+          variant="outline"
+        />
+      </div>
+    </div>
 
-    <p class="oss__skills">{skills}</p>
+    <div class="oss__project">
+      {/* A repository name, identical in both locales, so it is not in the dictionary. */}
+      <h3 class="oss__name">AI Coding Skills</h3>
+      <p class="oss__statement">{t.openSource.statement}</p>
 
-    <WorkflowDiagram
-      caption={t.openSource.workflow.caption}
-      start={t.openSource.workflow.start}
-      steps={t.openSource.workflow.steps}
-      end={t.openSource.workflow.end}
-    />
+      <p class="oss__skills">{skills}</p>
 
-    <div class="oss__actions">
-      <CtaLink href={caseStudyHref} label={t.openSource.caseStudyCta.label} variant="outline" />
-      <CtaLink
-        href={SKILLS_URL}
-        label={t.openSource.cta.label}
-        external
-        indicator={externalIndicator}
-        variant="outline"
+      <WorkflowDiagram
+        caption={t.openSource.workflow.caption}
+        start={t.openSource.workflow.start}
+        steps={t.openSource.workflow.steps}
+        end={t.openSource.workflow.end}
       />
+
+      <div class="oss__actions">
+        <CtaLink href={caseStudyHref} label={t.openSource.caseStudyCta.label} variant="outline" />
+        <CtaLink
+          href={SKILLS_URL}
+          label={t.openSource.cta.label}
+          external
+          indicator={externalIndicator}
+          variant="outline"
+        />
+      </div>
     </div>
   </div>
 </HomeSection>
 
 <style>
-  .oss {
+  /* Two projects side by side from the point two reading measures fit; one
+     column beneath that. Each project keeps its own reading measure, so the
+     pair reads as two short columns rather than one wide block. */
+  .oss--two {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8) var(--space-8);
+  }
+
+  @media (width >= 48rem) {
+    .oss--two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .oss__project {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
-    /* The statement is the section's only prose, so the whole block follows it
-       to the reading measure rather than stretching to the content width. */
+    gap: var(--space-5);
     max-width: var(--width-reading);
+  }
+
+  .oss__name {
+    font-size: var(--text-md);
+    letter-spacing: var(--tracking-normal);
   }
 
   .oss__statement {

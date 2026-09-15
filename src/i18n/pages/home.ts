@@ -159,6 +159,22 @@ export interface HomeStrings extends PageStrings {
   openSource: {
     eyebrow: string;
     heading: string;
+    /**
+     * The second project in the section, first in reading order: the public
+     * system proof. It has what Skills does not — a running instance — so it
+     * carries three actions where Skills carries two: the live reader, the
+     * case study, and the repository. `meta` is one compact line of facts
+     * (licence, language, what runs), the same role `skills` plays beside it.
+     */
+    signalforge: {
+      heading: string;
+      statement: string;
+      meta: string;
+      liveCta: CtaLabel;
+      /** Internal; the case-study route is resolved by the component, not here. */
+      caseStudyCta: CtaLabel;
+      cta: CtaLabel;
+    };
     /** doc-2 §7's one statement, in place of the old summary and lists. */
     statement: string;
     /** The published skills, in doc-2 §7's order: primary first. */
@@ -303,7 +319,16 @@ export const home = {
     },
     openSource: {
       eyebrow: 'Open Source',
-      heading: 'AI Coding Skills',
+      heading: 'SignalForge and AI Coding Skills',
+      signalforge: {
+        heading: 'SignalForge',
+        statement:
+          'An event-centric intelligence pipeline: multi-source collection, a cross-day story ledger, and a daily brief validated by code — running every morning.',
+        meta: 'MIT · TypeScript · Postgres · Live',
+        liveCta: { label: 'Read Today' },
+        caseStudyCta: { label: 'View Case Study' },
+        cta: { label: 'GitHub' },
+      },
       statement:
         'Versioned workflows for requirement alignment, just-in-time planning, validation, and explicit completion criteria.',
       skills: ['backlog-workflow', 'audit-claude-md'],
@@ -397,7 +422,17 @@ export const home = {
     },
     openSource: {
       eyebrow: '開源',
-      heading: 'AI Coding Skills',
+      heading: 'SignalForge 與 AI Coding Skills',
+      signalforge: {
+        heading: 'SignalForge',
+        statement:
+          '以事件為單位的情報管線：多來源收集、跨日事件帳本、由程式碼驗證的每日重點，每天早上實際運作。',
+        // Facts, not prose: licence, language, store, state (PRD §34).
+        meta: 'MIT · TypeScript · Postgres · 線上運作中',
+        liveCta: { label: '看今天的重點' },
+        caseStudyCta: { label: '查看完整案例' },
+        cta: { label: 'GitHub' },
+      },
       statement: '版本化工作流程，整合需求對齊、執行時規劃、驗證與明確的完成條件。',
       // The skill names are repository names, so they read the same in both
       // locales; the component joins them with a middot (doc-2 §7).

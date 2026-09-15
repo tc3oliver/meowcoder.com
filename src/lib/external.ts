@@ -45,3 +45,6 @@ export const ORCID_URL = 'https://orcid.org/0009-0001-8072-0977';
 
 /** SignalForge source repository — the knowledge- and agent-systems proof. */
 export const SIGNALFORGE_URL = 'https://github.com/tc3oliver/signalforge';
+
+/** SignalForge's own running instance — the reader, as the pipeline publishes it. */
+export const SIGNALFORGE_LIVE_URL = 'https://signal.meowcoder.com';

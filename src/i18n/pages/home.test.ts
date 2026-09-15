@@ -82,17 +82,28 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
   });
 
   it('carries only what doc-2 §7 leaves on the homepage', () => {
-    // doc-2 §7 fixes the whole section: eyebrow, heading, one statement, the
-    // two skill names, the workflow visual, and two actions. Anything else
-    // belongs on the case study, so the key set is the assertion.
+    // doc-2 §7 fixes the Skills half: eyebrow, heading, one statement, the
+    // two skill names, the workflow visual, and two actions. The SignalForge
+    // half is the same shape one size smaller — a name, one statement, one
+    // line of facts, and its actions. Anything else belongs on a case study,
+    // so the key sets are the assertion.
     expect(Object.keys(t.openSource).sort()).toEqual([
       'caseStudyCta',
       'cta',
       'eyebrow',
       'heading',
+      'signalforge',
       'skills',
       'statement',
       'workflow',
+    ]);
+    expect(Object.keys(t.openSource.signalforge).sort()).toEqual([
+      'caseStudyCta',
+      'cta',
+      'heading',
+      'liveCta',
+      'meta',
+      'statement',
     ]);
   });
 
@@ -150,6 +161,7 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     const CASE_STUDY = [/case study/i, /案例/];
     const permitted = new Set([
       t.openSource.caseStudyCta.label,
+      t.openSource.signalforge.caseStudyCta.label,
       ...t.expertise.pillars.flatMap((pillar) =>
         pillar.evidence?.caseStudy ? [pillar.evidence.label] : [],
       ),
@@ -411,6 +423,7 @@ describe('content language rules (PRD §34)', () => {
     // names, which PRD §34 exempts as product vocabulary.
     ...t.expertise.pillars.map((pillar) => pillar.description),
     t.openSource.statement,
+    t.openSource.signalforge.statement,
     // doc-2 §9 leaves the Research column one prose block: `detail` moved to
     // About, and the Technical Writing intro went with the merge — the column
     // now shows Study as its label instead of stating it in a sentence.
