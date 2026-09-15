@@ -42,3 +42,6 @@ export const PUBLICATION_URL = 'https://doi.org/10.1016/j.jisa.2026.104422';
  * DOI in `PUBLICATION_URL` above.
  */
 export const ORCID_URL = 'https://orcid.org/0009-0001-8072-0977';
+
+/** SignalForge source repository — the knowledge- and agent-systems proof. */
+export const SIGNALFORGE_URL = 'https://github.com/tc3oliver/signalforge';

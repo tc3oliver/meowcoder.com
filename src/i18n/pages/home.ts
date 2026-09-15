@@ -47,15 +47,28 @@ export interface CtaLabel {
 /**
  * One PRD §5 pillar.
  *
- * `evidence` carries the link to whatever proves that pillar publicly, and only
- * LLM Infrastructure has one: PRD §12 keeps it an expertise area whose public
- * proof is technical writing, precisely because the strongest evidence sits in
- * confidential employer systems. Marking the pillar here rather than matching
- * its name in a component is what keeps the rule intact in both locales — the
- * Chinese pillar is not called "LLM Infrastructure".
+ * `evidence` carries the link to whatever proves that pillar publicly. For
+ * LLM Infrastructure that is technical writing on Study: PRD §12 keeps it an
+ * expertise area rather than a case study, precisely because the strongest
+ * evidence sits in confidential employer systems. For AI & Agent Systems and
+ * Knowledge Systems it is the SignalForge case study — an inspectable public
+ * system built on exactly those two areas. Software Architecture has no single
+ * public proof and deliberately carries none. Marking the pillar here rather
+ * than matching its name in a component is what keeps the rule intact in both
+ * locales — the Chinese pillar is not called "LLM Infrastructure".
  */
 export interface ExpertisePillar extends NamedItem {
-  evidence?: CtaLabel;
+  evidence?: PillarEvidence;
+}
+
+/**
+ * Where a pillar's public proof lives. `caseStudy` names a slug under
+ * `src/content/work/`, and the component resolves it to the localized detail
+ * route; without it the proof is technical writing, and the link goes to
+ * Study.
+ */
+export interface PillarEvidence extends CtaLabel {
+  caseStudy?: string;
 }
 
 export interface HomeStrings extends PageStrings {
@@ -270,10 +283,12 @@ export const home = {
         {
           name: 'AI & Agent Systems',
           description: 'Agent workflows, tool execution, evaluation and recovery.',
+          evidence: { label: 'See the SignalForge case study', caseStudy: 'signalforge' },
         },
         {
           name: 'Knowledge Systems',
           description: 'Retrieval, grounding and agent-accessible knowledge.',
+          evidence: { label: 'See the SignalForge case study', caseStudy: 'signalforge' },
         },
         {
           name: 'LLM Infrastructure',
@@ -362,10 +377,12 @@ export const home = {
         {
           name: 'AI 與 Agent 系統',
           description: 'Agent 工作流程、工具執行、評估與失敗復原。',
+          evidence: { label: '查看 SignalForge 案例', caseStudy: 'signalforge' },
         },
         {
           name: '知識系統',
           description: '檢索、溯源，以及讓 Agent 取用的知識。',
+          evidence: { label: '查看 SignalForge 案例', caseStudy: 'signalforge' },
         },
         {
           name: 'LLM 基礎架構',

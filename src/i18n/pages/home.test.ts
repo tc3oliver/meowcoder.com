@@ -141,29 +141,50 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     // PRD §12: the strongest evidence is confidential, so public proof points
     // at technical writing and nothing on the homepage suggests otherwise.
     //
-    // The one permitted mention is doc-2 §7's link to the AI Coding Skills
-    // case study — published open-source work, which is the opposite of the
-    // confidential employer systems this rule protects. It is exempted by
-    // identity rather than by pattern, so any *other* case-study claim
-    // appearing anywhere in the homepage strings still fails here.
-    const CASE_STUDY = [/case study/i, /案例研究/];
-    const permitted = t.openSource.caseStudyCta.label;
+    // The permitted mentions are links to published open-source work — the
+    // opposite of the confidential employer systems this rule protects: doc-2
+    // §7's link to the AI Coding Skills case study, and any pillar whose
+    // evidence names a case study by slug. Each is exempted by identity rather
+    // than by pattern, so any *other* case-study claim appearing anywhere in
+    // the homepage strings still fails here.
+    const CASE_STUDY = [/case study/i, /案例/];
+    const permitted = new Set([
+      t.openSource.caseStudyCta.label,
+      ...t.expertise.pillars.flatMap((pillar) =>
+        pillar.evidence?.caseStudy ? [pillar.evidence.label] : [],
+      ),
+    ]);
 
     for (const pattern of CASE_STUDY) {
       const claims = strings(t).filter((value) => pattern.test(value));
-      expect(claims.filter((value) => value !== permitted)).toEqual([]);
+      expect(claims.filter((value) => !permitted.has(value))).toEqual([]);
     }
   });
 
   it('points LLM Infrastructure — and only it — at Study (PRD §12)', () => {
     // Both locales, which is the point: the Chinese pillar has a different
     // name, so this cannot be enforced by matching the English one.
-    const withEvidence = t.expertise.pillars.filter((pillar) => pillar.evidence);
+    //
+    // A pillar's evidence either names a case study — published open-source
+    // work, which PRD §12 does not restrict — or it points at Study. Only LLM
+    // Infrastructure may do the latter, because it is the one area whose
+    // public proof is writing rather than an inspectable system.
+    const atStudy = t.expertise.pillars.filter(
+      (pillar) => pillar.evidence && !pillar.evidence.caseStudy,
+    );
 
-    expect(withEvidence).toHaveLength(1);
+    expect(atStudy).toHaveLength(1);
     // PRD §5 fixes the order, so LLM Infrastructure is the third pillar.
-    expect(withEvidence[0]).toBe(t.expertise.pillars[2]);
-    expect(withEvidence[0]?.evidence?.label).toContain('Study');
+    expect(atStudy[0]).toBe(t.expertise.pillars[2]);
+    expect(atStudy[0]?.evidence?.label).toContain('Study');
+
+    // The case-study evidence must name a slug that has a Work entry; the
+    // component resolves it to a route, and a typo would be a dead link.
+    for (const pillar of t.expertise.pillars) {
+      if (pillar.evidence?.caseStudy) {
+        expect(pillar.evidence.caseStudy).toBe('signalforge');
+      }
+    }
   });
 
   it('carries only what doc-2 §9 leaves in the Research column', () => {

@@ -8,7 +8,7 @@ evidence: 'github.com/tc3oliver/skills · backlog-workflow 1.2.0，附有自己�
 slug: 'ai-coding-skills'
 locale: 'zh'
 translationKey: 'ai-coding-skills'
-order: 1
+order: 2
 draft: false
 meta:
   - label: '版本'
@@ -297,7 +297,7 @@ meta:
 
 - <a href="https://github.com/tc3oliver/skills" target="_blank" rel="noopener noreferrer"><code>github.com/tc3oliver/skills</code></a>——整個 skill 集合，採用 MIT 授權。
 - <a href="https://github.com/tc3oliver/skills/blob/main/backlog-workflow/README.md" target="_blank" rel="noopener noreferrer"><code>backlog-workflow/</code></a>——版本 `1.2.0`：安裝器與它的專案探查邏輯、工作流程規格範本（`WORKFLOW.md`、`TASK-POLICY.md`、`config.yml`）、三個專案 skill，以及安裝器自己的單元測試與封裝驗證（`python3 -m unittest discover -s tests`、`python3 scripts/validate_package.py`）。
-- <a href="https://github.com/tc3oliver/skills/blob/main/audit-claude-md/README.md" target="_blank" rel="noopener noreferrer"><code>audit-claude-md/</code></a>——前面提到的指令稽核 skill：context 品質、指令設計、漸進揭露，以及 coding agent 指令檔的可維護性。
+- <a href="https://github.com/tc3oliver/skills/blob/main/audit-agent-instructions/README.md" target="_blank" rel="noopener noreferrer"><code>audit-claude-md/</code></a>——前面提到的指令稽核 skill：context 品質、指令設計、漸進揭露，以及 coding agent 指令檔的可維護性。
 
 </div>
 

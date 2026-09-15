@@ -15,27 +15,30 @@
  * desktop rather than an `auto-fit` row that would spread to four columns and
  * read as the widest thing on the page.
  *
- * PRD §12 shapes the LLM Infrastructure pillar specifically, and doc-2 §8
- * restates it. It is an expertise area, and its public proof is technical
- * writing — the strongest evidence sits in confidential employer systems, so
- * nothing here implies a public case study exists. That is the one asymmetry
- * between the four blocks, and it is deliberate: whichever pillar the
- * dictionary marks with `evidence` gets a link to Study. The marking lives in
- * the dictionary rather than in a name match here, because the Chinese pillar
- * is not called "LLM Infrastructure".
+ * A pillar's public proof is whatever the dictionary marks it with. PRD §12
+ * shapes the LLM Infrastructure pillar specifically: it is an expertise area
+ * whose proof is technical writing — the strongest evidence sits in
+ * confidential employer systems, so its link goes to Study and nothing implies
+ * a case study exists. The two pillars SignalForge is built on link to that
+ * case study instead. The marking lives in the dictionary rather than in a
+ * name match here, because the Chinese pillar is not called "LLM
+ * Infrastructure".
  */
 
+import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
 import { STUDY_URL } from '../../lib/external';
+import { localizePath, workDetailRoute } from '../../lib/i18n';
 import CtaLink from './CtaLink.astro';
 import HomeSection from './HomeSection.astro';
 
 interface Props {
+  locale: Locale;
   t: HomeStrings;
   externalIndicator: string;
 }
 
-const { t, externalIndicator } = Astro.props;
+const { locale, t, externalIndicator } = Astro.props;
 ---
 
 <HomeSection id="engineering-focus" heading={t.expertise.heading}>
@@ -45,17 +48,26 @@ const { t, externalIndicator } = Astro.props;
         <li class="expertise__pillar">
           <h3 class="expertise__name">{pillar.name}</h3>
           <p class="expertise__description">{pillar.description}</p>
-          {pillar.evidence && (
-            <p class="expertise__evidence">
-              <CtaLink
-                href={STUDY_URL}
-                label={pillar.evidence.label}
-                external
-                indicator={externalIndicator}
-                variant="outline"
-              />
-            </p>
-          )}
+          {pillar.evidence &&
+            (pillar.evidence.caseStudy ? (
+              <p class="expertise__evidence">
+                <CtaLink
+                  href={localizePath(locale, workDetailRoute(pillar.evidence.caseStudy))}
+                  label={pillar.evidence.label}
+                  variant="outline"
+                />
+              </p>
+            ) : (
+              <p class="expertise__evidence">
+                <CtaLink
+                  href={STUDY_URL}
+                  label={pillar.evidence.label}
+                  external
+                  indicator={externalIndicator}
+                  variant="outline"
+                />
+              </p>
+            ))}
         </li>
       ))
     }

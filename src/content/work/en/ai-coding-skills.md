@@ -8,7 +8,7 @@ evidence: 'github.com/tc3oliver/skills · backlog-workflow 1.2.0, with its own u
 slug: 'ai-coding-skills'
 locale: 'en'
 translationKey: 'ai-coding-skills'
-order: 1
+order: 2
 draft: false
 meta:
   - label: 'Version'
@@ -425,7 +425,7 @@ All of it lives in one public repository:
   three project skills, and the installer's own unit tests and package validator
   (`python3 -m unittest discover -s tests`,
   `python3 scripts/validate_package.py`).
-- <a href="https://github.com/tc3oliver/skills/blob/main/audit-claude-md/README.md" target="_blank" rel="noopener noreferrer"><code>audit-claude-md/</code></a>
+- <a href="https://github.com/tc3oliver/skills/blob/main/audit-agent-instructions/README.md" target="_blank" rel="noopener noreferrer"><code>audit-claude-md/</code></a>
   — the instruction auditor described above: context quality, instruction
   design, progressive disclosure, and the maintainability of coding-agent
   instructions.
