@@ -4,7 +4,7 @@ type: 'Open Source · Knowledge & Agent Systems'
 summary: 'A self-hosted intelligence pipeline that turns noisy multi-source feeds into deduplicated events, tracked changes, emerging signals, and a source-grounded daily brief.'
 outcome: 'Runs unattended every morning on a two-session agent architecture, with every source reference and every number in the brief validated by code before publication.'
 indexMeta: 'MIT · TypeScript · Postgres · Two-session agent runtime'
-evidence: 'github.com/tc3oliver/signalforge · architecture, security model, and verify pipeline all published'
+evidence: 'signal.meowcoder.com · the live daily brief, plus the full source on GitHub'
 slug: 'signalforge'
 locale: 'en'
 translationKey: 'signalforge'
@@ -12,7 +12,7 @@ order: 1
 draft: false
 meta:
   - label: 'Status'
-    value: 'Self-hosted · Single user · Runs daily'
+    value: 'Live · Runs daily · Single user'
   - label: 'License'
     value: 'MIT'
   - label: 'Stack'
@@ -217,7 +217,8 @@ This is the least mature part of the pipeline and the part most likely to change
 Stated plainly, because they decide whether the design is worth adapting.
 
 - **Single-user, self-hosted.** One reader, one database, no authentication
-  in front of the reader.
+  in front of the reader. The public instance is read-only and serves only
+  what the pipeline has already published.
 - **Brief quality is bounded by the model and the source coverage.** The
   pipeline is deterministic where it can be; the judgement is not.
 - **Personalization is specified but not yet wired.** The interest profile is
@@ -232,6 +233,8 @@ Stated plainly, because they decide whether the design is worth adapting.
 
 <div class="evidence">
 
+- <a href="https://signal.meowcoder.com" target="_blank" rel="noopener noreferrer"><code>signal.meowcoder.com</code></a>
+  — my own instance, readable as published: today's brief, the archive, and the signals.
 - <a href="https://github.com/tc3oliver/signalforge" target="_blank" rel="noopener noreferrer"><code>github.com/tc3oliver/signalforge</code></a>
   — the pipeline, the reader, the migrations, and the verify suite, MIT licensed.
 - <a href="https://github.com/tc3oliver/signalforge/blob/main/docs/ARCHITECTURE.md" target="_blank" rel="noopener noreferrer"><code>docs/ARCHITECTURE.md</code></a>

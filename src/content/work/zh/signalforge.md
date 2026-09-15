@@ -4,7 +4,7 @@ type: '開源 · 知識與 Agent 系統'
 summary: '自架的情報處理管線，把多來源、充滿雜訊的資訊流整理成去重後的事件、跨日變化、正在浮現的訊號，以及每一句都有來源可查的每日簡報。'
 outcome: '以雙 session 的 agent 架構每天早上無人值守執行；簡報裡的每個來源引用與每個數字，都先由程式碼驗證才發布。'
 indexMeta: 'MIT · TypeScript · Postgres · 雙 session agent runtime'
-evidence: 'github.com/tc3oliver/signalforge · 架構、安全模型與驗證流程全部公開'
+evidence: 'signal.meowcoder.com · 每天實際產出的簡報，加上 GitHub 上的完整原始碼'
 slug: 'signalforge'
 locale: 'zh'
 translationKey: 'signalforge'
@@ -12,7 +12,7 @@ order: 1
 draft: false
 meta:
   - label: '狀態'
-    value: '自架 · 單人使用 · 每日執行'
+    value: '線上 · 每日執行 · 單人使用'
   - label: '授權'
     value: 'MIT'
   - label: '技術'
@@ -196,7 +196,7 @@ fact id，在渲染時才從結構化事實庫解析出數值、單位與時間�
 
 直接說清楚，因為這決定了這個設計值不值得參考。
 
-- **單人、自架。** 一個讀者、一個資料庫，閱讀介面前面沒有認證。
+- **單人、自架。** 一個讀者、一個資料庫，閱讀介面前面沒有認證。公開的實例是只讀的，只提供管線已經發布的內容。
 - **簡報品質受限於模型與來源涵蓋範圍。** 管線在能確定的地方都是確定性的；
   判斷不是。
 - **個人化已經規格化，但還沒接上。** 興趣設定檔會被驗證，但 agent 還沒讀它，
@@ -208,6 +208,8 @@ fact id，在渲染時才從結構化事實庫解析出數值、單位與時間�
 
 <div class="evidence">
 
+- <a href="https://signal.meowcoder.com" target="_blank" rel="noopener noreferrer"><code>signal.meowcoder.com</code></a>
+  — 我自己的實例，照管線發布的樣子公開：今天的簡報、歷史與訊號。
 - <a href="https://github.com/tc3oliver/signalforge" target="_blank" rel="noopener noreferrer"><code>github.com/tc3oliver/signalforge</code></a>
   — 管線、閱讀介面、migration 與驗證測試，MIT 授權。
 - <a href="https://github.com/tc3oliver/signalforge/blob/main/docs/ARCHITECTURE.md" target="_blank" rel="noopener noreferrer"><code>docs/ARCHITECTURE.md</code></a>
