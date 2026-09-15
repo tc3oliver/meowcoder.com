@@ -1,10 +1,10 @@
 ---
 title: 'SignalForge'
 type: '開源 · 知識與 Agent 系統'
-summary: '自架的情報處理管線，把多來源、充滿雜訊的資訊流整理成去重後的事件、跨日變化、正在浮現的訊號，以及每一句都有來源可查的每日簡報。'
-outcome: '以雙 session 的 agent 架構每天早上無人值守執行；簡報裡的每個來源引用與每個數字，都先由程式碼驗證才發布。'
+summary: '自架的情報處理管線，把多來源、充滿雜訊的資訊流整理成去重後的事件、跨日變化、正在浮現的訊號，以及每一句都有來源可查的每日重點整理。'
+outcome: '以雙 session 的 agent 架構每天早上無人值守執行；每日重點裡的每個來源引用與每個數字，都先由程式碼驗證才發布。'
 indexMeta: 'MIT · TypeScript · Postgres · 雙 session agent runtime'
-evidence: 'signal.meowcoder.com · 每天實際產出的簡報，加上 GitHub 上的完整原始碼'
+evidence: 'signal.meowcoder.com · 每天實際產出的每日重點，加上 GitHub 上的完整原始碼'
 slug: 'signalforge'
 locale: 'zh'
 translationKey: 'signalforge'
@@ -48,7 +48,7 @@ Feed reader 給你的是「今天的文章」。但文章是錯的單位。
 | `NO_MATERIAL_CHANGE` | 有報導，但沒有新資訊           |
 
 `NO_MATERIAL_CHANGE` 是整個設計的支點。處於這個狀態的 story 會更新 ledger，
-但刻意不進簡報。這就是「追蹤事件」和「摘要文章」的差別。
+但刻意不進每日重點。這就是「追蹤事件」和「摘要文章」的差別。
 
 ## 架構
 
@@ -70,21 +70,21 @@ tool 讀寫它。
 </li>
 <li class="state-flow__step">
 <span class="state-flow__name">撰寫</span>
-<span class="state-flow__detail">另一個獨立 session，全新 context，只看得到策展後的素材，負責寫簡報。</span>
+<span class="state-flow__detail">另一個獨立 session，全新 context，只看得到策展後的素材，負責寫每日重點。</span>
 <span class="state-flow__part"><span class="state-flow__part-label">讀取</span>素材、附掛的來源、結構化事實</span>
 <span class="state-flow__part state-flow__part--derived"><span class="state-flow__part-label">文字</span>發生什麼、為什麼重要、什麼變了</span>
 </li>
 <li class="state-flow__step">
 <span class="state-flow__name">驗證與發布</span>
-<span class="state-flow__detail">程式碼檢查每個來源 id 與事實引用。引用了不存在的東西的簡報會被退回。</span>
-<span class="state-flow__part"><span class="state-flow__part-label">輸出</span>每日簡報、story 列、浮現訊號</span>
+<span class="state-flow__detail">程式碼檢查每個來源 id 與事實引用。引用了不存在的東西的每日重點會被退回。</span>
+<span class="state-flow__part"><span class="state-flow__part-label">輸出</span>每日重點整理、story 列、浮現訊號</span>
 </li>
 </ol>
 <figcaption class="state-flow__caption">實線是收集或驗證過的內容；虛線是模型的判斷或文字。兩者永遠不共用同一列：閱讀介面只渲染已發布的資料列，從不呼叫模型。</figcaption>
 </figure>
 
 Postgres 是唯一的正式儲存。收集到的項目、決策、跨日 ledger、素材、草稿、已發布
-的簡報與浮現訊號都是資料列，管線和網頁閱讀介面讀的是同一批資料。資料列以
+的每日重點與浮現訊號都是資料列，管線和網頁閱讀介面讀的是同一批資料。資料列以
 lineage 區隔命名空間，所以合成資料或實驗性的執行可以和正式環境共用一個資料庫，
 永遠不會互相干擾。
 
@@ -123,7 +123,7 @@ Curator 已經捨棄的 story，也不可能拿更差的資訊悄悄重做一次
 
 ### 數字以引用傳遞，不以文字傳遞
 
-**原因** — 只存在於模型輸出裡的數字沒有出處。簡報用到的每個數字都是一個
+**原因** — 只存在於模型輸出裡的數字沒有出處。每日重點用到的每個數字都是一個
 fact id，在渲染時才從結構化事實庫解析出數值、單位與時間戳。
 
 **取捨** — 無法解析的 fact id 會渲染成一個明確的缺口，而不是換一個數字補上。
@@ -136,7 +136,7 @@ fact id，在渲染時才從結構化事實庫解析出數值、單位與時間�
 ### 驗證是程式碼，不是第二個模型
 
 **原因** — 問模型「你做得好不好」不是信任邊界。驗證器檢查每個引用的來源 id
-是不是收集過的項目、每個事實引用是否能解析、簡報是否符合必要的結構；失敗時
+是不是收集過的項目、每個事實引用是否能解析、每日重點是否符合必要的結構；失敗時
 指名是哪個欄位。
 
 **結果** — 管線從不從 assistant 訊息裡解析 JSON。兩個 session 都透過受驗證
@@ -153,7 +153,7 @@ fact id，在渲染時才從結構化事實庫解析出數值、單位與時間�
 違反來源政策而丟棄一筆項目。
 
 **取捨** — curator 要掃過當天收集的每一筆，忙碌的一天遠超過一千筆。成本
-隨收集量成長，而不是隨進入簡報的數量成長，這是最大的一筆營運成本。
+隨收集量成長，而不是隨進入每日重點的數量成長，這是最大的一筆營運成本。
 
 </div>
 
@@ -197,7 +197,7 @@ fact id，在渲染時才從結構化事實庫解析出數值、單位與時間�
 直接說清楚，因為這決定了這個設計值不值得參考。
 
 - **單人、自架。** 一個讀者、一個資料庫，閱讀介面前面沒有認證。公開的實例是只讀的，只提供管線已經發布的內容。
-- **簡報品質受限於模型與來源涵蓋範圍。** 管線在能確定的地方都是確定性的；
+- **每日重點品質受限於模型與來源涵蓋範圍。** 管線在能確定的地方都是確定性的；
   判斷不是。
 - **個人化已經規格化，但還沒接上。** 興趣設定檔會被驗證，但 agent 還沒讀它，
   也沒有任何東西從你實際讀了什麼學習。
@@ -209,7 +209,7 @@ fact id，在渲染時才從結構化事實庫解析出數值、單位與時間�
 <div class="evidence">
 
 - <a href="https://signal.meowcoder.com" target="_blank" rel="noopener noreferrer"><code>signal.meowcoder.com</code></a>
-  — 我自己的實例，照管線發布的樣子公開：今天的簡報、歷史與訊號。
+  — 我自己的實例，照管線發布的樣子公開：今天的每日重點、歷史與訊號。
 - <a href="https://github.com/tc3oliver/signalforge" target="_blank" rel="noopener noreferrer"><code>github.com/tc3oliver/signalforge</code></a>
   — 管線、閱讀介面、migration 與驗證測試，MIT 授權。
 - <a href="https://github.com/tc3oliver/signalforge/blob/main/docs/ARCHITECTURE.md" target="_blank" rel="noopener noreferrer"><code>docs/ARCHITECTURE.md</code></a>
