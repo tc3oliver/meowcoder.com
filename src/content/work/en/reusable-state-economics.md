@@ -2,7 +2,7 @@
 title: 'Reusable State Economics in Interactive LLM Inference'
 type: 'Systems Research · LLM Inference'
 summary: 'A study of speculative prefill on one Apple silicon machine: large cold-start wins at long context, a slowdown in one continuation-heavy agent session, and the prefix-cache mechanism that explains both.'
-outcome: 'Cold 32K time-to-first-token fell from 122.7 s to 33.5 s, then the same configuration cost time in a single paired coding-agent session; the request-level trace explaining why produced a correctness fix and a transport-level default, both sent upstream.'
+outcome: 'Built and measured a heterogeneous prefill path, sparse prefill on top of it, a background dense-prefix recovery job and the cooperative scheduler it needed; cold 32K time-to-first-token fell from 122.7 s to 33.5 s, a real coding-agent session then exposed a prefix-cache failure mode, and the work produced a correctness fix and per-request control, both submitted upstream.'
 indexMeta: 'Apple silicon · 27B-class MoE at 4-bit · Two upstream PRs'
 evidence: 'llm-inference-systems on GitHub · the article, the request-level traces, and two oMLX pull requests'
 slug: 'reusable-state-economics'
@@ -17,10 +17,10 @@ meta:
   - label: 'Model'
     value: '27B-class MoE, 4-bit'
   - label: 'Evidence'
-    value: 'Published article · two upstream pull requests'
+    value: 'Published article · two open upstream pull requests'
 ---
 
-Independently researched, measured, and upstreamed by Oliver Yu.
+Independently researched, measured, and submitted upstream by Oliver Yu.
 
 ## Problem
 
@@ -64,12 +64,12 @@ is not a faithful representation of the prompt, so its output cannot be written
 back to the prefix cache. One sparse request is therefore cheap and leaves
 nothing behind.
 
-Nothing is broken at that point, and that is what makes it hard to see. The
+At that point nothing is broken, which is why it is hard to see. The
 request that ran sparse was faster than it would have been dense, and the
 session continues normally. The cost lands on later requests. The reusable
 checkpoint stops advancing while the conversation keeps growing, so the gap
-between what is cached and what the next turn needs widens by roughly one turn's
-worth of tokens every turn, and each request recomputes a longer uncached tail
+between what is cached and what the next turn needs keeps widening every
+turn, and each request recomputes a longer uncached tail
 than the last.
 
 Two costs therefore move in opposite directions over the life of a session. The
@@ -103,6 +103,33 @@ each turn while the overhead grows, and the two cross. Nothing in the server's
 per-request metrics reports that crossing: each individual prefill still looks
 efficient in isolation, because the recomputation it is doing is counted as work
 the request legitimately needed.
+
+## System Evolution
+
+There was no single winning configuration. I built eight things in turn, and
+most of them exist because the one before turned out to rest on something
+false.
+
+1. **Dense baseline** — fast warm turns from the prefix cache, a 57.84 s wait
+   for the first token at 16K.
+2. **Heterogeneous prefill** — the GPU shares each layer's prefill work with
+   the neural engine, in tiles the same size as a cache block.
+3. **Sparse prefill stacked on it** — the two composed cleanly in an isolated
+   smoke run; an eight-turn session ran slower anyway, 129.1 s against 108.1 s.
+4. **Protected-prefix boundary fixed** — measured through the caller's own
+   template instead of inferred by subtraction, after it fell 37 tokens short.
+5. **Sparse first, dense later** — a background job rebuilds the skipped dense
+   prefix in 1024-token slices and publishes every completed block.
+6. **Cooperative scheduler** — the background job learned to see an arriving
+   request and to wait for it; the assistant's typing speed with a job running
+   went from 13.5 to 47 tok/s.
+7. **Real-workload validation** — context growth outran recovery, and the
+   design was set aside.
+8. **Transport-level policy** — the caller declares the request shape; the local
+   build gained per-request control.
+
+The stages, what each one assumed, and the data behind each number are in
+<a href="https://github.com/tc3oliver/llm-inference-systems/blob/main/ENGINEERING.md" target="_blank" rel="noopener noreferrer">ENGINEERING.md</a>.
 
 ## Engineering Decisions
 
@@ -158,12 +185,15 @@ and a saturated session does not have one.
 
 **Why** — A mechanism that degrades one session is not thereby a general
 problem. A third real session never triggered it at all: cache hit rate held at
-84–86%, the largest uncached suffix stayed under 2.5K tokens, and the scorer was
-never called.
+roughly 84–86%, the largest uncached suffix was about 2.5K tokens, and the
+scorer was never called. Those are session-level aggregates, not a trace.
 
-**Consequence** — The answer is workload-shaped. A session whose prefix keeps
-being reused never reaches the state where sparse prefill has anything to lose,
-which is why the fix is a default rather than a removal. It also means a single
+**Consequence** — The answer is workload-shaped, and there are three shapes:
+the disposable cold request, where sparse prefill wins; the continuation-heavy
+session that reaches the cliff, where it loses; and the healthy incremental
+session, where it never triggers. A session whose prefix keeps being reused
+never reaches the state where sparse prefill has anything to lose, which is
+why the fix is a default rather than a removal. It also means a single
 global setting is the wrong shape for the decision: the same server serves both
 kinds of traffic within minutes of each other.
 
@@ -177,9 +207,11 @@ kinds of traffic within minutes of each other.
 setting. The long-context path wants sparse prefill and measurably benefits from
 it; the agent path wants a prefix cache that keeps advancing.
 
-**Consequence** — What shipped is a transport-level policy: the agent path
-defaults to dense, with a per-request sparse override for a caller that knows
-its prompt is cold, and the long-context path is unchanged.
+**Consequence** — Locally the two paths now get different treatment. Agent
+traffic runs dense unless the caller says, on that request, that its prompt
+is cold; long-context traffic keeps the model-level setting. Only the
+per-request switch went upstream, and it is still under review. The default
+stayed a local decision.
 
 </div>
 
@@ -189,15 +221,18 @@ One finding outranks all of the performance work.
 
 Sparse prefill may drop tokens only after a protected prefix boundary — the
 region holding the system prompt and tool instructions has to be computed in
-full. That boundary was being derived by subtraction, and it fell short of the
-real boundary. With tools present the shortfall was as little as 37 tokens,
-which placed the tail of the tool instructions and the operator's system prompt
-inside the region sparse prefill is permitted to drop.
+full. The server was working that boundary out arithmetically, from two
+renders of the prompt, and the arithmetic was wrong for this chat template.
+With tools present it could land 37 tokens early, and those 37 tokens were
+the end of the tool instructions and the start of the operator's own
+instructions.
 
 This is not a throughput regression. It silently removes instructions the
 operator believes are in force, on exactly the requests — tool-carrying agent
-requests — where they matter most, and nothing in the output announces it. It
-was fixed upstream, separately from and ahead of the deployment policy.
+requests — where they matter most, and nothing in the output announces it. The
+fix reads the boundary off the caller's own template instead of computing it,
+and is submitted upstream,
+separately from and ahead of the deployment policy.
 
 ## Limitations
 
@@ -205,8 +240,9 @@ was fixed upstream, separately from and ahead of the deployment policy.
   different trajectories through the task. No session wall-clock ratio from it
   is presented as a measured slowdown; the request-level trace is what carries
   the argument.
-- **One machine, one model, one quantization.** The crossover point between
-  scorer overhead and prefill saving depends on all three.
+- **One machine, one model, one quantization, one run per cell.** The cold-start
+  table is a single run per cell, and the crossover point between scorer
+  overhead and prefill saving depends on all three of the platform choices.
 - **The idle-recovery result is synthetic.** It shows the mechanism can work
   when a gap exists, including the zero-idle row where it does not: 108.1 s
   against 119.7 s, 11% slower than dense.
@@ -220,9 +256,12 @@ was fixed upstream, separately from and ahead of the deployment policy.
 - <a href="https://github.com/tc3oliver/llm-inference-systems/blob/main/publications/article.zh.md" target="_blank" rel="noopener noreferrer"><code>publications/article.zh.md</code></a>
   — the written article, in Traditional Chinese.
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a>
-  — the prefix-boundary correctness fix.
+  — the prefix-boundary correctness fix. Both pull requests are open at the
+  time of writing.
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a>
-  — the transport-level deployment policy.
+  — lets a client of the Anthropic messages endpoint turn sparse prefill on
+  or off per request, as the OpenAI-compatible endpoint already could; no
+  default changes.
 
 </div>
 
