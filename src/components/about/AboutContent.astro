@@ -52,6 +52,20 @@ const { t } = Astro.props;
     </div>
   </AboutSection>
 
+  <AboutSection id="systems-research" heading={t.systemsResearch.heading}>
+    <div class="systems-research">
+      <p class="systems-research__description">{t.systemsResearch.description}</p>
+      <a
+        class="about-link"
+        href={t.systemsResearch.href}
+        target="_blank"
+        rel="external noopener noreferrer"
+      >
+        {t.systemsResearch.cta}<span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </AboutSection>
+
   <AboutSection id="research" heading={t.research.heading} prominence="strong">
     <div class="research">
       <p class="research__venue">{t.research.venue}</p>
@@ -142,6 +156,7 @@ const { t } = Astro.props;
   .about__paragraph,
   .focus-item p,
   .research__detail,
+  .systems-research__description,
   .current-focus__description,
   .current-focus__figure figcaption {
     color: var(--color-text-muted);
@@ -215,6 +230,7 @@ const { t } = Astro.props;
     margin-block-end: var(--space-2);
   }
 
+  .systems-research,
   .research {
     display: flex;
     flex-direction: column;

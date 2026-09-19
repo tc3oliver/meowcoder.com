@@ -36,6 +36,12 @@ export interface AboutStrings extends PageStrings {
       description: string;
     }[];
   };
+  systemsResearch: {
+    heading: string;
+    description: string;
+    cta: string;
+    href: string;
+  };
   research: {
     heading: string;
     venue: string;
@@ -66,6 +72,7 @@ export interface AboutStrings extends PageStrings {
 export type AboutDictionary = Record<Locale, AboutStrings>;
 
 const PUBLICATION_URL = 'https://doi.org/10.1016/j.jisa.2026.104422';
+const INFERENCE_SYSTEMS_URL = 'https://github.com/tc3oliver/llm-inference-systems';
 
 export const about = {
   en: {
@@ -143,6 +150,13 @@ export const about = {
           description: 'Security, privacy, web and mobile applications, and production software.',
         },
       ],
+    },
+    systemsResearch: {
+      heading: 'Current Technical Research',
+      description:
+        'I run independent systems research on LLM inference, mostly on prefill and the reusable KV and prefix state a request leaves behind, and on long-context correctness. The current study looks at how an optimization that speeds up one request changes the cost of the requests that follow it. It is published with its data and figures, and it sent two changes upstream to the oMLX inference server.',
+      cta: 'View the research repository',
+      href: INFERENCE_SYSTEMS_URL,
     },
     research: {
       heading: 'Research',
@@ -265,6 +279,13 @@ export const about = {
           description: '資安、隱私、Web／行動應用與正式軟體系統。',
         },
       ],
+    },
+    systemsResearch: {
+      heading: '目前的技術研究',
+      description:
+        '我獨立進行 LLM 推論的系統研究，主要在 prefill、請求留下的可重用 KV 與 prefix 狀態，以及長上下文的正確性。目前的研究探討一項讓單一請求變快的最佳化，如何改變後續請求的成本。研究連同資料與圖表一併公開，並向 oMLX 推論伺服器送出兩項上游修改。',
+      cta: '查看研究儲存庫',
+      href: INFERENCE_SYSTEMS_URL,
     },
     research: {
       heading: '研究',
