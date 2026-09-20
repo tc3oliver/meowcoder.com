@@ -18,13 +18,21 @@
 
 import type { MarkdownHeading } from 'astro';
 
+import type { JsonLd } from '../lib/structured-data';
+
 import StructuredData from '../components/StructuredData.astro';
 import WorkSidebar from '../components/work/WorkSidebar.astro';
 import { chrome } from '../i18n/chrome';
 import type { Locale } from '../i18n/locales';
 import { work } from '../i18n/pages/work';
 import { localizePath, workDetailRoute } from '../lib/i18n';
-import { aiCodingSkillsSchema, shouriSchema } from '../lib/structured-data';
+import {
+  aiCodingSkillsSchema,
+  personSchema,
+  shouriSchema,
+  signalForgeSchema,
+  workArticleSchema,
+} from '../lib/structured-data';
 import { socialPreview } from '../lib/social';
 import type { WorkEntryData } from '../lib/work';
 import SiteShell from './SiteShell.astro';
@@ -68,18 +76,37 @@ const title =
 const previewName =
   entry.slug === 'shouri' || entry.slug === 'ai-coding-skills' ? entry.slug : 'default';
 
+const preview = socialPreview(locale, previewName);
+
 /*
  * PRD §30 asks for a `SoftwareApplication`/`Product` node for Shouri
  * specifically, so this is keyed on the slug rather than emitted for every case
- * study. AI Coding Skills is open-source work, not a product, and has no
- * equivalent node in §30.
+ * study — each entry gets the type that actually describes it, and an entry
+ * with no accurate type gets none. The synthesized experience entry is
+ * deliberately absent: it is a career summary, not a work or a piece of
+ * software, and forcing a type on it would describe the page falsely.
  */
-const schemas =
-  entry.slug === 'shouri'
-    ? [shouriSchema(locale)]
-    : entry.slug === 'ai-coding-skills'
-      ? [aiCodingSkillsSchema(locale, entry.summary)]
-      : [];
+const subjects: Record<string, () => JsonLd> = {
+  shouri: () => shouriSchema(locale),
+  'ai-coding-skills': () => aiCodingSkillsSchema(locale, entry.summary),
+  signalforge: () => signalForgeSchema(locale, entry.summary),
+  'reusable-state-economics': () => workArticleSchema(locale, entry, preview.src),
+};
+
+/*
+ * Every node above names `#person` as its author, and a JSON-LD `@id` only
+ * resolves within the document it appears in. The `Person` travels with them
+ * so the reference is not dangling on a detail page.
+ */
+const subject = subjects[entry.slug];
+const schemas = subject ? [personSchema(locale), subject()] : [];
+
+/*
+ * `article` for a case study whose body is one piece of writing; the
+ * synthesized experience entry stays `website`, because it is a profile
+ * section rather than an article.
+ */
+const ogType = isExperience ? 'website' : 'article';
 ---
 
 <SiteShell
@@ -87,7 +114,8 @@ const schemas =
   route={workDetailRoute(entry.slug)}
   title={title}
   description={entry.summary}
-  socialImage={socialPreview(locale, previewName)}
+  socialImage={preview}
+  ogType={ogType}
 >
   {schemas.length > 0 && <StructuredData slot="head" schemas={schemas} />}
   <article class:list={['container', 'work', isExperience && 'work--experience']}>

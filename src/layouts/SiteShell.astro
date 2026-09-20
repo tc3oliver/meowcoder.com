@@ -32,9 +32,10 @@ interface Props {
   title: string;
   description: string;
   socialImage?: SocialPreview;
+  ogType?: 'website' | 'article';
 }
 
-const { locale, route, title, description, socialImage } = Astro.props;
+const { locale, route, title, description, socialImage, ogType } = Astro.props;
 
 const t = chrome[locale];
 
@@ -91,6 +92,7 @@ const footerLinks = [
   title={title}
   description={description}
   socialImage={socialImage}
+  ogType={ogType}
   skipLinkLabel={t.skipLink}
 >
   {/* Lets a page add its own `<head>` content — JSON-LD, for instance. */}

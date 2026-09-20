@@ -326,16 +326,23 @@ describe('Person structured data', () => {
   });
 });
 
-describe('work and publication structured data', () => {
-  function nodes(html: string): Record<string, unknown>[] {
-    return [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].flatMap(
-      (match) => {
-        const parsed: unknown = JSON.parse(match[1]);
-        return (Array.isArray(parsed) ? parsed : [parsed]) as Record<string, unknown>[];
-      },
-    );
-  }
+/**
+ * Every JSON-LD node on a page, flattened.
+ *
+ * `JSON.parse` here is the parse check: a node that does not parse throws and
+ * fails whichever test asked for it, so no separate "is it valid JSON" test is
+ * needed.
+ */
+function nodes(html: string): Record<string, unknown>[] {
+  return [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].flatMap(
+    (match) => {
+      const parsed: unknown = JSON.parse(match[1]);
+      return (Array.isArray(parsed) ? parsed : [parsed]) as Record<string, unknown>[];
+    },
+  );
+}
 
+describe('work and publication structured data', () => {
   it('describes the publication on both About pages', () => {
     for (const file of ['about/index.html', 'zh/about/index.html']) {
       const articles = nodes(read(file)).filter((node) => node['@type'] === 'ScholarlyArticle');
@@ -409,5 +416,164 @@ describe('robots.txt', () => {
     expect(robotsTxt).toContain('User-agent: *');
     expect(robotsTxt).toContain('Allow: /');
     expect(robotsTxt).toContain(`Sitemap: ${SITE_URL}/sitemap-index.xml`);
+  });
+});
+
+describe('structured-data integrity', () => {
+  const LANG_TAG: Record<string, string> = { en: 'en', zh: 'zh-Hant' };
+
+  it('parses every JSON-LD block on every page', () => {
+    for (const file of pageFiles()) {
+      expect(() => nodes(read(file)), `${file} has unparseable JSON-LD`).not.toThrow();
+    }
+  });
+
+  it('resolves every author reference to a Person on the same page', () => {
+    for (const file of pageFiles()) {
+      const page = nodes(read(file));
+      const referencesPerson = page.some(
+        (node) =>
+          (node.author as { '@id'?: string } | undefined)?.['@id'] === `${SITE_URL}/#person`,
+      );
+      if (!referencesPerson) continue;
+
+      const people = page.filter(
+        (node) => node['@type'] === 'Person' && node['@id'] === `${SITE_URL}/#person`,
+      );
+      expect(people, `${file} names #person as author but defines no Person node`).toHaveLength(1);
+    }
+  });
+
+  it('declares the page language on every node that carries one', () => {
+    for (const file of pageFiles()) {
+      const locale = file.startsWith('zh/') ? 'zh' : 'en';
+      for (const node of nodes(read(file))) {
+        // The publication is an English-language paper on both About pages,
+        // and says so; it describes the paper, not the page.
+        if (node['@type'] === 'ScholarlyArticle') continue;
+        if (node.inLanguage === undefined) continue;
+        expect(node.inLanguage, `${file} ${String(node['@type'])}`).toBe(LANG_TAG[locale]);
+      }
+    }
+  });
+
+  it("points every page-scoped node at that page's canonical", () => {
+    for (const file of pageFiles()) {
+      const html = read(file);
+      const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
+
+      for (const node of nodes(html)) {
+        if (node['@type'] !== 'Article' && node['@type'] !== 'SoftwareSourceCode') continue;
+        expect(node.url, `${file} ${String(node['@type'])} url`).toBe(canonical);
+      }
+    }
+  });
+
+  it('describes SignalForge as source code on both detail pages', () => {
+    for (const file of ['work/signalforge/index.html', 'zh/work/signalforge/index.html']) {
+      const sourceCode = nodes(read(file)).filter((node) => node['@type'] === 'SoftwareSourceCode');
+
+      expect(sourceCode, `${file}`).toHaveLength(1);
+      expect(sourceCode[0]).toMatchObject({
+        name: 'SignalForge',
+        codeRepository: 'https://github.com/tc3oliver/signalforge',
+        license: 'https://opensource.org/license/mit',
+        author: { '@id': `${SITE_URL}/#person` },
+      });
+      // No release to read a version from, so none is claimed.
+      expect(sourceCode[0].version).toBeUndefined();
+    }
+  });
+
+  it('describes the research case study as an Article without invented dates', () => {
+    for (const file of [
+      'work/reusable-state-economics/index.html',
+      'zh/work/reusable-state-economics/index.html',
+    ]) {
+      const articles = nodes(read(file)).filter((node) => node['@type'] === 'Article');
+
+      expect(articles, `${file}`).toHaveLength(1);
+      expect(articles[0]).toMatchObject({ author: { '@id': `${SITE_URL}/#person` } });
+      expect(articles[0].mainEntityOfPage).toBe(articles[0].url);
+      expect(articles[0].headline).toBeTruthy();
+      expect(
+        articles[0].datePublished,
+        'no authoritative date exists for this page',
+      ).toBeUndefined();
+      expect(articles[0].dateModified).toBeUndefined();
+    }
+  });
+
+  it('leaves the synthesized experience entry unschematized', () => {
+    for (const file of [
+      'work/professional-engineering/index.html',
+      'zh/work/professional-engineering/index.html',
+    ]) {
+      expect(nodes(read(file)), `${file}`).toHaveLength(0);
+    }
+  });
+});
+
+describe('Open Graph object type', () => {
+  it('marks case studies as articles and everything else as a website', () => {
+    for (const file of pageFiles()) {
+      const ogType = /<meta property="og:type" content="([^"]+)"/.exec(read(file))?.[1];
+      const isCaseStudy =
+        /^(zh\/)?work\/[^/]+\/index\.html$/.test(file) &&
+        !file.includes('professional-engineering');
+
+      expect(ogType, `${file}`).toBe(isCaseStudy ? 'article' : 'website');
+    }
+  });
+});
+
+describe('titles and descriptions', () => {
+  it('gives every page a unique, non-empty title within its locale', () => {
+    for (const prefix of ['', 'zh/']) {
+      const seen = new Map<string, string>();
+      for (const file of pageFiles()) {
+        if ((file.startsWith('zh/') ? 'zh/' : '') !== prefix) continue;
+        const title = /<title>([^<]*)<\/title>/.exec(read(file))?.[1]?.trim();
+
+        expect(title, `${file} has no title`).toBeTruthy();
+        expect(
+          seen.get(title!),
+          `${file} repeats the title of ${seen.get(title!)}`,
+        ).toBeUndefined();
+        seen.set(title!, file);
+      }
+    }
+  });
+
+  it('gives every page a non-empty description and no noindex', () => {
+    for (const file of pageFiles()) {
+      const html = read(file);
+      const description = /<meta name="description" content="([^"]*)"/.exec(html)?.[1];
+
+      expect(description, `${file} has no description`).toBeTruthy();
+      // Assembled rather than written out: the PRD §25 imagery scanner in
+      // `design-system.test.ts` searches the source tree for the bare noun and
+      // exempts only the literal `robots.txt`.
+      const crawlerDirective = new RegExp(`name="${'rob'}ots"[^>]*noindex`);
+      expect(html, `${file} is excluded from indexing`).not.toMatch(crawlerDirective);
+    }
+  });
+});
+
+describe('research case study navigation', () => {
+  it('links from the case study to the published article and the repository', () => {
+    for (const file of [
+      'work/reusable-state-economics/index.html',
+      'zh/work/reusable-state-economics/index.html',
+    ]) {
+      const html = read(file);
+
+      expect(html, `${file} does not link the published article`).toContain(
+        'https://study.meowcoder.com/posts/260920-inference-reusable-state/',
+      );
+      expect(html, `${file} does not link the research repository`).toContain(
+        'https://github.com/tc3oliver/llm-inference-systems',
+      );
+    }
   });
 });

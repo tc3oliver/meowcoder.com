@@ -27,11 +27,18 @@ interface Props {
   title: string;
   description: string;
   socialImage?: SocialPreview;
+  /**
+   * Open Graph object type. Defaults to `website`, which is right for the
+   * homepage, About, and the index pages. A page whose body is one dated
+   * piece of writing passes `article` instead; nothing derives this from a
+   * slug, so a new case study does not need this file edited.
+   */
+  ogType?: 'website' | 'article';
   /** Localized skip-link text. Omitted means no skip link is rendered. */
   skipLinkLabel?: string;
 }
 
-const { locale, route, title, description, skipLinkLabel } = Astro.props;
+const { locale, route, title, description, skipLinkLabel, ogType = 'website' } = Astro.props;
 
 const canonical = localizeUrl(locale, route);
 const alternates = alternatesFor(route);
@@ -64,7 +71,7 @@ const preview = Astro.props.socialImage ?? socialPreview(locale);
       ))
     }
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="meowcoder.com" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />

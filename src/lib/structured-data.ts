@@ -18,6 +18,7 @@ import {
   ORCID_URL,
   PUBLICATION_URL,
   SHOURI_URL,
+  SIGNALFORGE_URL,
   SKILLS_URL,
   STUDY_URL,
 } from './external';
@@ -99,6 +100,63 @@ export function aiCodingSkillsSchema(locale: Locale, description: string): JsonL
     version: '1.2.0',
     license: 'https://opensource.org/license/mit',
     inLanguage: LOCALE_TAG[locale],
+    author: { '@id': `${SITE_URL}/#person` },
+  };
+}
+
+/**
+ * The SignalForge repository.
+ *
+ * `SoftwareSourceCode` rather than `SoftwareApplication`: the case study
+ * describes a self-hosted pipeline readers run from source, and the public
+ * artifact is the repository. Only fields confirmed against that repository
+ * appear — the licence is the one it publishes, and there is no `version`
+ * here because the project publishes no release to read one from.
+ */
+export function signalForgeSchema(locale: Locale, description: string): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareSourceCode',
+    '@id': `${SITE_URL}/#signalforge`,
+    name: 'SignalForge',
+    description,
+    url: localizeUrl(locale, workDetailRoute('signalforge')),
+    codeRepository: SIGNALFORGE_URL,
+    programmingLanguage: 'TypeScript',
+    license: 'https://opensource.org/license/mit',
+    inLanguage: LOCALE_TAG[locale],
+    author: { '@id': `${SITE_URL}/#person` },
+  };
+}
+
+/**
+ * A case study whose body is one piece of technical writing.
+ *
+ * No `datePublished` or `dateModified`: the Work collection carries no date
+ * field, so there is nothing authoritative to read one from, and inventing
+ * one would describe the page falsely. Both are optional for `Article`.
+ *
+ * `mainEntityOfPage` and `url` are the page's own canonical, which is what
+ * ties the node to the document a crawler is reading rather than to the
+ * research repository it cites.
+ */
+export function workArticleSchema(
+  locale: Locale,
+  entry: { slug: string; title: string; summary: string },
+  image: string,
+): JsonLd {
+  const url = localizeUrl(locale, workDetailRoute(entry.slug));
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    '@id': `${url}#article`,
+    headline: entry.title,
+    description: entry.summary,
+    url,
+    mainEntityOfPage: url,
+    inLanguage: LOCALE_TAG[locale],
+    image,
     author: { '@id': `${SITE_URL}/#person` },
   };
 }
