@@ -112,7 +112,8 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 一個正確性 caveat，這裡只標不展開：**開啟 MTP 後，greedy 生成不再可重現**——同一個 prompt 兩次執行給出兩份不同的完成，也都與 dense 不同；dense 那一邊則是逐字元完全一致。語意上的影響沒有被量測，所以不宣稱有退化，也不宣稱沒有。這個未解問題被歸進正確性研究線。
 
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-002-speculative-decoding-economics" target="_blank" rel="noopener noreferrer">EXP-002</a>
-逐項標出每個結論的證據等級，以及五格 workload 的原始量測。
+逐項標出每個結論的證據等級，以及五格 workload 的原始量測；長文版本在
+<a href="https://study.meowcoder.com/posts/260920-speculative-decoding-cost-model/" target="_blank" rel="noopener noreferrer">推測解碼何時真的會加速？</a>。
 
 ## 系統主題
 
@@ -169,6 +170,7 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 - <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/data" target="_blank" rel="noopener noreferrer">資料</a>
   與 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/figures" target="_blank" rel="noopener noreferrer">圖表</a>——每張圖背後的每個數字，附出處與列數。
 - <a href="https://study.meowcoder.com/posts/260920-inference-reusable-state/" target="_blank" rel="noopener noreferrer">當 prefill 變快，agent 反而變慢</a>——EXP-001 的完整長文，含圖表。
+- <a href="https://study.meowcoder.com/posts/260920-speculative-decoding-cost-model/" target="_blank" rel="noopener noreferrer">推測解碼何時真的會加速？從 Acceptance Rate 到 Verify-Cycle Cost</a>——EXP-002 的完整長文。
 
 </div>
 

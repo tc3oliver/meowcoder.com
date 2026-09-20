@@ -112,7 +112,8 @@ Because the code under test was already choosing correctly, the finding came wit
 One correctness caveat, flagged here and not opened up: **with speculation on, greedy generation stopped being reproducible** — two runs of one prompt gave two different completions, both different from the dense one, while the dense arm was character-for-character identical. The semantic impact was not measured, so neither degradation nor its absence is claimed. The open question is filed in the correctness thread.
 
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-002-speculative-decoding-economics" target="_blank" rel="noopener noreferrer">EXP-002</a>
-states each result with its evidence level, alongside the raw measurements for all five workload cells.
+states each result with its evidence level, alongside the raw measurements for all five workload cells. The long-form write-up is
+<a href="https://study.meowcoder.com/posts/260920-speculative-decoding-cost-model/" target="_blank" rel="noopener noreferrer">推測解碼何時真的會加速？</a> (Traditional Chinese).
 
 ## Systems themes
 
@@ -169,6 +170,7 @@ One machine, one vendor, one runtime. EXP-001 is a single 27B dense model at 4-b
 - <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/data" target="_blank" rel="noopener noreferrer">Data</a>
   and <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/figures" target="_blank" rel="noopener noreferrer">figures</a> — every number behind every figure, with provenance and row counts.
 - <a href="https://study.meowcoder.com/posts/260920-inference-reusable-state/" target="_blank" rel="noopener noreferrer">當 prefill 變快，agent 反而變慢</a> — the long-form EXP-001 article, with charts.
+- <a href="https://study.meowcoder.com/posts/260920-speculative-decoding-cost-model/" target="_blank" rel="noopener noreferrer">推測解碼何時真的會加速？從 Acceptance Rate 到 Verify-Cycle Cost</a> — the long-form EXP-002 article.
 
 </div>
 
