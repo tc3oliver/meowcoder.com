@@ -312,7 +312,7 @@ export const home = {
           name: 'LLM Infrastructure',
           description: 'Serving, optimization, benchmarking and reliability.',
           evidence: {
-            label: 'See the reusable state economics case study',
+            label: 'See the LLM inference case study',
             caseStudy: 'reusable-state-economics',
           },
         },
@@ -418,7 +418,7 @@ export const home = {
           name: 'LLM 基礎架構',
           description: '模型服務、推論最佳化、效能量測與穩定性。',
           evidence: {
-            label: '查看可重用狀態經濟學案例',
+            label: '查看 LLM 推論案例',
             caseStudy: 'reusable-state-economics',
           },
         },

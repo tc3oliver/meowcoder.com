@@ -37,9 +37,19 @@ interface Props {
   steps: readonly string[];
   /** The stage the flow ends in; sits under the last step. */
   end: string;
+  /**
+   * Draw the diagram inside the same panel the page's other figures use.
+   *
+   * The Work index sets this: there the diagram sits in a row with a
+   * screenshot and a chart, both of which are bordered, and an unframed one
+   * reads as the entry that did not finish loading. The homepage leaves it
+   * off, because there its neighbours are plain text columns and a panel
+   * would be the odd one out in the other direction.
+   */
+  boxed?: boolean;
 }
 
-const { caption, start, steps, end } = Astro.props;
+const { caption, start, steps, end, boxed = false } = Astro.props;
 
 /**
  * The middle row's column count. The turn back down happens under the last
@@ -49,7 +59,7 @@ const { caption, start, steps, end } = Astro.props;
 const columns = Math.max(steps.length, 1);
 ---
 
-<figure class="flow" style={`--flow-columns: ${columns};`}>
+<figure class:list={['flow', boxed && 'flow--boxed']} style={`--flow-columns: ${columns};`}>
   <figcaption class="visually-hidden">{caption}</figcaption>
 
   <ol class="flow__stages" role="list">
@@ -74,6 +84,21 @@ const columns = Math.max(steps.length, 1);
 <style>
   .flow {
     margin: 0;
+  }
+
+  /* Same panel as `.work-entry__figure` on the Work index: one border token,
+     one radius token, and enough padding that the stage names are not flush
+     against the edge. Declared here rather than there so the component keeps
+     owning its own appearance. */
+  .flow--boxed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 11rem;
+    padding: var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
   }
 
   .flow__stages {

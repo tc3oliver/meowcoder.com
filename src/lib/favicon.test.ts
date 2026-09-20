@@ -63,8 +63,19 @@ describe('favicon.svg', () => {
     );
   });
 
-  it('is reused as the decorative mark beside the header brand', () => {
-    expect(HEADER).toContain('<img src="/favicon.svg" alt="" width="20" height="20" />');
+  it('stays out of the header, which carries the name as plain text', () => {
+    // The header used to render this asset at 20px beside the name. It reads
+    // as a cat at 200px and as specks at 20px: the five shapes are separate,
+    // with no head outline holding them together, which is exactly why the
+    // favicon carries a solid tile for the 16px tab-strip case. On the site's
+    // own dark header that tile is the same value as the surface behind it,
+    // so it disappeared and left the shapes floating.
+    //
+    // Dropping it rather than redrawing it is what `BrandWordmark.astro`
+    // already documents: the mark belongs to the site, which lives in the
+    // footer, and the header keeps the plain-text person's name so the two
+    // never compete (doc-2 §1).
+    expect(HEADER).not.toContain('favicon');
   });
 });
 

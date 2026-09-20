@@ -110,7 +110,10 @@ const { screenshot } = t.shouri;
        This is what keeps 390px free of a horizontal scrollbar (doc-2 §17). */
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-7);
-    align-items: center;
+    /* Top-aligned, not centred: the copy column is much shorter than the
+       screenshot, and centring it opened a gap under the heading big enough
+       to read as a section that failed to load. */
+    align-items: start;
   }
 
   /* doc-2 §6's 40 / 60 split. `minmax(0, …)` on both tracks so the image can
