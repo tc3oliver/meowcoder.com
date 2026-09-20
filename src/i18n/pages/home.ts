@@ -78,11 +78,18 @@ export interface HomeStrings extends PageStrings {
    * doc-2 §5. `heading` is the name and `intro` the statement beneath it, so
    * the hero adds only what `PageStrings` has no field for.
    *
-   * doc-2 §5 keeps the name, the role line, the two facts, and exactly two
-   * actions, and replaces only the supporting statement. `role` and the second
-   * entry of `facts` still stay in English in both locales: PRD §9.1 writes the
-   * Chinese hero that way, and each is its own standalone line rather than a
-   * prose block, so no block mixes languages (PRD §34).
+   * doc-2 §5 keeps the name, the role line, the facts, and exactly two
+   * actions, and replaces only the supporting statement. `role` stays in
+   * English in both locales: PRD §9.1 writes the Chinese hero that way, and it
+   * is its own standalone line rather than a prose block, so no block mixes
+   * languages (PRD §34).
+   *
+   * `facts` carried a second entry, `Taiwan`, also in English in both
+   * locales. It was the only fact that was not about the work, which put a
+   * bare country name at the same weight as a decade of engineering, and in
+   * the Chinese hero it told a Taiwanese reader nothing, in English. A
+   * location is worth stating when it answers something — a timezone for
+   * someone deciding whether to work together — and the bare name did not.
    */
   hero: {
     role: string;
@@ -278,7 +285,7 @@ export const home = {
       'I build reliable AI systems for developer workflows, knowledge retrieval, and model infrastructure.',
     hero: {
       role: 'AI Systems Engineer · System Architect',
-      facts: ['10+ Years in Software Engineering', 'Taiwan'],
+      facts: ['10+ Years in Software Engineering'],
       workCta: 'View Selected Work',
       writingCta: 'Technical Writing',
       noBreakSuffix: 'model infrastructure.',
@@ -380,7 +387,7 @@ export const home = {
       // PRD §9.1 keeps the role line and `Taiwan` in English in the Chinese
       // hero; both are standalone lines, so neither mixes languages.
       role: 'AI Systems Engineer · System Architect',
-      facts: ['10+ 年軟體工程經驗', 'Taiwan'],
+      facts: ['10+ 年軟體工程經驗'],
       workCta: '精選作品',
       writingCta: '技術文章',
       noBreakSuffix: '模型基礎架構。',

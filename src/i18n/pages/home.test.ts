@@ -34,8 +34,12 @@ function strings(value: unknown): string[] {
 const BY_LOCALE = LOCALES.map((locale) => [locale, home[locale]] as const);
 
 describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
-  it('states the two hero facts PRD §9.1 lists', () => {
-    expect(t.hero.facts).toHaveLength(2);
+  it('states the hero fact about the work, and nothing else', () => {
+    // One fact, not two. `Taiwan` used to sit beside it — the only entry that
+    // was not about the work, and in the Chinese hero an English word that
+    // told a Taiwanese reader nothing.
+    expect(t.hero.facts).toHaveLength(1);
+    expect(t.hero.facts[0]).toMatch(/10\+/);
   });
 
   it('names the three Shouri product principles doc-2 §6 lists', () => {
@@ -267,7 +271,7 @@ describe('requirement wording', () => {
     expect(home.en.intro).toBe(
       'I build reliable AI systems for developer workflows, knowledge retrieval, and model infrastructure.',
     );
-    expect(home.en.hero.facts).toEqual(['10+ Years in Software Engineering', 'Taiwan']);
+    expect(home.en.hero.facts).toEqual(['10+ Years in Software Engineering']);
     expect(home.en.hero.workCta).toBe('View Selected Work');
     expect(home.en.hero.writingCta).toBe('Technical Writing');
   });
@@ -276,9 +280,9 @@ describe('requirement wording', () => {
     expect(home.zh.intro).toBe(
       '設計與打造可投入實際使用的 AI 系統，聚焦開發者工作流程、知識檢索與模型基礎架構。',
     );
-    // doc-2 §5 keeps the role line and `Taiwan` in English in both locales.
+    // doc-2 §5 keeps the role line in English in both locales.
     expect(home.zh.hero.role).toBe('AI Systems Engineer · System Architect');
-    expect(home.zh.hero.facts[1]).toBe('Taiwan');
+    expect(home.zh.hero.facts).toEqual(['10+ 年軟體工程經驗']);
   });
 
   it('quotes the doc-2 §6 Shouri product statement verbatim in English', () => {
