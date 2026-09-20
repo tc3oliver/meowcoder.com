@@ -40,6 +40,7 @@ import { Image } from 'astro:assets';
 import { shouriScreenshot } from '../components/home/shouri-screenshot';
 import WorkflowDiagram from '../components/WorkflowDiagram.astro';
 import cacheCliff from '../assets/research/cache-cliff.svg';
+import { signalForgeScreenshot } from '../components/work/signalforge-screenshot';
 import type { Locale } from '../i18n/locales';
 import { work } from '../i18n/pages/work';
 import { localizePath, workDetailRoute } from '../lib/i18n';
@@ -65,10 +66,11 @@ const t = work[locale];
  * copy alone, which is the same shape the index had before this redesign and is
  * the correct shape for the experience entry, which has no honest visual.
  */
-const VISUALS: Readonly<Record<string, 'screenshot' | 'workflow' | 'chart'>> = {
+const VISUALS: Readonly<Record<string, 'screenshot' | 'workflow' | 'chart' | 'keyvisual'>> = {
   shouri: 'screenshot',
   'ai-coding-skills': 'workflow',
   'reusable-state-economics': 'chart',
+  signalforge: 'keyvisual',
 };
 
 /** `01`, `02` — the position doc-2 §11 numbers each entry by. */
@@ -146,6 +148,19 @@ function position(index: number): string {
                     <Image
                       src={shouriScreenshot}
                       alt={t.visuals.shouri.alt}
+                      widths={[480, 640, 960, 1280]}
+                      sizes="(min-width: 64rem) 30vw, 100vw"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </figure>
+                )}
+
+                {visual === 'keyvisual' && signalForgeScreenshot && (
+                  <figure class="work-entry__figure">
+                    <Image
+                      src={signalForgeScreenshot}
+                      alt={t.visuals.signalforge.alt}
                       widths={[480, 640, 960, 1280]}
                       sizes="(min-width: 64rem) 30vw, 100vw"
                       loading="lazy"

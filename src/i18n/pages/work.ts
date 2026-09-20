@@ -45,6 +45,8 @@ export interface WorkPageStrings extends PageStrings {
     };
     /** Caption and alt text for the cache-cliff chart. */
     reusableState: { alt: string; caption: string };
+    /** Alt text for the SignalForge key visual. */
+    signalforge: { alt: string };
   };
   /** Label for the `type` metadata on a detail page. */
   typeLabel: string;
@@ -103,6 +105,9 @@ export const work = {
         caption:
           'One session, twenty restores: the reusable checkpoint flatlines at the eleventh while the recomputed suffix keeps growing.',
       },
+      signalforge: {
+        alt: 'The SignalForge daily brief in a browser: a sixty-second summary of the day, a numbered list of the events worth reading, a column of the latest changes, and a trend panel, each item carrying a count of the sources behind it.',
+      },
     },
     typeLabel: 'Type',
     asideLabel: 'Project details and contents',
@@ -136,6 +141,9 @@ export const work = {
       reusableState: {
         alt: '一個 session、20 次 prefix cache 還原的折線圖。可重用的 checkpoint 一路爬到約 38,000 token，在第 11 次還原掉回 28,672，之後整段 session 都是水平線；同時每個 request 必須重算的未快取尾巴，從幾百個 token 長到約 34,000。',
         caption: '一個 session、20 次還原：checkpoint 在第 11 次之後就停住，重算的尾巴繼續長。',
+      },
+      signalforge: {
+        alt: 'SignalForge 的每日重點頁面：最上方是 60 秒摘要，接著是編號的今日必看事件、最新變化列表，以及趨勢面板，每一則都標示背後有幾個來源。',
       },
     },
     typeLabel: '類型',
