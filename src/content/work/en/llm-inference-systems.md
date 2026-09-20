@@ -2,7 +2,7 @@
 title: 'LLM Inference Systems'
 type: 'Systems Research · LLM Inference'
 summary: 'An ongoing inference-systems research program driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, and turn the result into a production decision or an upstream fix. Two completed experiments and three open research threads.'
-outcome: 'Two finished experiments — reusable state economics and speculative decoding economics — three threads that each state the evidence they still lack, two open upstream pull requests, and a reproducible harness with the full dataset behind every figure.'
+outcome: 'Two finished experiments — reusable state dynamics, and a cost model for speculative decoding — three threads that each state the evidence they still lack, two open upstream pull requests, and a reproducible harness with the full dataset behind every figure.'
 indexMeta: 'Apple silicon · Two experiments · Three research threads · Two open upstream PRs'
 evidence: 'llm-inference-systems on GitHub · methodology, request-level traces, raw data, and figures'
 slug: 'llm-inference-systems'
@@ -62,9 +62,9 @@ The scope is runtime, serving, reusable state, speculative execution, correctnes
 
 Every claim carries an evidence level: observed, measured, derived, inferred, hypothesized, not established. The grading is the point — three subjects in the repository are filed as research threads rather than experiments precisely because each one names the evidence it still lacks.
 
-## Reusable State Economics (EXP-001)
+## Reusable State Dynamics (EXP-001)
 
-The tension: **cold prefill became dramatically faster, and the interactive session became slower.**
+The question: **does a faster request make the whole interactive session slower, by destroying the reusable state the next request needed?**
 
 Sparse prefill — here SpecPrefill, an attention-based mechanism — delivers on a cold long prompt: 16K time-to-first-token fell from 57.84 s to 19.24 s, and 32K from 122.7 s to 33.5 s. But an agent's next request is mostly its previous request again, and a sparsified suffix does not advance the normal reusable dense prefix state.
 
@@ -86,11 +86,11 @@ The full findings, data, and limitations are in
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-001-reusable-state-economics" target="_blank" rel="noopener noreferrer">EXP-001</a>; the long-form write-up is
 <a href="https://study.meowcoder.com/posts/260920-inference-reusable-state/" target="_blank" rel="noopener noreferrer">當 prefill 變快，agent 反而變慢</a> (Traditional Chinese).
 
-## Speculative Decoding Economics (EXP-002)
+## Speculative Decoding Cost Model (EXP-002)
 
-The tension: **high acceptance did not guarantee a speedup.**
+The question: **under what conditions does speculative decoding actually save time — is break-even decided by the acceptance rate, or by the cost of one verify cycle?**
 
-The number everybody reports for speculative decoding is the acceptance rate. Thirty-six matched runs later, it is the wrong number. What decides whether speculation pays is **the cost of one verify cycle measured in dense decode steps**, and that cost is a property of the model's architecture rather than of the content.
+By the verify cycle. Acceptance is the number everybody reports for this mechanism, and thirty-six matched runs later it is the wrong one: high acceptance did not guarantee a speedup. What decides whether speculation pays is **the cost of one verify cycle measured in dense decode steps**, and that cost is a property of the model's architecture rather than of the content.
 
 - On a 35B-A3B mixture-of-experts, a four-position verify forward costs 2.43 dense steps. A fixed draft depth of 3 came out 10% slower than dense decoding on code and 43% slower on prose, at acceptance rates of 56% and 25%.
 - On a dense 27B, same runtime and same prompts, the identical forward costs 1.37 dense steps and the mechanism is 1.81× faster on a matched 13.6K-token coding prompt — at 79% acceptance.

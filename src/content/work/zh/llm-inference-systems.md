@@ -2,7 +2,7 @@
 title: 'LLM Inference Systems'
 type: '系統研究 · LLM 推論'
 summary: '一個持續進行的推論系統研究計畫：從真實互動式 workload 出發，對 runtime 下儀器、建立受控實驗、追到機制、檢查正確性，最後轉成 production 決策或上游修正。目前含兩個已完成實驗與三條研究線。'
-outcome: '兩個完成的實驗（可重用狀態經濟學、推測解碼經濟學）、三條標明缺什麼證據的研究線、兩個審查中的上游 pull request，以及一套可重跑的量測工具與完整資料集。'
+outcome: '兩個完成的實驗（可重用狀態與互動延遲、推測解碼成本模型）、三條標明缺什麼證據的研究線、兩個審查中的上游 pull request，以及一套可重跑的量測工具與完整資料集。'
 indexMeta: 'Apple silicon · 兩個實驗 · 三條研究線 · 兩個審查中的上游 PR'
 evidence: 'GitHub 上的 llm-inference-systems · 實驗方法、request 層級 trace、原始資料與圖表'
 slug: 'llm-inference-systems'
@@ -62,9 +62,9 @@ meta:
 
 每一項結論都標上證據等級：observed、measured、derived、inferred、hypothesized、not established。這個分級是刻意的——repo 裡有三條主題被標成研究線而不是實驗，正因為它們各自寫明了還缺什麼證據。
 
-## 可重用狀態經濟學（EXP-001）
+## 可重用狀態與互動延遲（EXP-001）
 
-核心張力：**冷啟動 prefill 大幅變快，互動式 session 反而變慢。**
+這個實驗問的是：**一次 request 的加速，會不會因為破壞了可重用狀態，反而讓整個互動 session 變慢？**
 
 Sparse prefill（此處為 SpecPrefill，一種 attention-based 機制）在冷啟動長 prompt 上效果很實在：16K 首個 token 從 57.84 秒降到 19.24 秒，32K 從 122.7 秒降到 33.5 秒。但一個 agent 的下一個 request，大部分就是上一個 request 再來一次——而 sparse 化過的尾巴，不會推進正常可重用的 dense prefix state。
 
@@ -86,11 +86,11 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-001-reusable-state-economics" target="_blank" rel="noopener noreferrer">EXP-001</a>，長文版本在
 <a href="https://study.meowcoder.com/posts/260920-inference-reusable-state/" target="_blank" rel="noopener noreferrer">當 prefill 變快，agent 反而變慢</a>。
 
-## 推測解碼經濟學（EXP-002）
+## 推測解碼成本模型（EXP-002）
 
-核心張力：**高接受率並不保證變快。**
+這個實驗問的是：**推測解碼在什麼條件下真的省時間？決定 break-even 的是 acceptance rate，還是一次 verify cycle 的成本？**
 
-推測解碼被報得最多的數字是 acceptance rate。36 次配對量測之後的結論是：那是錯的數字。真正決定速度的是**一次 verify cycle 的代價，以 dense decode step 為單位**，而這個代價屬於模型架構，不屬於內容。
+答案是後者。acceptance rate 是這個機制被報得最多的數字，而 36 次配對量測之後的結論是：那是錯的數字——高接受率並不保證變快。真正決定划不划算的是**一次 verify cycle 的代價，以 dense decode step 為單位**，而這個代價屬於模型架構，不屬於內容。
 
 - 35B-A3B MoE 上，一次四位置的 verify forward 值 2.43 個 dense step；固定 draft depth 3 在 code 上比 dense 慢 10%、在 prose 上慢 43%，而當下的 acceptance 分別是 56% 與 25%。
 - 同一個 runtime、同一批 prompt，dense 27B 上同樣的 forward 只值 1.37 個 dense step，機制在配對的 13.6K coding prompt 上快 1.81 倍——acceptance 是 79%。
