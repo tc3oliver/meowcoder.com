@@ -47,15 +47,17 @@ export interface CtaLabel {
 /**
  * One PRD §5 pillar.
  *
- * `evidence` carries the link to whatever proves that pillar publicly. For
- * LLM Infrastructure that is technical writing on Study: PRD §12 keeps it an
- * expertise area rather than a case study, precisely because the strongest
- * evidence sits in confidential employer systems. For AI & Agent Systems and
- * Knowledge Systems it is the SignalForge case study — an inspectable public
- * system built on exactly those two areas. Software Architecture has no single
- * public proof and deliberately carries none. Marking the pillar here rather
- * than matching its name in a component is what keeps the rule intact in both
- * locales — the Chinese pillar is not called "LLM Infrastructure".
+ * `evidence` carries the link to whatever proves that pillar publicly. For AI
+ * & Agent Systems and Knowledge Systems it is the SignalForge case study — an
+ * inspectable public system built on exactly those two areas. LLM
+ * Infrastructure pointed at Study instead, because PRD §12 wrote it as an
+ * expertise area on the grounds that its strongest evidence sat in
+ * confidential employer systems; the reusable-state study is public,
+ * measured, and inspectable, so that ground no longer holds and the pillar
+ * carries a case study like the other two. Software Architecture has no
+ * single public proof and deliberately carries none. Marking the pillar here
+ * rather than matching its name in a component is what keeps the rule intact
+ * in both locales — the Chinese pillar is not called "LLM Infrastructure".
  */
 export interface ExpertisePillar extends NamedItem {
   evidence?: PillarEvidence;
@@ -309,7 +311,10 @@ export const home = {
         {
           name: 'LLM Infrastructure',
           description: 'Serving, optimization, benchmarking and reliability.',
-          evidence: { label: 'Read the published analysis on Study' },
+          evidence: {
+            label: 'See the reusable state economics case study',
+            caseStudy: 'reusable-state-economics',
+          },
         },
         {
           name: 'Software Architecture',
@@ -412,7 +417,10 @@ export const home = {
         {
           name: 'LLM 基礎架構',
           description: '模型服務、推論最佳化、效能量測與穩定性。',
-          evidence: { label: '閱讀 Study 上的公開分析' },
+          evidence: {
+            label: '查看可重用狀態經濟學案例',
+            caseStudy: 'reusable-state-economics',
+          },
         },
         {
           name: '軟體架構',

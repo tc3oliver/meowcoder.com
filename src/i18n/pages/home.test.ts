@@ -173,30 +173,32 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     }
   });
 
-  it('points LLM Infrastructure — and only it — at Study (PRD §12)', () => {
-    // Both locales, which is the point: the Chinese pillar has a different
-    // name, so this cannot be enforced by matching the English one.
+  it('backs every evidenced pillar with a case study that exists', () => {
+    // Both locales, which is the point: the Chinese pillars have different
+    // names, so this cannot be enforced by matching the English ones.
     //
-    // A pillar's evidence either names a case study — published open-source
-    // work, which PRD §12 does not restrict — or it points at Study. Only LLM
-    // Infrastructure may do the latter, because it is the one area whose
-    // public proof is writing rather than an inspectable system.
-    const atStudy = t.expertise.pillars.filter(
-      (pillar) => pillar.evidence && !pillar.evidence.caseStudy,
-    );
+    // LLM Infrastructure used to be the exception, pointing at Study because
+    // PRD §12 wrote it as an expertise area whose strongest evidence sat in
+    // confidential employer systems. The reusable-state study is public and
+    // inspectable, so it now carries a case study like the other two, and no
+    // pillar falls back to Study.
+    //
+    // The slug must name a real Work entry; the component resolves it to a
+    // route, and a typo would ship a dead link from the homepage.
+    const PUBLISHED = new Set(['signalforge', 'reusable-state-economics']);
 
-    expect(atStudy).toHaveLength(1);
-    // PRD §5 fixes the order, so LLM Infrastructure is the third pillar.
-    expect(atStudy[0]).toBe(t.expertise.pillars[2]);
-    expect(atStudy[0]?.evidence?.label).toContain('Study');
+    // PRD §5 fixes the order: the first three pillars carry evidence and
+    // Software Architecture, the fourth, deliberately carries none.
+    expect(t.expertise.pillars.filter((pillar) => pillar.evidence)).toHaveLength(3);
+    expect(t.expertise.pillars[3]?.evidence).toBeUndefined();
 
-    // The case-study evidence must name a slug that has a Work entry; the
-    // component resolves it to a route, and a typo would be a dead link.
     for (const pillar of t.expertise.pillars) {
-      if (pillar.evidence?.caseStudy) {
-        expect(pillar.evidence.caseStudy).toBe('signalforge');
-      }
+      if (!pillar.evidence) continue;
+      expect(pillar.evidence.caseStudy, `${pillar.name} points nowhere inspectable`).toBeDefined();
+      expect(PUBLISHED.has(pillar.evidence.caseStudy!), `${pillar.name}`).toBe(true);
     }
+
+    expect(t.expertise.pillars[2]?.evidence?.caseStudy).toBe('reusable-state-economics');
   });
 
   it('carries only what doc-2 §9 leaves in the Research column', () => {
