@@ -172,7 +172,7 @@ at all: cache hit rate held at roughly 84–86%, the largest uncached suffix was
 about 2.5K tokens, and the scorer was never called. The repository also carries
 four further threads — speculative decoding, correctness, heterogeneous compute,
 cross-runtime — each labelled a thread rather than an experiment because each
-names evidence it is still missing. The repository also carries four research threads — speculative decoding, correctness, heterogeneous compute and cross-runtime — each labelled a thread rather than an experiment, because each one names the evidence it still lacks.
+names evidence it is still missing.
 
 <div class="evidence">
 

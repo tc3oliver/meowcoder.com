@@ -94,9 +94,9 @@ const subjects: Record<string, () => JsonLd> = {
 };
 
 /*
- * Every node above names `#person` as its author, and a JSON-LD `@id` only
- * resolves within the document it appears in. The `Person` travels with them
- * so the reference is not dangling on a detail page.
+ * Every node above names `#person` as its author. Co-locating the `Person`
+ * node gives crawlers the full author identity graph on the page instead of
+ * relying on the identifier alone.
  */
 const subject = subjects[entry.slug];
 const schemas = subject ? [personSchema(locale), subject()] : [];
