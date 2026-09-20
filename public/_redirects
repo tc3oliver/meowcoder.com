@@ -1,0 +1,13 @@
+# Redirects for Cloudflare Workers Static Assets (MCD-13).
+#
+# `/work/reusable-state-economics/` was the portfolio entry for one experiment.
+# The research program it belongs to now has two finished experiments and three
+# threads, so the entry became `/work/llm-inference-systems/` and the old URL
+# points at it rather than competing with it as a second project.
+#
+# 301, not 302: the move is permanent, and the old URL is linked from the Study
+# article and from outside the site.
+/work/reusable-state-economics/    /work/llm-inference-systems/    301
+/work/reusable-state-economics     /work/llm-inference-systems/    301
+/zh/work/reusable-state-economics/ /zh/work/llm-inference-systems/ 301
+/zh/work/reusable-state-economics  /zh/work/llm-inference-systems/ 301

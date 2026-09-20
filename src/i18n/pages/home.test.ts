@@ -189,7 +189,7 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     //
     // The slug must name a real Work entry; the component resolves it to a
     // route, and a typo would ship a dead link from the homepage.
-    const PUBLISHED = new Set(['signalforge', 'reusable-state-economics']);
+    const PUBLISHED = new Set(['signalforge', 'llm-inference-systems']);
 
     // PRD §5 fixes the order: the first three pillars carry evidence and
     // Software Architecture, the fourth, deliberately carries none.
@@ -202,7 +202,7 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
       expect(PUBLISHED.has(pillar.evidence.caseStudy!), `${pillar.name}`).toBe(true);
     }
 
-    expect(t.expertise.pillars[2]?.evidence?.caseStudy).toBe('reusable-state-economics');
+    expect(t.expertise.pillars[2]?.evidence?.caseStudy).toBe('llm-inference-systems');
   });
 
   it('carries only what doc-2 §9 leaves in the Research column', () => {

@@ -487,8 +487,8 @@ describe('structured-data integrity', () => {
 
   it('describes the research case study as an Article without invented dates', () => {
     for (const file of [
-      'work/reusable-state-economics/index.html',
-      'zh/work/reusable-state-economics/index.html',
+      'work/llm-inference-systems/index.html',
+      'zh/work/llm-inference-systems/index.html',
     ]) {
       const articles = nodes(read(file)).filter((node) => node['@type'] === 'Article');
 
@@ -563,8 +563,8 @@ describe('titles and descriptions', () => {
 describe('research case study navigation', () => {
   it('links from the case study to the published article and the repository', () => {
     for (const file of [
-      'work/reusable-state-economics/index.html',
-      'zh/work/reusable-state-economics/index.html',
+      'work/llm-inference-systems/index.html',
+      'zh/work/llm-inference-systems/index.html',
     ]) {
       const html = read(file);
 

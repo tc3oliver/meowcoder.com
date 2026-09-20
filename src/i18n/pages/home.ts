@@ -320,7 +320,7 @@ export const home = {
           description: 'Serving, optimization, benchmarking and reliability.',
           evidence: {
             label: 'See the LLM inference case study',
-            caseStudy: 'reusable-state-economics',
+            caseStudy: 'llm-inference-systems',
           },
         },
         {
@@ -426,7 +426,7 @@ export const home = {
           description: '模型服務、推論最佳化、效能量測與穩定性。',
           evidence: {
             label: '查看 LLM 推論案例',
-            caseStudy: 'reusable-state-economics',
+            caseStudy: 'llm-inference-systems',
           },
         },
         {
