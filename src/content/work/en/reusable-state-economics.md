@@ -248,8 +248,8 @@ labelled as threads rather than experiments so the difference stays visible.
   recognising it as a finding.
 - **Speculative decoding** — 431 drafted sequences across two models of the
   same size class. Acceptance tracks the model, not the kind of work: 78.8%
-  against 88.6% median between models, under two points of spread across
-  four agent task types within each. No arm with the mechanism disabled
+  against 88.6% median between models, against 4.0 and 1.7 points of spread
+  across all the task groups within each. No arm with the mechanism disabled
   exists, so it is not a latency result.
 - **Correctness** — three optimizations, three different answers on whether
   the arithmetic reaches the output. A restored prefix cut one case from
