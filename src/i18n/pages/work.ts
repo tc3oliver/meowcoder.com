@@ -43,6 +43,8 @@ export interface WorkPageStrings extends PageStrings {
       steps: readonly string[];
       end: string;
     };
+    /** Caption and alt text for the cache-cliff chart. */
+    reusableState: { alt: string; caption: string };
   };
   /** Label for the `type` metadata on a detail page. */
   typeLabel: string;
@@ -96,6 +98,11 @@ export const work = {
         steps: ['Plan', 'Execute', 'Validate'],
         end: 'Complete',
       },
+      reusableState: {
+        alt: 'A line chart of one session over twenty prefix-cache restores. The reusable checkpoint climbs to about 38,000 tokens, drops back to 28,672 at the eleventh restore, and stays flat for the rest of the session while the uncached suffix recomputed per request rises from a few hundred tokens to about 34,000.',
+        caption:
+          'One session, twenty restores: the reusable checkpoint flatlines at the eleventh while the recomputed suffix keeps growing.',
+      },
     },
     typeLabel: 'Type',
     asideLabel: 'Project details and contents',
@@ -125,6 +132,10 @@ export const work = {
         start: '需求',
         steps: ['規劃', '執行', '驗證'],
         end: '完成',
+      },
+      reusableState: {
+        alt: '一個 session、20 次 prefix cache 還原的折線圖。可重用的 checkpoint 一路爬到約 38,000 token，在第 11 次還原掉回 28,672，之後整段 session 都是水平線；同時每個 request 必須重算的未快取尾巴，從幾百個 token 長到約 34,000。',
+        caption: '一個 session、20 次還原：checkpoint 在第 11 次之後就停住，重算的尾巴繼續長。',
       },
     },
     typeLabel: '類型',

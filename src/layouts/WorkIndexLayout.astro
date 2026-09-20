@@ -39,6 +39,7 @@ import { Image } from 'astro:assets';
 
 import { shouriScreenshot } from '../components/home/shouri-screenshot';
 import WorkflowDiagram from '../components/WorkflowDiagram.astro';
+import cacheCliff from '../assets/research/cache-cliff.svg';
 import type { Locale } from '../i18n/locales';
 import { work } from '../i18n/pages/work';
 import { localizePath, workDetailRoute } from '../lib/i18n';
@@ -64,9 +65,10 @@ const t = work[locale];
  * copy alone, which is the same shape the index had before this redesign and is
  * the correct shape for the experience entry, which has no honest visual.
  */
-const VISUALS: Readonly<Record<string, 'screenshot' | 'workflow'>> = {
+const VISUALS: Readonly<Record<string, 'screenshot' | 'workflow' | 'chart'>> = {
   shouri: 'screenshot',
   'ai-coding-skills': 'workflow',
+  'reusable-state-economics': 'chart',
 };
 
 /** `01`, `02` — the position doc-2 §11 numbers each entry by. */
@@ -97,6 +99,7 @@ function position(index: number): string {
                   'work-entry',
                   visual === 'screenshot' && 'work-entry--featured',
                   visual === 'workflow' && 'work-entry--diagram',
+                  visual === 'chart' && 'work-entry--chart',
                   isExperience && 'work-entry--experience',
                 ]}
               >
@@ -150,6 +153,20 @@ function position(index: number): string {
                       loading="lazy"
                       decoding="async"
                     />
+                  </figure>
+                )}
+
+                {visual === 'chart' && (
+                  <figure class="work-entry__figure work-entry__figure--chart">
+                    <img
+                      src={cacheCliff.src}
+                      width={cacheCliff.width}
+                      height={cacheCliff.height}
+                      alt={t.visuals.reusableState.alt}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <figcaption>{t.visuals.reusableState.caption}</figcaption>
                   </figure>
                 )}
 
@@ -333,7 +350,37 @@ function position(index: number): string {
   /* The rendered box is the column, not the asset's own 1536px. Astro still
      writes `width` and `height` onto the tag, so the aspect ratio is known
      before the bytes arrive and the image reserves its own space. */
-  .work-entry__figure :global(img) {
+  /*
+   * The chart is ink on paper: its strokes and labels are dark, and it carries
+   * no background of its own. A fixed light surface underneath is what keeps it
+   * legible in dark mode, where `--color-surface` would put dark ink on a dark
+   * panel. The padding is the chart's own margin, which the asset does not have.
+   */
+  .work-entry__figure--chart {
+    max-width: 44rem;
+    padding: var(--space-4);
+    background-color: #fff;
+  }
+
+  .work-entry__figure--chart figcaption {
+    margin-block-start: var(--space-3);
+    color: #4a4a4a;
+    font-size: var(--text-xs);
+    line-height: var(--leading-snug);
+  }
+
+  /* Same treatment as the diagram entry: from 64rem the chart sits beside the
+     copy rather than under it, so the research entry reads as one row. */
+  @media (min-width: 64rem) {
+    .work-entry--chart {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: start;
+      gap: var(--space-8);
+    }
+  }
+
+  .work-entry__figure :global(img),
+  .work-entry__figure > img {
     display: block;
     inline-size: 100%;
     block-size: auto;
