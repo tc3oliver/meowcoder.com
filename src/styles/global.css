@@ -359,6 +359,27 @@ button {
     inset-block-start: 50%;
     inset-inline-start: calc(-1 * var(--space-5));
   }
+
+  /* Past four states, one row is too many columns: each box gets a sixth of the
+     measure and every label inside it wraps mid-word. So a long flow breaks
+     into rows of three instead, which is the same shape at half the width.
+
+     Four or fewer states keep the single row they already had, which is why
+     this is scoped by `:has()` rather than applied to every flow.
+
+     The connector then has to go from whichever box starts a row — its arrow
+     would point left into the gutter, at nothing. */
+  .prose .state-flow__steps:has(> :nth-child(5)) {
+    flex-wrap: wrap;
+  }
+
+  .prose .state-flow__steps:has(> :nth-child(5)) > .state-flow__step {
+    flex-basis: calc((100% - 2 * var(--space-8)) / 3);
+  }
+
+  .prose .state-flow__steps:has(> :nth-child(5)) > .state-flow__step:nth-child(3n + 1)::before {
+    content: none;
+  }
 }
 
 /* --- Execution modes: two flows with the same completion discipline ------ */

@@ -332,6 +332,48 @@ describe('accessibility baseline', () => {
 });
 
 /* -------------------------------------------------------------------------
+ * The state-flow figure, past four states
+ *
+ * Two case studies draw a six-state flow. Laid out as one row that is six
+ * columns wide, and the reported symptom was the research-approach figure on
+ * the LLM Inference Systems entry breaking up mid-label.
+ *
+ * Both halves of the fix are one declaration each and neither looks wrong on
+ * its own, so both are asserted: the wrap, and the connector being removed from
+ * the box that starts a row — otherwise its arrow points left into the gutter.
+ *
+ * Scoped by `:has()` on a fifth child, so the three- and four-state flows on
+ * the other entries keep the single row they were designed for.
+ * ---------------------------------------------------------------------- */
+
+describe('state-flow figure with more than four states', () => {
+  const scoped = /\.prose \.state-flow__steps:has\(> :nth-child\(5\)\)/;
+
+  it('wraps a long flow instead of squeezing it into one row', () => {
+    expect(GLOBAL_CSS).toMatch(new RegExp(`${scoped.source}\\s*\\{[^}]*flex-wrap:\\s*wrap`));
+  });
+
+  it('gives each state a third of the row, so the wrap lands on three', () => {
+    expect(GLOBAL_CSS).toMatch(
+      new RegExp(`${scoped.source} > \\.state-flow__step\\s*\\{[^}]*flex-basis:[^}]*/ 3\\)`),
+    );
+  });
+
+  it('drops the connector from the state that starts a row', () => {
+    expect(GLOBAL_CSS).toMatch(
+      new RegExp(
+        `${scoped.source} > \\.state-flow__step:nth-child\\(3n \\+ 1\\)::before\\s*\\{[^}]*content:\\s*none`,
+      ),
+    );
+  });
+
+  it('leaves a four-state flow on one row', () => {
+    const unscoped = GLOBAL_CSS.match(/\.prose \.state-flow__step \{[^}]*\}/g)?.join('') ?? '';
+    expect(unscoped).not.toMatch(/flex-wrap/);
+  });
+});
+
+/* -------------------------------------------------------------------------
  * The progression figure (MCD-31, doc-2 §21)
  *
  * The experience entry's closing graphic is five stage labels and four arrows
