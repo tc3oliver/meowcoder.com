@@ -51,6 +51,38 @@ meta:
 
 第 11 個 request 的 sparse 進場，並不是那次 restore 塌陷的成因：restore 先發生。cache log 指出那是一次 partial prefix 命中，最後一個命中的 block 裡放的是 placeholder，但留下來的 trace 無法確立這個 placeholder 是何時、如何產生的。trace 能確立的是：塌陷之後，所有觀察到的未命中都維持在 SpecPrefill 門檻之上，sparse 化的尾巴不會推進正常可重用的 dense prefix state，而檢查點在其餘十個 request 裡都沒有回復。
 
+## 工程決策
+
+<div class="decision">
+
+### Session 才是量測單位，不是單一 request
+
+**原因** — cold benchmark 只告訴我這次 request 自己省了多少，量不到它留給下一輪多少 reusable state，而那正是 agent workload 在付的帳。
+
+**結果** — 改追 reusable checkpoint 與 uncached suffix；real-agent 的牆鐘時間只當追查的起點，不當效果量。
+
+</div>
+
+<div class="decision">
+
+### Protected prefix 要量出來，不靠推算
+
+**原因** — chat template 的輸出會隨 roles 和 tools 改變，whole render 減掉 non-system render 不保證落在真正的 static prefix boundary 上。
+
+**結果** — 改成從 caller 自己的 template render 量邊界；這個正確性修正就是 oMLX #3756。
+
+</div>
+
+<div class="decision">
+
+### Policy 放在 request，而不是找一個全域最佳設定
+
+**原因** — cold、用過就丟的長 prompt，和以延續為主的 agent，對 reusable state 的需求是相反的。一個全域設定一定會對其中一邊是錯的。
+
+**取捨** — 不做自動分類器，因為手上的證據不足以預測一個 session 屬於哪一種；改由 caller 明確覆寫。oMLX #3762 只提供 per-request 的能力，部署預設值仍然是本機 policy。
+
+</div>
+
 ## 落地的改動
 
 - **本機服務策略。** Agent 流量預設走 dense，除非呼叫端在該 request 上宣告自己的 prompt 是冷的；長 context 流量維持模型層級的設定。先前是兩種需求相反的 workload 共用一個開關。預設值留在本機決定。

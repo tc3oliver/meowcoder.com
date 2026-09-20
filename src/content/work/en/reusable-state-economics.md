@@ -101,6 +101,50 @@ SpecPrefill threshold, the sparsified suffix did not advance the normal reusable
 dense prefix state, and the checkpoint did not recover over the remaining ten
 requests.
 
+## Engineering Decisions
+
+<div class="decision">
+
+### Measure the session, not only the request
+
+**Why** — A cold benchmark reports what a request saved for itself. It cannot
+see how much reusable state that request left for the next turn, and that is
+the term the agent workload is actually spending.
+
+**Consequence** — Measurement moved to reusable checkpoints and uncached
+suffixes. The real-agent wall time became an investigation trigger, not an
+effect size.
+
+</div>
+
+<div class="decision">
+
+### Measure the protected prefix; do not infer it by subtraction
+
+**Why** — The chat template's output changes with the roles and tools present,
+so a whole render minus a non-system render is not guaranteed to land on the
+real static prefix boundary.
+
+**Consequence** — The boundary is now measured from the caller's own template
+render. That correctness fix became oMLX #3756.
+
+</div>
+
+<div class="decision">
+
+### Put policy at the request boundary instead of choosing one global setting
+
+**Why** — A cold, disposable long prompt and a continuation-heavy agent want
+opposite things from reusable state. One global setting has to be wrong for one
+of them.
+
+**Trade-off** — No automatic classifier, because nothing here supports
+predicting which kind a session is; the caller overrides explicitly instead.
+oMLX #3762 supplies only the per-request capability, and the deployment default
+stays a local policy.
+
+</div>
+
 ## What Changed
 
 - **Local serving policy.** Agent traffic runs dense unless the caller says, on
