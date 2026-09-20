@@ -97,9 +97,7 @@ function position(index: number): string {
               <li
                 class:list={[
                   'work-entry',
-                  visual === 'screenshot' && 'work-entry--featured',
-                  visual === 'workflow' && 'work-entry--diagram',
-                  visual === 'chart' && 'work-entry--chart',
+                  visual !== undefined && 'work-entry--illustrated',
                   isExperience && 'work-entry--experience',
                 ]}
               >
@@ -148,8 +146,8 @@ function position(index: number): string {
                     <Image
                       src={shouriScreenshot}
                       alt={t.visuals.shouri.alt}
-                      widths={[640, 960, 1000, 1280, 1536]}
-                      sizes="(min-width: 66.5rem) 1000px, 100vw"
+                      widths={[480, 640, 960, 1280]}
+                      sizes="(min-width: 64rem) 30vw, 100vw"
                       loading="lazy"
                       decoding="async"
                     />
@@ -334,11 +332,13 @@ function position(index: number): string {
     }
   }
 
-  /* The featured project remains the largest visual on the page, but the
-     1000px cap keeps its jump from the 760px copy measure proportional. */
+  /* Every illustrated entry gets the same figure box. An earlier revision made
+     the screenshot span up to 1000px while the other visuals took a third of
+     that, which read as one entry shouting over the rest; the cap is now the
+     column they all share. */
   .work-entry__figure {
     width: 100%;
-    max-width: 62.5rem;
+    max-width: 44rem;
     margin: 0;
     margin-inline: auto;
     border: var(--border-width) solid var(--color-border);
@@ -347,9 +347,6 @@ function position(index: number): string {
     background-color: var(--color-surface);
   }
 
-  /* The rendered box is the column, not the asset's own 1536px. Astro still
-     writes `width` and `height` onto the tag, so the aspect ratio is known
-     before the bytes arrive and the image reserves its own space. */
   /*
    * The chart is ink on paper: its strokes and labels are dark, and it carries
    * no background of its own. A fixed light surface underneath is what keeps it
@@ -357,7 +354,6 @@ function position(index: number): string {
    * panel. The padding is the chart's own margin, which the asset does not have.
    */
   .work-entry__figure--chart {
-    max-width: 44rem;
     padding: var(--space-4);
     background-color: #fff;
   }
@@ -369,16 +365,9 @@ function position(index: number): string {
     line-height: var(--leading-snug);
   }
 
-  /* Same treatment as the diagram entry: from 64rem the chart sits beside the
-     copy rather than under it, so the research entry reads as one row. */
-  @media (min-width: 64rem) {
-    .work-entry--chart {
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-      align-items: start;
-      gap: var(--space-8);
-    }
-  }
-
+  /* The rendered box is the column, not the asset's own pixel width. Astro
+     still writes `width` and `height` onto the tag, so the aspect ratio is
+     known before the bytes arrive and the image reserves its own space. */
   .work-entry__figure :global(img),
   .work-entry__figure > img {
     display: block;
@@ -386,16 +375,15 @@ function position(index: number): string {
     block-size: auto;
   }
 
-  /* From 64rem the diagram entry runs its figure beside the copy rather than
-     under it. That is what keeps the two illustrated entries visually unequal
-     by layout: one visual spans up to 1000px, the other is a column of about a
-     third of that. Below the breakpoint both stack, which is also the 390px case.
+  /* From 64rem an illustrated entry runs its figure beside the copy rather than
+     under it, so each one reads as a single row. Below the breakpoint they
+     stack, which is also the 390px case.
 
-     Keyed on the entry that has a diagram rather than on "not the featured
-     one", so the experience entry — which has no visual at all — is not given
-     a two-column grid with an empty second column. */
+     Keyed on having a visual at all rather than on which visual, so the
+     experience entry — which has none — is not given a two-column grid with an
+     empty second column. */
   @media (min-width: 64rem) {
-    .work-entry--diagram {
+    .work-entry--illustrated {
       grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
       align-items: start;
       gap: var(--space-8);
