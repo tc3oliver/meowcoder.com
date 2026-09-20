@@ -1,9 +1,9 @@
 ---
-title: '互動式 LLM 推論中的可重用狀態經濟學'
+title: 'LLM 推論系統研究'
 type: '系統研究 · LLM 推論'
 summary: '在一台 Apple silicon 機器上研究 SpecPrefill（一種 attention-based 的 sparse prefill 機制）：冷啟動長 context 大幅變快，但在一次以延續為主的 agent session 裡反而變慢，而解釋這兩件事的是同一個 prefix cache 機制。'
 outcome: '自行建構並量測異質 prefill 路徑、疊上去的 sparse prefill、背景補回 dense 前綴的機制與其協作式排程器。冷啟動 32K 首個 token 從 122.7 秒降到 33.5 秒，真實 coding agent session 隨即暴露出 prefix cache 的失效模式；整段工作產出一個正確性修正與 per-request 控制欄位，兩者都已提交上游。'
-indexMeta: 'Apple silicon · 27B 級 MoE 4-bit · 兩個上游 PR'
+indexMeta: 'Apple silicon · 一個完整研究、四條研究線 · 兩個上游 PR'
 evidence: 'GitHub 上的 llm-inference-systems · 文章、request 層級 trace，以及兩個 oMLX pull request'
 slug: 'reusable-state-economics'
 locale: 'zh'
@@ -134,11 +134,32 @@ Sparse prefill 只能在受保護的前綴邊界之後丟棄 token；放系統�
 
 這不是吞吐量退化。它會在操作者以為規則仍生效時悄悄拿掉那些指令，偏偏發生在最需要它們的 request——帶工具的 agent request——上，輸出裡看不出跡象。修法是把邊界實際量出來而不是推算，這個修正單獨送上游、目前仍在審查中，而且比部署策略先送。
 
+## 研究線
+
+上面那個完整研究只是 repo 裡五個主題之一。另外四條都有實際量測，但還回答不了自己
+提出的問題，所以標成研究線而不是實驗，讓兩者的差別看得出來。
+
+- **可重用狀態與 prefill** — 就是上面這個研究。在它之前，我用同一顆模型做過一次
+  設定比較，其實已經出現同樣的特徵：隔離測試快了將近 5 倍，但在真實 coding 任務上
+  重算的 token 多了 7.2 倍，最後的 cache 命中率 63.1% 對 99.5%。我當時照那份證據
+  選了 dense，卻沒意識到那是一個發現。
+- **Speculative decoding** — 兩顆同級模型、431 條 draft 序列。接受率跟著模型走，
+  不跟著工作類型走：模型之間中位數 78.8% 對 88.6%，但同一顆模型跨四種 agent 任務
+  只差不到兩個百分點。沒有關掉這個機制的對照臂，所以它不是延遲結論。
+- **正確性** — 三個最佳化，三種不同答案。還原快取前綴讓其中一筆從 56.3 秒降到
+  2.3 秒，而 7 組配對案例的輸出全部逐 byte 相同；三個 attention routing build 在
+  68K context 下產生三組不同的 logits，輸出卻完全一樣；真正悄悄改掉模型輸入的，
+  是保護前綴的邊界計算。
+- **異質運算** — 一條 ANE prefill 路徑會編譯、會回報自己已啟用，然後一次都沒執行，
+  因為服務層的 block 大小永遠填不滿它編譯出來的 tile。
+- **跨 runtime** — 沒有受控比較。那一頁就是用來把這件事講清楚，而不是暗示有。
+
 ## 限制
 
 - **真實 agent 的比較每邊只跑一次**，兩個 agent 走的任務路徑也不同，所以 session 總時間的比值不能當成量到的變慢；撐住論點的是 request 層級的 trace。
 - **一台機器、一個模型、一種量化，每格一次。** 評分器成本與 prefill 節省的交叉點，三個平台選擇都會影響。
 - **閒置補回的結果是合成的。** 它證明有空檔時這個機制能運作，也包含沒有空檔、比 dense 慢 11% 的那一列。
+- **那四條研究線不是實驗。** 每一條都寫明自己缺什麼證據，而且沒有為了寫它們去補跑任何東西。
 
 ## 證據
 

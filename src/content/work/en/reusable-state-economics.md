@@ -1,9 +1,9 @@
 ---
-title: 'Reusable State Economics in Interactive LLM Inference'
+title: 'LLM Inference Systems Research'
 type: 'Systems Research · LLM Inference'
 summary: 'A study of SpecPrefill, an attention-based sparse prefill mechanism, on one Apple silicon machine: large cold-start wins at long context, a slowdown in one continuation-heavy agent session, and the prefix-cache mechanism that explains both.'
 outcome: 'Built and measured a heterogeneous prefill path, sparse prefill on top of it, a background dense-prefix recovery job and the cooperative scheduler it needed; cold 32K time-to-first-token fell from 122.7 s to 33.5 s, a real coding-agent session then exposed a prefix-cache failure mode, and the work produced a correctness fix and per-request control, both submitted upstream.'
-indexMeta: 'Apple silicon · 27B-class MoE at 4-bit · Two upstream PRs'
+indexMeta: 'Apple silicon · One completed study, four research threads · Two upstream PRs'
 evidence: 'llm-inference-systems on GitHub · the article, the request-level traces, and two oMLX pull requests'
 slug: 'reusable-state-economics'
 locale: 'en'
@@ -234,6 +234,35 @@ requests — where they matter most, and nothing in the output announces it. The
 fix reads the boundary off the caller's own template instead of computing it,
 and is submitted upstream and still open, ahead of the deployment policy.
 
+## Research Threads
+
+The completed study above is one of five subjects in the repository. The
+other four have real measurement behind them and no answer yet, and are
+labelled as threads rather than experiments so the difference stays visible.
+
+- **Reusable state and prefill** — the study above. An earlier configuration
+  bake-off, run before it on the same model, already showed the signature:
+  nearly 5× faster on an isolated fresh tail, then 7.2× the tokens
+  recomputed over a real coding task and a 63.1% final cache hit rate
+  against 99.5%. I picked the dense configuration on that evidence without
+  recognising it as a finding.
+- **Speculative decoding** — 431 drafted sequences across two models of the
+  same size class. Acceptance tracks the model, not the kind of work: 78.8%
+  against 88.6% median between models, under two points of spread across
+  four agent task types within each. No arm with the mechanism disabled
+  exists, so it is not a latency result.
+- **Correctness** — three optimizations, three different answers on whether
+  the arithmetic reaches the output. A restored prefix cut one case from
+  56.3 s to 2.3 s and produced identical bytes in 7 of 7 paired cases; three
+  attention-routing builds produced three logit vectors and one identical
+  output at 68K context; the protected-prefix boundary was the one that
+  silently changed the model's input.
+- **Heterogeneous compute** — a neural-engine prefill path that compiled,
+  reported itself enabled, and never executed, because the serving layer's
+  block size never filled its compiled tile.
+- **Cross-runtime** — no controlled comparison exists. The page says so
+  rather than implying one.
+
 ## Limitations
 
 - **The real-agent comparison is one run per arm**, and the two agents took
@@ -245,6 +274,8 @@ and is submitted upstream and still open, ahead of the deployment policy.
   overhead and prefill saving depends on all three of the platform choices.
 - **The idle-recovery result is synthetic.** It shows the mechanism can work
   when a gap exists, including the zero-idle row where it does not.
+- **The four threads are not experiments.** Each names the specific evidence
+  it is missing, and none of it was gathered in order to write them up.
 
 ## Evidence
 
