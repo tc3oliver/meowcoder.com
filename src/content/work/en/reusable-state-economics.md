@@ -8,7 +8,7 @@ evidence: 'llm-inference-systems on GitHub · the article, the request-level tra
 slug: 'reusable-state-economics'
 locale: 'en'
 translationKey: 'reusable-state-economics'
-order: 4
+order: 3
 draft: false
 kind: 'case-study'
 meta:
