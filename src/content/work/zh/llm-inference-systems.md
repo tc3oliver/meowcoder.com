@@ -2,8 +2,8 @@
 title: 'LLM Inference Systems'
 type: '系統研究 · LLM 推論'
 summary: '一個持續進行的推論系統研究計畫：從真實互動式 workload 出發，對 runtime 下儀器、建立受控實驗、追到機制、檢查正確性，最後轉成 production 決策或上游修正。目前含三個已完成實驗與三條研究線。'
-outcome: '三個完成的實驗（可重用狀態與互動延遲、推測解碼成本模型、可重用 canonical 狀態的背景補回）、三條標明缺什麼證據的研究線、三個審查中的上游 pull request，以及一套可重跑的量測工具與完整資料集。'
-indexMeta: 'Apple silicon · 三個實驗 · 三條研究線 · 三個審查中的上游 PR'
+outcome: '三個完成的實驗（可重用狀態與互動延遲、推測解碼成本模型、可重用 canonical 狀態的背景補回）、三條標明缺什麼證據的研究線、四個開著的上游 pull request（其中一個是草稿），以及一套可重跑的量測工具與完整資料集。'
+indexMeta: 'Apple silicon · 三個實驗 · 三條研究線 · 四個開著的上游 PR'
 evidence: 'GitHub 上的 llm-inference-systems · 實驗方法、request 層級 trace、原始資料與圖表'
 slug: 'llm-inference-systems'
 locale: 'zh'
@@ -19,7 +19,7 @@ meta:
   - label: '範圍'
     value: 'Runtime · Serving · 可重用狀態 · 推測執行 · 正確性 · 異質運算'
   - label: '證據'
-    value: '公開 repo · 已發表文章 · 三個審查中的上游 pull request'
+    value: '公開 repo · 已發表文章 · 四個開著的上游 pull request'
 ---
 
 由 Oliver Yu 獨立研究、量測並提交上游。
@@ -156,8 +156,8 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 
 答案是後者。acceptance rate 是這個機制被報得最多的數字，而 36 次配對量測之後的結論是：那是錯的數字——高接受率並不保證變快。真正決定划不划算的是**一次 verify cycle 的代價，以 dense decode step 為單位**，而這個代價屬於模型架構，不屬於內容。
 
-- 35B-A3B MoE 上，一次四位置的 verify forward 值 2.43 個 dense step；固定 draft depth 3 在 code 上比 dense 慢 10%、在 prose 上慢 43%，而當下的 acceptance 分別是 56% 與 25%。
-- 同一個 runtime、同一批 prompt，dense 27B 上同樣的 forward 只值 1.37 個 dense step，機制在配對的 13.6K coding prompt 上快 1.81 倍——acceptance 是 79%。
+- 35B-A3B MoE 上，一次四位置的 verify forward 值 2.43 個 dense step；固定 draft depth 3 在 code 上比 dense 慢 10%、在 prose 上慢 44%，而當下的 acceptance 分別是 56% 與 25%。
+- 同一個 runtime、同一批 prompt，dense 27B 上同樣的 forward 只值 1.37 個 dense step，機制在配對的 13.6K coding prompt 上 decode 快 1.81 倍（同一列的端到端是 1.05 倍）——acceptance 是 79%。
 - 一個只用 runtime 自己的計時器算出來的成本模型，能預測整段 0.56x–1.81x 的配對加速比。
 - Runtime 既有的 adaptive depth controller 避開了所有量到的虧損區：它把四格虧損全部轉成打平或小幅落後，而在固定 depth 會贏的那一格，它靠 draft 得更淺、買到更便宜的 cycle，比固定 depth 再快 12%。
 
@@ -185,7 +185,7 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 
 可以——但路上那個修正比結果本身更值得記。在一組受控的七輪 session 裡，sparse 那一邊的可重用 canonical 前綴始終停在 0，prompt 卻長到 43,065 tokens，於是每一輪都把整份重算一次。改成在前景閒置的空檔把這段前綴重建、而且只在一般 serving 路徑本身能獨立還原的 cache block 邊界上發布，累積 session 延遲在該 workload 上從 228.38 s 降到 79.06 s。兩邊的前景都仍然走 SpecPrefill。
 
-比較大的那一半是讓它能安全上線。以時間比例設的 budget 只框得住背景工作「多常」撞到請求，框不住撞到之後那個請求要等多久——budget 調動二十倍，最糟的一次碰撞仍落在同樣的 12–15 s 區間。真正決定等待時間的是 execution slice，而它和 publication grain 是互相獨立的：五種 slice 大小走到完全相同的邊界，把 slice 縮小之後，client 端觀測到的最糟等待從 15.08 s 降到 1.30 s，補回的吞吐量沒有變。另一個缺陷則讓它沒能如期送上游——recovery budget 是每個 engine 各持一份，但 accelerator 是共用的，於是每多載入一個模型，上限就被乘一次。
+比較大的那一半是讓它能安全上線。以時間比例設的 budget 只框得住背景工作「多常」撞到請求，框不住撞到之後那個請求要等多久——budget 調動二十倍，最糟的一次碰撞仍落在同樣的 12–15 s 區間。真正決定等待時間的是 execution slice，而它和 publication grain 是互相獨立的：跑過的每一種 slice 設定都走到完全相同的邊界，把 slice 從 block grain 縮到 512 之後，client 端觀測到的最糟等待從 15.08 s 降到 1.30 s，補回的吞吐量沒有變。再縮到 256 並沒有更好——它 trace 推導的界更低，觀測到的最糟值反而更高。另一個缺陷則讓它沒能如期送上游——recovery budget 是每個 engine 各持一份，但 accelerator 是共用的，於是每多載入一個模型，上限就被乘一次。
 
 <div class="decision">
 
@@ -197,7 +197,7 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 
 </div>
 
-這些跑之前並沒有先定義前景延遲目標，所以 runtime trace 記錄到的 2.39 s 最糟不可中斷 execution slice——那是一個請求「可能」要等多久的界，不是任何人觀測到的延遲——是一個量測值，不是一個「可以接受」的判斷。
+這些跑之前並沒有先定義前景延遲目標，所以 runtime trace 記錄到的 2.39 s 最糟不可中斷 execution slice——那是一個請求「可能」要等多久的界，不是任何人觀測到的延遲——是一個推導值，不是一個「可以接受」的判斷。
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a>
 收了資料集、圖表與限制；功能本身以
 <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>
@@ -241,7 +241,7 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 - **傳輸層的 request policy**：真實 workload 證明沒有單一設定對每個 request 都對之後才加的。
 - **可重跑的 harness 與資料集**：所有圖表由兩個只讀 `data/` 的腳本重畫，沒有任何一格被平滑、內插或反推。
 
-上游部分列 repo 已確認的三個，撰寫時都仍在審查中：
+上游部分列 repo 已確認的三個，撰寫時都還開著，也都還沒有被審到結論：
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a>——受保護前綴邊界的正確性修正。它比部署策略先送，因為這是唯一一個改到模型輸入、而不只是改到速度的發現。
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a>——在 Anthropic messages 端點補上 per-request 的 SpecPrefill 欄位，OpenAI 相容端點本來就有。不改上游任何預設值。

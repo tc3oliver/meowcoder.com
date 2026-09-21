@@ -2,8 +2,8 @@
 title: 'LLM Inference Systems'
 type: 'Systems Research · LLM Inference'
 summary: 'An ongoing inference-systems research program driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, and turn the result into a production decision or an upstream fix. Three completed experiments and three open research threads.'
-outcome: 'Three finished experiments — reusable state dynamics, a cost model for speculative decoding, and background recovery of reusable canonical state — three threads that each state the evidence they still lack, three open upstream pull requests, and a reproducible harness with the full dataset behind every figure.'
-indexMeta: 'Apple silicon · Three experiments · Three research threads · Three open upstream PRs'
+outcome: 'Three finished experiments — reusable state dynamics, a cost model for speculative decoding, and background recovery of reusable canonical state — three threads that each state the evidence they still lack, four open upstream pull requests, one of them a draft, and a reproducible harness with the full dataset behind every figure.'
+indexMeta: 'Apple silicon · Three experiments · Three research threads · Four open upstream PRs'
 evidence: 'llm-inference-systems on GitHub · methodology, request-level traces, raw data, and figures'
 slug: 'llm-inference-systems'
 locale: 'en'
@@ -19,7 +19,7 @@ meta:
   - label: 'Scope'
     value: 'Runtime · Serving · Reusable state · Speculative execution · Correctness · Heterogeneous compute'
   - label: 'Evidence'
-    value: 'Public repository · published articles · three open upstream pull requests'
+    value: 'Public repository · published articles · four open upstream pull requests'
 ---
 
 Independently researched, measured, and submitted upstream by Oliver Yu.
@@ -156,8 +156,8 @@ The question: **under what conditions does speculative decoding actually save ti
 
 By the verify cycle. Acceptance is the number everybody reports for this mechanism, and thirty-six matched runs later it is the wrong one: high acceptance did not guarantee a speedup. What decides whether speculation pays is **the cost of one verify cycle measured in dense decode steps**, and that cost is a property of the model's architecture rather than of the content.
 
-- On a 35B-A3B mixture-of-experts, a four-position verify forward costs 2.43 dense steps. A fixed draft depth of 3 came out 10% slower than dense decoding on code and 43% slower on prose, at acceptance rates of 56% and 25%.
-- On a dense 27B, same runtime and same prompts, the identical forward costs 1.37 dense steps and the mechanism is 1.81× faster on a matched 13.6K-token coding prompt — at 79% acceptance.
+- On a 35B-A3B mixture-of-experts, a four-position verify forward costs 2.43 dense steps. A fixed draft depth of 3 came out 10% slower than dense decoding on code and 44% slower on prose, at acceptance rates of 56% and 25%.
+- On a dense 27B, same runtime and same prompts, the identical forward costs 1.37 dense steps and the mechanism decodes 1.81× faster on a matched 13.6K-token coding prompt — 1.05× end to end on the same row — at 79% acceptance.
 - A cost model built from the runtime's own timers predicts the measured matched speedup across the whole 0.56×–1.81× range.
 - The runtime's existing adaptive depth controller avoided every measured losing region: it turned all four losses into parity or a small deficit, and in the one cell where the fixed depth won it won by a further 12%, by drafting shallower and buying a cheaper cycle.
 
@@ -185,7 +185,7 @@ The question: **if a sparse prefill leaves no reusable state behind, can that st
 
 Yes — and the correction on the way there matters more than the result. Across a controlled seven-turn session the sparse arm's reusable canonical prefix never left zero while the prompt grew to 43,065 tokens, so every turn recomputed everything. Rebuilding that prefix during foreground-idle windows, publishing only at cache-block boundaries the ordinary serving path could independently restore, took cumulative session latency from 228.38 s to 79.06 s on that workload. The foreground stayed on SpecPrefill in both arms.
 
-Making it safe to serve was the larger half. A share-of-time budget bounds how _often_ background work collides with a request, not how long that request then waits — the worst collision stayed in the same 12–15 s band across a twentyfold budget change. What bounds the wait is the execution slice, and that turned out to be independent of the publication grain: five slice sizes reached identical boundaries, and shrinking the slice took the worst client-observed wait from 15.08 s to 1.30 s with recovery throughput unchanged. A second defect held it back from upstream — the recovery budget was owned per engine while the accelerator is shared, so each loaded model multiplied the cap.
+Making it safe to serve was the larger half. A share-of-time budget bounds how _often_ background work collides with a request, not how long that request then waits — the worst collision stayed in the same 12–15 s band across a twentyfold budget change. What bounds the wait is the execution slice, and that turned out to be independent of the publication grain: every slice setting that ran reached identical boundaries, and shrinking the slice from the block grain to 512 took the worst client-observed wait from 15.08 s to 1.30 s with recovery throughput unchanged. Shrinking further to 256 did not help: its trace-derived bound is lower and its observed maximum is higher. A second defect held it back from upstream — the recovery budget was owned per engine while the accelerator is shared, so each loaded model multiplied the cap.
 
 <div class="decision">
 
@@ -197,7 +197,7 @@ Making it safe to serve was the larger half. A share-of-time budget bounds how _
 
 </div>
 
-No foreground latency target was defined before those runs, so the 2.39 s worst uninterruptible execution slice the runtime trace recorded — a bound on what a request could have waited for, not a latency anyone observed — is a measurement and not a verdict on whether it is acceptable.
+No foreground latency target was defined before those runs, so the 2.39 s worst uninterruptible execution slice the runtime trace recorded — a bound on what a request could have waited for, not a latency anyone observed — is a derived bound and not a verdict on whether it is acceptable.
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a> carries the datasets, the figures and the limitations; the feature is proposed upstream as
 <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>, a draft. The long-form write-up is
 <a href="https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/" target="_blank" rel="noopener noreferrer">償還 reusable state 的債</a> (Traditional Chinese).
@@ -239,7 +239,7 @@ None of the findings above was available to someone who only ran benchmarks. Get
 - **A transport-level request policy**, added only after the real workload showed no single configuration was right for every request.
 - **A reproducible harness and dataset** — every figure is redrawn by two scripts that read nothing but `data/`, and nothing in it is smoothed, interpolated, or back-generated.
 
-Upstream, two pull requests, both open at the time of writing:
+Upstream, three pull requests, all open at the time of writing and none reviewed to a conclusion:
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a> — the correctness fix for the protected-prefix boundary. It went before the deployment policy because it is the only finding that changed the model's input rather than only its speed.
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a> — per-request SpecPrefill fields on the Anthropic messages endpoint, matching what the OpenAI-compatible endpoint already had. It changes no upstream default.
