@@ -185,7 +185,7 @@ The question: **if a sparse prefill leaves no reusable state behind, can that st
 
 Yes — and the correction on the way there matters more than the result. Across a controlled seven-turn session the sparse arm's reusable canonical prefix never left zero while the prompt grew to 43,065 tokens, so every turn recomputed everything. Rebuilding that prefix during foreground-idle windows, publishing only at cache-block boundaries the ordinary serving path could independently restore, took cumulative session latency from 228.38 s to 79.06 s on that workload. The foreground stayed on SpecPrefill in both arms.
 
-Making it safe to serve was the larger half. A share-of-time budget bounds how *often* background work collides with a request, not how long that request then waits — the worst collision stayed in the same 12–15 s band across a twentyfold budget change. What bounds the wait is the execution slice, and that turned out to be independent of the publication grain: five slice sizes reached identical boundaries, and shrinking the slice took the worst client-observed wait from 15.08 s to 1.30 s with recovery throughput unchanged. A second defect held it back from upstream — the recovery budget was owned per engine while the accelerator is shared, so each loaded model multiplied the cap.
+Making it safe to serve was the larger half. A share-of-time budget bounds how _often_ background work collides with a request, not how long that request then waits — the worst collision stayed in the same 12–15 s band across a twentyfold budget change. What bounds the wait is the execution slice, and that turned out to be independent of the publication grain: five slice sizes reached identical boundaries, and shrinking the slice took the worst client-observed wait from 15.08 s to 1.30 s with recovery throughput unchanged. A second defect held it back from upstream — the recovery budget was owned per engine while the accelerator is shared, so each loaded model multiplied the cap.
 
 <div class="decision">
 
@@ -199,7 +199,8 @@ Making it safe to serve was the larger half. A share-of-time budget bounds how *
 
 No foreground latency target was defined before those runs, so the 2.39 s worst uninterruptible execution slice the runtime trace recorded — a bound on what a request could have waited for, not a latency anyone observed — is a measurement and not a verdict on whether it is acceptable.
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a> carries the datasets, the figures and the limitations; the feature is proposed upstream as
-<a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>, a draft.
+<a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>, a draft. The long-form write-up is
+<a href="https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/" target="_blank" rel="noopener noreferrer">償還 reusable state 的債</a> (Traditional Chinese).
 
 ## Systems themes
 
@@ -262,6 +263,7 @@ One machine, one vendor, one runtime. EXP-001 is a single 27B dense model at 4-b
   and <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/figures" target="_blank" rel="noopener noreferrer">figures</a> — every number behind every figure, with provenance and row counts.
 - <a href="https://study.meowcoder.com/posts/260920-inference-reusable-state/" target="_blank" rel="noopener noreferrer">當 prefill 變快，agent 反而變慢</a> — the long-form EXP-001 article, with charts.
 - <a href="https://study.meowcoder.com/posts/260920-speculative-decoding-cost-model/" target="_blank" rel="noopener noreferrer">推測解碼何時真的會加速？從 Acceptance Rate 到 Verify-Cycle Cost</a> — the long-form EXP-002 article.
+- <a href="https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/" target="_blank" rel="noopener noreferrer">償還 reusable state 的債</a> — the long-form EXP-003 article, with charts.
 
 </div>
 

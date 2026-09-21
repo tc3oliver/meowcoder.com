@@ -201,7 +201,8 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a>
 收了資料集、圖表與限制；功能本身以
 <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>
-草稿的形式送上游。
+草稿的形式送上游，長文版本在
+<a href="https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/" target="_blank" rel="noopener noreferrer">償還 reusable state 的債</a>。
 
 ## 系統主題
 
@@ -264,6 +265,7 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
   與 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/figures" target="_blank" rel="noopener noreferrer">圖表</a>——每張圖背後的每個數字，附出處與列數。
 - <a href="https://study.meowcoder.com/posts/260920-inference-reusable-state/" target="_blank" rel="noopener noreferrer">當 prefill 變快，agent 反而變慢</a>——EXP-001 的完整長文，含圖表。
 - <a href="https://study.meowcoder.com/posts/260920-speculative-decoding-cost-model/" target="_blank" rel="noopener noreferrer">推測解碼何時真的會加速？從 Acceptance Rate 到 Verify-Cycle Cost</a>——EXP-002 的完整長文。
+- <a href="https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/" target="_blank" rel="noopener noreferrer">償還 reusable state 的債</a>——EXP-003 的完整長文，含圖表。
 
 </div>
 
