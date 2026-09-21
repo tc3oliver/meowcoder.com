@@ -1,9 +1,9 @@
 ---
 title: 'LLM Inference Systems'
 type: '系統研究 · LLM 推論'
-summary: '一個持續進行的推論系統研究計畫：從真實互動式 workload 出發，對 runtime 下儀器、建立受控實驗、追到機制、檢查正確性，最後轉成 production 決策或上游修正。目前含兩個已完成實驗與三條研究線。'
-outcome: '兩個完成的實驗（可重用狀態與互動延遲、推測解碼成本模型）、三條標明缺什麼證據的研究線、兩個審查中的上游 pull request，以及一套可重跑的量測工具與完整資料集。'
-indexMeta: 'Apple silicon · 兩個實驗 · 三條研究線 · 兩個審查中的上游 PR'
+summary: '一個持續進行的推論系統研究計畫：從真實互動式 workload 出發，對 runtime 下儀器、建立受控實驗、追到機制、檢查正確性，最後轉成 production 決策或上游修正。目前含三個已完成實驗與三條研究線。'
+outcome: '三個完成的實驗（可重用狀態與互動延遲、推測解碼成本模型、可重用 canonical 狀態的背景補回）、三條標明缺什麼證據的研究線、三個審查中的上游 pull request，以及一套可重跑的量測工具與完整資料集。'
+indexMeta: 'Apple silicon · 三個實驗 · 三條研究線 · 三個審查中的上游 PR'
 evidence: 'GitHub 上的 llm-inference-systems · 實驗方法、request 層級 trace、原始資料與圖表'
 slug: 'llm-inference-systems'
 locale: 'zh'
@@ -19,7 +19,7 @@ meta:
   - label: '範圍'
     value: 'Runtime · Serving · 可重用狀態 · 推測執行 · 正確性 · 異質運算'
   - label: '證據'
-    value: '公開 repo · 已發表文章 · 兩個審查中的上游 pull request'
+    value: '公開 repo · 已發表文章 · 三個審查中的上游 pull request'
 ---
 
 由 Oliver Yu 獨立研究、量測並提交上游。
@@ -179,6 +179,30 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 逐項標出每個結論的證據等級，以及五格 workload 的原始量測；長文版本在
 <a href="https://study.meowcoder.com/posts/260920-speculative-decoding-cost-model/" target="_blank" rel="noopener noreferrer">推測解碼何時真的會加速？</a>。
 
+## 可重用 canonical 狀態的背景補回（EXP-003）
+
+問題：**如果 sparse prefill 不留下任何可重用狀態，這份狀態能不能事後補回來，而且不讓前景付代價？**
+
+可以——但路上那個修正比結果本身更值得記。在一組受控的七輪 session 裡，sparse 那一邊的可重用 canonical 前綴始終停在 0，prompt 卻長到 43,065 tokens，於是每一輪都把整份重算一次。改成在前景閒置的空檔把這段前綴重建、而且只在一般 serving 路徑本身能獨立還原的 cache block 邊界上發布，累積 session 延遲在該 workload 上從 228.38 s 降到 79.06 s。兩邊的前景都仍然走 SpecPrefill。
+
+比較大的那一半是讓它能安全上線。以時間比例設的 budget 只框得住背景工作「多常」撞到請求，框不住撞到之後那個請求要等多久——budget 調動二十倍，最糟的一次碰撞仍落在同樣的 12–15 s 區間。真正決定等待時間的是 execution slice，而它和 publication grain 是互相獨立的：五種 slice 大小走到完全相同的邊界，把 slice 縮小之後，client 端觀測到的最糟等待從 15.08 s 降到 1.30 s，補回的吞吐量沒有變。另一個缺陷則讓它沒能如期送上游——recovery budget 是每個 engine 各持一份，但 accelerator 是共用的，於是每多載入一個模型，上限就被乘一次。
+
+<div class="decision">
+
+### 目標不是 Spec Exit，是尾巴
+
+**為什麼** — 這個功能本來是為了讓前綴補回後、前景能退回 dense prefill。但量到最快的那個設定，正好是從來沒有退回去的那個；而真的換了路徑的那幾輪，都是各自 session 裡最貴的一輪。
+
+**結果** — 背景補回的價值在於下一輪要算的東西變少，不在於下一輪換一條路徑走。某一輪該走哪條路徑是另一個問題，已另立研究線，這裡不回答。
+
+</div>
+
+這些跑之前並沒有先定義前景延遲目標，所以 runtime trace 記錄到的 2.39 s 最糟不可中斷 execution slice——那是一個請求「可能」要等多久的界，不是任何人觀測到的延遲——是一個量測值，不是一個「可以接受」的判斷。
+<a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a>
+收了資料集、圖表與限制；功能本身以
+<a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>
+草稿的形式送上游。
+
 ## 系統主題
 
 這兩條沒有做成實驗，因為它們各自還缺關鍵證據。它們留在 repo 裡是當支撐證據，不是當結論。
@@ -211,15 +235,20 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 - **異質 prefill 路徑**：以對齊 cache block 的 1024-token tile，把每一層的工作分攤到 GPU 與 neural engine。
 - **疊加量測**：sparse prefill 疊上去之後，在隔離的驗證中兩者疊到理想乘積的 95–97%。
 - **量測式的受保護前綴邊界**：用兩個 throwaway 探針 render，取兩次都同意的 token 前綴，取代減法推算。
-- **背景 dense 前綴補回與協作式排程器**：設計上 fail closed，讓背景切片對進來的請求讓路（前景 decode 從 13.5 回到 47 tok/s）。這是實驗分支，後來的檢視找出四個缺口，服務的 build 不帶這段程式。
+- **背景 dense 前綴補回與協作式排程器**：設計上 fail closed，讓背景切片對進來的請求讓路（前景 decode 從 13.5 回到 47 tok/s）。這是實驗分支，後來的檢視找出四個缺口，服務的 build 不帶這段程式。下面的 EXP-003 是把它重做的版本：那四個缺口補上了，serving 安全性是量出來的，不是假設的。
 - **Request 層級儀器**：checkpoint 位置與 uncached suffix，這是 trace 能成立的前提。
 - **傳輸層的 request policy**：真實 workload 證明沒有單一設定對每個 request 都對之後才加的。
 - **可重跑的 harness 與資料集**：所有圖表由兩個只讀 `data/` 的腳本重畫，沒有任何一格被平滑、內插或反推。
 
-上游部分只列 repo 已確認的兩個，兩個在撰寫時都仍在審查中：
+上游部分列 repo 已確認的三個，撰寫時都仍在審查中：
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a>——受保護前綴邊界的正確性修正。它比部署策略先送，因為這是唯一一個改到模型輸入、而不只是改到速度的發現。
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a>——在 Anthropic messages 端點補上 per-request 的 SpecPrefill 欄位，OpenAI 相容端點本來就有。不改上游任何預設值。
+- <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a>——prefill OOM 重排路徑上的 SpecPrefill RoPE 清理修正，是做 EXP-003 時發現、獨立送出的。它有自己的重現條件，和背景補回這個功能無關。
+
+另外有一個草稿，送出去是為了徵求意見而不是為了合併：
+
+- <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>——背景 canonical 狀態補回，也就是 EXP-003 的功能本身。它帶著一個給維護者的明確問題：它自己那套背景排程原語，是否應該和上游正在進行的相關工作收斂。
 
 ## 證據與限制
 

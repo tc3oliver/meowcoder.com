@@ -1,9 +1,9 @@
 ---
 title: 'LLM Inference Systems'
 type: 'Systems Research · LLM Inference'
-summary: 'An ongoing inference-systems research program driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, and turn the result into a production decision or an upstream fix. Two completed experiments and three open research threads.'
-outcome: 'Two finished experiments — reusable state dynamics, and a cost model for speculative decoding — three threads that each state the evidence they still lack, two open upstream pull requests, and a reproducible harness with the full dataset behind every figure.'
-indexMeta: 'Apple silicon · Two experiments · Three research threads · Two open upstream PRs'
+summary: 'An ongoing inference-systems research program driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, and turn the result into a production decision or an upstream fix. Three completed experiments and three open research threads.'
+outcome: 'Three finished experiments — reusable state dynamics, a cost model for speculative decoding, and background recovery of reusable canonical state — three threads that each state the evidence they still lack, three open upstream pull requests, and a reproducible harness with the full dataset behind every figure.'
+indexMeta: 'Apple silicon · Three experiments · Three research threads · Three open upstream PRs'
 evidence: 'llm-inference-systems on GitHub · methodology, request-level traces, raw data, and figures'
 slug: 'llm-inference-systems'
 locale: 'en'
@@ -19,7 +19,7 @@ meta:
   - label: 'Scope'
     value: 'Runtime · Serving · Reusable state · Speculative execution · Correctness · Heterogeneous compute'
   - label: 'Evidence'
-    value: 'Public repository · published article · two open upstream pull requests'
+    value: 'Public repository · published articles · three open upstream pull requests'
 ---
 
 Independently researched, measured, and submitted upstream by Oliver Yu.
@@ -179,6 +179,28 @@ One correctness caveat, flagged here and not opened up: **with speculation on, g
 states each result with its evidence level, alongside the raw measurements for all five workload cells. The long-form write-up is
 <a href="https://study.meowcoder.com/posts/260920-speculative-decoding-cost-model/" target="_blank" rel="noopener noreferrer">推測解碼何時真的會加速？</a> (Traditional Chinese).
 
+## Progressive Canonical State Recovery (EXP-003)
+
+The question: **if a sparse prefill leaves no reusable state behind, can that state be rebuilt later without the foreground paying for it?**
+
+Yes — and the correction on the way there matters more than the result. Across a controlled seven-turn session the sparse arm's reusable canonical prefix never left zero while the prompt grew to 43,065 tokens, so every turn recomputed everything. Rebuilding that prefix during foreground-idle windows, publishing only at cache-block boundaries the ordinary serving path could independently restore, took cumulative session latency from 228.38 s to 79.06 s on that workload. The foreground stayed on SpecPrefill in both arms.
+
+Making it safe to serve was the larger half. A share-of-time budget bounds how *often* background work collides with a request, not how long that request then waits — the worst collision stayed in the same 12–15 s band across a twentyfold budget change. What bounds the wait is the execution slice, and that turned out to be independent of the publication grain: five slice sizes reached identical boundaries, and shrinking the slice took the worst client-observed wait from 15.08 s to 1.30 s with recovery throughput unchanged. A second defect held it back from upstream — the recovery budget was owned per engine while the accelerator is shared, so each loaded model multiplied the cap.
+
+<div class="decision">
+
+### Spec Exit was not the outcome. The tail was.
+
+**Why** — The feature was built to return the foreground to dense prefill once the prefix recovered. The fastest configuration measured was the one where that never happened, and the turns that did switch routes were the most expensive turns of their sessions.
+
+**Consequence** — What background recovery is worth is that the next turn has less left to compute, not that it takes a different route. Which route a turn should take is a separate question, filed as its own research thread and not answered here.
+
+</div>
+
+No foreground latency target was defined before those runs, so the 2.39 s worst uninterruptible execution slice the runtime trace recorded — a bound on what a request could have waited for, not a latency anyone observed — is a measurement and not a verdict on whether it is acceptable.
+<a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a> carries the datasets, the figures and the limitations; the feature is proposed upstream as
+<a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>, a draft.
+
 ## Systems themes
 
 Neither of these is an experiment, because each is still missing the evidence that would make it one. They sit in the repository as supporting evidence, not as conclusions.
@@ -211,7 +233,7 @@ None of the findings above was available to someone who only ran benchmarks. Get
 - **A heterogeneous prefill path** splitting each layer's work between the GPU and the neural engine, on a 1024-token tile matched to the cache block.
 - **Composition measurement** — sparse prefill on top of it, stacking at 95–97% of the product of their individual speedups in an isolated qualification.
 - **A measured protected-prefix boundary**, taken from two throwaway template probes and the token prefix both agree on, replacing a derivation by subtraction.
-- **A background dense-prefix recovery job and a cooperative scheduler**, designed to fail closed, with background slices yielding to inbound requests — foreground decode went from 13.5 back to 47 tok/s in the one run measured. This was an experimental branch; a later review found four gaps in it and none of that code is in the served build.
+- **A background dense-prefix recovery job and a cooperative scheduler**, designed to fail closed, with background slices yielding to inbound requests — foreground decode went from 13.5 back to 47 tok/s in the one run measured. This was an experimental branch; a later review found four gaps in it and none of that code is in the served build. EXP-003 below is the rebuilt version, with those gaps closed and the serving safety measured rather than assumed.
 - **Request-level instrumentation** of checkpoint position and uncached suffix, which is what made the trace possible at all.
 - **A transport-level request policy**, added only after the real workload showed no single configuration was right for every request.
 - **A reproducible harness and dataset** — every figure is redrawn by two scripts that read nothing but `data/`, and nothing in it is smoothed, interpolated, or back-generated.
@@ -220,6 +242,11 @@ Upstream, two pull requests, both open at the time of writing:
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a> — the correctness fix for the protected-prefix boundary. It went before the deployment policy because it is the only finding that changed the model's input rather than only its speed.
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a> — per-request SpecPrefill fields on the Anthropic messages endpoint, matching what the OpenAI-compatible endpoint already had. It changes no upstream default.
+- <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a> — a SpecPrefill RoPE cleanup fix on the prefill-OOM requeue path, found while building EXP-003 and sent on its own. It is a correctness fix with its own reproduction, unrelated to the recovery feature.
+
+Plus one draft, opened for review rather than for merge:
+
+- <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a> — background canonical-state recovery, the EXP-003 feature. It carries an explicit question for the maintainers about whether its background-scheduling primitives should converge with work already in flight upstream.
 
 ## Evidence and limits
 
