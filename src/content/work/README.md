@@ -194,6 +194,34 @@ free of blank lines so the block passes through verbatim:
 The steps stack on a phone and sit in a row from 40rem up, with the connector
 drawn by CSS, so the content file holds states rather than arrows.
 
+A **trajectory figure** shows before/after measurements grouped by unit — one
+panel per unit, each panel scaled against its own maximum. Units are never mixed
+on one scale, which is why the panels exist at all. The bars are decoration: the
+`--extent` on each one is that value as a percentage of its panel's largest
+number, the track is `aria-hidden`, and every figure is also written out in the
+`trajectory__value` beside it, so nothing is readable only as a bar:
+
+```markdown
+<figure class="trajectory" aria-label="What the three panels measure">
+<div class="trajectory__panel">
+<p class="trajectory__title">Prefill throughput</p>
+<p class="trajectory__unit">tok/s · higher is better</p>
+<ol class="trajectory__rows" role="list">
+<li class="trajectory__row">
+<span class="trajectory__label">16K</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 23%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 79%"></span></span>
+<span class="trajectory__value">302 → 1,046<span class="trajectory__ratio">3.5×</span></span>
+</li>
+</ol>
+</div>
+<figcaption class="trajectory__caption">What the reader should not conclude from it.</figcaption>
+</figure>
+```
+
+Baseline and optimized are told apart by fill rather than by hue alone: the
+baseline bar is an outline, the optimized one is solid. A row stacks on a phone
+and becomes label / bars / numbers from 40rem up.
+
 ### Blocks for an experience entry
 
 An `experience` entry uses neither of the two blocks above, and that is a

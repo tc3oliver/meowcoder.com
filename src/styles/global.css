@@ -590,6 +590,114 @@ button {
   }
 }
 
+/* --- Optimization trajectory: three panels, one unit each --------------- */
+
+/*
+ * The case study's one quantitative figure. Prefill throughput, time to first
+ * token and foreground decode are three different units, so they are three
+ * panels rather than three series on one axis — a shared axis would put a
+ * 1,328 tok/s bar and a 122.7 s bar on the same scale and mean nothing.
+ *
+ * Each panel scales its own bars against its own maximum, passed per bar as an
+ * inline `--extent` so the content file carries the numbers and this file
+ * carries none. The bars are decoration: every value is also written out in
+ * text beside them, and the tracks are hidden from assistive technology.
+ */
+.prose .trajectory {
+  display: grid;
+  gap: var(--space-6);
+  margin-block-start: var(--space-6);
+  padding-block: var(--space-5);
+  border-block: var(--border-width) solid var(--color-border);
+}
+
+.prose .trajectory__panel {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.prose .trajectory__title {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+}
+
+.prose .trajectory__unit {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.prose .trajectory__rows {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* Label, bars, numbers. One column on a phone; three once there is width. */
+.prose .trajectory__row {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.prose .trajectory__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.prose .trajectory__track {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+/* The two states of one measurement. Distinguished by fill and not by hue
+   alone: the baseline is an outline, the optimized figure is solid. */
+.prose .trajectory__bar {
+  block-size: var(--space-2);
+  inline-size: var(--extent, 100%);
+  /* A visibility floor: a bar at a few percent would otherwise render as
+     nothing. The row's width is protected by `min-width: 0` on the track and
+     the `minmax(0, 1fr)` column below, not by this. */
+  min-inline-size: 2px;
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.prose .trajectory__bar--after {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+}
+
+.prose .trajectory__value {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  overflow-wrap: anywhere;
+}
+
+.prose .trajectory__ratio {
+  margin-inline-start: var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.prose .trajectory__caption {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 40rem) {
+  .prose .trajectory__row {
+    grid-template-columns: 6rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-4);
+  }
+}
+
 .site-main {
   /* Absorbs the leftover height so the footer sits at the bottom of short
      pages without being fixed. */

@@ -62,6 +62,70 @@ The scope is runtime, serving, reusable state, speculative execution, correctnes
 
 Every claim carries an evidence level: observed, measured, derived, inferred, hypothesized, not established. The grading is the point — three subjects in the repository are filed as research threads rather than experiments precisely because each one names the evidence it still lacks.
 
+## From baseline to optimized serving
+
+This study did not start from a prefix-cache problem. The first goal was plain: take a 27B-class dense model at 4-bit on one Apple silicon machine from "it runs" to an inference service you can actually interact with.
+
+At 16K context, dense prefill ran at about 302 tok/s; with heterogeneous prefill and sparse prefill stacked on it, 1,046 tok/s. At 32K, 277 tok/s became 1,112 tok/s. In an isolated qualification with the two mechanisms composed, prefill peaked at roughly 1,328 tok/s. Time to first token followed: 16K from 57.84 s to 19.24 s, 32K from 122.7 s to 33.5 s.
+
+The optimization was not confined to model compute either. Background dense prefix recovery contended with foreground generation on the same executor, and foreground decode fell to 13.5 tok/s. Once the two defects behind that — a request being invisible to the scheduler until its admission ran, and a slice starving the loop that accepts requests — were fixed, foreground decode under the same background work came back to about 47 tok/s, in the one run where it was measured.
+
+<figure class="trajectory" aria-label="Three measurements from baseline to optimized serving: prefill throughput, time to first token, and foreground decode under background recovery">
+<div class="trajectory__panel">
+<p class="trajectory__title">Prefill throughput</p>
+<p class="trajectory__unit">tok/s · higher is better</p>
+<ol class="trajectory__rows" role="list">
+<li class="trajectory__row">
+<span class="trajectory__label">16K</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 23%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 79%"></span></span>
+<span class="trajectory__value">302 → 1,046<span class="trajectory__ratio">3.5×</span></span>
+</li>
+<li class="trajectory__row">
+<span class="trajectory__label">32K</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 21%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 84%"></span></span>
+<span class="trajectory__value">277 → 1,112<span class="trajectory__ratio">4.0×</span></span>
+</li>
+<li class="trajectory__row">
+<span class="trajectory__label">Stacked, one smoke run</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 23%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 100%"></span></span>
+<span class="trajectory__value">~300 → 1,328<span class="trajectory__ratio">4.4×</span></span>
+</li>
+</ol>
+</div>
+<div class="trajectory__panel">
+<p class="trajectory__title">Time to first token</p>
+<p class="trajectory__unit">seconds · lower is better</p>
+<ol class="trajectory__rows" role="list">
+<li class="trajectory__row">
+<span class="trajectory__label">16K</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 47%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 16%"></span></span>
+<span class="trajectory__value">57.84 s → 19.24 s</span>
+</li>
+<li class="trajectory__row">
+<span class="trajectory__label">32K</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 100%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 27%"></span></span>
+<span class="trajectory__value">122.7 s → 33.5 s</span>
+</li>
+</ol>
+</div>
+<div class="trajectory__panel">
+<p class="trajectory__title">Scheduler isolation</p>
+<p class="trajectory__unit">tok/s · foreground decode under background recovery</p>
+<ol class="trajectory__rows" role="list">
+<li class="trajectory__row">
+<span class="trajectory__label">Foreground decode</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 29%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 100%"></span></span>
+<span class="trajectory__value">13.5 → 47</span>
+</li>
+</ol>
+</div>
+<figcaption class="trajectory__caption">Each panel carries its own unit and its own scale; they do not share a Y axis, and in the middle one lower is better, so the solid bar is the shorter one. The stacked row comes from a single isolated smoke run, not from the same measurement as the two rows above it. The last panel is not a general decode baseline — it is the foreground side of one run where background dense recovery and foreground generation were competing for the same executor.</figcaption>
+</figure>
+
+By this point the single-request numbers looked good. Then the same configuration was put behind a coding agent that reads files, calls tools, and grows its context turn after turn — and the session came out slower.
+
+That is where EXP-001 actually begins: **if every request is faster, why is the whole interactive workload slower?**
+
 ## Reusable State Dynamics (EXP-001)
 
 The question: **does a faster request make the whole interactive session slower, by destroying the reusable state the next request needed?**

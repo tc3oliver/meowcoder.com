@@ -62,6 +62,70 @@ meta:
 
 每一項結論都標上證據等級：observed、measured、derived、inferred、hypothesized、not established。這個分級是刻意的——repo 裡有三條主題被標成研究線而不是實驗，正因為它們各自寫明了還缺什麼證據。
 
+## 從 baseline 到 optimized serving
+
+這個研究不是從 prefix cache 的問題開始的。最初的目標很直接：讓一個 27B-class dense 模型在 4-bit 下、在單機 Apple silicon 上，從「跑得動」變成真正可互動的推論服務。
+
+在 16K context，dense prefill 約 302 tok/s；把異質 prefill 與 sparse prefill 疊上去之後是 1,046 tok/s。32K 從 277 tok/s 到 1,112 tok/s。在隔離的驗證環境裡兩種機制疊加，prefill 最高量到約 1,328 tok/s。對應的首個 token，16K 從 57.84 秒降到 19.24 秒，32K 從 122.7 秒降到 33.5 秒。
+
+優化也不是只發生在模型計算本身。背景的 dense 前綴補回一度與前景生成搶同一個 executor，前景 decode 掉到 13.5 tok/s；把到達可見性與 executor 飢餓這兩個缺陷分別修掉之後，同樣條件下的前景 decode 回到約 47 tok/s——這一格只量過一次。
+
+<figure class="trajectory" aria-label="從 baseline 到 optimized serving 的三組量測：prefill throughput、首字延遲，以及背景補回期間的前景 decode">
+<div class="trajectory__panel">
+<p class="trajectory__title">Prefill 吞吐</p>
+<p class="trajectory__unit">tok/s · 越高越好</p>
+<ol class="trajectory__rows" role="list">
+<li class="trajectory__row">
+<span class="trajectory__label">16K</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 23%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 79%"></span></span>
+<span class="trajectory__value">302 → 1,046<span class="trajectory__ratio">3.5×</span></span>
+</li>
+<li class="trajectory__row">
+<span class="trajectory__label">32K</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 21%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 84%"></span></span>
+<span class="trajectory__value">277 → 1,112<span class="trajectory__ratio">4.0×</span></span>
+</li>
+<li class="trajectory__row">
+<span class="trajectory__label">疊加（單次 smoke run）</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 23%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 100%"></span></span>
+<span class="trajectory__value">~300 → 1,328<span class="trajectory__ratio">4.4×</span></span>
+</li>
+</ol>
+</div>
+<div class="trajectory__panel">
+<p class="trajectory__title">首個 token 的延遲</p>
+<p class="trajectory__unit">秒 · 越低越好</p>
+<ol class="trajectory__rows" role="list">
+<li class="trajectory__row">
+<span class="trajectory__label">16K</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 47%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 16%"></span></span>
+<span class="trajectory__value">57.84 → 19.24</span>
+</li>
+<li class="trajectory__row">
+<span class="trajectory__label">32K</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 100%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 27%"></span></span>
+<span class="trajectory__value">122.7 → 33.5</span>
+</li>
+</ol>
+</div>
+<div class="trajectory__panel">
+<p class="trajectory__title">排程器隔離</p>
+<p class="trajectory__unit">tok/s · 背景補回進行中的前景 decode</p>
+<ol class="trajectory__rows" role="list">
+<li class="trajectory__row">
+<span class="trajectory__label">前景 decode</span>
+<span class="trajectory__track" aria-hidden="true"><span class="trajectory__bar" style="--extent: 29%"></span><span class="trajectory__bar trajectory__bar--after" style="--extent: 100%"></span></span>
+<span class="trajectory__value">13.5 → 47</span>
+</li>
+</ol>
+</div>
+<figcaption class="trajectory__caption">三個面板各自有自己的單位與自己的尺標，不共用一條 Y 軸；中間那格越低越好，實心條因此比空心條短。疊加那一列來自一次隔離的 smoke run，與上面兩列不是同一次量測。最後一格不是 decode 的一般基準，而是背景 dense 補回與前景生成搶執行資源時、前景這一側在唯一一次量測中的數字。</figcaption>
+</figure>
+
+到這裡，單次 request 的數字已經很好看。但同一套設定真正接上一個持續讀檔、呼叫工具、把 context 越疊越長的 coding agent 之後，整個 session 反而變慢了。
+
+這才是 EXP-001 真正的起點：**如果每一次 request 都更快了，為什麼整個互動式 workload 會更慢？**
+
 ## 可重用狀態與互動延遲（EXP-001）
 
 這個實驗問的是：**一次 request 的加速，會不會因為破壞了可重用狀態，反而讓整個互動 session 變慢？**

@@ -405,6 +405,38 @@ describe('progression figure (doc-2 §21)', () => {
 });
 
 /* -------------------------------------------------------------------------
+ * The trajectory figure
+ *
+ * The one quantitative figure on the LLM Inference Systems entry. Its bars are
+ * sized by an inline `--extent` per bar, which is the shape most able to
+ * reintroduce the 390px horizontal scroll: a percentage resolves against a
+ * track that must be allowed to shrink, and a bar must never claim a width of
+ * its own. Both are single declarations, so both are asserted.
+ * ---------------------------------------------------------------------- */
+
+describe('trajectory figure', () => {
+  it('lets the track shrink instead of sizing the row from its bars', () => {
+    const track = GLOBAL_CSS.match(/\.prose \.trajectory__track\s*\{[^}]*\}/)?.[0] ?? '';
+    expect(track).toMatch(/min-width:\s*0/);
+  });
+
+  it('scales each bar by its own extent and never below a hairline', () => {
+    const bar = GLOBAL_CSS.match(/\.prose \.trajectory__bar\s*\{[^}]*\}/)?.[0] ?? '';
+    expect(bar).toMatch(/inline-size:\s*var\(--extent, 100%\)/);
+    expect(bar).toMatch(/min-inline-size:\s*2px/);
+  });
+
+  /*
+   * The baseline is an outline and the optimized figure is solid, so the two
+   * states survive a reader who cannot separate them by color.
+   */
+  it('separates before from after by fill, not by hue alone', () => {
+    const after = GLOBAL_CSS.match(/\.prose \.trajectory__bar--after\s*\{[^}]*\}/)?.[0] ?? '';
+    expect(after).toMatch(/background-color:/);
+  });
+});
+
+/* -------------------------------------------------------------------------
  * Forbidden visual elements (PRD §25)
  *
  * A source scan, not a rendering check: these effects all leave a
