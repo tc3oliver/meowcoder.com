@@ -2,8 +2,8 @@
 title: 'LLM Inference Systems'
 type: 'Systems Research · LLM Inference'
 summary: 'An ongoing inference-systems research program driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, and turn the result into a production decision or an upstream fix. Three completed experiments and three open research threads.'
-outcome: 'Three finished experiments: on reusable state dynamics, on the cost model for speculative decoding, and on background recovery of reusable canonical state. Alongside them, three open research threads that each state the evidence they still lack, seven upstream pull requests — six open, none a draft, and one merged — and a reproducible harness with the full dataset behind every figure.'
-indexMeta: 'Apple silicon · Three experiments · Three open research threads · Six open upstream PRs, one merged'
+outcome: 'Three finished experiments: on reusable state dynamics, on the cost model for speculative decoding, and on background recovery of reusable canonical state. Alongside them, three open research threads that each state the evidence they still lack, nine upstream pull requests — eight open, none a draft, and one merged — and a reproducible harness with the full dataset behind every figure.'
+indexMeta: 'Apple silicon · Three experiments · Three open research threads · Eight open upstream PRs, one merged'
 evidence: 'llm-inference-systems on GitHub · methodology, request-level traces, raw data, and figures'
 slug: 'llm-inference-systems'
 locale: 'en'
@@ -19,7 +19,7 @@ meta:
   - label: 'Scope'
     value: 'Runtime · Serving · Reusable state · Speculative execution · Correctness · Heterogeneous compute'
   - label: 'Evidence'
-    value: 'Public repository · published articles · seven upstream pull requests: six open, one merged'
+    value: 'Public repository · published articles · nine upstream pull requests: eight open, one merged'
 ---
 
 Independently researched, measured, and submitted upstream by Oliver Yu.
@@ -239,11 +239,13 @@ None of the findings above was available to someone who only ran benchmarks. Get
 - **A transport-level request policy**, added only after the real workload showed no single configuration was right for every request.
 - **A reproducible harness and dataset** — every figure is redrawn by three scripts that read nothing but `data/`, and nothing in it is smoothed, interpolated, or back-generated.
 
-Upstream, seven pull requests. Six are open at the time of writing, none a draft and none reviewed to a conclusion; one is merged. An open pull request is a proposal, not an outcome:
+Upstream, nine pull requests. Eight are open at the time of writing, none a draft and none reviewed to a conclusion; one is merged. An open pull request is a proposal, not an outcome:
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a> — the correctness fix for the protected-prefix boundary. It was sent before the performance work because it is the only finding that changed the model's input rather than only its speed.
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a> — per-request SpecPrefill fields on the Anthropic messages endpoint, matching what the OpenAI-compatible endpoint already had. It changes no upstream default.
 - <a href="https://github.com/jundot/omlx/pull/3685" target="_blank" rel="noopener noreferrer"><code>omlx#3685</code></a> — deterministic SDPA-256 routing. The route was chosen per call from live memory headroom, so two otherwise identical processes could take different floating-point reductions; this pins qualifying prefill to the bounded one.
+- <a href="https://github.com/jundot/omlx/pull/3840" target="_blank" rel="noopener noreferrer"><code>omlx#3840</code></a> — on a hybrid model the first layer can be a recurrent cache with no offset, so a restored draft cache was silently read as empty and the prompt was prefilled on top of the state it already held, corrupting the importance scoring the selector runs on. It derives the position from an attention layer instead.
+- <a href="https://github.com/jundot/omlx/pull/3842" target="_blank" rel="noopener noreferrer"><code>omlx#3842</code></a> — reusable recurrent state at draft cache block boundaries. It depends on #3840 and should not merge before it.
 - <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a> — a SpecPrefill RoPE cleanup fix on the prefill-OOM requeue path, found while building EXP-003 and sent on its own. It is a correctness fix with its own reproduction, unrelated to the recovery feature.
 - <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a> — on mRoPE VLMs, SpecPrefill wrote its selected tokens at compacted rather than original positions. Validating progressive canonical state recovery (PCSR) is what exposed it; **PCSR did not cause it**, and it is present with background recovery switched off.
 - <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a> — background canonical-state recovery, the EXP-003 feature. It depends on #3811 and should be ordered after it, and it puts an explicit question to the maintainers: whether this PR's own background-scheduling primitives should be merged with work already in flight upstream.
