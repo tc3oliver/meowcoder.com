@@ -2,8 +2,8 @@
 title: 'LLM Inference Systems'
 type: 'Systems Research · LLM Inference'
 summary: 'An ongoing inference-systems research program driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, and turn the result into a production decision or an upstream fix. Three completed experiments and three open research threads.'
-outcome: 'Three finished experiments: on reusable state dynamics, on the cost model for speculative decoding, and on background recovery of reusable canonical state. Alongside them, three open research threads that each state the evidence they still lack, nine upstream pull requests — eight open, none a draft, and one merged — and a reproducible harness with the full dataset behind every figure.'
-indexMeta: 'Apple silicon · Three experiments · Three open research threads · Eight open upstream PRs, one merged'
+outcome: 'Three finished experiments: on reusable state dynamics, on the cost model for speculative decoding, and on background recovery of reusable canonical state. Alongside them, three open research threads that each state the evidence they still lack, ten upstream pull requests — eight open, none a draft, and two merged — and a reproducible harness with the full dataset behind every figure.'
+indexMeta: 'Apple silicon · Three experiments · Three open research threads · Eight open upstream PRs, two merged'
 evidence: 'llm-inference-systems on GitHub · methodology, request-level traces, raw data, and figures'
 slug: 'llm-inference-systems'
 locale: 'en'
@@ -19,7 +19,7 @@ meta:
   - label: 'Scope'
     value: 'Runtime · Serving · Reusable state · Speculative execution · Correctness · Heterogeneous compute'
   - label: 'Evidence'
-    value: 'Public repository · published articles · nine upstream pull requests: eight open, one merged'
+    value: 'Public repository · published articles · ten upstream pull requests: eight open, two merged'
 ---
 
 Independently researched, measured, and submitted upstream by Oliver Yu.
@@ -239,7 +239,7 @@ None of the findings above was available to someone who only ran benchmarks. Get
 - **A transport-level request policy**, added only after the real workload showed no single configuration was right for every request.
 - **A reproducible harness and dataset** — every figure is redrawn by three scripts that read nothing but `data/`, and nothing in it is smoothed, interpolated, or back-generated.
 
-Upstream, nine pull requests. Eight are open at the time of writing, none a draft and none reviewed to a conclusion; one is merged. An open pull request is a proposal, not an outcome:
+Upstream, ten pull requests. Eight are open at the time of writing, none a draft and none reviewed to a conclusion; two are merged. An open pull request is a proposal, not an outcome:
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a> — the correctness fix for the protected-prefix boundary. It was sent before the performance work because it is the only finding that changed the model's input rather than only its speed.
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a> — per-request SpecPrefill fields on the Anthropic messages endpoint, matching what the OpenAI-compatible endpoint already had. It changes no upstream default.
@@ -250,6 +250,7 @@ Upstream, nine pull requests. Eight are open at the time of writing, none a draf
 - <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a> — on mRoPE VLMs, SpecPrefill wrote its selected tokens at compacted rather than original positions. Validating progressive canonical state recovery (PCSR) is what exposed it; **PCSR did not cause it**, and it is present with background recovery switched off.
 - <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a> — background canonical-state recovery, the EXP-003 feature. It depends on #3811 and should be ordered after it, and it puts an explicit question to the maintainers: whether this PR's own background-scheduling primitives should be merged with work already in flight upstream.
 - <a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a> — the one merged so far. The ANE prefill scheduler recommended a sequence length the accelerator cannot accept, since it requires a multiple of 64 and at least 1024 tokens; the merged change reports that geometry as impossible instead. It alters no scheduling and no execution — it makes a silent misconfiguration say so.
+- <a href="https://github.com/jundot/omlx/pull/3664" target="_blank" rel="noopener noreferrer"><code>omlx#3664</code></a> — merged, and the one item here that did not come from an experiment. Tool groups in the Responses API were dropped before reaching the chat template, because only entries typed as functions survived the conversion, so a client's namespaced tools never reached the model. It is a defect met while running the stack, not a finding produced by one.
 
 Hardening #3793 surfaced six defects that the experiment's own workloads could not reach, under conditions such as a second model in the process, multi-token prediction on, an eviction mid-job, and a prompt whose length is an exact multiple of the cache block. Three of them are not only about this runtime: background work must yield **ownership** and not only execution; foreground arrival must be visible process-wide and before execution begins; and a cache watermark is bookkeeping rather than the cache's actual state, so it has to be able to move backward. The invariants are in EXP-003's <code>HARDENING.md</code>.
 
