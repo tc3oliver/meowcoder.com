@@ -2,8 +2,8 @@
 title: 'LLM Inference Systems'
 type: '系統研究 · LLM 推論'
 summary: '一個持續進行的推論系統研究計畫：從真實互動式 workload 出發，對 runtime 下儀器、建立受控實驗、追到機制、檢查正確性，最後轉成 production 決策或上游修正。目前含三個已完成實驗與三條研究線。'
-outcome: '三個完成的實驗（可重用狀態與互動延遲、推測解碼成本模型、可重用 canonical 狀態的背景補回）、三條標明缺什麼證據的研究線、四個開著的上游 pull request（其中一個是草稿），以及一套可重跑的量測工具與完整資料集。'
-indexMeta: 'Apple silicon · 三個實驗 · 三條研究線 · 四個開著的上游 PR'
+outcome: '三個完成的實驗（可重用狀態與互動延遲、推測解碼成本模型、可重用 canonical 狀態的背景補回）、三條標明缺什麼證據的研究線、五個開著的上游 pull request（都不是草稿，也都還沒被合併），以及一套可重跑的量測工具與完整資料集。'
+indexMeta: 'Apple silicon · 三個實驗 · 三條研究線 · 五個開著的上游 PR'
 evidence: 'GitHub 上的 llm-inference-systems · 實驗方法、request 層級 trace、原始資料與圖表'
 slug: 'llm-inference-systems'
 locale: 'zh'
@@ -19,7 +19,7 @@ meta:
   - label: '範圍'
     value: 'Runtime · Serving · 可重用狀態 · 推測執行 · 正確性 · 異質運算'
   - label: '證據'
-    value: '公開 repo · 已發表文章 · 四個開著的上游 pull request'
+    value: '公開 repo · 已發表文章 · 五個開著的上游 pull request'
 ---
 
 由 Oliver Yu 獨立研究、量測並提交上游。
@@ -201,7 +201,7 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a>
 收了資料集、圖表與限制；功能本身以
 <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>
-草稿的形式送上游，長文版本在
+送上游（已開放審查，不再是草稿，也還沒有被合併），長文版本在
 <a href="https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/" target="_blank" rel="noopener noreferrer">償還 reusable state 的債</a>。
 
 ## 系統主題
@@ -241,15 +241,16 @@ Request 層級的 trace 讓機制現形：可重用檢查點爬到 37,888 token 
 - **傳輸層的 request policy**：真實 workload 證明沒有單一設定對每個 request 都對之後才加的。
 - **可重跑的 harness 與資料集**：所有圖表由兩個只讀 `data/` 的腳本重畫，沒有任何一格被平滑、內插或反推。
 
-上游部分列 repo 已確認的三個，撰寫時都還開著，也都還沒有被審到結論：
+上游部分列 repo 已確認的五個，撰寫時都還開著、都不是草稿，也都還沒有被審到結論。開著的 pull request 是提案，不是成果：
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a>——受保護前綴邊界的正確性修正。它比部署策略先送，因為這是唯一一個改到模型輸入、而不只是改到速度的發現。
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a>——在 Anthropic messages 端點補上 per-request 的 SpecPrefill 欄位，OpenAI 相容端點本來就有。不改上游任何預設值。
 - <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a>——prefill OOM 重排路徑上的 SpecPrefill RoPE 清理修正，是做 EXP-003 時發現、獨立送出的。它有自己的重現條件，和背景補回這個功能無關。
 
-另外有一個草稿，送出去是為了徵求意見而不是為了合併：
+- <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a>——在 mRoPE VLM 上，SpecPrefill 把選中的 token 寫在壓縮後的位置而不是原始位置。這是驗證 PCSR 的過程暴露出來的獨立正確性缺陷；**PCSR 沒有造成它**，把背景補回關掉它一樣存在。
+- <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>——背景 canonical 狀態補回，也就是 EXP-003 的功能本身，相依於 #3811，應該排在它後面。它帶著一個給維護者的明確問題：它自己那套背景排程原語，是否應該和上游正在進行的相關工作收斂。
 
-- <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>——背景 canonical 狀態補回，也就是 EXP-003 的功能本身。它帶著一個給維護者的明確問題：它自己那套背景排程原語，是否應該和上游正在進行的相關工作收斂。
+把 #3793 整理到可以被審查的過程，又找出六個實驗本身的 workload 碰不到的缺陷——進程裡有第二個模型、MTP 打開、補回途中遇到 eviction、prompt 長度剛好是 cache block 的整數倍。其中三個不只是這個 runtime 的問題：背景工作要讓出的是**所有權**而不只是執行；前景的到達必須在執行之前、而且是跨進程可見；cache 的 watermark 是記帳，不是 cache 的事實，所以它必須能往回走。細節與不變式在 repo 的 <code>HARDENING.md</code>。
 
 ## 證據與限制
 

@@ -2,8 +2,8 @@
 title: 'LLM Inference Systems'
 type: 'Systems Research · LLM Inference'
 summary: 'An ongoing inference-systems research program driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, and turn the result into a production decision or an upstream fix. Three completed experiments and three open research threads.'
-outcome: 'Three finished experiments — reusable state dynamics, a cost model for speculative decoding, and background recovery of reusable canonical state — three threads that each state the evidence they still lack, four open upstream pull requests, one of them a draft, and a reproducible harness with the full dataset behind every figure.'
-indexMeta: 'Apple silicon · Three experiments · Three research threads · Four open upstream PRs'
+outcome: 'Three finished experiments — reusable state dynamics, a cost model for speculative decoding, and background recovery of reusable canonical state — three threads that each state the evidence they still lack, five open upstream pull requests, none a draft and none merged, and a reproducible harness with the full dataset behind every figure.'
+indexMeta: 'Apple silicon · Three experiments · Three research threads · Five open upstream PRs'
 evidence: 'llm-inference-systems on GitHub · methodology, request-level traces, raw data, and figures'
 slug: 'llm-inference-systems'
 locale: 'en'
@@ -19,7 +19,7 @@ meta:
   - label: 'Scope'
     value: 'Runtime · Serving · Reusable state · Speculative execution · Correctness · Heterogeneous compute'
   - label: 'Evidence'
-    value: 'Public repository · published articles · four open upstream pull requests'
+    value: 'Public repository · published articles · five open upstream pull requests'
 ---
 
 Independently researched, measured, and submitted upstream by Oliver Yu.
@@ -199,7 +199,7 @@ Making it safe to serve was the larger half. A share-of-time budget bounds how _
 
 No foreground latency target was defined before those runs, so the 2.39 s worst uninterruptible execution slice the runtime trace recorded — a bound on what a request could have waited for, not a latency anyone observed — is a derived bound and not a verdict on whether it is acceptable.
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a> carries the datasets, the figures and the limitations; the feature is proposed upstream as
-<a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>, a draft. The long-form write-up is
+<a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>, open for review and not merged. The long-form write-up is
 <a href="https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/" target="_blank" rel="noopener noreferrer">償還 reusable state 的債</a> (Traditional Chinese).
 
 ## Systems themes
@@ -239,15 +239,16 @@ None of the findings above was available to someone who only ran benchmarks. Get
 - **A transport-level request policy**, added only after the real workload showed no single configuration was right for every request.
 - **A reproducible harness and dataset** — every figure is redrawn by two scripts that read nothing but `data/`, and nothing in it is smoothed, interpolated, or back-generated.
 
-Upstream, three pull requests, all open at the time of writing and none reviewed to a conclusion:
+Upstream, five pull requests, all open at the time of writing, none a draft and none reviewed to a conclusion. An open pull request is a proposal, not an outcome:
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a> — the correctness fix for the protected-prefix boundary. It went before the deployment policy because it is the only finding that changed the model's input rather than only its speed.
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a> — per-request SpecPrefill fields on the Anthropic messages endpoint, matching what the OpenAI-compatible endpoint already had. It changes no upstream default.
 - <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a> — a SpecPrefill RoPE cleanup fix on the prefill-OOM requeue path, found while building EXP-003 and sent on its own. It is a correctness fix with its own reproduction, unrelated to the recovery feature.
 
-Plus one draft, opened for review rather than for merge:
+- <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a> — on mRoPE VLMs, SpecPrefill wrote its selected tokens at compacted rather than original positions. Validating PCSR is what exposed it; **PCSR did not cause it**, and it is present with background recovery switched off.
+- <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a> — background canonical-state recovery, the EXP-003 feature. It depends on #3811 and should follow it. It carries an explicit question for the maintainers about whether its background-scheduling primitives should converge with work already in flight upstream.
 
-- <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a> — background canonical-state recovery, the EXP-003 feature. It carries an explicit question for the maintainers about whether its background-scheduling primitives should converge with work already in flight upstream.
+Getting #3793 into reviewable shape found six further defects that the experiment's own workloads could not reach — a second model in the process, multi-token prediction on, an eviction mid-job, a prompt whose length is an exact multiple of the cache block. Three of them are not about this runtime: background work must yield **ownership** and not only execution; foreground arrival must be visible process-wide and before execution begins; and a cache watermark is bookkeeping rather than cache truth, so it has to be able to move backward. The invariants are in the repository's <code>HARDENING.md</code>.
 
 ## Evidence and limits
 
