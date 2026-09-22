@@ -154,11 +154,11 @@ The full findings, data, and limitations are in
 
 The question: **under what conditions does speculative decoding actually save time — is break-even decided by the acceptance rate, or by the cost of one verify cycle?**
 
-By the verify cycle. Acceptance is the number everybody reports for this mechanism, and thirty-six matched runs later it is the wrong one: high acceptance did not guarantee a speedup. What decides whether speculation pays is **the cost of one verify cycle measured in dense decode steps**, and that cost is a property of the model rather than of the content.
+By the verify cycle. Acceptance is the number everybody reports for this mechanism, and thirty-six runs later it is the wrong one: high acceptance did not guarantee a speedup. What decides whether speculation pays is **the cost of one verify cycle measured in dense decode steps**, and that cost is a property of the model rather than of the content.
 
 - On a 35B-A3B mixture-of-experts, a four-position verify forward costs 2.43 dense steps. A fixed draft depth of 3 came out 10% slower than dense decoding on code and 44% slower on prose, at acceptance rates of 56% and 25%.
-- On a dense 27B, same runtime and same prompts, the identical forward costs 1.37 dense steps, and at 79% acceptance the mechanism decodes 1.81× faster on a matched 13.6K-token coding prompt — 1.05× end to end on the same row.
-- A cost model built from the runtime's own timers predicts the measured matched speedup across the whole 0.56×–1.81× range.
+- On a dense 27B, same runtime and the same prompt, the identical forward costs 1.37 dense steps, and at 79% acceptance the mechanism decodes 1.81× faster on a matched 13.6K-token coding prompt — 1.05× end to end on the same row.
+- A cost model built from the runtime's own timers predicts the measured speedup to within 5% in ten of the eleven matched pairs, across the 0.56×–1.81× range.
 - The runtime's existing adaptive depth controller avoided every measured losing region: it turned all four losses into parity or a small deficit, and in the one cell where the fixed depth already won, the controller won by a further 12% on top, by drafting shallower and buying a cheaper cycle.
 
 Because the code under test was already choosing correctly, the finding came with no upstream proposal attached. The production decision is to change nothing and keep the current adaptive MTP.
@@ -183,9 +183,9 @@ states each result with its evidence level, alongside the raw measurements for a
 
 The question: **if a sparse prefill leaves no reusable state behind, can that state be rebuilt later without the foreground paying for it?**
 
-Yes — and the correction on the way there matters more than the result. Across a controlled seven-turn session the sparse arm's reusable canonical prefix never left zero while the prompt grew to 43,065 tokens, so every turn recomputed everything. The prefix was rebuilt during foreground-idle windows and published only at cache-block boundaries that the ordinary serving path could independently restore. That took cumulative session latency from 228.38 s to 79.06 s on that workload. The foreground stayed on SpecPrefill in both arms.
+Yes — and the correction on the way there matters more than the result. Across a controlled seven-turn session the sparse arm's reusable canonical prefix never left zero while the prompt grew to 43,065 tokens, so every turn recomputed everything. The prefix was rebuilt during foreground-idle windows and published only at cache-block boundaries that the ordinary serving path could independently restore. That took cumulative session latency from 228.38 s to 79.06 s on that workload. The foreground was pinned to SpecPrefill in both arms.
 
-Making it safe to serve was the larger half. A share-of-time budget bounds how _often_ background work collides with a request, not how long that request then waits — the worst collision stayed in the same 12–15 s band across a twentyfold budget change. What bounds the wait is the execution slice, and that turned out to be independent of the publication grain: every slice setting that ran reached identical boundaries, and shrinking the slice from the block grain to 512 took the worst client-observed wait from 15.08 s to 1.30 s with recovery throughput unchanged. Shrinking further to 256 did not help: its trace-derived bound is lower and its observed maximum is higher. One more defect had to be fixed before it was proposable upstream: the recovery budget was owned per engine while the accelerator is shared, so each loaded model multiplied the cap.
+Making it safe to serve was the larger half. A share-of-time budget bounds how _often_ background work collides with a request, not how long that request then waits — the worst collision stayed in the same 12–15 s band across a twentyfold budget change. What bounds the wait is the execution slice, and that turned out to be independent of the publication grain: every slice setting that ran reached identical boundaries, and shrinking the slice from the block grain to 512 took the worst client-observed wait from 15.08 s to 1.30 s for about 2.4% of recovery throughput at the extreme. Shrinking further to 256 did not help: its trace-derived bound is lower and its observed maximum is higher. One more defect had to be fixed before it was proposable upstream: the recovery budget was owned per engine while the accelerator is shared, so each loaded model multiplied the cap.
 
 <div class="decision">
 
@@ -204,7 +204,7 @@ No foreground latency target was defined before those runs, so the worst uninter
 
 ## Systems themes
 
-Neither of these is an experiment, because each is still missing the evidence that would make it one. They sit in the repository as supporting evidence, not as conclusions.
+Neither of the two below is an experiment, because each is still missing the evidence that would make it one. The third open thread, on cross-runtime observations, is not written up here — its content is the absence: no controlled comparison exists, and none was run. All three sit in the repository as supporting evidence, not as conclusions.
 
 ### Correctness — fast but wrong is a regression
 
@@ -247,11 +247,11 @@ Upstream, there are five pull requests, all open at the time of writing, none a 
 - <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a> — on mRoPE VLMs, SpecPrefill wrote its selected tokens at compacted rather than original positions. Validating progressive canonical state recovery (PCSR) is what exposed it; **PCSR did not cause it**, and it is present with background recovery switched off.
 - <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a> — background canonical-state recovery, the EXP-003 feature. It depends on #3811 and should follow it. It carries an explicit question for the maintainers about whether its background-scheduling primitives should converge with work already in flight upstream.
 
-Getting #3793 into reviewable shape surfaced six further defects that the experiment's own workloads could not reach, under conditions such as a second model in the process, multi-token prediction on, an eviction mid-job, and a prompt whose length is an exact multiple of the cache block. Three of them are not only about this runtime: background work must yield **ownership** and not only execution; foreground arrival must be visible process-wide and before execution begins; and a cache watermark is bookkeeping rather than the cache's actual state, so it has to be able to move backward. The invariants are in the repository's <code>HARDENING.md</code>.
+Getting #3793 into reviewable shape surfaced six further defects that the experiment's own workloads could not reach, under conditions such as a second model in the process, multi-token prediction on, an eviction mid-job, and a prompt whose length is an exact multiple of the cache block. Three of them are not only about this runtime: background work must yield **ownership** and not only execution; foreground arrival must be visible process-wide and before execution begins; and a cache watermark is bookkeeping rather than the cache's actual state, so it has to be able to move backward. The invariants are in EXP-003's <code>HARDENING.md</code>.
 
 ## Evidence and limits
 
-One machine, one vendor, one runtime. EXP-001 is a single 27B dense model at 4-bit, one run per cell. EXP-002 measures the 35B-A3B MoE and the 27B side by side, which is the closest thing here to a second configuration and is still the same machine. Cross-model and cross-hardware generalization is stated as not established in both experiments.
+One machine, one vendor, one runtime. EXP-001 is a single 27B dense model at 4-bit, one run per cell. EXP-002 measures the 35B-A3B MoE and the 27B side by side, which is the closest thing here to a second configuration and is still the same machine. EXP-003 is that 27B dense model again with multi-token prediction off, a single run per arm — enough to establish a mechanism, not enough to state an effect size. Cross-model and cross-hardware generalization is stated as not established in all three: the mechanism arguments are about this runtime's cache and scheduler, and the numbers are about this machine.
 
 <div class="evidence">
 

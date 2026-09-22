@@ -154,11 +154,11 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 這個實驗問的是：**推測解碼在什麼條件下真的省時間？決定 break-even 的是 acceptance rate，還是一次 verify cycle 的成本？**
 
-答案是後者。acceptance rate 是這個機制最常被拿來報的數字，而 36 次配對量測之後的結論是：那是錯的數字——高 acceptance rate 並不保證變快。真正決定划不划算的是**一次 verify cycle 的代價，以 dense decode step 為單位**，而這個代價屬於模型本身，不屬於內容。
+答案是後者。acceptance rate 是這個機制最常被拿來報的數字，而 36 次量測之後的結論是：那是錯的數字——高 acceptance rate 並不保證變快。真正決定划不划算的是**一次 verify cycle 的代價，以 dense decode step 為單位**，而這個代價屬於模型本身，不屬於內容。
 
 - 35B-A3B MoE 上，一次四位置的 verify forward 相當於 2.43 個 dense step；固定 draft depth 3 在 code 上比 dense 慢 10%、在 prose 上慢 44%，而當下的 acceptance 分別是 56% 與 25%。
-- 同一個 runtime、同一批 prompt，dense 27B 上同樣的 forward 只相當於 1.37 個 dense step，機制在配對的 13.6K coding prompt 上 decode 快 1.81 倍（同一列的端到端是 1.05 倍）——acceptance 是 79%。
-- 一個只用 runtime 自己的計時器算出來的成本模型，能預測整段 0.56×–1.81× 的配對加速比。
+- 同一個 runtime、同一個 prompt，dense 27B 上同樣的 forward 只相當於 1.37 個 dense step，機制在配對的 13.6K coding prompt 上 decode 快 1.81 倍（同一列的端到端是 1.05 倍）——acceptance 是 79%。
+- 一個只用 runtime 自己的計時器算出來的成本模型，在十一組配對裡有十組把量到的加速比預測到 5% 以內，範圍涵蓋 0.56×–1.81×。
 - Runtime 既有的 adaptive depth controller 避開了所有量到的虧損區：它把四格虧損全部轉成打平或小幅落後，而在固定 depth 會贏的那一格，它靠 draft 得更淺、買到更便宜的 cycle，比固定 depth 再快 12%。
 
 因為受測的程式本來就選對了，這個 finding 沒有附帶上游提案。Production 決策是不動：維持現行的 adaptive MTP。
@@ -183,9 +183,9 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 問題：**如果 sparse prefill 不留下任何可重用狀態，這份狀態能不能事後補回來，而且不讓前景付代價？**
 
-可以——但過程中的那個修正比結果本身更值得記。在一組受控的七輪 session 裡，sparse 那一邊的可重用 canonical 前綴始終停在 0，prompt 卻長到 43,065 tokens，於是每一輪都把整份重算一次。改成在前景閒置的空檔重建這段前綴，而且只在 cache block 邊界上發布——這些邊界是一般 serving 路徑自己就能獨立還原的。累積 session 延遲在該 workload 上因此從 228.38 s 降到 79.06 s。兩邊的前景都仍然走 SpecPrefill。
+可以——但過程中的那個修正比結果本身更值得記。在一組受控的七輪 session 裡，sparse 那一邊的可重用 canonical 前綴始終停在 0，prompt 卻長到 43,065 tokens，於是每一輪都把整份重算一次。改成在前景閒置的空檔重建這段前綴，而且只在 cache block 邊界上發布——這些邊界是一般 serving 路徑自己就能獨立還原的。累積 session 延遲在該 workload 上因此從 228.38 s 降到 79.06 s。兩邊的前景都被釘在 SpecPrefill。
 
-真正花掉大半力氣的，是讓它能安全上線。以時間比例設的 budget 只框得住背景工作「多常」撞到請求，框不住撞到之後那個請求要等多久——budget 調了二十倍，最糟的一次碰撞仍落在同樣的 12–15 s 區間。真正決定等待時間的是 execution slice，而它和 publication grain 是互相獨立的：跑過的每一種 slice 設定都走到完全相同的邊界，把 slice 從 block grain 縮到 512 之後，client 端觀測到的最糟等待從 15.08 s 降到 1.30 s，補回的吞吐量沒有變。再縮到 256 並沒有更好——它從 trace 推導出來的上界更低，實際觀測到的最糟值反而更高。還有一個缺陷得先修掉，它才能送上游提案——recovery budget 是每個 engine 各持一份，但 accelerator 是共用的，於是每多載入一個模型，上限就被乘一次。
+真正花掉大半力氣的，是讓它能安全上線。以時間比例設的 budget 只框得住背景工作「多常」撞到請求，框不住撞到之後那個請求要等多久——budget 調了二十倍，最糟的一次碰撞仍落在同樣的 12–15 s 區間。真正決定等待時間的是 execution slice，而它和 publication grain 是互相獨立的：跑過的每一種 slice 設定都走到完全相同的邊界，把 slice 從 block grain 縮到 512 之後，client 端觀測到的最糟等待從 15.08 s 降到 1.30 s，代價是補回的吞吐量在最極端的一格約掉 2.4%。再縮到 256 並沒有更好——它從 trace 推導出來的上界更低，實際觀測到的最糟值反而更高。還有一個缺陷得先修掉，它才能送上游提案——recovery budget 是每個 engine 各持一份，但 accelerator 是共用的，於是每多載入一個模型，上限就被乘一次。
 
 <div class="decision">
 
@@ -206,7 +206,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 ## 系統主題
 
-這兩條沒有做成實驗，因為它們各自還缺關鍵證據。它們留在 repo 裡是當支撐證據，不是當結論。
+下面這兩條沒有做成實驗，因為它們各自還缺關鍵證據。第三條開著的研究線是跨 runtime 的比較，這裡沒有寫——它的內容就是那個空缺：沒有做過任何受控比較，也沒有跑。三條都留在 repo 裡當支撐證據，不當結論。
 
 ### 正確性：快而錯就是 regression
 
@@ -249,11 +249,11 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 - <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a>——在 mRoPE VLM 上，SpecPrefill 把選中的 token 寫在壓縮後的位置而不是原始位置。這是驗證背景補回（PCSR）的過程暴露出來的獨立正確性缺陷；**PCSR 沒有造成它**，把背景補回關掉它一樣存在。
 - <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>——背景 canonical 狀態補回，也就是 EXP-003 的功能本身，相依於 #3811，應該排在它後面。它帶著一個給維護者的明確問題：它自己那套背景排程原語，是否應該和上游正在進行的相關工作收斂。
 
-在把 #3793 整理到可以送審的過程中，又找出六個缺陷，都是實驗本身的 workload 碰不到的——行程裡有第二個模型、MTP 打開、補回途中遇到 eviction、prompt 長度剛好是 cache block 的整數倍。其中三個不只是這個 runtime 的問題：背景工作要讓出的是**所有權**而不只是執行；前景的到達必須在執行之前、而且是跨行程可見；cache 的 watermark 是記帳，不是 cache 的事實，所以它必須能往回走。細節與不變式在 repo 的 <code>HARDENING.md</code>。
+在把 #3793 整理到可以送審的過程中，又找出六個缺陷，都是實驗本身的 workload 碰不到的——行程裡有第二個模型、MTP 打開、補回途中遇到 eviction、prompt 長度剛好是 cache block 的整數倍。其中三個不只是這個 runtime 的問題：背景工作要讓出的是**所有權**而不只是執行；前景的到達必須在執行之前、而且是跨行程可見；cache 的 watermark 是記帳，不是 cache 的事實，所以它必須能往回走。細節與不變式在 EXP-003 的 <code>HARDENING.md</code>。
 
 ## 證據與限制
 
-一台機器、一個廠商、一個 runtime。EXP-001 是單一 27B dense 4-bit 模型，每格一次；EXP-002 把 35B-A3B MoE 與 27B 並排量，這是這裡最接近第二組設定的東西，而它仍然是同一台機器。跨模型、跨硬體的推廣，兩個實驗都明講沒有建立。
+一台機器、一個廠商、一個 runtime。EXP-001 是單一 27B dense 4-bit 模型，每格一次；EXP-002 把 35B-A3B MoE 與 27B 並排量，這是這裡最接近第二組設定的東西，而它仍然是同一台機器；EXP-003 又回到同一個 27B dense 4-bit 模型，關掉 MTP，每組設定各跑一次——夠用來確立機制，不夠用來給出效果量。跨模型、跨硬體的推廣，三個實驗都明講沒有建立：機制的論證是關於這個 runtime 的 cache 與排程器，數字則是關於這台機器。
 
 <div class="evidence">
 
