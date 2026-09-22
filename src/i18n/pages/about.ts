@@ -154,7 +154,7 @@ export const about = {
     systemsResearch: {
       heading: 'Current Technical Research',
       description:
-        'I run independent systems research on LLM inference, mostly on prefill and the reusable KV and prefix state a request leaves behind, and on long-context correctness. The current study looks at how an optimization that speeds up one request changes the cost of the requests that follow it. It is published with its data and figures, and it produced two upstream pull requests to the oMLX inference server, both currently open.',
+        'I run independent systems research on LLM inference, mostly on prefill and the reusable KV and prefix state a request leaves behind, and on long-context correctness. The current study looks at how an optimization that speeds up one request changes the cost of the requests that follow it. It is published with its data and figures, and it produced ten upstream pull requests to the oMLX inference server — eight open at the time of writing, two merged.',
       cta: 'View the research repository',
       href: INFERENCE_SYSTEMS_URL,
     },
@@ -283,7 +283,7 @@ export const about = {
     systemsResearch: {
       heading: '目前的技術研究',
       description:
-        '我獨立進行 LLM 推論的系統研究，主要在 prefill、請求留下的可重用 KV 與 prefix 狀態，以及長上下文的正確性。目前的研究探討一項讓單一請求變快的最佳化，如何改變後續請求的成本。研究連同資料與圖表一併公開，並向 oMLX 推論伺服器提交兩個上游 pull request，目前都還在審查中。',
+        '我獨立進行 LLM 推論的系統研究，主要在 prefill、請求留下的可重用 KV 與 prefix 狀態，以及長上下文的正確性。目前的研究探討一項讓單一請求變快的最佳化，如何改變後續請求的成本。研究連同資料與圖表一併公開，並向 oMLX 推論伺服器提交十個上游 pull request：撰寫本文時八個還開著、兩個已合併。',
       cta: '查看研究儲存庫',
       href: INFERENCE_SYSTEMS_URL,
     },

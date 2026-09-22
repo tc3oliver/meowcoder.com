@@ -256,6 +256,8 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 在把 #3793 整理到可以送審的過程中，又找出六個缺陷，都是實驗本身的 workload 碰不到的——行程裡有第二個模型、MTP 打開、補回途中遇到 eviction、prompt 長度剛好是 cache block 的整數倍。其中三個不只是這個 runtime 的問題：背景工作要讓出的是**所有權**而不只是執行；前景請求一進來就要被看到，而且要在執行開始之前、跨行程都看得到；cache 的 watermark 是記帳，不是 cache 的實際狀態，所以它必須能往回走。細節與不變式在 EXP-003 的 <code>HARDENING.md</code>。
 
+實驗收尾之後，把這個機制放進真實 agent workload 做 production validation，又暴露出兩個獨立的缺陷——它們在 SpecPrefill 的 draft cache 路徑上，不在背景補回這個機制裡，上游修正是前面的 <code>omlx#3840</code> 與 <code>omlx#3842</code>。兩者都不改變 EXP-003 的結論，也**不是**前面六個 hardening 缺陷的第七、第八個。
+
 ## 證據與限制
 
 一台機器、一個廠商、一個 runtime。EXP-001 只有一個 27B dense 4-bit 模型，每格跑一次。EXP-002 把 35B-A3B MoE 和 27B 並排量，是這裡最接近第二組設定的一次，機器仍然是同一台。EXP-003 又回到那個 27B dense 4-bit 模型，關掉 MTP，每組設定各跑一次——夠確立機制，不夠給出效果量。能不能推廣到別的模型、別的硬體，三個實驗都寫明沒有建立：機制講的是這個 runtime 的 cache 與排程器，數字講的是這台機器。

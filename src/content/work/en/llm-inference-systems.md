@@ -254,6 +254,8 @@ Upstream, ten pull requests. Eight are open at the time of writing, none a draft
 
 Hardening #3793 surfaced six defects that the experiment's own workloads could not reach, under conditions such as a second model in the process, multi-token prediction on, an eviction mid-job, and a prompt whose length is an exact multiple of the cache block. Three of them are not only about this runtime: background work must yield **ownership** and not only execution; foreground arrival must be visible process-wide and before execution begins; and a cache watermark is bookkeeping rather than the cache's actual state, so it has to be able to move backward. The invariants are in EXP-003's <code>HARDENING.md</code>.
 
+Taking that mechanism into a real agent workload, after the experiment closed, then exposed two independent defects — in SpecPrefill's draft-cache path, not in background recovery. The upstream fixes are <code>omlx#3840</code> and <code>omlx#3842</code> above. Neither changes EXP-003's result, and neither is a seventh or eighth hardening finding of it.
+
 ## Evidence and limits
 
 One machine, one vendor, one runtime. EXP-001 is a single 27B dense model at 4-bit, one run per cell. EXP-002 measures the 35B-A3B MoE and the 27B side by side, which is the closest thing here to a second configuration — and still the same machine. EXP-003 is that 27B dense model again with multi-token prediction off, a single run per arm — enough to establish a mechanism, not enough to state an effect size. All three state that cross-model and cross-hardware generalization is not established: the mechanism arguments are about this runtime's cache and scheduler; the numbers are about this machine.
