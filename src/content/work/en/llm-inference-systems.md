@@ -60,15 +60,15 @@ The scope is runtime, serving, reusable state, speculative execution, correctnes
 <figcaption class="state-flow__caption">Each stage can break the one before it. The three experiments below each went the whole way round.</figcaption>
 </figure>
 
-Every claim carries an evidence level: observed, measured, derived, inferred, hypothesized, not established. The grading is the point — three subjects in the repository are filed as open research threads rather than experiments precisely because each one names the evidence it still lacks.
+Every claim in the repository carries an evidence level: observed, measured, derived, inferred, hypothesized, not established. The grading is the point — three subjects in the repository are filed as open research threads rather than experiments precisely because each one names the evidence it still lacks.
 
 ## From baseline to optimized serving
 
 This study did not start from a prefix-cache problem. The first goal was plain: take a 27B-class dense model at 4-bit on one Apple silicon machine from "it runs" to an inference service you can actually interact with.
 
-At 16K context, dense prefill ran at about 302 tok/s; with heterogeneous prefill and sparse prefill stacked on it, 1,046 tok/s. At 32K, 277 tok/s became 1,112 tok/s. In an isolated qualification with the two mechanisms composed, prefill peaked at roughly 1,328 tok/s. Time to first token followed: 16K from 57.84 s to 19.24 s, 32K from 122.7 s to 33.5 s.
+At 16K context, dense prefill ran at about 302 tok/s; with sparse prefill, 1,046 tok/s. At 32K, 277 tok/s became 1,112 tok/s. Time to first token comes from the same two rows: 16K from 57.84 s to 19.24 s, 32K from 122.7 s to 33.5 s. Stacking the heterogeneous prefill path on top of that is a separate measurement, in throughput only — roughly 300 to 1,328 tok/s at 16K, from a single isolated smoke run with one resident engine, and the most fragile number on this page.
 
-The optimization was not confined to model compute. Background dense prefix recovery contended with foreground generation on the same executor, and foreground decode fell to 13.5 tok/s. Two defects were behind that: a request was invisible to the scheduler until its admission ran, and a slice starved the loop that accepts requests. With both fixed, foreground decode under the same background work came back to about 47 tok/s, in the one run where it was measured.
+The optimization was not confined to model compute. Background dense prefix recovery contended with foreground generation on the same executor, and foreground decode fell to 13.5 tok/s. Two defects were behind that: a request was invisible to the scheduler until its admission ran, and a slice starved the loop that accepts requests. With both fixed, foreground decode under the same background work came back to about 47 tok/s, in the one run where it was measured. That work was an experimental branch; the rebuilt version is EXP-003 below.
 
 <figure class="trajectory" aria-label="Three measurements from baseline to optimized serving: prefill throughput, time to first token, and foreground decode under background recovery">
 <div class="trajectory__panel">
@@ -122,7 +122,7 @@ The optimization was not confined to model compute. Background dense prefix reco
 <figcaption class="trajectory__caption">Each panel carries its own unit and its own scale; they do not share a Y axis, and in the middle one lower is better, so the solid bar is the shorter one. The stacked row comes from a single isolated smoke run, not from the same measurement as the two rows above it. The last panel is not a general decode baseline — it is the foreground side of one run where background dense recovery and foreground generation were competing for the same executor.</figcaption>
 </figure>
 
-By this point the single-request numbers looked good. Then the same configuration was put behind a coding agent that reads files, calls tools, and grows its context turn after turn — and the session came out slower.
+By this point both the single-request numbers and the background work staying out of the foreground's way looked good. Then the same configuration was put behind a coding agent that reads files, calls tools, and grows its context turn after turn — and the session came out slower.
 
 That is where EXP-001 actually begins: **if every request is faster, why is the whole interactive workload slower?**
 
@@ -142,7 +142,7 @@ The correctness defect found along the way mattered more than any of the perform
 
 **Why** — A cold benchmark reports what one request saved for itself. It cannot see how much reusable state that request left for the next one, and that is the bill an agent workload actually pays.
 
-**Consequence** — Track the reusable checkpoint and the uncached suffix. The real-agent wall-clock gap is the observation that started the investigation, not a measured effect size — the two agent sessions being compared took different trajectories.
+**Consequence** — Track the reusable checkpoint and the uncached suffix, not the per-request saving. The slower agent session that started this is an observation, not a measured effect size: the two sessions took different trajectories.
 
 </div>
 
@@ -159,7 +159,7 @@ By the verify cycle. Acceptance is the number everybody reports for this mechani
 - On a 35B-A3B mixture-of-experts, a four-position verify forward costs 2.43 dense steps. A fixed draft depth of 3 came out 10% slower than dense decoding on code and 44% slower on prose, at acceptance rates of 56% and 25%.
 - On a dense 27B, same runtime and the same prompt, the identical forward costs 1.37 dense steps, and at 79% acceptance the mechanism decodes 1.81× faster on a matched 13.6K-token coding prompt — 1.05× end to end on the same row.
 - A cost model built from the runtime's own timers predicts the measured speedup to within 5% in ten of the eleven matched pairs, across the 0.56×–1.81× range.
-- The runtime's existing adaptive depth controller avoided every measured losing region: it turned all four losses into parity or a small deficit, and in the one cell where the fixed depth already won, the controller won by a further 12% on top, by drafting shallower and buying a cheaper cycle.
+- The runtime's existing adaptive depth controller pulled every measured losing region back to the break-even line: it turned all four losses into parity or a small deficit, and in the one cell where the fixed depth already won, the controller won by a further 12% on top, by drafting shallower and buying a cheaper cycle.
 
 Because the code under test was already choosing correctly, the finding came with no upstream proposal attached. The production decision is to change nothing and keep the current adaptive MTP.
 
@@ -169,7 +169,7 @@ Because the code under test was already choosing correctly, the finding came wit
 
 **Why** — Proposing a new policy before establishing whether the current one misdecides trades an unproven problem for an untested solution.
 
-**Consequence** — Once the controller was measured choosing correctly in every cell, there was no pull request to send. That is the honest outcome when the code under test is already right.
+**Consequence** — The measurement's product was a decision not to change anything, which is the harder result to publish and the cheaper one to ship.
 
 </div>
 
@@ -183,47 +183,47 @@ states each result with its evidence level, alongside the raw measurements for a
 
 The question: **if a sparse prefill leaves no reusable state behind, can that state be rebuilt later without the foreground paying for it?**
 
-Yes — and the correction on the way there matters more than the result. Across a controlled seven-turn session the sparse arm's reusable canonical prefix never left zero while the prompt grew to 43,065 tokens, so every turn recomputed everything. The prefix was rebuilt during foreground-idle windows and published only at cache-block boundaries that the ordinary serving path could independently restore. That took cumulative session latency from 228.38 s to 79.06 s on that workload. The foreground was pinned to SpecPrefill in both arms.
+Yes — and what the feature was expected to buy turned out not to be what it bought. Across a controlled seven-turn session the sparse arm's reusable canonical prefix never left zero while the prompt grew to 43,065 tokens, so every turn recomputed everything. In the recovery arm that prefix was rebuilt during foreground-idle windows and published only at cache-block boundaries the ordinary serving path could independently restore from. That took cumulative session latency from 228.38 s to 79.06 s on that workload. The foreground was pinned to SpecPrefill in both arms.
 
-Making it safe to serve was the larger half. A share-of-time budget bounds how _often_ background work collides with a request, not how long that request then waits — the worst collision stayed in the same 12–15 s band across a twentyfold budget change. What bounds the wait is the execution slice, and that turned out to be independent of the publication grain: every slice setting that ran reached identical boundaries, and shrinking the slice from the block grain to 512 took the worst client-observed wait from 15.08 s to 1.30 s for about 2.4% of recovery throughput at the extreme. Shrinking further to 256 did not help: its trace-derived bound is lower and its observed maximum is higher. One more defect had to be fixed before it was proposable upstream: the recovery budget was owned per engine while the accelerator is shared, so each loaded model multiplied the cap.
+Making it safe to serve was the larger half. A share-of-time budget bounds how _often_ background work collides with a request, not how long that request then waits — the worst collision stayed in the same 12–15 s band across a twentyfold budget change. What bounds the wait is the execution slice, and that turned out to be independent of the publication grain: every slice setting that ran reached identical boundaries, and shrinking the slice from the block grain to 512 took the worst client-observed wait from 15.08 s to 1.30 s for about 2.4% of recovery throughput at the extreme. Shrinking further to 256 did not clearly help: its trace-derived bound is lower, but its observed maximum is higher. At that point one more defect had to be fixed before it could be proposed upstream: the recovery budget was owned per engine while the accelerator is shared, so each loaded model multiplied the cap.
 
 <div class="decision">
 
-### Returning the foreground to dense prefill was not the outcome. The waiting was.
+### Returning the foreground to dense prefill was not the outcome. Leaving the next turn less to compute was.
 
 **Why** — The feature was built to return the foreground to dense prefill once the prefix recovered. The fastest configuration measured was the one where that never happened, and the turns that did switch routes were the most expensive turns of their sessions.
 
-**Consequence** — Background recovery earns its keep by leaving the next turn less to compute, not by changing the route that turn takes. Which route a turn should take is a separate question, filed as its own research thread and not answered here.
+**Consequence** — Background recovery earns its keep by leaving the next turn less to compute, not by changing the route that turn takes. Which route a turn should take is a separate question, filed in the repository and not answered here.
 
 </div>
 
-No foreground latency target was defined before those runs, so the worst uninterruptible execution slice in the runtime trace, 2.39 s, is a derived bound on what a request could have waited for rather than a latency anyone observed — and not a verdict on whether it is acceptable.
+No foreground latency target was defined before those runs, so the worst uninterruptible execution slice in the runtime trace at that 512-token slice, 2.39 s, is a derived bound on what a request could have waited for rather than a latency anyone observed — and not a verdict on whether it is acceptable.
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a> carries the datasets, the figures and the limitations; the feature is proposed upstream as
 <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>, open for review and not merged. The long-form write-up is
 <a href="https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/" target="_blank" rel="noopener noreferrer">償還 reusable state 的債</a> (Traditional Chinese).
 
 ## Systems themes
 
-Neither of the two below is an experiment, because each is still missing the evidence that would make it one. The third open thread, on cross-runtime observations, is not written up here — its content is the absence: no controlled comparison exists, and none was run. All three sit in the repository as supporting evidence, not as conclusions.
+Neither of the two below is an experiment: one is a configuration history, the other is still missing its judgement. The third open thread, on cross-runtime observations, is not written up here — its content is the absence: no controlled comparison exists, and none was run. All three sit in the repository as supporting evidence, not as conclusions.
 
 ### Correctness — fast but wrong is a regression
 
-Every inference optimization changes the arithmetic that produces the answer, so each one has to answer the same question: does the difference reach the output? Four cases give four different answers.
+Every inference optimization changes something between the prompt and the answer — the arithmetic, the input, or the order of operations — so each one has to answer the same question: does the difference reach the output? Four cases give four different answers.
 
-- **Restoring a cached prefix.** Seven prompts, fourteen runs, byte-identical output every time. The longest case went from 56.3 s to 2.3 s and produced the same bytes.
+- **Restoring a cached prefix.** Seven prompts, fourteen runs, byte-identical output every time. The longest case went from 56.3 s to 2.3 s.
 - **Changing the attention route.** At 68K context, three numerically different builds differed in their logits by up to about 0.4 — and still produced the same argmax, the same top-3 token set, and the same output hash.
 - **The protected-prefix boundary.** The output changed, because the model's input changed — the one case that genuinely altered what the model saw, and the one that sounded most like bookkeeping.
 - **Speculative decoding.** The output changed and stopped being reproducible.
 
-The ordering is not guessable from how aggressive an optimization sounds. Reusing a cached prefix sounds risky and is exact. Speculative decoding sounds like the most dangerous of the four, and its guessing is the exactly-correct part — what moved the output was the arithmetic underneath.
+Which of the four reaches the output is not guessable from how aggressive an optimization sounds. Reusing a cached prefix sounds risky and is exact. Speculative decoding sounds like the most dangerous of the four, and its guessing is the exactly-correct part — what moved the output was the arithmetic underneath.
 
-What this thread is missing is no longer the comparison but the judgement: every comparison so far can say whether the bytes differ, and none of them says whether the answer got worse.
+What this thread is missing is not the comparison but the judgement: once the output does change, every comparison so far can say whether the bytes differ, and none of them says whether the answer got worse.
 
 ### Heterogeneous compute — accelerator enabled ≠ accelerator executed
 
-The clearest result here is a null one. The neural-engine prefill path compiles for a fixed tile length, while the serving layer divides prefill into cache blocks. With the deployed block at 512 tokens and the compiled tile at 2048, no delivered chunk could ever fill a tile: the path initialized, compiled, reported itself as enabled, and never executed a single tile.
+The clearest result here is a null one. The neural-engine prefill path compiles for a fixed tile length, while the serving layer divides prefill into cache blocks. In the deployment where the block was 512 tokens and the compiled tile 2048, no delivered chunk could ever fill a tile: the path initialized, compiled, reported itself as enabled, and never executed a single tile.
 
-None of that is visible in a throughput number. The configuration said "neural engine on", the server agreed it was on, and the contribution was exactly zero. What made the path usable was raising the tile alignment to match the block structure — a change to how work is divided, not to how it is computed.
+None of that is visible in a throughput number. The configuration said "neural engine on", the server agreed it was on, and the contribution was exactly zero. What made the path usable was a compiled tile and a cache block on the same grain — a matter of how work is divided, not how it is computed.
 
 The general form is worth keeping: on a heterogeneous device, the unit of work an accelerator compiles for and the unit of work the serving layer hands out are two different decisions, usually made by two different people.
 
@@ -231,7 +231,7 @@ The general form is worth keeping: on a heterogeneous device, the unit of work a
 
 None of the findings above was available to someone who only ran benchmarks. Getting to them meant building:
 
-- **A heterogeneous prefill path** splitting each layer's work between the GPU and the neural engine, on a 1024-token tile matched to the cache block.
+- **A heterogeneous prefill path** splitting each layer's work between the GPU and the neural engine, on a 1024-token tile matched to the 1024-token cache block of the deployed configuration.
 - **Composition measurement** — sparse prefill on top of it, stacking at 95–97% of the product of their individual speedups in an isolated qualification.
 - **A measured protected-prefix boundary**, taken from two throwaway template probes and the token prefix that both of them agree on, replacing a derivation by subtraction.
 - **A background dense-prefix recovery job and a cooperative scheduler**, designed to fail closed, with background slices yielding to inbound requests — foreground decode went from 13.5 back to 47 tok/s in the one run measured. This was an experimental branch; a later review found four gaps in it and none of that code is in the served build. EXP-003 above is the rebuilt version, with those gaps closed and the serving safety measured rather than assumed.
@@ -245,13 +245,13 @@ Upstream, there are five pull requests, all open at the time of writing, none a 
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a> — per-request SpecPrefill fields on the Anthropic messages endpoint, matching what the OpenAI-compatible endpoint already had. It changes no upstream default.
 - <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a> — a SpecPrefill RoPE cleanup fix on the prefill-OOM requeue path, found while building EXP-003 and sent on its own. It is a correctness fix with its own reproduction, unrelated to the recovery feature.
 - <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a> — on mRoPE VLMs, SpecPrefill wrote its selected tokens at compacted rather than original positions. Validating progressive canonical state recovery (PCSR) is what exposed it; **PCSR did not cause it**, and it is present with background recovery switched off.
-- <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a> — background canonical-state recovery, the EXP-003 feature. It depends on #3811 and should follow it. It carries an explicit question for the maintainers about whether its background-scheduling primitives should converge with work already in flight upstream.
+- <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a> — background canonical-state recovery, the EXP-003 feature. It depends on #3811 and should be ordered after it, and it puts an explicit question to the maintainers: whether this PR's own background-scheduling primitives should be merged with work already in flight upstream.
 
-Getting #3793 into reviewable shape surfaced six further defects that the experiment's own workloads could not reach, under conditions such as a second model in the process, multi-token prediction on, an eviction mid-job, and a prompt whose length is an exact multiple of the cache block. Three of them are not only about this runtime: background work must yield **ownership** and not only execution; foreground arrival must be visible process-wide and before execution begins; and a cache watermark is bookkeeping rather than the cache's actual state, so it has to be able to move backward. The invariants are in EXP-003's <code>HARDENING.md</code>.
+Hardening #3793 surfaced six defects that the experiment's own workloads could not reach, under conditions such as a second model in the process, multi-token prediction on, an eviction mid-job, and a prompt whose length is an exact multiple of the cache block. Three of them are not only about this runtime: background work must yield **ownership** and not only execution; foreground arrival must be visible process-wide and before execution begins; and a cache watermark is bookkeeping rather than the cache's actual state, so it has to be able to move backward. The invariants are in EXP-003's <code>HARDENING.md</code>.
 
 ## Evidence and limits
 
-One machine, one vendor, one runtime. EXP-001 is a single 27B dense model at 4-bit, one run per cell. EXP-002 measures the 35B-A3B MoE and the 27B side by side, which is the closest thing here to a second configuration and is still the same machine. EXP-003 is that 27B dense model again with multi-token prediction off, a single run per arm — enough to establish a mechanism, not enough to state an effect size. All three state that cross-model and cross-hardware generalization is not established: the mechanism arguments are about this runtime's cache and scheduler; the numbers are about this machine.
+One machine, one vendor, one runtime. EXP-001 is a single 27B dense model at 4-bit, one run per cell. EXP-002 measures the 35B-A3B MoE and the 27B side by side, which is the closest thing here to a second configuration — and still the same machine. EXP-003 is that 27B dense model again with multi-token prediction off, a single run per arm — enough to establish a mechanism, not enough to state an effect size. All three state that cross-model and cross-hardware generalization is not established: the mechanism arguments are about this runtime's cache and scheduler; the numbers are about this machine.
 
 <div class="evidence">
 
@@ -267,4 +267,4 @@ One machine, one vendor, one runtime. EXP-001 is a single 27B dense model at 4-b
 
 </div>
 
-What I still cannot do is classify a request as it arrives. Until then the caller declares the shape and the server honours it.
+What I still cannot do is classify a request as it arrives. Until that changes, the caller declares the shape and the server honours it.
