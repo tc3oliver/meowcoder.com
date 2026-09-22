@@ -251,7 +251,7 @@ Getting #3793 into reviewable shape surfaced six further defects that the experi
 
 ## Evidence and limits
 
-One machine, one vendor, one runtime. EXP-001 is a single 27B dense model at 4-bit, one run per cell. EXP-002 measures the 35B-A3B MoE and the 27B side by side, which is the closest thing here to a second configuration and is still the same machine. EXP-003 is that 27B dense model again with multi-token prediction off, a single run per arm — enough to establish a mechanism, not enough to state an effect size. Cross-model and cross-hardware generalization is stated as not established in all three: the mechanism arguments are about this runtime's cache and scheduler, and the numbers are about this machine.
+One machine, one vendor, one runtime. EXP-001 is a single 27B dense model at 4-bit, one run per cell. EXP-002 measures the 35B-A3B MoE and the 27B side by side, which is the closest thing here to a second configuration and is still the same machine. EXP-003 is that 27B dense model again with multi-token prediction off, a single run per arm — enough to establish a mechanism, not enough to state an effect size. All three state that cross-model and cross-hardware generalization is not established: the mechanism arguments are about this runtime's cache and scheduler; the numbers are about this machine.
 
 <div class="evidence">
 

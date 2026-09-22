@@ -68,7 +68,7 @@ meta:
 
 在 16K context，dense prefill 約 302 tok/s；把異質 prefill 與 sparse prefill 疊上去之後是 1,046 tok/s。32K 從 277 tok/s 到 1,112 tok/s。在隔離的驗證環境裡兩種機制疊加，prefill 最高量到約 1,328 tok/s。首個 token 的延遲也跟著下來：16K 從 57.84 秒降到 19.24 秒，32K 從 122.7 秒降到 33.5 秒。
 
-最佳化也不是只發生在模型計算本身。背景的 dense 前綴補回一度與前景生成搶同一個 executor，前景 decode 掉到 13.5 tok/s；背後是兩個缺陷：請求在被受理之前，排程器根本看不到它；而一個背景切片會讓負責收請求的迴圈一直拿不到執行機會。兩個都修掉之後，同樣條件下的前景 decode 回到約 47 tok/s——這一格只量過一次。
+最佳化也不是只發生在模型計算本身。背景的 dense 前綴補回一度與前景生成搶同一個 executor，前景 decode 掉到 13.5 tok/s；背後是兩個缺陷：一個是請求在被受理之前，排程器根本看不到它；另一個是背景切片會讓負責收請求的迴圈一直拿不到執行機會。兩個都修掉之後，同樣條件下的前景 decode 回到約 47 tok/s——這一格只量過一次。
 
 <figure class="trajectory" aria-label="從 baseline 到 optimized serving 的三組量測：prefill throughput、首字延遲，以及背景補回期間的前景 decode">
 <div class="trajectory__panel">
@@ -206,7 +206,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 ## 系統主題
 
-下面這兩條沒有做成實驗，因為它們各自還缺關鍵證據。第三條開著的研究線是跨 runtime 的比較，這裡沒有寫——它的內容就是那個空缺：沒有做過任何受控比較，也沒有跑。三條都留在 repo 裡當支撐證據，不當結論。
+下面這兩條沒有做成實驗，因為它們各自還缺關鍵證據。第三條開著的研究線是跨 runtime 的比較，這裡沒有寫；那條線的內容本來就是一句話：受控比較不存在，也沒有人跑過。三條都是 repo 裡的支撐證據，不是結論。
 
 ### 正確性：快而錯就是 regression
 
@@ -249,11 +249,11 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 - <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a>——在 mRoPE VLM 上，SpecPrefill 把選中的 token 寫在壓縮後的位置而不是原始位置。這是驗證背景補回（PCSR）的過程暴露出來的獨立正確性缺陷；**PCSR 沒有造成它**，把背景補回關掉它一樣存在。
 - <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>——背景 canonical 狀態補回，也就是 EXP-003 的功能本身，相依於 #3811，應該排在它後面。它帶著一個給維護者的明確問題：它自己那套背景排程原語，是否應該和上游正在進行的相關工作收斂。
 
-在把 #3793 整理到可以送審的過程中，又找出六個缺陷，都是實驗本身的 workload 碰不到的——行程裡有第二個模型、MTP 打開、補回途中遇到 eviction、prompt 長度剛好是 cache block 的整數倍。其中三個不只是這個 runtime 的問題：背景工作要讓出的是**所有權**而不只是執行；前景的到達必須在執行之前、而且是跨行程可見；cache 的 watermark 是記帳，不是 cache 的事實，所以它必須能往回走。細節與不變式在 EXP-003 的 <code>HARDENING.md</code>。
+在把 #3793 整理到可以送審的過程中，又找出六個缺陷，都是實驗本身的 workload 碰不到的——行程裡有第二個模型、MTP 打開、補回途中遇到 eviction、prompt 長度剛好是 cache block 的整數倍。其中三個不只是這個 runtime 的問題：背景工作要讓出的是**所有權**而不只是執行；前景請求一進來就要被看到，而且要在執行開始之前、跨行程都看得到；cache 的 watermark 是記帳，不是 cache 的實際狀態，所以它必須能往回走。細節與不變式在 EXP-003 的 <code>HARDENING.md</code>。
 
 ## 證據與限制
 
-一台機器、一個廠商、一個 runtime。EXP-001 是單一 27B dense 4-bit 模型，每格一次；EXP-002 把 35B-A3B MoE 與 27B 並排量，這是這裡最接近第二組設定的東西，而它仍然是同一台機器；EXP-003 又回到同一個 27B dense 4-bit 模型，關掉 MTP，每組設定各跑一次——夠用來確立機制，不夠用來給出效果量。跨模型、跨硬體的推廣，三個實驗都明講沒有建立：機制的論證是關於這個 runtime 的 cache 與排程器，數字則是關於這台機器。
+一台機器、一個廠商、一個 runtime。EXP-001 只有一個 27B dense 4-bit 模型，每格跑一次。EXP-002 把 35B-A3B MoE 和 27B 並排量，是這裡最接近第二組設定的一次，機器仍然是同一台。EXP-003 又回到那個 27B dense 4-bit 模型，關掉 MTP，每組設定各跑一次——夠確立機制，不夠給出效果量。能不能推廣到別的模型、別的硬體，三個實驗都寫明沒有建立：機制講的是這個 runtime 的 cache 與排程器，數字講的是這台機器。
 
 <div class="evidence">
 
