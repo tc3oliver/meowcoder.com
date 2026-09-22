@@ -2,8 +2,8 @@
 title: 'LLM Inference Systems'
 type: 'Systems Research · LLM Inference'
 summary: 'An ongoing inference-systems research program driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, and turn the result into a production decision or an upstream fix. Three completed experiments and three open research threads.'
-outcome: 'Three finished experiments: on reusable state dynamics, on the cost model for speculative decoding, and on background recovery of reusable canonical state. Alongside them, three open research threads that each state the evidence they still lack, five upstream pull requests, none a draft and none merged, and a reproducible harness with the full dataset behind every figure.'
-indexMeta: 'Apple silicon · Three experiments · Three open research threads · Five open upstream PRs'
+outcome: 'Three finished experiments: on reusable state dynamics, on the cost model for speculative decoding, and on background recovery of reusable canonical state. Alongside them, three open research threads that each state the evidence they still lack, seven upstream pull requests — six open, none a draft, and one merged — and a reproducible harness with the full dataset behind every figure.'
+indexMeta: 'Apple silicon · Three experiments · Three open research threads · Six open upstream PRs, one merged'
 evidence: 'llm-inference-systems on GitHub · methodology, request-level traces, raw data, and figures'
 slug: 'llm-inference-systems'
 locale: 'en'
@@ -19,7 +19,7 @@ meta:
   - label: 'Scope'
     value: 'Runtime · Serving · Reusable state · Speculative execution · Correctness · Heterogeneous compute'
   - label: 'Evidence'
-    value: 'Public repository · published articles · five open upstream pull requests'
+    value: 'Public repository · published articles · seven upstream pull requests: six open, one merged'
 ---
 
 Independently researched, measured, and submitted upstream by Oliver Yu.
@@ -211,7 +211,7 @@ Neither of the two below is an experiment: one is a configuration history, the o
 Every inference optimization changes something between the prompt and the answer — the arithmetic, the input, or the order of operations — so each one has to answer the same question: does the difference reach the output? Four cases give four different answers.
 
 - **Restoring a cached prefix.** Seven prompts, fourteen runs, byte-identical output every time. The longest case went from 56.3 s to 2.3 s.
-- **Changing the attention route.** At 68K context, three numerically different builds differed in their logits by up to about 0.4 — and still produced the same argmax, the same top-3 token set, and the same output hash.
+- **Changing the attention route.** At 68K context, three numerically different builds differed in their logits by up to about 0.4 — and still produced the same argmax, the same top-3 token set, and the same output hash. The route itself was chosen per call from live memory headroom, which is why two identical processes could differ; <a href="https://github.com/jundot/omlx/pull/3685" target="_blank" rel="noopener noreferrer"><code>omlx#3685</code></a> pins it to the bounded path.
 - **The protected-prefix boundary.** The output changed, because the model's input changed — the one case that genuinely altered what the model saw, and the one that sounded most like bookkeeping.
 - **Speculative decoding.** The output changed and stopped being reproducible.
 
@@ -223,7 +223,7 @@ What this thread is missing is not the comparison but the judgement: once the ou
 
 The clearest result here is a null one. The neural-engine prefill path compiles for a fixed tile length, while the serving layer divides prefill into cache blocks. In the deployment where the block was 512 tokens and the compiled tile 2048, no delivered chunk could ever fill a tile: the path initialized, compiled, reported itself as enabled, and never executed a single tile.
 
-None of that is visible in a throughput number. The configuration said "neural engine on", the server agreed it was on, and the contribution was exactly zero. What made the path usable was a compiled tile and a cache block on the same grain — a matter of how work is divided, not how it is computed.
+None of that is visible in a throughput number. The configuration said "neural engine on", the server agreed it was on, and the contribution was exactly zero. The accelerator will not take a prefill width below 1024 tokens at all, and <a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a> — merged — makes that geometry report itself as impossible instead of warning about a shape it cannot accept. What made the path usable was a compiled tile and a cache block on the same grain — a matter of how work is divided, not how it is computed.
 
 The general form is worth keeping: on a heterogeneous device, the unit of work an accelerator compiles for and the unit of work the serving layer hands out are two different decisions, usually made by two different people.
 
@@ -239,13 +239,15 @@ None of the findings above was available to someone who only ran benchmarks. Get
 - **A transport-level request policy**, added only after the real workload showed no single configuration was right for every request.
 - **A reproducible harness and dataset** — every figure is redrawn by three scripts that read nothing but `data/`, and nothing in it is smoothed, interpolated, or back-generated.
 
-Upstream, there are five pull requests, all open at the time of writing, none a draft and none reviewed to a conclusion. An open pull request is a proposal, not an outcome:
+Upstream, seven pull requests. Six are open at the time of writing, none a draft and none reviewed to a conclusion; one is merged. An open pull request is a proposal, not an outcome:
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a> — the correctness fix for the protected-prefix boundary. It was sent before the performance work because it is the only finding that changed the model's input rather than only its speed.
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a> — per-request SpecPrefill fields on the Anthropic messages endpoint, matching what the OpenAI-compatible endpoint already had. It changes no upstream default.
+- <a href="https://github.com/jundot/omlx/pull/3685" target="_blank" rel="noopener noreferrer"><code>omlx#3685</code></a> — deterministic SDPA-256 routing. The route was chosen per call from live memory headroom, so two otherwise identical processes could take different floating-point reductions; this pins qualifying prefill to the bounded one.
 - <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a> — a SpecPrefill RoPE cleanup fix on the prefill-OOM requeue path, found while building EXP-003 and sent on its own. It is a correctness fix with its own reproduction, unrelated to the recovery feature.
 - <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a> — on mRoPE VLMs, SpecPrefill wrote its selected tokens at compacted rather than original positions. Validating progressive canonical state recovery (PCSR) is what exposed it; **PCSR did not cause it**, and it is present with background recovery switched off.
 - <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a> — background canonical-state recovery, the EXP-003 feature. It depends on #3811 and should be ordered after it, and it puts an explicit question to the maintainers: whether this PR's own background-scheduling primitives should be merged with work already in flight upstream.
+- <a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a> — the one merged so far. The ANE prefill scheduler recommended a sequence length the accelerator cannot accept, since it requires a multiple of 64 and at least 1024 tokens; the merged change reports that geometry as impossible instead. It alters no scheduling and no execution — it makes a silent misconfiguration say so.
 
 Hardening #3793 surfaced six defects that the experiment's own workloads could not reach, under conditions such as a second model in the process, multi-token prediction on, an eviction mid-job, and a prompt whose length is an exact multiple of the cache block. Three of them are not only about this runtime: background work must yield **ownership** and not only execution; foreground arrival must be visible process-wide and before execution begins; and a cache watermark is bookkeeping rather than the cache's actual state, so it has to be able to move backward. The invariants are in EXP-003's <code>HARDENING.md</code>.
 

@@ -2,8 +2,8 @@
 title: 'LLM Inference Systems'
 type: '系統研究 · LLM 推論'
 summary: '一個持續進行的推論系統研究計畫：從真實互動式 workload 出發，對 runtime 加上量測、隔離出機制、檢查正確性，最後轉成 production 決策或上游修正。目前含三個已完成實驗與三條還開著的研究線。'
-outcome: '三個完成的實驗（可重用狀態與互動延遲、推測解碼成本模型、可重用 canonical 狀態的背景補回）、三條各自寫明還缺什麼證據、都還開著的研究線、五個開著的上游 pull request（都不是草稿，也都還沒被合併），以及一套可重跑的量測工具與完整資料集。'
-indexMeta: 'Apple silicon · 三個實驗 · 三條開著的研究線 · 五個開著的上游 PR'
+outcome: '三個完成的實驗（可重用狀態與互動延遲、推測解碼成本模型、可重用 canonical 狀態的背景補回）、三條各自寫明還缺什麼證據、都還開著的研究線、七個上游 pull request（六個開著、都不是草稿，一個已合併），以及一套可重跑的量測工具與完整資料集。'
+indexMeta: 'Apple silicon · 三個實驗 · 三條開著的研究線 · 六個開著的上游 PR、一個已合併'
 evidence: 'GitHub 上的 llm-inference-systems · 實驗方法、request 層級 trace、原始資料與圖表'
 slug: 'llm-inference-systems'
 locale: 'zh'
@@ -19,7 +19,7 @@ meta:
   - label: '範圍'
     value: 'Runtime · Serving · 可重用狀態 · 推測執行 · 正確性 · 異質運算'
   - label: '證據'
-    value: '公開 repo · 已發表文章 · 五個開著的上游 pull request'
+    value: '公開 repo · 已發表文章 · 七個上游 pull request：六個開著、一個已合併'
 ---
 
 由 Oliver Yu 獨立研究、量測並提交上游。
@@ -213,7 +213,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 每一個推論最佳化都在改動產生答案的那段運算，所以每一個都要回答同一個問題：這個差異最後會不會影響到輸出？目前四個案例給出四種不同的答案——
 
 - **還原 cache 前綴**：七組 prompt、十四次執行，輸出逐 byte 相同。最長的一格從 56.3 秒降到 2.3 秒，輸出不變。
-- **改變 attention 路由**：68K context、三個數值上不同的 build，logit 差到約 0.4，但 argmax、top-3 token 集合與輸出 hash 都只有一種。
+- **改變 attention 路由**：68K context、三個數值上不同的 build，logit 差到約 0.4，但 argmax、top-3 token 集合與輸出 hash 都只有一種。路由本身是每次呼叫看當下記憶體餘裕才決定的，所以兩個一模一樣的行程也可能走不同路；<a href="https://github.com/jundot/omlx/pull/3685" target="_blank" rel="noopener noreferrer"><code>omlx#3685</code></a>把它釘在 bounded 那條路上。
 - **受保護前綴的邊界**：輸出會變，因為這一個真的改到了模型看到的輸入，而不只是改到運算——而它是四個之中最像「記帳」的那個。
 - **推測解碼**：輸出改變，且不再可重現。
 
@@ -225,7 +225,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 最清楚的結果是一個 null result。Neural engine 的 prefill 路徑是照固定的 tile 長度編譯的，而 serving 層把 prefill 切成 cache block。部署的 block 是 512 token、編譯的 tile 是 2048 token，這時沒有任何一個送進來的 chunk 填得滿一個 tile：這條路徑完成初始化、完成編譯、回報自己已啟用，然後一個 tile 都沒有執行過。
 
-這件事在任何 throughput 數字上都看不出來——設定寫著「neural engine on」，伺服器也回報它是 on，貢獻正好是零。讓這條路徑真的能用的，是編譯的 tile 和 cache block 落在同一個粒度上：差別在工作怎麼被切分，不在怎麼被計算。
+這件事在任何 throughput 數字上都看不出來——設定寫著「neural engine on」，伺服器也回報它是 on，貢獻正好是零。accelerator 根本不接受小於 1024 token 的 prefill 寬度，而<a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a>（已合併）讓這種幾何直接回報「不可能」，而不是去建議一個它根本收不下的形狀。讓這條路徑真的能用的，是編譯的 tile 和 cache block 落在同一個粒度上：差別在工作怎麼被切分，不在怎麼被計算。
 
 這個結論值得留成一條通則：在異質裝置上，accelerator 編譯時假設的工作單位，和 serving 層實際發出的工作單位，是兩個不同的決定，通常由兩個不同的人做。
 
@@ -241,13 +241,15 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 - **傳輸層的 request policy**：等真實 workload 證明沒有哪一組設定對每個 request 都適用，才補上這一層。
 - **可重跑的 harness 與資料集**：所有圖表由三個只讀 `data/` 的腳本重畫，沒有任何一格被平滑、內插或反推。
 
-上游的部分，這裡列出 repo 已確認的五個。撰寫本文時它們都還開著、都不是草稿，也都還沒有審出結論。開著的 pull request 是提案，不是成果：
+上游的部分共七個。撰寫本文時六個還開著、都不是草稿，也都還沒有審出結論，另一個已經合併。開著的 pull request 是提案，不是成果：
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a>——受保護前綴邊界的正確性修正。它比部署策略先送，因為這是唯一一個改到模型輸入、而不只是改到速度的發現。
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a>——在 Anthropic messages 端點補上 per-request 的 SpecPrefill 欄位，OpenAI 相容端點本來就有。不改上游任何預設值。
+- <a href="https://github.com/jundot/omlx/pull/3685" target="_blank" rel="noopener noreferrer"><code>omlx#3685</code></a>——讓 SDPA-256 的路由變成決定性的。原本每次呼叫都看當下記憶體餘裕才選路，兩個一模一樣的行程因此可能走到不同的浮點歸約；這個修正把符合條件的 prefill 釘在 bounded 那一條。
 - <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a>——prefill OOM 重排路徑上的 SpecPrefill RoPE 清理修正，是做 EXP-003 時發現、獨立送出的。它有自己的重現條件，和背景補回這個功能無關。
 - <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a>——在 mRoPE VLM 上，SpecPrefill 把選中的 token 寫在壓縮後的位置而不是原始位置。這個獨立的正確性缺陷，是在驗證背景補回（PCSR）時暴露出來的；**PCSR 沒有造成它**，把背景補回關掉，它一樣存在。
 - <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>——背景 canonical 狀態補回，也就是 EXP-003 的功能本身，相依於 #3811，順序應該排在 #3811 後面，並且向維護者提了一個明確的問題：這個 PR 自己那套背景排程原語，是否應該和上游正在進行的相關工作整合。
+- <a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a>——目前唯一合併的一個。ANE 的 prefill 排程器會建議一個 accelerator 根本收不下的 sequence length，因為它要求 64 的倍數、而且至少 1024 token；這個修正改成直接回報這種幾何不可能。它不改排程、也不改執行，只是讓一個沉默的錯誤設定開口說話。
 
 在把 #3793 整理到可以送審的過程中，又找出六個缺陷，都是實驗本身的 workload 碰不到的——行程裡有第二個模型、MTP 打開、補回途中遇到 eviction、prompt 長度剛好是 cache block 的整數倍。其中三個不只是這個 runtime 的問題：背景工作要讓出的是**所有權**而不只是執行；前景請求一進來就要被看到，而且要在執行開始之前、跨行程都看得到；cache 的 watermark 是記帳，不是 cache 的實際狀態，所以它必須能往回走。細節與不變式在 EXP-003 的 <code>HARDENING.md</code>。
 
