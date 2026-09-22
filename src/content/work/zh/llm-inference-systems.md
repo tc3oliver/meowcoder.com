@@ -159,7 +159,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 - 在 35B-A3B MoE 上，一次驗證四個位置的 verify forward 相當於 2.43 個 dense step；固定 draft depth 3 在 code 上比 dense 慢 10%、在 prose 上慢 44%，而這兩格量到的 acceptance 分別是 56% 與 25%。
 - 在同一個 runtime 上，dense 27B 的同樣一次 forward 只相當於 1.37 個 dense step；在配對的 13.6K coding prompt 上，推測解碼 decode 快 1.81 倍（同一列的端到端是 1.05 倍）——acceptance 是 79%。
 - 成本模型只用 runtime 自己的計時器，十一組配對裡有十組預測誤差在 5% 以內，範圍涵蓋 0.56×–1.81×。
-- Runtime 既有的 adaptive depth controller 避開了所有量到的虧損區：它把四格虧損全部轉成打平或小幅落後，而在固定 depth 會贏的那一格，它靠 draft 得更淺、買到更便宜的 cycle，比固定 depth 再快 12%。
+- Runtime 既有的 adaptive depth controller 把每一格量到的虧損都拉回打平附近：四格虧損全部變成打平或小幅落後；而在固定 depth 會贏的那一格，它把 draft 放得更淺，換到更便宜的 cycle，比固定 depth 再快 12%。
 
 因為受測的程式本來就選對了，這個 finding 沒有附帶上游提案。Production 決策是不動：維持現行的 adaptive MTP。
 
@@ -225,7 +225,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 最清楚的結果是一個 null result。Neural engine 的 prefill 路徑是照固定的 tile 長度編譯的，而 serving 層把 prefill 切成 cache block。部署的 block 是 512 token、編譯的 tile 是 2048 token，這時沒有任何一個送進來的 chunk 填得滿一個 tile：這條路徑完成初始化、完成編譯、回報自己已啟用，然後一個 tile 都沒有執行過。
 
-這件事在任何 throughput 數字上都看不出來——設定寫著「neural engine on」，伺服器也回報它是 on，貢獻正好是零。改法是把 tile 對齊改成配合 block 結構：改的是工作怎麼被切分，不是怎麼被計算。
+這件事在任何 throughput 數字上都看不出來——設定寫著「neural engine on」，伺服器也回報它是 on，貢獻正好是零。讓這條路徑真的能用的，是編譯的 tile 和 cache block 落在同一個粒度上：差別在工作怎麼被切分，不在怎麼被計算。
 
 這個結論值得留成一條通則：在異質裝置上，accelerator 編譯時假設的工作單位，和 serving 層實際發出的工作單位，是兩個不同的決定，通常由兩個不同的人做。
 
