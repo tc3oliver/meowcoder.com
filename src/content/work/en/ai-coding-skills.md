@@ -8,7 +8,7 @@ evidence: 'github.com/tc3oliver/skills · backlog-workflow 1.2.0, with its own u
 slug: 'ai-coding-skills'
 locale: 'en'
 translationKey: 'ai-coding-skills'
-order: 3
+order: 4
 draft: false
 meta:
   - label: 'Version'

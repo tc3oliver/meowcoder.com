@@ -8,7 +8,7 @@ evidence: 'GitHub 上的 llm-inference-systems · 實驗方法、request 層級 
 slug: 'llm-inference-systems'
 locale: 'zh'
 translationKey: 'llm-inference-systems'
-order: 2
+order: 3
 draft: false
 kind: 'case-study'
 meta:

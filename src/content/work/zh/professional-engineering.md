@@ -8,7 +8,7 @@ kind: 'experience'
 slug: 'professional-engineering'
 locale: 'zh'
 translationKey: 'professional-engineering'
-order: 4
+order: 5
 draft: false
 meta:
   - label: '年資'

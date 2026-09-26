@@ -8,7 +8,7 @@ evidence: 'llm-inference-systems on GitHub · methodology, request-level traces,
 slug: 'llm-inference-systems'
 locale: 'en'
 translationKey: 'llm-inference-systems'
-order: 2
+order: 3
 draft: false
 kind: 'case-study'
 meta:
