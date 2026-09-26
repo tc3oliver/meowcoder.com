@@ -24,10 +24,10 @@ meta:
 
 Independently researched, measured, and shipped by Oliver Yu.
 
-<a href="https://github.com/tc3oliver/laya-apple" target="_blank" rel="noopener noreferrer">laya-apple</a> is concurrent MLX GPU + Neural Engine serving on one Mac: long requests go to the GPU, short ones to the Apple Neural Engine through Core ML, and both devices serve at the same time.
+<a href="https://github.com/tc3oliver/laya-apple" target="_blank" rel="noopener noreferrer">laya-apple</a> is concurrent MLX GPU + Neural Engine serving on one Mac: long requests go to the GPU, short ones to the Apple Neural Engine through Core ML.
 
 - **GPU result return, 7.67 → 0.14 ms (P50)** in a causal intervention on the GIL.
-- **4.28–8.60 → 0.035–0.043 ms in production**: laya-apple 1.5 against the 1.4 path, at 1.038–1.042× its throughput.
+- **4.28–8.60 → 0.035–0.043 ms in production validation**: laya-apple 1.5 against the 1.4 path, at 1.038–1.042× its throughput.
 - **12 of 12 slow episodes recovered**, the worst in 414 ms, against a preregistered limit of 1.0 s.
 - **154 production validation episodes**, with zero output mismatches, routing failures, lost requests or crashes.
 
@@ -62,11 +62,11 @@ Upstream: <a href="https://github.com/apple/coremltools/pull/2876" target="_blan
 
 The two devices were supposed to work in parallel. Short requests would stop queueing behind long GPU work, and the GPU would carry on as before. It did not: with the Neural Engine on a thread beside it, GPU service time on typed-decisions rose by 1.04–1.64×, while the Neural Engine itself was barely affected.
 
-That left four suspects: the GPU, the Neural Engine, Python, or the runtime around them. Each one implies a different fix, and without a measurement there was no way to choose between them.
+That left four suspects: the GPU, the Neural Engine, Python, or the runtime around them. In what follows, an episode is one period in which the GPU and the Neural Engine serve at the same time. Each one implies a different fix, and without a measurement there was no way to choose between them.
 
 ## Finding the GIL
 
-The GPU came off the list first. MLX `mx.eval` time rose by at most 1.04× in 15 of 16 GPU streams, so the GPU was not computing more slowly.
+The GPU came off the list first. MLX `mx.eval` time rose by at most 1.04× in 15 of 16 GPU streams, so GPU compute was barely slower.
 
 The runtime already recorded a `RequestTrace` for every request, and it placed the delay in the GPU reply leg, lined up with the end of the Neural Engine's `predict` call. The return leg grew from 0.05 to 7.41 ms, 91.1% of the added occupancy. The GPU had finished its work; the result was waiting.
 
@@ -76,7 +76,7 @@ A profile shows correlation, so a 2×2 intervention tested for cause. Holding th
 
 ## Taking it upstream
 
-The GIL hold is not specific to laya-apple. Any Python process that calls synchronous Core ML prediction on one thread while other threads need the interpreter pays for it. Working around it only inside this runtime would have left it in place for everyone else, so the fix went to the framework: <a href="https://github.com/apple/coremltools/pull/2876" target="_blank" rel="noopener noreferrer"><code>apple/coremltools#2876</code></a>.
+The GIL hold is not specific to laya-apple. Any Python process that runs synchronous Core ML prediction on one thread while other threads need the interpreter can hit the same wait. A workaround inside this runtime would not help other coremltools users, so the fix was proposed to the framework: <a href="https://github.com/apple/coremltools/pull/2876" target="_blank" rel="noopener noreferrer"><code>apple/coremltools#2876</code></a>.
 
 The change releases the GIL only around the native `predictionFromFeatures:` call and keeps `predict()` synchronous for its caller, with a threading regression test. It depends on a separate fix, apple/coremltools#2827 or #2829, for a NumPy-backed input being released without the GIL. It is open, and until it merges and ships, released coremltools still holds the GIL for the whole native call. 1.5 therefore does not depend on it.
 
@@ -89,9 +89,9 @@ The GIL wait could be removed in four ways, and every one of them removed it:
 3. a prebound binding that cut Python–Objective-C crossings per forward from 108 to 4;
 4. Core ML's official asynchronous API.
 
-None of them passed the product mix. Process isolation failed its gate on both models, with the short-request P99 up 17.5% against a 5% limit. The GIL-released thread failed on all three models, and the cost moved to the Neural Engine's short-request stream. The prebound binding passed on two models under a heterogeneous-only protocol, then stopped for futility at n = 12 under the full protocol, with a short-request P99 of 1.409× the 1.4 path.
+None of them could be made safe on the product mix. Process isolation failed its gate on both models: laya's short-request P99 rose 17.5% against a 5% limit, and typed-decisions' rose 73.3%. The GIL-released thread failed on all three models, and the cost moved to the Neural Engine's short-request stream. The prebound binding passed on two models under a heterogeneous-only protocol, but the GIL-released thread, which had failed, passed under that protocol too. Under the full protocol the prebound binding stopped for futility at n = 12, with a short-request P99 of 1.409× the 1.4 path. Core ML's asynchronous API still went slow in its screen, described below. It stayed the candidate fast path, but not as a fix.
 
-Those results are kept as recorded. The prebound PASS and FAIL each stand under the protocol that produced them, and neither was rewritten after the fact. The negative results are what pointed at the next question.
+Those results are kept as recorded. The prebound PASS and FAIL each stand under the protocol that produced them, and neither was rewritten after the fact.
 
 <div class="decision">
 
@@ -105,25 +105,25 @@ Those results are kept as recorded. The prebound PASS and FAIL each stand under 
 
 ## The host slow state
 
-The full protocol exposed a second state. Heterogeneous windows fell into two groups: normal, at 10.4–12.3 ms, and slow, at 13.6–21.2 ms. In the slow state the GPU thread's CPU time per forward rose from 1.8 to 6.1 ms. The native Core ML `predict` did not change: 9.67 ms slow, 9.62 ms normal. The host had slowed down, and the Neural Engine had not.
+The full protocol exposed a second state. Heterogeneous windows fell into two groups by short-request P99: normal, at 10.4–12.3 ms, and slow, at 13.6–21.2 ms. In the slow state the GPU thread's CPU time per forward rose from 1.8 to 6.1 ms. The native Core ML `predict` did not change: 9.67 ms slow, 9.62 ms normal. The host had slowed down, and the Neural Engine had not.
 
-Core ML's asynchronous API kept GPU return at 0.035 ms and throughput at or above the 1.4 path, and still went slow in 2 of 3 windows. Taking those windows apart gave the state a time structure: an episode at the start of each overlap, lasting 0.8–3.4 s. Outside those episodes the asynchronous path beat 1.4, with a P99 of 10.4 against 11.9 ms.
+Core ML's asynchronous API kept GPU return at 0.035 ms and throughput at or above the 1.4 path, and still went slow in 2 of 3 windows. A post-hoc analysis of those windows gave the state a time structure: an episode at the start of each overlap, lasting 0.8–3.4 s. Outside those episodes the asynchronous path beat 1.4, with a P99 of 10.4 against 11.9 ms.
 
-Per-thread CPU counters tied it to where the threads ran. During the transient, the Neural Engine dispatcher, the short-request client and the Core ML callback threads ran with an Efficiency-core share of 0.91–1.00. In steady state that share was 0.00, and the transient ended when they moved back to the Performance cores. It was not confined to one thread or process: the Neural Engine chain, the parent process's other threads and the GPU worker process were on the Efficiency cores together in all six transitions sampled.
+Per-thread CPU counters tied it to where the threads ran. During the transient, the Neural Engine dispatcher, the short-request client and the Core ML callback threads ran with an Efficiency-core share of 0.91–1.00. In steady state that share was 0.00, and the transient ended when they moved back to the Performance cores. It was not confined to one thread or process: the Neural Engine chain, the parent process's other threads and the GPU worker process were on the Efficiency cores together in all six transitions sampled (also post-hoc).
 
-Two scheduling interventions followed. A dependency QoS override and USER_INITIATED dispatcher QoS both took effect, with the QoS read back as 0x19, and neither moved a thread off the Efficiency cores. The QoS route stopped there.
+Two scheduling interventions followed. A dependency QoS override and USER_INITIATED dispatcher QoS both took effect, with the QoS read back as 0x19, and neither moved the Neural Engine dispatcher off the Efficiency cores. The QoS route stopped there.
 
-This is a strong correlation, not a proven cause. No study here shows why macOS placed the threads on the Efficiency cores, and the case study does not claim to know.
+This is a strong correlation, not a proven cause. No study here shows why macOS placed the threads on the Efficiency cores, and this page does not guess.
 
 ## From prevention to recovery
 
-If the slow state only happened at the start of an overlap, a guard could wait it out: run each episode's first requests on the 1.4 path and hand off afterwards. At 64 requests (H64), the handoff avoided Efficiency-core residency in all 10 screen transitions and all 16 confirmation transitions.
+If the slow state only happened at the start of an overlap, a guard could wait it out: run each episode's first requests on the 1.4 path and hand off afterwards. At 64 requests (H64), the handoff avoided Efficiency-core residency in all 10 screen transitions and all 16 confirmation transitions. Its confirmation still failed an outlier guard, at +2.43 ms against a +2.0 ms limit, and that FAIL stands.
 
 The production-runtime evaluation falsified it. One episode handed off normally at 0.73 s, entered the slow state about 4.7 s later, and stayed there until the window ended. A background process had been at 92% CPU before that run. The preregistered rule did not excuse it, since background load is part of real use. The slow state was not only an onset effect, so a guard counted in requests could not cover it. The route was closed, and 1.4 stayed the default.
 
 That ended the attempt to predict the macOS scheduler. The question changed from how to prevent the slow state to how quickly the runtime could notice it and get out.
 
-The answer was already in the runtime. `RequestTrace` had been added as debugging instrumentation, and one of its fields, `prepare_ms`, is the host time spent before a Neural Engine request is routed. Above 0.3 ms a request counts as host-slow. The breaker, C3, trips on three host-slow requests in a row and sends the rest of the episode back to the 1.4 path.
+The runtime already recorded a usable signal. `RequestTrace` had been added as observability, to show where a request's time went, and one of its fields, `prepare_ms`, is the host time spent before a Neural Engine request is routed. Above 0.3 ms a request counts as host-slow. The breaker, C3, trips on three host-slow requests in a row and sends the rest of the episode back to the 1.4 path.
 
 - **Replay.** Against every recorded asynchronous-family episode, C3 caught all 16 sustained slow episodes. The worst detection delay was 126 ms, with 4 false trips in 51 healthy episodes. C3 was chosen on that same data, so replay shows it can work but does not validate it. It was frozen before the next test.
 - **Controlled recovery.** That test was preregistered. Without the breaker, the slow state appeared in 6 of 6 episodes. With it, the breaker tripped in 12 of 12, every time on a slow state that occurred naturally; none was induced. Each trip returned to sustained 1.4-level latency in 215 / 364 / 414 ms (median / P95 / worst), and throughput after fallback was 0.999× that of the 1.4 path.
@@ -178,7 +178,7 @@ No natural slow state occurred during validation, so the breaker never tripped, 
 </li>
 <li class="state-flow__step">
 <span class="state-flow__name">Falsify</span>
-<span class="state-flow__detail">A guard that passed its gates fails in the real runtime.</span>
+<span class="state-flow__detail">A guard that avoided the onset slow state fails in the real runtime.</span>
 </li>
 <li class="state-flow__step">
 <span class="state-flow__name">Detect</span>
@@ -193,15 +193,16 @@ No natural slow state occurred during validation, so the breaker never tripped, 
 <span class="state-flow__detail">A default in 1.5, validated over 154 episodes.</span>
 </li>
 </ol>
-<figcaption class="state-flow__caption">Each step answered the question the previous one raised. Several studies along the way ended in a FAIL, and every one of them is still on the record.</figcaption>
+<figcaption class="state-flow__caption">Several studies along the way ended in FAIL, and all of them remain on record.</figcaption>
 </figure>
 
-The result that mattered most was not a speed-up. It was knowing which parts of the problem were understood and which were not. The GIL is a proven cause, and it went upstream. The Efficiency-core residency is a correlation, so the runtime was built not to depend on explaining it: it measures the symptom it can observe and limits how long a user sees it.
+The useful outcome was a clear line between what was understood and what was not. The GIL is a proven cause, and the fix is proposed upstream. The Efficiency-core residency is a correlation, so the runtime was built not to depend on explaining it: it measures the symptom it can observe and limits how long a user sees it.
 
 ## Evidence and limits
 
 - **One machine.** Every result comes from one M4 Max on one macOS version. Nothing is claimed for other Apple chips or macOS releases.
 - **Mid-episode recovery is unmeasured.** Every slow state in the controlled test began at overlap onset. Replay shows that C3 detects one starting mid-episode, the kind that falsified the static guard, but not that recovery from it is bounded.
+- **The residency data covers only laya's own two processes.** It is not shown system-wide.
 - **The detector threshold is validated on laya only.** For typed-decisions, validation checked for false trips instead.
 - **The trigger is still open.** What starts the host slow state is unanswered. Its screen was preregistered and has never run.
 
