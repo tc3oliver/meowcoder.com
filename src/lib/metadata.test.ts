@@ -485,10 +485,12 @@ describe('structured-data integrity', () => {
     }
   });
 
-  it('describes the research case study as an Article without invented dates', () => {
+  it('describes the research case studies as Articles without invented dates', () => {
     for (const file of [
       'work/llm-inference-systems/index.html',
       'zh/work/llm-inference-systems/index.html',
+      'work/laya-apple/index.html',
+      'zh/work/laya-apple/index.html',
     ]) {
       const articles = nodes(read(file)).filter((node) => node['@type'] === 'Article');
 

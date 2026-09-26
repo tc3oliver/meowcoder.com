@@ -91,6 +91,7 @@ const subjects: Record<string, () => JsonLd> = {
   'ai-coding-skills': () => aiCodingSkillsSchema(locale, entry.summary),
   signalforge: () => signalForgeSchema(locale, entry.summary),
   'llm-inference-systems': () => workArticleSchema(locale, entry, preview.src),
+  'laya-apple': () => workArticleSchema(locale, entry, preview.src),
 };
 
 /*
