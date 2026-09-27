@@ -59,6 +59,11 @@ export interface ResearchProject {
   stat: { value: string; label: string };
   statement: string;
   meta: string;
+  /**
+   * Overrides the section's `articleCta` when this project's article exists in
+   * the reader's language: the section label marks an article as Chinese-only.
+   */
+  articleCta?: CtaLabel;
 }
 
 /** One upstream pull request, or a stacked pair shown as one item. */
@@ -396,6 +401,7 @@ export const home = {
           statement:
             'Serves requests on the MLX GPU and the Apple Neural Engine at the same time. The research traced the added GPU latency to Python’s GIL and sent the fix upstream. laya-apple 1.5 detects a host-side slow state from its own request trace and falls back to the known-safe path.',
           meta: 'Apple M4 Max · MLX + Core ML · laya-apple 1.5 on PyPI',
+          articleCta: { label: 'Read the Article' },
         },
         {
           id: 'llm-inference-systems',
@@ -560,6 +566,7 @@ export const home = {
           statement:
             '同時用 MLX GPU 和 Apple Neural Engine 處理請求。研究查出 GPU 多出來的延遲來自 Python 的 GIL，並把修正送回上游；laya-apple 1.5 會從自己的請求紀錄判斷主機端是否變慢，一旦變慢就退回已知安全的路徑。',
           meta: 'Apple M4 Max · MLX + Core ML · laya-apple 1.5 已發布於 PyPI',
+          articleCta: { label: '閱讀長文' },
         },
         {
           id: 'llm-inference-systems',

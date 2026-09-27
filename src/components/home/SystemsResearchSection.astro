@@ -24,6 +24,7 @@ import type { HomeStrings, ResearchProjectId } from '../../i18n/pages/home';
 import {
   INFERENCE_SYSTEMS_ARTICLE_URL,
   INFERENCE_SYSTEMS_URL,
+  LAYA_APPLE_ARTICLE_EN_URL,
   LAYA_APPLE_ARTICLE_URL,
   LAYA_APPLE_URL,
   MI300X_URL,
@@ -47,7 +48,13 @@ const { locale, t, externalIndicator } = Astro.props;
  * the Work index uses, so these links cannot drift from the pages they name.
  */
 const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: string }> = {
-  'laya-apple': { slug: 'laya-apple', article: LAYA_APPLE_ARTICLE_URL, repo: LAYA_APPLE_URL },
+  // laya-apple's write-up exists in both languages: Study in Chinese, an X
+  // article in English.
+  'laya-apple': {
+    slug: 'laya-apple',
+    article: locale === 'en' ? LAYA_APPLE_ARTICLE_EN_URL : LAYA_APPLE_ARTICLE_URL,
+    repo: LAYA_APPLE_URL,
+  },
   'llm-inference-systems': {
     slug: 'llm-inference-systems',
     article: INFERENCE_SYSTEMS_ARTICLE_URL,
@@ -80,7 +87,7 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
               {links.article && (
                 <CtaLink
                   href={links.article}
-                  label={t.systems.articleCta.label}
+                  label={project.articleCta?.label ?? t.systems.articleCta.label}
                   external
                   indicator={externalIndicator}
                   variant="text"

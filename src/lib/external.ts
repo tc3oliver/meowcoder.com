@@ -56,8 +56,8 @@ export const SIGNALFORGE_LIVE_URL = 'https://signal.meowcoder.com';
 export const LAYA_APPLE_URL = 'https://github.com/tc3oliver/laya-apple';
 
 /**
- * The long-form write-up of the laya-apple 1.4 → 1.5 research, on Study. It is
- * published in Chinese only, so the English homepage labels the link as such.
+ * The long-form write-up of the laya-apple 1.4 → 1.5 research, in Chinese on
+ * Study. The English version is an X article, below.
  */
 export const LAYA_APPLE_ARTICLE_URL =
   'https://study.meowcoder.com/posts/260927-laya-apple-gpu-ane-concurrency/';
@@ -74,3 +74,10 @@ export const INFERENCE_SYSTEMS_URL = 'https://github.com/tc3oliver/llm-inference
  */
 export const INFERENCE_SYSTEMS_ARTICLE_URL =
   'https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/';
+
+/**
+ * The English write-up of the laya-apple research, published as an X article.
+ * This is the post that carries it: the article's own `x.com/i/article/` URL
+ * answers 404 to anything not logged in, which would fail the link check.
+ */
+export const LAYA_APPLE_ARTICLE_EN_URL = 'https://x.com/oliver_yu9/status/2103930467183706274';
