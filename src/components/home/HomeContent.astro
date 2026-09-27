@@ -14,6 +14,7 @@
  *   Hero                    Who is Oliver?
  *   Featured Product        Can he build a real product?
  *   Open Source             Can I inspect his implementation?
+ *   Systems Research        Can he find and prove a root cause?
  *   Engineering Focus       What areas does that work sit in?
  *   Research + Writing      Is there deeper technical credibility, and can I
  *                           inspect his technical thinking?
@@ -38,6 +39,7 @@ import HomeHero from './HomeHero.astro';
 import OpenSourceSection from './OpenSourceSection.astro';
 import ResearchWritingSection from './ResearchWritingSection.astro';
 import ShouriSection from './ShouriSection.astro';
+import SystemsResearchSection from './SystemsResearchSection.astro';
 
 interface Props {
   locale: Locale;
@@ -55,6 +57,7 @@ const { locale, t, posts, externalIndicator } = Astro.props;
   <HomeHero locale={locale} t={t} externalIndicator={externalIndicator} />
   <ShouriSection locale={locale} t={t} externalIndicator={externalIndicator} />
   <OpenSourceSection locale={locale} t={t} externalIndicator={externalIndicator} />
+  <SystemsResearchSection locale={locale} t={t} externalIndicator={externalIndicator} />
   <ExpertiseSection locale={locale} t={t} externalIndicator={externalIndicator} />
   <ResearchWritingSection
     locale={locale}

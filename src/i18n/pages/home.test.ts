@@ -481,3 +481,20 @@ describe('content language rules (PRD §34)', () => {
     }
   });
 });
+
+describe.each(BY_LOCALE)('Systems Research (%s)', (_locale, t: HomeStrings) => {
+  it('states only the numbers the laya-apple figure establishes', () => {
+    // The caption and alt text restate figure 1 of the laya-apple research
+    // (`docs/media/research/README.md` there lists each source). A number that
+    // is not in this set has no source on the figure beside it.
+    const allowed = ['0.05', '7.41', '7.67', '0.14', '1.5', '2876', '4'];
+    const numbers =
+      strings(t.systems)
+        .join(' ')
+        // `P50` is the name of a percentile, not a measured value.
+        .replaceAll('P50', '')
+        .match(/\d+(?:\.\d+)?/g) ?? [];
+
+    expect(numbers.filter((n) => !allowed.includes(n))).toEqual([]);
+  });
+});

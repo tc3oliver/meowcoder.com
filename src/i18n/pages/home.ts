@@ -201,6 +201,27 @@ export interface HomeStrings extends PageStrings {
     cta: CtaLabel;
   };
   /**
+   * laya-apple, the systems-research proof: one statement, one line of facts,
+   * one figure with its caption, and three actions — the case study, the Study
+   * article, and the repository.
+   *
+   * Every number here must trace to the laya-apple repository; the figure's
+   * sources are listed in its `docs/media/research/README.md`. The article is
+   * published in Chinese only, which the English `articleCta` says.
+   */
+  systems: {
+    eyebrow: string;
+    /** A repository name, identical in both locales. */
+    heading: string;
+    statement: string;
+    meta: string;
+    figure: { alt: string; caption: string };
+    /** Internal; the case-study route is resolved by the component, not here. */
+    caseStudyCta: CtaLabel;
+    articleCta: CtaLabel;
+    cta: CtaLabel;
+  };
+  /**
    * PRD §9.5, doc-2 §9. One publication, and deliberately no navigation entry
    * for it — it is the left column of the merged editorial section.
    *
@@ -354,6 +375,21 @@ export const home = {
       caseStudyCta: { label: 'View Case Study' },
       cta: { label: 'GitHub' },
     },
+    systems: {
+      eyebrow: 'Systems Research',
+      heading: 'laya-apple',
+      statement:
+        'Serving on the MLX GPU and the Apple Neural Engine at once, on one Mac. The GPU had already finished; the added latency was synchronous Core ML prediction holding Python’s GIL. laya-apple 1.5 now watches its own request trace for a host-side slow state and falls back to the known-safe path when it sees one.',
+      meta: 'Apple M4 Max · MLX + Core ML · Shipped in laya-apple 1.5 · apple/coremltools#2876',
+      figure: {
+        alt: 'A chart in three parts. A timeline shows the GPU worker finishing its work while the reply path waits in take_gil, because the Neural Engine thread holds the GIL through a synchronous Core ML predict. Stacked bars show the GPU reply leg growing from 0.05 ms running alone to 7.41 ms with the Neural Engine busy, while service time barely moves. A final panel shows GPU result return at the median falling from 7.67 ms to 0.14 ms once the GIL is released around the native prediction.',
+        caption:
+          'The GPU had already finished. Releasing the GIL only around the native Core ML prediction cut GPU result return (P50) from 7.67 ms to 0.14 ms.',
+      },
+      caseStudyCta: { label: 'View Case Study' },
+      articleCta: { label: 'Read the Article (Chinese)' },
+      cta: { label: 'GitHub' },
+    },
     research: {
       eyebrow: 'Research',
       heading: 'Leakage-Resilient Cryptography',
@@ -459,6 +495,22 @@ export const home = {
         end: '完成',
       },
       caseStudyCta: { label: '查看完整案例' },
+      cta: { label: 'GitHub' },
+    },
+    systems: {
+      eyebrow: '系統研究',
+      heading: 'laya-apple',
+      statement:
+        '讓同一台 Mac 的 MLX GPU 和 Apple Neural Engine 同時提供服務。GPU 其實早就算完了，多出來的延遲來自同步的 Core ML prediction 一直佔著 Python GIL。laya-apple 1.5 會從自己的請求紀錄判斷主機是否變慢，一旦變慢就退回已知安全的路徑。',
+      // Facts, not prose (PRD §34), matching the case study's own index line.
+      meta: 'Apple M4 Max · MLX + Core ML · 已於 laya-apple 1.5 發布 · apple/coremltools#2876',
+      figure: {
+        alt: '分成三部分的圖表。時間軸顯示 GPU worker 已經做完工作，回傳結果的路徑卻卡在 take_gil，因為 Neural Engine 那條 thread 在同步的 Core ML predict 期間一直佔著 GIL。堆疊長條圖顯示，GPU 回傳這一段從單獨執行時的 0.05 ms 增加到 Neural Engine 同時忙碌時的 7.41 ms，服務時間幾乎沒變。最後一塊顯示，只在原生 prediction 期間釋放 GIL 後，GPU 結果回傳的中位數從 7.67 ms 降到 0.14 ms。',
+        caption:
+          'GPU 其實早就算完了。只在原生 Core ML prediction 期間釋放 GIL 後，GPU 結果回傳（P50）從 7.67 ms 降到 0.14 ms。',
+      },
+      caseStudyCta: { label: '查看完整案例' },
+      articleCta: { label: '閱讀長文' },
       cta: { label: 'GitHub' },
     },
     research: {

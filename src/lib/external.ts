@@ -48,3 +48,13 @@ export const SIGNALFORGE_URL = 'https://github.com/tc3oliver/signalforge';
 
 /** SignalForge's own running instance — the reader, as the pipeline publishes it. */
 export const SIGNALFORGE_LIVE_URL = 'https://signal.meowcoder.com';
+
+/** laya-apple source repository — the systems-research proof, with its raw data. */
+export const LAYA_APPLE_URL = 'https://github.com/tc3oliver/laya-apple';
+
+/**
+ * The long-form write-up of the laya-apple 1.4 → 1.5 research, on Study. It is
+ * published in Chinese only, so the English homepage labels the link as such.
+ */
+export const LAYA_APPLE_ARTICLE_URL =
+  'https://study.meowcoder.com/posts/260927-laya-apple-gpu-ane-concurrency/';
