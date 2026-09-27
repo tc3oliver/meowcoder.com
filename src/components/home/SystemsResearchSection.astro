@@ -1,28 +1,30 @@
 ---
 /**
- * Systems Research — laya-apple.
+ * Featured Research — laya-apple and LLM Inference Systems.
  *
- * The homepage had no route to the site's deepest engineering evidence: the
- * laya-apple case study, its preregistered research and the upstream Core ML
- * fix were reachable only from the Work index. This section puts that work one
- * scroll below Open Source, as the second section that carries a figure.
+ * The homepage had no route to the site's deepest engineering evidence: two
+ * research programs with raw data behind every number, and the upstream fixes
+ * they produced, were reachable only from the Work index. This section puts
+ * them directly beneath Shouri, as the homepage's second lead proof.
  *
- * The layout is Shouri's 40 / 60 copy / figure pair, so the two sections that
- * carry a visual read as a set. The chart's labels are small at 60% width;
- * the full-size PNG is one click away in the laya-apple repository, and the
- * one number the figure establishes is stated in the caption.
+ * It carries numbers rather than figures. A product is proved by what it looks
+ * like, so Shouri keeps its screenshot; research is proved by what it measured,
+ * and a chart shrunk to homepage size is unreadable decoration. Each project
+ * leads with one measured result, stated large, and its charts stay on the case
+ * study and the article where they can be read.
  *
- * Every number in `home.ts` for this section traces to the laya-apple
- * repository (`docs/media/research/README.md` lists the source of each one in
- * the figure), and the article link goes live only after the Study post does.
+ * Every number in `home.ts` for this section is quoted from the project's own
+ * case study, which names the data it comes from.
  */
 
-import { Image } from 'astro:assets';
-
-import gilStall from '../../assets/laya-apple/gil-stall.png';
 import type { Locale } from '../../i18n/locales';
-import type { HomeStrings } from '../../i18n/pages/home';
-import { LAYA_APPLE_ARTICLE_URL, LAYA_APPLE_URL } from '../../lib/external';
+import type { HomeStrings, ResearchProjectId } from '../../i18n/pages/home';
+import {
+  INFERENCE_SYSTEMS_ARTICLE_URL,
+  INFERENCE_SYSTEMS_URL,
+  LAYA_APPLE_ARTICLE_URL,
+  LAYA_APPLE_URL,
+} from '../../lib/external';
 import { localizePath, workDetailRoute } from '../../lib/i18n';
 import CtaLink from './CtaLink.astro';
 import HomeSection from './HomeSection.astro';
@@ -35,112 +37,125 @@ interface Props {
 
 const { locale, t, externalIndicator } = Astro.props;
 
-/** The case study's slug — `src/content/work/{en,zh}/laya-apple.md`. */
-const CASE_STUDY_SLUG = 'laya-apple';
-const caseStudyHref = localizePath(locale, workDetailRoute(CASE_STUDY_SLUG));
+/**
+ * Where each project's three actions go. The slug is the case study's —
+ * `src/content/work/{en,zh}/<slug>.md` — and is routed through the same helpers
+ * the Work index uses, so these links cannot drift from the pages they name.
+ */
+const LINKS: Record<ResearchProjectId, { slug: string; article: string; repo: string }> = {
+  'laya-apple': { slug: 'laya-apple', article: LAYA_APPLE_ARTICLE_URL, repo: LAYA_APPLE_URL },
+  'llm-inference-systems': {
+    slug: 'llm-inference-systems',
+    article: INFERENCE_SYSTEMS_ARTICLE_URL,
+    repo: INFERENCE_SYSTEMS_URL,
+  },
+};
 ---
 
-<HomeSection id="systems-research" eyebrow={t.systems.eyebrow} heading={t.systems.heading}>
-  <div class="systems">
-    <div class="systems__copy">
-      <p class="systems__statement">{t.systems.statement}</p>
-      <p class="systems__meta">{t.systems.meta}</p>
-
-      <div class="systems__actions">
-        <CtaLink href={caseStudyHref} label={t.systems.caseStudyCta.label} variant="outline" />
-        <CtaLink
-          href={LAYA_APPLE_ARTICLE_URL}
-          label={t.systems.articleCta.label}
-          external
-          indicator={externalIndicator}
-          variant="outline"
-        />
-        <CtaLink
-          href={LAYA_APPLE_URL}
-          label={t.systems.cta.label}
-          external
-          indicator={externalIndicator}
-          variant="outline"
-        />
-      </div>
-    </div>
-
-    <figure class="systems__figure">
-      <Image
-        src={gilStall}
-        alt={t.systems.figure.alt}
-        widths={[640, 960, 1280, 1920]}
-        sizes="(min-width: 72.5rem) 640px, (min-width: 64rem) 58vw, 100vw"
-        loading="lazy"
-        decoding="async"
-      />
-      <figcaption class="systems__caption">{t.systems.figure.caption}</figcaption>
-    </figure>
+<HomeSection id="featured-research" eyebrow={t.systems.eyebrow} heading={t.systems.heading}>
+  <div class="research-projects">
+    {
+      t.systems.projects.map((project) => {
+        const links = LINKS[project.id];
+        return (
+          <article class="project">
+            <h3 class="project__name">{project.name}</h3>
+            <p class="project__stat">{project.stat.value}</p>
+            <p class="project__stat-label">{project.stat.label}</p>
+            <p class="project__statement">{project.statement}</p>
+            <p class="project__meta">{project.meta}</p>
+            <div class="project__actions">
+              <CtaLink
+                href={localizePath(locale, workDetailRoute(links.slug))}
+                label={t.systems.caseStudyCta.label}
+                variant="outline"
+              />
+              <CtaLink
+                href={links.article}
+                label={t.systems.articleCta.label}
+                external
+                indicator={externalIndicator}
+                variant="outline"
+              />
+              <CtaLink
+                href={links.repo}
+                label={t.systems.cta.label}
+                external
+                indicator={externalIndicator}
+                variant="outline"
+              />
+            </div>
+          </article>
+        );
+      })
+    }
   </div>
 </HomeSection>
 
 <style>
-  .systems {
+  /* Two projects side by side from the breakpoint Open Source uses, one column
+     beneath it. `minmax(0, 1fr)` keeps a long number from forcing a 390px
+     viewport wider than the screen. */
+  .research-projects {
     display: grid;
-    /* `minmax(0, 1fr)` so the 2400px chart cannot force the track wider than a
-       390px viewport — the same guard the Shouri section uses. */
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-7);
-    align-items: start;
+    gap: var(--space-8);
   }
 
-  /* Shouri's 40 / 60 split, at the same breakpoint. */
-  @media (min-width: 64rem) {
-    .systems {
-      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-      gap: var(--space-8);
+  @media (width >= 48rem) {
+    .research-projects {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  .systems__copy {
+  .project {
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
     max-width: var(--width-reading);
   }
 
-  .systems__statement {
+  .project__name {
+    font-size: var(--text-md);
+    letter-spacing: var(--tracking-normal);
+  }
+
+  /* The measured result is the section's visual: large, tabular, and the
+     first thing the eye lands on after the name. */
+  .project__stat {
+    margin-block-start: var(--space-5);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .project__stat-label {
+    margin-block-start: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  .project__statement {
+    margin-block-start: var(--space-5);
     font-size: var(--text-md);
     line-height: var(--leading-relaxed);
   }
 
   /* Facts, not prose: the same muted monospace line Open Source uses. */
-  .systems__meta {
+  .project__meta {
+    margin-block-start: var(--space-4);
     color: var(--color-text-muted);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     letter-spacing: var(--tracking-normal);
   }
 
-  .systems__actions {
+  .project__actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
-  }
-
-  .systems__figure {
-    margin: 0;
-  }
-
-  /* The chart is drawn on white; the frame keeps it from reading as a hole in
-     the page on the dark theme. */
-  .systems__figure :global(img) {
-    inline-size: 100%;
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background-color: #fff;
-  }
-
-  .systems__caption {
-    margin-block-start: var(--space-3);
-    max-width: var(--width-reading);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    line-height: var(--leading-relaxed);
+    margin-block-start: var(--space-5);
   }
 </style>

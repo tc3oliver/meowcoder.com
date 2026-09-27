@@ -73,6 +73,32 @@ export interface PillarEvidence extends CtaLabel {
   caseStudy?: string;
 }
 
+/** The research programs the homepage features; each maps to its links in the component. */
+export type ResearchProjectId = 'laya-apple' | 'llm-inference-systems';
+
+/**
+ * One research program: a name, the one measured result it leads with, one
+ * statement, and one line of facts. `stat.value` must be quoted from the
+ * project's case study, which names the data behind it.
+ */
+export interface ResearchProject {
+  id: ResearchProjectId;
+  /** A repository name, identical in both locales. */
+  name: string;
+  stat: { value: string; label: string };
+  statement: string;
+  meta: string;
+}
+
+/** One upstream pull request, or a stacked pair shown as one item. */
+export interface UpstreamItem {
+  /** `owner/repo#number`, as GitHub prints it; never translated. */
+  name: string;
+  href: string;
+  merged?: boolean;
+  description: string;
+}
+
 export interface HomeStrings extends PageStrings {
   /**
    * doc-2 §5. `heading` is the name and `intro` the statement beneath it, so
@@ -196,28 +222,36 @@ export interface HomeStrings extends PageStrings {
       steps: readonly string[];
       end: string;
     };
+    /**
+     * Pull requests to projects this site's author does not maintain — the
+     * upstream half of the section. Only pull requests whose state cannot go
+     * stale are marked: `merged` is final, and an open one carries no status
+     * rather than one that would be wrong the day it merges.
+     */
+    upstream: {
+      heading: string;
+      items: readonly UpstreamItem[];
+      /** The state label printed beside a merged pull request. */
+      merged: string;
+      /** The full, generated record on the GitHub profile. */
+      cta: CtaLabel;
+    };
     /** Internal; the case-study route is resolved by the component, not here. */
     caseStudyCta: CtaLabel;
     cta: CtaLabel;
   };
   /**
-   * laya-apple, the systems-research proof: one statement, one line of facts,
-   * one figure with its caption, and three actions — the case study, the Study
-   * article, and the repository.
-   *
-   * Every number here must trace to the laya-apple repository; the figure's
-   * sources are listed in its `docs/media/research/README.md`. The article is
-   * published in Chinese only, which the English `articleCta` says.
+   * The research proof: two programs, each led by one measured result, with
+   * three actions each — the case study, the Study article, and the repository.
    */
   systems: {
     eyebrow: string;
-    /** A repository name, identical in both locales. */
     heading: string;
-    statement: string;
-    meta: string;
-    figure: { alt: string; caption: string };
-    /** Internal; the case-study route is resolved by the component, not here. */
+    /** The two research programs, laya-apple first: it is the one that shipped. */
+    projects: readonly ResearchProject[];
+    /** Internal; each case-study route is resolved by the component, not here. */
     caseStudyCta: CtaLabel;
+    /** The Study article. Both are published in Chinese only, which `en` says. */
     articleCta: CtaLabel;
     cta: CtaLabel;
   };
@@ -306,7 +340,11 @@ export const home = {
       'I build reliable AI systems for developer workflows, knowledge retrieval, and model infrastructure.',
     hero: {
       role: 'AI Systems Engineer · System Architect',
-      facts: ['10+ Years in Software Engineering'],
+      facts: [
+        'laya-apple 1.5 on PyPI',
+        'Upstream: Apple coremltools · oMLX',
+        '10+ Years in Software Engineering',
+      ],
       workCta: 'View Selected Work',
       writingCta: 'Technical Writing',
       noBreakSuffix: 'model infrastructure.',
@@ -352,7 +390,7 @@ export const home = {
     },
     openSource: {
       eyebrow: 'Open Source',
-      heading: 'SignalForge and AI Coding Skills',
+      heading: 'Open Source and Upstream',
       signalforge: {
         heading: 'SignalForge',
         statement:
@@ -372,20 +410,71 @@ export const home = {
         steps: ['Plan', 'Execute', 'Validate'],
         end: 'Complete',
       },
+      upstream: {
+        heading: 'Upstream',
+        merged: 'Merged',
+        items: [
+          {
+            name: 'apple/coremltools#2876',
+            href: 'https://github.com/apple/coremltools/pull/2876',
+            description:
+              'Releases the GIL around native Core ML prediction only. Came out of the laya-apple research.',
+          },
+          {
+            name: 'jundot/omlx#3685',
+            href: 'https://github.com/jundot/omlx/pull/3685',
+            merged: true,
+            description:
+              'Keeps SDPA256 prefill on one route, so an identical request gives the same temperature-0 output in every process.',
+          },
+          {
+            name: 'jundot/omlx#3840 + #3842',
+            href: 'https://github.com/jundot/omlx/pull/3842',
+            merged: true,
+            description:
+              'Makes the SpecPrefill draft cache produce usable hits on hybrid attention and recurrent models.',
+          },
+          {
+            name: 'jundot/omlx#3664',
+            href: 'https://github.com/jundot/omlx/pull/3664',
+            merged: true,
+            description:
+              'Carries namespace tool groups through the Responses API, the shape Codex uses for MCP servers.',
+          },
+        ],
+        cta: { label: 'All upstream pull requests' },
+      },
       caseStudyCta: { label: 'View Case Study' },
       cta: { label: 'GitHub' },
     },
     systems: {
-      eyebrow: 'Systems Research',
-      heading: 'laya-apple',
-      statement:
-        'Serving on the MLX GPU and the Apple Neural Engine at once, on one Mac. The GPU had already finished; the added latency was synchronous Core ML prediction holding Python’s GIL. laya-apple 1.5 now watches its own request trace for a host-side slow state and falls back to the known-safe path when it sees one.',
-      meta: 'Apple M4 Max · MLX + Core ML · Shipped in laya-apple 1.5 · apple/coremltools#2876',
-      figure: {
-        alt: 'A chart in three parts. A timeline shows the GPU worker finishing its work while the reply path waits in take_gil, because the Neural Engine thread holds the GIL through a synchronous Core ML predict. Stacked bars show the GPU reply leg growing from 0.05 ms running alone to 7.41 ms with the Neural Engine busy, while service time barely moves. A final panel shows GPU result return at the median falling from 7.67 ms to 0.14 ms once the GIL is released around the native prediction.',
-        caption:
-          'The GPU had already finished. Releasing the GIL only around the native Core ML prediction cut GPU result return (P50) from 7.67 ms to 0.14 ms.',
-      },
+      eyebrow: 'Featured Research',
+      heading: 'Inference Systems Research',
+      projects: [
+        {
+          id: 'laya-apple',
+          name: 'laya-apple',
+          stat: {
+            value: '7.67 → 0.14 ms',
+            label: 'GPU result return (P50), once synchronous Core ML stopped holding the GIL',
+          },
+          statement:
+            'Serving on the MLX GPU and the Apple Neural Engine at once. The research traced the added GPU latency to Python’s GIL and sent the fix upstream; laya-apple 1.5 detects a host-side slow state from its own request trace and falls back to the known-safe path.',
+          meta: 'Apple M4 Max · MLX + Core ML · laya-apple 1.5 · apple/coremltools#2876',
+        },
+        {
+          id: 'llm-inference-systems',
+          name: 'llm-inference-systems',
+          stat: {
+            value: '228.38 → 79.06 s',
+            label:
+              'Cumulative latency of a seven-turn session, once reusable prefix state is rebuilt in idle time',
+          },
+          statement:
+            'What an inference optimization leaves behind for the next request. Three experiments, each with its raw data and figures: reusable prefix state, the cost model of speculative decoding, and background recovery.',
+          meta: 'Apple M4 Max · oMLX · Three experiments · Raw data and figures',
+        },
+      ],
       caseStudyCta: { label: 'View Case Study' },
       articleCta: { label: 'Read the Article (Chinese)' },
       cta: { label: 'GitHub' },
@@ -423,7 +512,11 @@ export const home = {
       // PRD §9.1 keeps the role line and `Taiwan` in English in the Chinese
       // hero; both are standalone lines, so neither mixes languages.
       role: 'AI Systems Engineer · System Architect',
-      facts: ['10+ 年軟體工程經驗'],
+      facts: [
+        'laya-apple 1.5 已發布於 PyPI',
+        '上游貢獻：Apple coremltools · oMLX',
+        '10+ 年軟體工程經驗',
+      ],
       workCta: '精選作品',
       writingCta: '技術文章',
       noBreakSuffix: '模型基礎架構。',
@@ -473,7 +566,7 @@ export const home = {
     },
     openSource: {
       eyebrow: '開源',
-      heading: 'SignalForge 與 AI Coding Skills',
+      heading: '開源與上游貢獻',
       signalforge: {
         heading: 'SignalForge',
         statement:
@@ -494,21 +587,69 @@ export const home = {
         steps: ['規劃', '執行', '驗證'],
         end: '完成',
       },
+      upstream: {
+        heading: '上游貢獻',
+        merged: '已合併',
+        items: [
+          {
+            name: 'apple/coremltools#2876',
+            href: 'https://github.com/apple/coremltools/pull/2876',
+            description: '只在原生 Core ML prediction 期間釋放 GIL，來自 laya-apple 的研究。',
+          },
+          {
+            name: 'jundot/omlx#3685',
+            href: 'https://github.com/jundot/omlx/pull/3685',
+            merged: true,
+            description:
+              '讓 SDPA256 prefill 固定走同一條路徑，相同請求在不同 process 的 temperature 0 輸出一致。',
+          },
+          {
+            name: 'jundot/omlx#3840 + #3842',
+            href: 'https://github.com/jundot/omlx/pull/3842',
+            merged: true,
+            description:
+              '讓 SpecPrefill 的 draft cache 在 attention 與 recurrent 混合的模型上真正命中。',
+          },
+          {
+            name: 'jundot/omlx#3664',
+            href: 'https://github.com/jundot/omlx/pull/3664',
+            merged: true,
+            description:
+              '讓 Responses API 保留 namespace 工具群組，也就是 Codex 接 MCP server 的格式。',
+          },
+        ],
+        cta: { label: '所有上游 PR' },
+      },
       caseStudyCta: { label: '查看完整案例' },
       cta: { label: 'GitHub' },
     },
     systems: {
-      eyebrow: '系統研究',
-      heading: 'laya-apple',
-      statement:
-        '讓同一台 Mac 的 MLX GPU 和 Apple Neural Engine 同時提供服務。GPU 其實早就算完了，多出來的延遲來自同步的 Core ML prediction 一直佔著 Python GIL。laya-apple 1.5 會從自己的請求紀錄判斷主機是否變慢，一旦變慢就退回已知安全的路徑。',
-      // Facts, not prose (PRD §34), matching the case study's own index line.
-      meta: 'Apple M4 Max · MLX + Core ML · 已於 laya-apple 1.5 發布 · apple/coremltools#2876',
-      figure: {
-        alt: '分成三部分的圖表。時間軸顯示 GPU worker 已經做完工作，回傳結果的路徑卻卡在 take_gil，因為 Neural Engine 那條 thread 在同步的 Core ML predict 期間一直佔著 GIL。堆疊長條圖顯示，GPU 回傳這一段從單獨執行時的 0.05 ms 增加到 Neural Engine 同時忙碌時的 7.41 ms，服務時間幾乎沒變。最後一塊顯示，只在原生 prediction 期間釋放 GIL 後，GPU 結果回傳的中位數從 7.67 ms 降到 0.14 ms。',
-        caption:
-          'GPU 其實早就算完了。只在原生 Core ML prediction 期間釋放 GIL 後，GPU 結果回傳（P50）從 7.67 ms 降到 0.14 ms。',
-      },
+      eyebrow: '精選研究',
+      heading: '推論系統研究',
+      projects: [
+        {
+          id: 'laya-apple',
+          name: 'laya-apple',
+          stat: {
+            value: '7.67 → 0.14 ms',
+            label: 'GPU 結果回傳（P50），同步 Core ML 不再佔著 GIL 之後',
+          },
+          statement:
+            '讓 MLX GPU 和 Apple Neural Engine 同時提供服務。研究把多出來的 GPU 延遲追到 Python GIL，修正送回上游；laya-apple 1.5 會從自己的請求紀錄判斷主機是否變慢，一旦變慢就退回已知安全的路徑。',
+          meta: 'Apple M4 Max · MLX + Core ML · laya-apple 1.5 · apple/coremltools#2876',
+        },
+        {
+          id: 'llm-inference-systems',
+          name: 'llm-inference-systems',
+          stat: {
+            value: '228.38 → 79.06 s',
+            label: '七輪 session 的累積延遲，在閒置時重建可重用前綴之後',
+          },
+          statement:
+            '一次推論最佳化，會替下一個請求留下什麼。三個實驗都附原始資料與圖表：可重用前綴狀態、推測解碼的成本模型，以及背景補回。',
+          meta: 'Apple M4 Max · oMLX · 三個實驗 · 原始資料與圖表',
+        },
+      ],
       caseStudyCta: { label: '查看完整案例' },
       articleCta: { label: '閱讀長文' },
       cta: { label: 'GitHub' },

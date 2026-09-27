@@ -21,6 +21,10 @@ import AI_CODING_SKILLS_EN from '../../content/work/en/ai-coding-skills.md?raw';
 import AI_CODING_SKILLS_ZH from '../../content/work/zh/ai-coding-skills.md?raw';
 import SHOURI_EN from '../../content/work/en/shouri.md?raw';
 import SHOURI_ZH from '../../content/work/zh/shouri.md?raw';
+import INFERENCE_EN from '../../content/work/en/llm-inference-systems.md?raw';
+import INFERENCE_ZH from '../../content/work/zh/llm-inference-systems.md?raw';
+import LAYA_EN from '../../content/work/en/laya-apple.md?raw';
+import LAYA_ZH from '../../content/work/zh/laya-apple.md?raw';
 import { LOCALES, type Locale } from '../locales';
 import { home, type HomeStrings } from './home';
 
@@ -34,12 +38,16 @@ function strings(value: unknown): string[] {
 const BY_LOCALE = LOCALES.map((locale) => [locale, home[locale]] as const);
 
 describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
-  it('states the hero fact about the work, and nothing else', () => {
-    // One fact, not two. `Taiwan` used to sit beside it — the only entry that
-    // was not about the work, and in the Chinese hero an English word that
-    // told a Taiwanese reader nothing.
-    expect(t.hero.facts).toHaveLength(1);
-    expect(t.hero.facts[0]).toMatch(/10\+/);
+  it('states only facts about the work in the hero', () => {
+    // Three verifiable facts: a shipped release, where the upstream work went,
+    // and the length of the career. `Taiwan` used to sit here — the only entry
+    // that was not about the work. Names rather than counts, because a count
+    // of pull requests is stale the week the next one merges.
+    expect(t.hero.facts).toHaveLength(3);
+    expect(t.hero.facts[0]).toMatch(/laya-apple 1\.5/);
+    expect(t.hero.facts[1]).toMatch(/coremltools/);
+    expect(t.hero.facts[2]).toMatch(/10\+/);
+    expect(t.hero.facts.join(' ')).not.toMatch(/\d+ (merged|pull requests|PRs)/i);
   });
 
   it('names the three Shouri product principles doc-2 §6 lists', () => {
@@ -99,6 +107,7 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
       'signalforge',
       'skills',
       'statement',
+      'upstream',
       'workflow',
     ]);
     expect(Object.keys(t.openSource.signalforge).sort()).toEqual([
@@ -271,7 +280,7 @@ describe('requirement wording', () => {
     expect(home.en.intro).toBe(
       'I build reliable AI systems for developer workflows, knowledge retrieval, and model infrastructure.',
     );
-    expect(home.en.hero.facts).toEqual(['10+ Years in Software Engineering']);
+    expect(home.en.hero.facts.at(-1)).toBe('10+ Years in Software Engineering');
     expect(home.en.hero.workCta).toBe('View Selected Work');
     expect(home.en.hero.writingCta).toBe('Technical Writing');
   });
@@ -282,7 +291,7 @@ describe('requirement wording', () => {
     );
     // doc-2 §5 keeps the role line in English in both locales.
     expect(home.zh.hero.role).toBe('AI Systems Engineer · System Architect');
-    expect(home.zh.hero.facts).toEqual(['10+ 年軟體工程經驗']);
+    expect(home.zh.hero.facts.at(-1)).toBe('10+ 年軟體工程經驗');
   });
 
   it('quotes the doc-2 §6 Shouri product statement verbatim in English', () => {
@@ -482,19 +491,27 @@ describe('content language rules (PRD §34)', () => {
   });
 });
 
-describe.each(BY_LOCALE)('Systems Research (%s)', (_locale, t: HomeStrings) => {
-  it('states only the numbers the laya-apple figure establishes', () => {
-    // The caption and alt text restate figure 1 of the laya-apple research
-    // (`docs/media/research/README.md` there lists each source). A number that
-    // is not in this set has no source on the figure beside it.
-    const allowed = ['0.05', '7.41', '7.67', '0.14', '1.5', '2876', '4'];
-    const numbers =
-      strings(t.systems)
-        .join(' ')
-        // `P50` is the name of a percentile, not a measured value.
-        .replaceAll('P50', '')
-        .match(/\d+(?:\.\d+)?/g) ?? [];
+describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => {
+  it('quotes each lead result from its own case study', () => {
+    // A homepage number with no source behind it is exactly what this site's
+    // rules forbid. Each value must appear verbatim in the case study for the
+    // same project, in the same locale, which in turn names its data.
+    const CASE_STUDIES: Record<string, Record<string, string>> = {
+      'laya-apple': { en: LAYA_EN, zh: LAYA_ZH },
+      'llm-inference-systems': { en: INFERENCE_EN, zh: INFERENCE_ZH },
+    };
+    for (const project of t.systems.projects) {
+      const source = CASE_STUDIES[project.id][_locale];
+      for (const number of project.stat.value.match(/\d+(?:\.\d+)?/g) ?? []) {
+        expect(source).toContain(number);
+      }
+    }
+  });
 
-    expect(numbers.filter((n) => !allowed.includes(n))).toEqual([]);
+  it('leads with the project that shipped', () => {
+    expect(t.systems.projects.map((project) => project.id)).toEqual([
+      'laya-apple',
+      'llm-inference-systems',
+    ]);
   });
 });

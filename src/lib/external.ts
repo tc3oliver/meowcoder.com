@@ -58,3 +58,13 @@ export const LAYA_APPLE_URL = 'https://github.com/tc3oliver/laya-apple';
  */
 export const LAYA_APPLE_ARTICLE_URL =
   'https://study.meowcoder.com/posts/260927-laya-apple-gpu-ane-concurrency/';
+
+/** The LLM inference research repository — experiments, raw data and figures. */
+export const INFERENCE_SYSTEMS_URL = 'https://github.com/tc3oliver/llm-inference-systems';
+
+/**
+ * The long-form write-up of the background-recovery experiment, the one whose
+ * result the homepage quotes. Published in Chinese only.
+ */
+export const INFERENCE_SYSTEMS_ARTICLE_URL =
+  'https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/';
