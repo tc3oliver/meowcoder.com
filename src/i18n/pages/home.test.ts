@@ -446,6 +446,11 @@ describe('content language rules (PRD §34)', () => {
       'ML',
       'prediction',
       'RequestTrace',
+      'activation',
+      'function',
+      'shape',
+      'coding',
+      'workflow',
     ]);
     // The publication's scheme and security-notion names — `LR-CBEET`,
     // `IND-CCA`, `OW-CCA` — are deliberately absent: doc-2 §9 moved the only
