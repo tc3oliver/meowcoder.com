@@ -7,11 +7,10 @@
  * fix were reachable only from the Work index. This section puts that work one
  * scroll below Open Source, as the second section that carries a figure.
  *
- * The figure is a research chart rather than a product screenshot, so it does
- * not take Shouri's 40 / 60 split. A chart's labels are set at 12–15px on a
- * 1200px canvas, and squeezing it into 60% of the content width would put them
- * below a readable size; it sits full width beneath the copy instead, with the
- * one number it establishes stated in the caption.
+ * The layout is Shouri's 40 / 60 copy / figure pair, so the two sections that
+ * carry a visual read as a set. The chart's labels are small at 60% width;
+ * the full-size PNG is one click away in the laya-apple repository, and the
+ * one number the figure establishes is stated in the caption.
  *
  * Every number in `home.ts` for this section traces to the laya-apple
  * repository (`docs/media/research/README.md` lists the source of each one in
@@ -71,7 +70,7 @@ const caseStudyHref = localizePath(locale, workDetailRoute(CASE_STUDY_SLUG));
         src={gilStall}
         alt={t.systems.figure.alt}
         widths={[640, 960, 1280, 1920]}
-        sizes="(min-width: 72.5rem) 1160px, 100vw"
+        sizes="(min-width: 72.5rem) 640px, (min-width: 64rem) 58vw, 100vw"
         loading="lazy"
         decoding="async"
       />
@@ -87,6 +86,15 @@ const caseStudyHref = localizePath(locale, workDetailRoute(CASE_STUDY_SLUG));
        390px viewport — the same guard the Shouri section uses. */
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-7);
+    align-items: start;
+  }
+
+  /* Shouri's 40 / 60 split, at the same breakpoint. */
+  @media (min-width: 64rem) {
+    .systems {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: var(--space-8);
+    }
   }
 
   .systems__copy {
