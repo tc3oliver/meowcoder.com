@@ -2,13 +2,13 @@
 title: 'LLM Inference Systems'
 type: 'Systems Research · LLM Inference'
 summary: 'An ongoing inference-systems research program driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, and turn the result into a production decision or an upstream fix. Three completed experiments and three open research threads.'
-outcome: 'Three finished experiments: on reusable state dynamics, on the cost model for speculative decoding, and on background recovery of reusable canonical state. Alongside them, three open research threads that each state the evidence they still lack, ten upstream pull requests — eight open, none a draft, and two merged — and a reproducible harness with the full dataset behind every figure.'
-indexMeta: 'Apple silicon · Three experiments · Three open research threads · Eight open upstream PRs, two merged'
+outcome: 'Three finished experiments: reusable state dynamics, the cost model for speculative decoding, and background recovery of reusable canonical state. Also three open research threads, each stating the evidence it still lacks; eleven upstream pull requests (five merged, six open, none a draft); and a reproducible harness with the full dataset behind every figure.'
+indexMeta: 'Apple silicon · Three experiments · Three open research threads · Five merged upstream PRs, six open'
 evidence: 'llm-inference-systems on GitHub · methodology, request-level traces, raw data, and figures'
 slug: 'llm-inference-systems'
 locale: 'en'
 translationKey: 'llm-inference-systems'
-order: 3
+order: 2
 draft: false
 kind: 'case-study'
 meta:
@@ -19,7 +19,7 @@ meta:
   - label: 'Scope'
     value: 'Runtime · Serving · Reusable state · Speculative execution · Correctness · Heterogeneous compute'
   - label: 'Evidence'
-    value: 'Public repository · published articles · ten upstream pull requests: eight open, two merged'
+    value: 'Public repository · published articles · eleven upstream pull requests: five merged, six open'
 ---
 
 Independently researched, measured, and submitted upstream by Oliver Yu.
@@ -197,9 +197,9 @@ Making it safe to serve was the larger half. A share-of-time budget bounds how _
 
 </div>
 
-No foreground latency target was defined before those runs, so the worst uninterruptible execution slice in the runtime trace at that 512-token slice, 2.39 s, is a derived bound on what a request could have waited for rather than a latency anyone observed — and not a verdict on whether it is acceptable.
+No foreground latency target was set before those runs. The worst uninterruptible execution slice in the runtime trace at the 512-token slice size, 2.39 s, is therefore a derived bound on how long a request could have waited. Nobody observed that latency, and the number says nothing about whether it is acceptable.
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a> carries the datasets, the figures and the limitations; the feature is proposed upstream as
-<a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>, open for review and not merged. The long-form write-up is
+<a href="https://github.com/jundot/omlx/pull/3964" target="_blank" rel="noopener noreferrer"><code>omlx#3964</code></a>, open for review and not merged. The long-form write-up is
 <a href="https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/" target="_blank" rel="noopener noreferrer">償還 reusable state 的債</a> (Traditional Chinese).
 
 ## Systems themes
@@ -239,22 +239,23 @@ None of the findings above was available to someone who only ran benchmarks. Get
 - **A transport-level request policy**, added only after the real workload showed no single configuration was right for every request.
 - **A reproducible harness and dataset** — every figure is redrawn by three scripts that read nothing but `data/`, and nothing in it is smoothed, interpolated, or back-generated.
 
-Upstream, ten pull requests. Eight are open at the time of writing, none a draft and none reviewed to a conclusion; two are merged. An open pull request is a proposal, not an outcome:
+Eleven pull requests went upstream. Five are merged; six were open at the time of writing, none of them drafts. An open pull request counts as a proposal, not a result:
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a> — the correctness fix for the protected-prefix boundary. It was sent before the performance work because it is the only finding that changed the model's input rather than only its speed.
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a> — per-request SpecPrefill fields on the Anthropic messages endpoint, matching what the OpenAI-compatible endpoint already had. It changes no upstream default.
-- <a href="https://github.com/jundot/omlx/pull/3685" target="_blank" rel="noopener noreferrer"><code>omlx#3685</code></a> — deterministic SDPA-256 routing. The route was chosen per call from live memory headroom, so two otherwise identical processes could take different floating-point reductions; this pins qualifying prefill to the bounded one.
-- <a href="https://github.com/jundot/omlx/pull/3840" target="_blank" rel="noopener noreferrer"><code>omlx#3840</code></a> — on a hybrid model the first layer can be a recurrent cache with no offset, so a restored draft cache was silently read as empty and the prompt was prefilled on top of the state it already held, corrupting the importance scoring the selector runs on. It derives the position from an attention layer instead.
-- <a href="https://github.com/jundot/omlx/pull/3842" target="_blank" rel="noopener noreferrer"><code>omlx#3842</code></a> — reusable recurrent state at draft cache block boundaries. It depends on #3840 and should not merge before it.
-- <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a> — a SpecPrefill RoPE cleanup fix on the prefill-OOM requeue path, found while building EXP-003 and sent on its own. It is a correctness fix with its own reproduction, unrelated to the recovery feature.
+- <a href="https://github.com/jundot/omlx/pull/3685" target="_blank" rel="noopener noreferrer"><code>omlx#3685</code></a> — merged. Deterministic SDPA-256 routing. The route was chosen per call from live memory headroom, so two otherwise identical processes could take different floating-point reductions; the change pins qualifying prefill to the bounded route.
+- <a href="https://github.com/jundot/omlx/pull/3840" target="_blank" rel="noopener noreferrer"><code>omlx#3840</code></a> — merged. On a hybrid model the first layer can be a recurrent cache with no offset, so a restored draft cache was silently read as empty. The prompt was then prefilled on top of the state the cache already held, which corrupted the importance scores the selector relies on. The fix derives the position from an attention layer instead.
+- <a href="https://github.com/jundot/omlx/pull/3842" target="_blank" rel="noopener noreferrer"><code>omlx#3842</code></a> — merged. Keeps reusable recurrent state at draft-cache block boundaries. It depended on #3840 and merged after it.
+- <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a> — a SpecPrefill RoPE cleanup fix on the prefill-OOM requeue path, found while building EXP-003 and submitted separately. It is a correctness fix with its own reproduction and is unrelated to the recovery feature.
 - <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a> — on mRoPE VLMs, SpecPrefill wrote its selected tokens at compacted rather than original positions. Validating progressive canonical state recovery (PCSR) is what exposed it; **PCSR did not cause it**, and it is present with background recovery switched off.
-- <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a> — background canonical-state recovery, the EXP-003 feature. It depends on #3811 and should be ordered after it, and it puts an explicit question to the maintainers: whether this PR's own background-scheduling primitives should be merged with work already in flight upstream.
-- <a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a> — merged. The ANE prefill scheduler recommended a sequence length the accelerator cannot accept, since it requires a multiple of 64 and at least 1024 tokens; the merged change reports that geometry as impossible instead. It alters no scheduling and no execution — it makes a silent misconfiguration say so.
-- <a href="https://github.com/jundot/omlx/pull/3664" target="_blank" rel="noopener noreferrer"><code>omlx#3664</code></a> — merged, and the one item here that did not come from an experiment. Tool groups in the Responses API were dropped before reaching the chat template, because only entries typed as functions survived the conversion, so a client's namespaced tools never reached the model. It is a defect met while running the stack, not a finding produced by one.
+- <a href="https://github.com/jundot/omlx/pull/3964" target="_blank" rel="noopener noreferrer"><code>omlx#3964</code></a> — background canonical-state recovery, the EXP-003 feature, off by default. It supersedes #3793, which had grown to include a follow-up feature; the recovery code is unchanged. VLM validation assumes #3811, so #3811 should merge first.
+- <a href="https://github.com/jundot/omlx/pull/3962" target="_blank" rel="noopener noreferrer"><code>omlx#3962</code></a> — a test-isolation fix: a process-global image decode cache leaked between tests, so one memory-pressure test failed whenever an image test ran before it. CI runs test files in a fixed order that hides the failure; any other order exposes it.
+- <a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a> — merged. The ANE prefill scheduler recommended a sequence length the accelerator cannot accept, since it requires a multiple of 64 and at least 1024 tokens; the merged change reports that geometry as impossible instead. It changes neither scheduling nor execution; it only makes a silent misconfiguration visible.
+- <a href="https://github.com/jundot/omlx/pull/3664" target="_blank" rel="noopener noreferrer"><code>omlx#3664</code></a> — merged, and the one item here that did not come from an experiment. Tool groups in the Responses API were dropped before reaching the chat template, because only entries typed as functions survived the conversion, so a client's namespaced tools never reached the model. It was a bug hit while running the stack.
 
-Hardening #3793 surfaced six defects that the experiment's own workloads could not reach, under conditions such as a second model in the process, multi-token prediction on, an eviction mid-job, and a prompt whose length is an exact multiple of the cache block. Three of them are not only about this runtime: background work must yield **ownership** and not only execution; foreground arrival must be visible process-wide and before execution begins; and a cache watermark is bookkeeping rather than the cache's actual state, so it has to be able to move backward. The invariants are in EXP-003's <code>HARDENING.md</code>.
+Hardening the recovery feature (first #3793, now #3964) surfaced six defects that the experiment's own workloads could not reach, under conditions such as a second model in the process, multi-token prediction on, an eviction mid-job, and a prompt whose length is an exact multiple of the cache block. Three of them apply beyond this runtime: background work must yield **ownership** and not only execution; foreground arrival must be visible process-wide and before execution begins; and a cache watermark is bookkeeping rather than the cache's actual state, so it has to be able to move backward. The invariants are in EXP-003's <code>HARDENING.md</code>.
 
-Taking that mechanism into a real agent workload, after the experiment closed, then exposed two independent defects — in SpecPrefill's draft-cache path, not in background recovery. The upstream fixes are <code>omlx#3840</code> and <code>omlx#3842</code> above. Neither changes EXP-003's result, and neither is a seventh or eighth hardening finding of it.
+After the experiment closed, running the mechanism under a real agent workload exposed two independent defects. Both are in SpecPrefill's draft-cache path, not in background recovery, and their upstream fixes are <code>omlx#3840</code> and <code>omlx#3842</code> above. Neither changes EXP-003's result, and neither counts as a seventh or eighth hardening finding.
 
 ## Evidence and limits
 

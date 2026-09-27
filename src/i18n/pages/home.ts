@@ -44,37 +44,8 @@ export interface CtaLabel {
   label: string;
 }
 
-/**
- * One PRD §5 pillar.
- *
- * `evidence` carries the link to whatever proves that pillar publicly. For AI
- * & Agent Systems and Knowledge Systems it is the SignalForge case study — an
- * inspectable public system built on exactly those two areas. LLM
- * Infrastructure pointed at Study instead, because PRD §12 wrote it as an
- * expertise area on the grounds that its strongest evidence sat in
- * confidential employer systems; the reusable-state study is public,
- * measured, and inspectable, so that ground no longer holds and the pillar
- * carries a case study like the other two. Software Architecture has no
- * single public proof and deliberately carries none. Marking the pillar here
- * rather than matching its name in a component is what keeps the rule intact
- * in both locales — the Chinese pillar is not called "LLM Infrastructure".
- */
-export interface ExpertisePillar extends NamedItem {
-  evidence?: PillarEvidence;
-}
-
-/**
- * Where a pillar's public proof lives. `caseStudy` names a slug under
- * `src/content/work/`, and the component resolves it to the localized detail
- * route; without it the proof is technical writing, and the link goes to
- * Study.
- */
-export interface PillarEvidence extends CtaLabel {
-  caseStudy?: string;
-}
-
 /** The research programs the homepage features; each maps to its links in the component. */
-export type ResearchProjectId = 'laya-apple' | 'llm-inference-systems';
+export type ResearchProjectId = 'laya-apple' | 'llm-inference-systems' | 'deepseek-v4-flash-mi300x';
 
 /**
  * One research program: a name, the one measured result it leads with, one
@@ -168,18 +139,6 @@ export interface HomeStrings extends PageStrings {
     cta: CtaLabel;
   };
   /**
-   * doc-2 §8 (Engineering Focus). Four areas, one short line each.
-   *
-   * The explanatory meta-copy that used to introduce the section is gone: it
-   * described the section instead of adding evidence, which is exactly what
-   * doc-2 §8 asks to be removed. The four areas signal and navigate; they are
-   * not primary evidence, so they carry no section intro of their own.
-   */
-  expertise: {
-    heading: string;
-    pillars: readonly ExpertisePillar[];
-  };
-  /**
    * doc-2 §7. The primary open-source proof; the site source is not (PRD §24).
    *
    * doc-2 §7 cuts this section back to a single statement, the two skill names,
@@ -247,7 +206,10 @@ export interface HomeStrings extends PageStrings {
   systems: {
     eyebrow: string;
     heading: string;
-    /** The two research programs, laya-apple first: it is the one that shipped. */
+    /**
+     * The research programs, laya-apple first: it is the one that shipped. The
+     * MI300X baseline is here so the section does not read as Apple-only work.
+     */
     projects: readonly ResearchProject[];
     /** Internal; each case-study route is resolved by the component, not here. */
     caseStudyCta: CtaLabel;
@@ -337,7 +299,7 @@ export const home = {
       'AI Systems Engineer and System Architect with 10+ years of software engineering experience, building AI systems, developer tooling, model infrastructure, and production software.',
     heading: 'Oliver Yu',
     intro:
-      'I build reliable AI systems for developer workflows, knowledge retrieval, and model infrastructure.',
+      'I build AI products and the LLM inference systems under them, on Apple silicon and AMD GPUs, and trace performance problems to a measured cause.',
     hero: {
       role: 'AI Systems Engineer · System Architect',
       facts: [
@@ -347,7 +309,7 @@ export const home = {
       ],
       workCta: 'View Selected Work',
       writingCta: 'Technical Writing',
-      noBreakSuffix: 'model infrastructure.',
+      noBreakSuffix: 'measured cause.',
     },
     shouri: {
       eyebrow: 'Featured Product',
@@ -361,40 +323,13 @@ export const home = {
       caseStudyCta: { label: 'View Case Study' },
       cta: { label: 'Visit Shouri' },
     },
-    expertise: {
-      heading: 'Engineering Focus',
-      pillars: [
-        {
-          name: 'AI & Agent Systems',
-          description: 'Agent workflows, tool execution, evaluation and recovery.',
-          evidence: { label: 'See the SignalForge case study', caseStudy: 'signalforge' },
-        },
-        {
-          name: 'Knowledge Systems',
-          description: 'Retrieval, grounding and agent-accessible knowledge.',
-          evidence: { label: 'See the SignalForge case study', caseStudy: 'signalforge' },
-        },
-        {
-          name: 'LLM Infrastructure',
-          description: 'Serving, optimization, benchmarking and reliability.',
-          evidence: {
-            label: 'See the LLM inference case study',
-            caseStudy: 'llm-inference-systems',
-          },
-        },
-        {
-          name: 'Software Architecture',
-          description: 'Systems, integration, cloud, security and delivery.',
-        },
-      ],
-    },
     openSource: {
       eyebrow: 'Open Source',
       heading: 'Open Source and Upstream',
       signalforge: {
         heading: 'SignalForge',
         statement:
-          'An event-centric intelligence pipeline: multi-source collection, a cross-day story ledger, and a daily brief validated by code — running every morning.',
+          'An event-centric intelligence pipeline that runs every morning. It collects from multiple sources, tracks stories across days in a ledger, and writes a daily brief that is validated by code.',
         meta: 'MIT · TypeScript · Postgres · Live',
         liveCta: { label: 'Read Today' },
         caseStudyCta: { label: 'View Case Study' },
@@ -418,7 +353,7 @@ export const home = {
             name: 'apple/coremltools#2876',
             href: 'https://github.com/apple/coremltools/pull/2876',
             description:
-              'Releases the GIL around native Core ML prediction only. Came out of the laya-apple research.',
+              'Releases the GIL only for the duration of the native Core ML prediction call. Found during the laya-apple research.',
           },
           {
             name: 'jundot/omlx#3685',
@@ -432,14 +367,14 @@ export const home = {
             href: 'https://github.com/jundot/omlx/pull/3842',
             merged: true,
             description:
-              'Makes the SpecPrefill draft cache produce usable hits on hybrid attention and recurrent models.',
+              'Makes the SpecPrefill draft cache produce usable hits on hybrid attention–recurrent models.',
           },
           {
             name: 'jundot/omlx#3664',
             href: 'https://github.com/jundot/omlx/pull/3664',
             merged: true,
             description:
-              'Carries namespace tool groups through the Responses API, the shape Codex uses for MCP servers.',
+              'Keeps namespace tool groups intact through the Responses API, which is the format Codex uses for MCP servers.',
           },
         ],
         cta: { label: 'All upstream pull requests' },
@@ -459,8 +394,8 @@ export const home = {
             label: 'GPU result return (P50), once synchronous Core ML stopped holding the GIL',
           },
           statement:
-            'Serving on the MLX GPU and the Apple Neural Engine at once. The research traced the added GPU latency to Python’s GIL and sent the fix upstream; laya-apple 1.5 detects a host-side slow state from its own request trace and falls back to the known-safe path.',
-          meta: 'Apple M4 Max · MLX + Core ML · laya-apple 1.5 · apple/coremltools#2876',
+            'Serves requests on the MLX GPU and the Apple Neural Engine at the same time. The research traced the added GPU latency to Python’s GIL and sent the fix upstream. laya-apple 1.5 detects a host-side slow state from its own request trace and falls back to the known-safe path.',
+          meta: 'Apple M4 Max · MLX + Core ML · laya-apple 1.5 on PyPI',
         },
         {
           id: 'llm-inference-systems',
@@ -471,8 +406,20 @@ export const home = {
               'Cumulative latency of a seven-turn session, once reusable prefix state is rebuilt in idle time',
           },
           statement:
-            'What an inference optimization leaves behind for the next request. Three experiments, each with its raw data and figures: reusable prefix state, the cost model of speculative decoding, and background recovery.',
+            'Measures what an inference optimization leaves behind for the next request. Three experiments, each published with its raw data and figures, cover reusable prefix state, the cost model of speculative decoding, and background recovery.',
           meta: 'Apple M4 Max · oMLX · Three experiments · Raw data and figures',
+        },
+        {
+          id: 'deepseek-v4-flash-mi300x',
+          name: 'deepseek-v4-flash-mi300x',
+          stat: {
+            value: '1,275 tok/s',
+            label:
+              'Aggregate output at 64 concurrent requests, 2× MI300X at TP=2; specific to that host and image',
+          },
+          statement:
+            'Kernel-level work to serve DeepSeek V4 Flash on two MI300X GPUs, building on a single-GPU stack: 64-bit addressing across 20 sites in the paged-MQA kernel, a dropped activation argument fixed in the Triton MoE path, and 84 AITER GEMM shapes retuned for TP=2 on gfx942.',
+          meta: 'AMD MI300X · ROCm · vLLM · AITER · Triton',
         },
       ],
       caseStudyCta: { label: 'View Case Study' },
@@ -505,21 +452,22 @@ export const home = {
   zh: {
     title: 'Oliver Yu — AI 系統工程師與系統架構師',
     description:
-      '擁有 10+ 年軟體工程經驗的 AI 系統工程師與系統架構師，專注於 AI 系統、開發者工具、模型基礎架構與正式產品開發。',
+      'AI 系統工程師與系統架構師，有 10+ 年軟體工程經驗，開發 AI 系統、開發者工具、模型基礎架構與正式上線的軟體。',
     heading: 'Oliver Yu',
-    intro: '設計與打造可投入實際使用的 AI 系統，聚焦開發者工作流程、知識檢索與模型基礎架構。',
+    intro:
+      '我開發 AI 產品和底層的 LLM 推論系統，跑在 Apple silicon 與 AMD GPU 上；遇到效能問題，會一路追到有量測佐證的根因。',
     hero: {
-      // PRD §9.1 keeps the role line and `Taiwan` in English in the Chinese
-      // hero; both are standalone lines, so neither mixes languages.
+      // PRD §9.1 keeps the role line in English in the Chinese hero; it is a
+      // standalone line, so it mixes no languages inside a prose block.
       role: 'AI Systems Engineer · System Architect',
       facts: [
-        'laya-apple 1.5 已發布於 PyPI',
+        'laya-apple 1.5 已發布到 PyPI',
         '上游貢獻：Apple coremltools · oMLX',
         '10+ 年軟體工程經驗',
       ],
       workCta: '精選作品',
       writingCta: '技術文章',
-      noBreakSuffix: '模型基礎架構。',
+      noBreakSuffix: '佐證的根因。',
     },
     shouri: {
       eyebrow: '精選產品',
@@ -537,47 +485,21 @@ export const home = {
       caseStudyCta: { label: '查看完整案例' },
       cta: { label: '前往 Shouri' },
     },
-    expertise: {
-      heading: '工程專長',
-      pillars: [
-        {
-          name: 'AI 與 Agent 系統',
-          description: 'Agent 工作流程、工具執行、評估與失敗復原。',
-          evidence: { label: '查看 SignalForge 案例', caseStudy: 'signalforge' },
-        },
-        {
-          name: '知識系統',
-          description: '檢索、溯源，以及讓 Agent 取用的知識。',
-          evidence: { label: '查看 SignalForge 案例', caseStudy: 'signalforge' },
-        },
-        {
-          name: 'LLM 基礎架構',
-          description: '模型服務、推論最佳化、效能量測與穩定性。',
-          evidence: {
-            label: '查看 LLM 推論案例',
-            caseStudy: 'llm-inference-systems',
-          },
-        },
-        {
-          name: '軟體架構',
-          description: '系統設計、系統整合、雲端、資安與交付。',
-        },
-      ],
-    },
     openSource: {
       eyebrow: '開源',
       heading: '開源與上游貢獻',
       signalforge: {
         heading: 'SignalForge',
         statement:
-          '以事件為單位的情報管線：多來源收集、跨日事件帳本、由程式碼驗證的每日重點，每天早上實際運作。',
+          '以事件為單位的情報管線，每天早上執行：從多個來源收集資料，用跨日帳本追蹤事件發展，產出經程式驗證的每日重點。',
         // Facts, not prose: licence, language, store, state (PRD §34).
         meta: 'MIT · TypeScript · Postgres · 線上運作中',
         liveCta: { label: '看今天的重點' },
         caseStudyCta: { label: '查看完整案例' },
         cta: { label: 'GitHub' },
       },
-      statement: '版本化工作流程，整合需求對齊、執行時規劃、驗證與明確的完成條件。',
+      statement:
+        '納入版本控管的工作流程：對齊需求、動手前才規劃、驗證結果，並用明確條件判斷是否完成。',
       // The skill names are repository names, so they read the same in both
       // locales; the component joins them with a middot (doc-2 §7).
       skills: ['backlog-workflow', 'audit-claude-md'],
@@ -594,28 +516,29 @@ export const home = {
           {
             name: 'apple/coremltools#2876',
             href: 'https://github.com/apple/coremltools/pull/2876',
-            description: '只在原生 Core ML prediction 期間釋放 GIL，來自 laya-apple 的研究。',
+            description:
+              '只在原生 Core ML prediction 呼叫期間釋放 GIL，是在 laya-apple 的研究中發現的問題。',
           },
           {
             name: 'jundot/omlx#3685',
             href: 'https://github.com/jundot/omlx/pull/3685',
             merged: true,
             description:
-              '讓 SDPA256 prefill 固定走同一條路徑，相同請求在不同 process 的 temperature 0 輸出一致。',
+              '讓 SDPA256 prefill 固定走同一條路徑，同樣的請求在每個 process 裡的 temperature 0 輸出都相同。',
           },
           {
             name: 'jundot/omlx#3840 + #3842',
             href: 'https://github.com/jundot/omlx/pull/3842',
             merged: true,
             description:
-              '讓 SpecPrefill 的 draft cache 在 attention 與 recurrent 混合的模型上真正命中。',
+              '讓 SpecPrefill 的 draft cache 在 attention 與 recurrent 混合架構的模型上產生可用的命中。',
           },
           {
             name: 'jundot/omlx#3664',
             href: 'https://github.com/jundot/omlx/pull/3664',
             merged: true,
             description:
-              '讓 Responses API 保留 namespace 工具群組，也就是 Codex 接 MCP server 的格式。',
+              '讓 Responses API 完整保留 namespace 工具群組；Codex 就是用這種格式接 MCP server。',
           },
         ],
         cta: { label: '所有上游 PR' },
@@ -632,22 +555,33 @@ export const home = {
           name: 'laya-apple',
           stat: {
             value: '7.67 → 0.14 ms',
-            label: 'GPU 結果回傳（P50），同步 Core ML 不再佔著 GIL 之後',
+            label: 'GPU 結果回傳（P50），同步 Core ML 不再佔住 GIL 前後的對比',
           },
           statement:
-            '讓 MLX GPU 和 Apple Neural Engine 同時提供服務。研究把多出來的 GPU 延遲追到 Python GIL，修正送回上游；laya-apple 1.5 會從自己的請求紀錄判斷主機是否變慢，一旦變慢就退回已知安全的路徑。',
-          meta: 'Apple M4 Max · MLX + Core ML · laya-apple 1.5 · apple/coremltools#2876',
+            '同時用 MLX GPU 和 Apple Neural Engine 處理請求。研究查出 GPU 多出來的延遲來自 Python 的 GIL，並把修正送回上游；laya-apple 1.5 會從自己的請求紀錄判斷主機端是否變慢，一旦變慢就退回已知安全的路徑。',
+          meta: 'Apple M4 Max · MLX + Core ML · laya-apple 1.5 已發布於 PyPI',
         },
         {
           id: 'llm-inference-systems',
           name: 'llm-inference-systems',
           stat: {
             value: '228.38 → 79.06 s',
-            label: '七輪 session 的累積延遲，在閒置時重建可重用前綴之後',
+            label: '七輪 session 的累積延遲，改在閒置時重建可重用前綴狀態前後的對比',
           },
           statement:
-            '一次推論最佳化，會替下一個請求留下什麼。三個實驗都附原始資料與圖表：可重用前綴狀態、推測解碼的成本模型，以及背景補回。',
+            '研究一次推論最佳化會替下一個請求留下什麼。三個實驗都公開原始資料與圖表，主題是可重用的前綴狀態、推測解碼的成本模型，以及背景補回。',
           meta: 'Apple M4 Max · oMLX · 三個實驗 · 原始資料與圖表',
+        },
+        {
+          id: 'deepseek-v4-flash-mi300x',
+          name: 'deepseek-v4-flash-mi300x',
+          stat: {
+            value: '1,275 tok/s',
+            label: '64 個並行請求的總輸出，2× MI300X、TP=2；數字只適用於當時那台主機與那個 image',
+          },
+          statement:
+            '以單 GPU 版本為基礎，從 kernel 層級著手，讓 DeepSeek V4 Flash 能在兩張 MI300X 上服務：paged-MQA kernel 裡 20 處改用 64 位元定址，修正 Triton MoE 路徑漏傳的激活函數參數，並在 gfx942 上針對 TP=2 重新調校 84 組 AITER GEMM 形狀。',
+          meta: 'AMD MI300X · ROCm · vLLM · AITER · Triton',
         },
       ],
       caseStudyCta: { label: '查看完整案例' },
@@ -661,7 +595,7 @@ export const home = {
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
       venue: 'Journal of Information Security and Applications · 2026',
-      summary: '共同發表的研究，探討憑證式加密如何在金鑰持續洩漏的情況下仍能維持安全性。',
+      summary: '與他人合著的研究，主題是在金鑰持續洩漏下仍能保持安全的憑證式加密。',
       cta: { label: '閱讀論文' },
     },
     writing: {

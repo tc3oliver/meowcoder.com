@@ -16,18 +16,19 @@
  *   Featured Research       Can he find and prove a root cause?
  *   Open Source + Upstream  Can I inspect his implementation, and does it
  *                           hold up in other people's projects?
- *   Engineering Focus       What areas does that work sit in?
  *   Research + Writing      Is there deeper technical credibility, and can I
  *                           inspect his technical thinking?
  *   10+ Years strip         What experience supports this?
  *
- * Two consequences of that reordering are deliberate. Engineering Focus moved
- * below Open Source because doc-2 §8 makes it a signalling section rather than
- * evidence, so it must not outrank the two sections a visitor can verify. And
- * Research and Technical Writing are one component rather than two: doc-2 §9
- * makes them a single two-column band, which is `ResearchWritingSection`.
+ * Engineering Focus, doc-2 §8's four areas with a line each, is gone. It was
+ * a signalling section rather than evidence, and once Featured Research and
+ * the upstream list carried the proof it only restated them: two of its
+ * pillars linked to the same case study and a third to a project already
+ * featured above it. Research and Technical Writing are one component rather
+ * than two: doc-2 §9 makes them a single two-column band, which is
+ * `ResearchWritingSection`.
  *
- * The seventh item, the footer, is site chrome and is rendered by `SiteShell`
+ * The last item, the footer, is site chrome and is rendered by `SiteShell`
  * after this component — it is the same link row on every route (PRD §9.8).
  */
 
@@ -35,7 +36,6 @@ import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
 import type { StudyPost } from '../../lib/study-feed';
 import ExperienceSection from './ExperienceSection.astro';
-import ExpertiseSection from './ExpertiseSection.astro';
 import HomeHero from './HomeHero.astro';
 import OpenSourceSection from './OpenSourceSection.astro';
 import ResearchWritingSection from './ResearchWritingSection.astro';
@@ -59,7 +59,6 @@ const { locale, t, posts, externalIndicator } = Astro.props;
   <ShouriSection locale={locale} t={t} externalIndicator={externalIndicator} />
   <SystemsResearchSection locale={locale} t={t} externalIndicator={externalIndicator} />
   <OpenSourceSection locale={locale} t={t} externalIndicator={externalIndicator} />
-  <ExpertiseSection locale={locale} t={t} externalIndicator={externalIndicator} />
   <ResearchWritingSection
     locale={locale}
     t={t}

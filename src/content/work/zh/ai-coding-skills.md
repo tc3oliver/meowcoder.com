@@ -1,8 +1,8 @@
 ---
 title: 'AI Coding Skills'
 type: '開源 · Agent 工程'
-summary: '一套開源的開發工作流程 skill，協助 coding agent 對齊需求、在執行前建立符合當下情境的實作計畫、依專案情境驗證，並按明確條件完成工作。'
-outcome: '採 MIT 授權，可作為 agent skill 或 Claude Code plugin 安裝，也是本站採用的開發流程。'
+summary: '一套開源的開發流程 skill，讓 coding agent 先對齊需求、動手前才擬定實作計畫、用各專案自己的方式驗證，並依明確條件完成工作。'
+outcome: '採 MIT 授權，可安裝成 agent skill 或 Claude Code plugin；本站就是用它開發的。'
 indexMeta: 'MIT · backlog-workflow 1.2.0 · 附單元測試'
 evidence: 'github.com/tc3oliver/skills · backlog-workflow 1.2.0，附有自己的單元測試'
 slug: 'ai-coding-skills'

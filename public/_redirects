@@ -1,7 +1,7 @@
 # Redirects for Cloudflare Workers Static Assets (MCD-13).
 #
 # `/work/reusable-state-economics/` was the portfolio entry for one experiment.
-# The research program it belongs to now has two finished experiments and three
+# The research program it belongs to now has three finished experiments and three
 # threads, so the entry became `/work/llm-inference-systems/` and the old URL
 # points at it rather than competing with it as a second project.
 #

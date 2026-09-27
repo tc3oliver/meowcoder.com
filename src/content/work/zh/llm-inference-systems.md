@@ -1,14 +1,14 @@
 ---
 title: 'LLM Inference Systems'
 type: '系統研究 · LLM 推論'
-summary: '一個持續進行的推論系統研究計畫：從真實互動式 workload 出發，對 runtime 加上量測、隔離出機制、檢查正確性，最後轉成 production 決策或上游修正。目前含三個已完成實驗與三條還開著的研究線。'
-outcome: '三個完成的實驗（可重用狀態與互動延遲、推測解碼成本模型、可重用 canonical 狀態的背景補回）、三條各自寫明還缺什麼證據、都還開著的研究線、十個上游 pull request（八個開著、都不是草稿，兩個已合併），以及一套可重跑的量測工具與完整資料集。'
-indexMeta: 'Apple silicon · 三個實驗 · 三條開著的研究線 · 八個開著的上游 PR、兩個已合併'
+summary: '持續進行中的推論系統研究：從真實的互動式 workload 出發，在 runtime 加上量測、找出背後的機制、檢查正確性，再把結果變成正式環境的決策或上游修正。目前完成三個實驗，另有三條研究線仍在進行。'
+outcome: '三個已完成的實驗：可重用狀態與互動延遲、推測解碼的成本模型、可重用 canonical 狀態的背景補回。另有三條仍在進行的研究線，各自寫明還缺哪些證據；十一個上游 pull request（五個已合併，六個仍開放審查，都不是草稿）；以及一套可重跑的量測工具，附上每張圖背後的完整資料集。'
+indexMeta: 'Apple silicon · 三個實驗 · 三條進行中的研究線 · 上游 PR 五個已合併、六個審查中'
 evidence: 'GitHub 上的 llm-inference-systems · 實驗方法、request 層級 trace、原始資料與圖表'
 slug: 'llm-inference-systems'
 locale: 'zh'
 translationKey: 'llm-inference-systems'
-order: 3
+order: 2
 draft: false
 kind: 'case-study'
 meta:
@@ -19,7 +19,7 @@ meta:
   - label: '範圍'
     value: 'Runtime · Serving · 可重用狀態 · 推測執行 · 正確性 · 異質運算'
   - label: '證據'
-    value: '公開 repo · 已發表文章 · 十個上游 pull request：八個開著、兩個已合併'
+    value: '公開 repo · 已發表文章 · 十一個上游 pull request：五個已合併、六個審查中'
 ---
 
 由 Oliver Yu 獨立研究、量測並提交上游。
@@ -197,11 +197,11 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 </div>
 
-這一組七輪 session 跑之前並沒有先定義前景的延遲目標。把 slice 縮到 512 之後，runtime trace 記錄到的最糟不可中斷 execution slice 是 2.39 s，那是一個請求「可能」要等多久的上界，不是任何人觀測到的延遲；它是一個推導值，不是一個「可以接受」的判斷。
+這組七輪 session 在執行前沒有訂下前景延遲的目標。把 slice 縮到 512 之後，runtime trace 裡最長的不可中斷 execution slice 是 2.39 s；這是推導出來的上界，代表一個請求最多可能要等多久，並不是實際觀測到的延遲，也不代表這個數字可以接受。
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a>
-收了資料集、圖表與限制；功能本身以
-<a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>
-送上游（已開放審查，不是草稿，也還沒有被合併），長文版本在
+收錄了資料集、圖表與限制；功能本身已經以
+<a href="https://github.com/jundot/omlx/pull/3964" target="_blank" rel="noopener noreferrer"><code>omlx#3964</code></a>
+送交上游，目前開放審查、尚未合併。長文版本是
 <a href="https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/" target="_blank" rel="noopener noreferrer">償還 reusable state 的債</a>。
 
 ## 系統主題
@@ -241,22 +241,23 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 - **傳輸層的 request policy**：等真實 workload 證明沒有哪一組設定對每個 request 都適用，才補上這一層。
 - **可重跑的 harness 與資料集**：所有圖表由三個只讀 `data/` 的腳本重畫，沒有任何一格被平滑、內插或反推。
 
-上游的部分共十個。撰寫本文時八個還開著、都不是草稿，也都還沒有審出結論，另外兩個已經合併。開著的 pull request 是提案，不是成果：
+送到上游的 pull request 共十一個：五個已合併；撰寫本文時，另外六個仍開放審查中，都不是草稿。還沒合併的 pull request 只算提案，不算成果：
 
-- <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a>——受保護前綴邊界的正確性修正。它比部署策略先送，因為這是唯一一個改到模型輸入、而不只是改到速度的發現。
-- <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a>——在 Anthropic messages 端點補上 per-request 的 SpecPrefill 欄位，OpenAI 相容端點本來就有。不改上游任何預設值。
-- <a href="https://github.com/jundot/omlx/pull/3685" target="_blank" rel="noopener noreferrer"><code>omlx#3685</code></a>——讓 SDPA-256 的路由變成決定性的。原本每次呼叫都看當下記憶體餘裕才選路，兩個一模一樣的行程因此可能走到不同的浮點歸約；這個修正把符合條件的 prefill 釘在 bounded 那一條。
-- <a href="https://github.com/jundot/omlx/pull/3840" target="_blank" rel="noopener noreferrer"><code>omlx#3840</code></a>——在 hybrid 模型上，第一層可能是沒有 offset 的 recurrent cache，於是一個已經還原成功的 draft cache 會被悄悄當成空的，prompt 疊在它已經持有的狀態上重跑一次，selector 依據的 importance scoring 因此被弄壞。改成從 attention 層取位置。
-- <a href="https://github.com/jundot/omlx/pull/3842" target="_blank" rel="noopener noreferrer"><code>omlx#3842</code></a>——讓 draft cache 的 block 邊界上留下可重用的 recurrent state。相依於 #3840，不應該排在它前面合併。
-- <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a>——prefill OOM 重排路徑上的 SpecPrefill RoPE 清理修正，是做 EXP-003 時發現、獨立送出的。它有自己的重現條件，和背景補回這個功能無關。
-- <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a>——在 mRoPE VLM 上，SpecPrefill 把選中的 token 寫在壓縮後的位置而不是原始位置。這個獨立的正確性缺陷，是在驗證背景補回（PCSR）時暴露出來的；**PCSR 沒有造成它**，把背景補回關掉，它一樣存在。
-- <a href="https://github.com/jundot/omlx/pull/3793" target="_blank" rel="noopener noreferrer"><code>omlx#3793</code></a>——背景 canonical 狀態補回，也就是 EXP-003 的功能本身，相依於 #3811，順序應該排在 #3811 後面，並且向維護者提了一個明確的問題：這個 PR 自己那套背景排程原語，是否應該和上游正在進行的相關工作整合。
-- <a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a>——已合併。ANE 的 prefill 排程器會建議一個 accelerator 根本收不下的 sequence length，因為它要求 64 的倍數、而且至少 1024 token；這個修正改成直接回報這種幾何不可能。它不改排程、也不改執行，只是讓一個沉默的錯誤設定開口說話。
-- <a href="https://github.com/jundot/omlx/pull/3664" target="_blank" rel="noopener noreferrer"><code>omlx#3664</code></a>——已合併，也是這裡唯一不是從實驗來的一項。Responses API 的 tool group 在送到 chat template 之前就被丟掉了，因為轉換只保留型別是 function 的項目，client 帶命名空間的工具因此從來沒有到過模型面前。這是用這套系統時撞到的缺陷，不是某個實驗產出的發現。
+- <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a>——修正受保護前綴邊界的正確性問題。它比效能相關的修改先送出，因為在所有發現中，只有它改變了模型的輸入，而不只是速度。
+- <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a>——在 Anthropic messages 端點補上可逐一請求設定的 SpecPrefill 欄位，與 OpenAI 相容端點既有的功能一致；不改動上游任何預設值。
+- <a href="https://github.com/jundot/omlx/pull/3685" target="_blank" rel="noopener noreferrer"><code>omlx#3685</code></a>——已合併。讓 SDPA-256 的路由結果固定、可重現。原本每次呼叫都依當下的記憶體餘裕選路，兩個其他條件完全相同的行程，可能因此走到不同的浮點歸約；這個修正讓符合條件的 prefill 固定走 bounded 那條路徑。
+- <a href="https://github.com/jundot/omlx/pull/3840" target="_blank" rel="noopener noreferrer"><code>omlx#3840</code></a>——已合併。在 hybrid 模型上，第一層可能是沒有 offset 的 recurrent cache，導致已還原的 draft cache 被默默當成空的；prompt 於是疊在 cache 原本持有的狀態上再 prefill 一次，破壞了 selector 所依據的 importance scoring。修正後改從 attention 層取得位置。
+- <a href="https://github.com/jundot/omlx/pull/3842" target="_blank" rel="noopener noreferrer"><code>omlx#3842</code></a>——已合併。在 draft cache 的 block 邊界保留可重用的 recurrent state。它相依於 #3840，並在其後合併。
+- <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a>——修正 prefill OOM 重新排隊路徑上的 SpecPrefill RoPE 清理問題，是開發 EXP-003 時發現、另外單獨送出的。這是正確性修正，有自己的重現步驟，與背景補回功能無關。
+- <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a>——在 mRoPE VLM 上，SpecPrefill 把選出的 token 寫到壓縮後的位置，而不是原始位置。這個問題是在驗證漸進式 canonical 狀態補回（PCSR）時發現的，但**不是 PCSR 造成的**：關掉背景補回，問題依然存在。
+- <a href="https://github.com/jundot/omlx/pull/3964" target="_blank" rel="noopener noreferrer"><code>omlx#3964</code></a>——背景 canonical 狀態補回，也就是 EXP-003 的功能本身，預設關閉。它取代 #3793：#3793 後來多包了一個後續功能，補回的程式碼則沒有改變。VLM 的驗證以 #3811 為前提，所以 #3811 應該先合併。
+- <a href="https://github.com/jundot/omlx/pull/3962" target="_blank" rel="noopener noreferrer"><code>omlx#3962</code></a>——修正測試隔離問題：圖片解碼快取由整個行程共用，會殘留到下一個測試，只要有圖片測試先跑，某個記憶體壓力測試就會失敗。CI 固定的檔案執行順序剛好把問題藏住，換成其他順序就會出現。
+- <a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a>——已合併。ANE 的 prefill 排程器會建議 accelerator 無法接受的 sequence length：accelerator 要求長度是 64 的倍數，而且至少 1024 token。合併後的修改會直接回報這種幾何配置不可行。它不改排程，也不改執行，只是讓原本不會報錯的錯誤設定浮上檯面。
+- <a href="https://github.com/jundot/omlx/pull/3664" target="_blank" rel="noopener noreferrer"><code>omlx#3664</code></a>——已合併，也是這裡唯一不是來自實驗的一項。Responses API 的 tool group 在送進 chat template 之前就被丟掉，因為轉換時只保留型別為 function 的項目，client 帶命名空間的工具因此從未送到模型。這是實際使用這套系統時遇到的 bug。
 
-在把 #3793 整理到可以送審的過程中，又找出六個缺陷，都是實驗本身的 workload 碰不到的——行程裡有第二個模型、MTP 打開、補回途中遇到 eviction、prompt 長度剛好是 cache block 的整數倍。其中三個不只是這個 runtime 的問題：背景工作要讓出的是**所有權**而不只是執行；前景請求一進來就要被看到，而且要在執行開始之前、跨行程都看得到；cache 的 watermark 是記帳，不是 cache 的實際狀態，所以它必須能往回走。細節與不變式在 EXP-003 的 <code>HARDENING.md</code>。
+強化背景補回功能的過程中（先是 #3793，現在是 #3964），又找出六個實驗本身的 workload 碰不到的缺陷，觸發條件包括：同一行程裡有第二個模型、開啟 MTP、補回途中發生 eviction，以及 prompt 長度剛好是 cache block 的整數倍。其中三個問題不限於這個 runtime：背景工作必須讓出**所有權**，不只是讓出執行；前景請求一到，整個行程都要看得到，而且要在執行開始之前；cache 的 watermark 只是記帳，不等於 cache 的實際狀態，所以必須允許往回移。這些不變式記錄在 EXP-003 的 <code>HARDENING.md</code>。
 
-實驗收尾之後，把這個機制放進真實 agent workload 做 production validation，又暴露出兩個獨立的缺陷——它們在 SpecPrefill 的 draft cache 路徑上，不在背景補回這個機制裡，上游修正是前面的 <code>omlx#3840</code> 與 <code>omlx#3842</code>。兩者都不改變 EXP-003 的結論，也**不是**前面六個 hardening 缺陷的第七、第八個。
+實驗結束後，把這個機制放進真實的 agent workload 執行，又發現兩個獨立的缺陷。它們位在 SpecPrefill 的 draft cache 路徑，不在背景補回機制裡，上游修正就是前面的 <code>omlx#3840</code> 與 <code>omlx#3842</code>。兩者都不影響 EXP-003 的結論，也**不算**前面六個 hardening 缺陷之外的第七、第八個。
 
 ## 證據與限制
 

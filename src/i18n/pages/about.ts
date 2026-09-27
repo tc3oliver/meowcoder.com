@@ -1,4 +1,5 @@
 import type { Locale } from '../locales';
+import { GITHUB_URL } from '../../lib/external';
 import type { PageStrings } from './types';
 
 export interface Credential {
@@ -72,7 +73,6 @@ export interface AboutStrings extends PageStrings {
 export type AboutDictionary = Record<Locale, AboutStrings>;
 
 const PUBLICATION_URL = 'https://doi.org/10.1016/j.jisa.2026.104422';
-const INFERENCE_SYSTEMS_URL = 'https://github.com/tc3oliver/llm-inference-systems';
 
 export const about = {
   en: {
@@ -95,39 +95,39 @@ export const about = {
           period: '2014–2017',
           name: 'Application Engineering',
           description:
-            'Built iOS, mobile, and web applications, establishing a foundation in product delivery and beginning applied AI work in 2017.',
+            'Built and shipped iOS, mobile, and web applications. Started applied AI work in 2017.',
         },
         {
           period: '2018–2020',
           name: 'Software Engineering & Applied AI',
           description:
-            'Expanded applied AI alongside backend services, cloud integration, enterprise workflows, and end-to-end software delivery.',
+            'Continued applied AI work while taking on backend services, cloud integration, enterprise workflows, and end-to-end software delivery.',
         },
         {
           period: '2020–2025',
           name: 'System Architecture & Technical Leadership',
           description:
-            'Took ownership of system architecture, AI integration, engineering practices, project delivery, mentoring, and cross-system integration.',
+            'Owned system architecture, AI integration, engineering practices, project delivery, and cross-system integration, and mentored other engineers.',
         },
         {
           period: '2025–Present',
           name: 'Enterprise AI Systems',
           description:
-            'Focused on enterprise AI systems, coding agents, knowledge systems, model infrastructure, security validation, and continuous evaluation.',
+            'Work on enterprise AI systems: coding agents, knowledge systems, model infrastructure, security validation, and continuous evaluation.',
         },
       ],
       summary:
-        'AI work began in 2017 and developed alongside a broader progression from application delivery to architecture, technical leadership, and enterprise AI systems.',
+        'AI has been part of my work since 2017, while my role moved from application delivery to architecture, technical leadership, and enterprise AI systems.',
       cta: 'Explore Professional Engineering Experience',
       href: '/work/professional-engineering/',
     },
     currentFocus: {
       heading: 'Current Focus — Enterprise AI Systems',
       description:
-        'My current work focuses on enterprise AI systems that connect engineering knowledge, coding agents, model infrastructure, security validation, and continuous evaluation.',
+        'I currently work on enterprise AI systems that connect engineering knowledge, coding agents, model infrastructure, security validation, and continuous evaluation.',
       alt: 'Conceptual architecture of an AI-driven R&D platform connecting enterprise context, agentic development, engineering knowledge, model gateway, and evaluation.',
       caption:
-        'This conceptual architecture illustrates how I approach AI-driven R&D platforms at a system level.',
+        'A conceptual architecture showing how I design AI-driven R&D platforms at the system level.',
     },
     focus: {
       heading: 'Engineering Focus',
@@ -152,11 +152,11 @@ export const about = {
       ],
     },
     systemsResearch: {
-      heading: 'Current Technical Research',
+      heading: 'Systems Research',
       description:
-        'I run independent systems research on LLM inference, mostly on prefill and the reusable KV and prefix state a request leaves behind, and on long-context correctness. The current study looks at how an optimization that speeds up one request changes the cost of the requests that follow it. It is published with its data and figures, and it produced ten upstream pull requests to the oMLX inference server — eight open at the time of writing, two merged.',
-      cta: 'View the research repository',
-      href: INFERENCE_SYSTEMS_URL,
+        'I run independent systems research on LLM inference, on Apple silicon and on AMD GPUs. laya-apple serves requests on the MLX GPU and the Apple Neural Engine at the same time. Its research traced a GPU latency regression to Python’s GIL and sent the fix to Apple coremltools; the result shipped as laya-apple 1.5. A second program, on the oMLX server, studies how an optimization that speeds up one request changes the cost of the requests that follow it. It produced eleven upstream pull requests: five merged, and six open at the time of writing. On AMD, I took DeepSeek V4 Flash from one MI300X to two with kernel-level fixes and AITER GEMM tuning. Each is published with its data.',
+      cta: 'View the research on GitHub',
+      href: GITHUB_URL,
     },
     research: {
       heading: 'Research',
@@ -216,8 +216,8 @@ export const about = {
     role: 'AI 系統工程師 · 系統架構師',
     intro: '具 10+ 年軟體工程經驗，目前在台灣工作。',
     summary: [
-      '技術背景包括企業系統、雲端平台、行動與 Web 應用、軟體安全、機器學習與 AI 系統。',
-      '目前專注於 AI 基礎架構、Coding Agent、知識系統，以及 AI 應用的產品化與落地。',
+      '技術背景涵蓋企業系統、雲端平台、行動與 Web 應用、軟體安全、機器學習與 AI 系統。',
+      '目前專注在 AI 基礎架構、以 agent 為核心的開發者系統、知識系統，以及正式上線的 AI 應用。',
     ],
     career: {
       heading: '職涯歷程',
@@ -226,38 +226,36 @@ export const about = {
         {
           period: '2014–2017',
           name: '應用程式工程',
-          description:
-            '以 iOS、行動與 Web 應用開發為主，建立產品交付與連網應用的工程基礎，並於 2017 年開始參與 AI 應用。',
+          description: '開發並交付 iOS、行動與 Web 應用，2017 年開始做 AI 應用。',
         },
         {
           period: '2018–2020',
           name: '軟體工程與 AI 應用',
-          description:
-            '持續發展 AI 應用，工作範圍也延伸至後端服務、雲端整合、企業流程與端到端軟體交付。',
+          description: '持續做 AI 應用，同時負責後端服務、雲端整合、企業流程與端到端的軟體交付。',
         },
         {
           period: '2020–2025',
           name: '系統架構與技術領導',
-          description: '負責系統架構、AI 整合、工程流程、專案交付、技術經驗傳承與跨系統整合。',
+          description: '負責系統架構、AI 整合、工程實務、專案交付與跨系統整合，並指導其他工程師。',
         },
         {
           period: '2025–至今',
           name: '企業 AI 系統',
           description:
-            '聚焦企業 AI 系統、Coding Agent、知識系統、模型基礎架構、安全驗證與持續評估。',
+            '投入企業 AI 系統：coding agent、知識系統、模型基礎架構、安全驗證與持續評估。',
         },
       ],
       summary:
-        '自 2017 年開始參與 AI 應用，並隨著工程職責擴展，逐步延伸至系統架構、技術領導與企業 AI\u00a0系統。',
+        '從 2017 年起，AI 就一直是我工作的一部分；職責則從應用交付，一路擴展到系統架構、技術領導與企業 AI\u00a0系統。',
       cta: '查看專業工程經歷',
       href: '/zh/work/professional-engineering/',
     },
     currentFocus: {
       heading: '目前方向 — 企業 AI 系統',
       description:
-        '目前專注於企業 AI 系統，整合工程知識、Coding Agent、模型基礎架構、安全驗證與持續評估。',
-      alt: 'AI 驅動研發平台概念架構，整合企業情境、Agentic Development、工程知識、模型閘道與評估機制。',
-      caption: '這張概念架構圖呈現我對 AI 驅動研發平台的系統層級設計方式。',
+        '目前的工作是企業 AI 系統，把工程知識、coding agent、模型基礎架構、安全驗證與持續評估串在一起。',
+      alt: 'AI 驅動研發平台的概念架構，串接企業情境、agentic 開發、工程知識、模型閘道與評估機制。',
+      caption: '這張概念架構圖說明我如何在系統層級設計 AI 驅動的研發平台。',
     },
     focus: {
       heading: '工程專長',
@@ -276,16 +274,16 @@ export const about = {
         },
         {
           name: '資安與應用開發',
-          description: '資安、隱私、Web／行動應用與正式軟體系統。',
+          description: '資安、隱私、Web／行動應用與正式上線的軟體。',
         },
       ],
     },
     systemsResearch: {
-      heading: '目前的技術研究',
+      heading: '系統研究',
       description:
-        '我獨立進行 LLM 推論的系統研究，主要在 prefill、請求留下的可重用 KV 與 prefix 狀態，以及長上下文的正確性。目前的研究探討一項讓單一請求變快的最佳化，如何改變後續請求的成本。研究連同資料與圖表一併公開，並向 oMLX 推論伺服器提交十個上游 pull request：撰寫本文時八個還開著、兩個已合併。',
-      cta: '查看研究儲存庫',
-      href: INFERENCE_SYSTEMS_URL,
+        '我獨立做 LLM 推論的系統研究，平台涵蓋 Apple silicon 與 AMD GPU。laya-apple 同時用 MLX GPU 和 Apple Neural Engine 處理請求；研究查出一個 GPU 延遲退化的原因是 Python 的 GIL，修正已送交 Apple coremltools，成果隨 laya-apple 1.5 發布。另一條研究線以 oMLX 推論伺服器為對象，研究讓單一請求變快的最佳化，會如何改變後續請求的成本，過程中提交了十一個上游 PR：五個已合併，撰寫本文時另外六個仍開放審查中。在 AMD 上，我透過 kernel 層級的修正與 AITER GEMM 調校，讓 DeepSeek V4 Flash 從單張 MI300X 擴展到兩張。每項研究都連同資料公開。',
+      cta: '在 GitHub 查看研究',
+      href: GITHUB_URL,
     },
     research: {
       heading: '研究',
@@ -293,7 +291,8 @@ export const about = {
       record: 'Volume 99 · Article 104422',
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
-      detail: '共同研究抗洩漏憑證式加密，透過金鑰更新機制提升系統在持續金鑰洩漏情境下的安全性。',
+      detail:
+        '與他人合著，研究抗洩漏的憑證式加密：透過金鑰更新機制，讓系統在金鑰持續洩漏的情況下仍能保持安全。',
       areasLabel: '研究主題',
       areas: ['抗洩漏密碼學', '憑證式加密', '側通道安全', '等值測試'],
       cta: '查看論文',

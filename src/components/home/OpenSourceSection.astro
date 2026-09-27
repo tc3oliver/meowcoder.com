@@ -28,7 +28,12 @@
 
 import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
-import { GITHUB_URL, SIGNALFORGE_LIVE_URL, SIGNALFORGE_URL, SKILLS_URL } from '../../lib/external';
+import {
+  SIGNALFORGE_LIVE_URL,
+  SIGNALFORGE_URL,
+  SKILLS_URL,
+  UPSTREAM_PRS_URL,
+} from '../../lib/external';
 import { localizePath, workDetailRoute } from '../../lib/i18n';
 import WorkflowDiagram from '../WorkflowDiagram.astro';
 import CtaLink from './CtaLink.astro';
@@ -86,7 +91,7 @@ const skills = t.openSource.skills.join(' · ');
           label={t.openSource.signalforge.cta.label}
           external
           indicator={externalIndicator}
-          variant="outline"
+          variant="text"
         />
       </div>
     </div>
@@ -112,7 +117,7 @@ const skills = t.openSource.skills.join(' · ');
           label={t.openSource.cta.label}
           external
           indicator={externalIndicator}
-          variant="outline"
+          variant="text"
         />
       </div>
     </div>
@@ -137,11 +142,11 @@ const skills = t.openSource.skills.join(' · ');
     </ul>
     <div class="oss__actions">
       <CtaLink
-        href={GITHUB_URL}
+        href={UPSTREAM_PRS_URL}
         label={t.openSource.upstream.cta.label}
         external
         indicator={externalIndicator}
-        variant="outline"
+        variant="text"
       />
     </div>
   </div>
@@ -241,6 +246,7 @@ const skills = t.openSource.skills.join(' · ');
   .oss__actions {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: var(--space-3);
   }
 </style>

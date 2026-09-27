@@ -1,14 +1,14 @@
 ---
 title: 'SignalForge'
 type: '開源 · 知識與 Agent 系統'
-summary: '自架的情報系統：把十幾個來源的雜訊收進來，整理成去重的事件、跨日的變化、正在成形的趨勢，最後產出一頁每個數字都查得到出處的每日重點。'
+summary: '自架的情報系統：把多個來源的雜訊收進來，整理成去重後的事件、跨日的變化與正在成形的趨勢，最後產出一份每項內容都查得到出處的每日重點。'
 outcome: '每天早上自動跑完，不用人顧；每日重點裡的每個來源引用和每個數字，都先經過程式碼驗證才發布。'
 indexMeta: 'MIT · TypeScript · Postgres · 雙 session agent runtime'
 evidence: 'signal.meowcoder.com · 每天實際產出的每日重點，加上 GitHub 上的完整原始碼'
 slug: 'signalforge'
 locale: 'zh'
 translationKey: 'signalforge'
-order: 1
+order: 3
 draft: false
 meta:
   - label: '狀態'

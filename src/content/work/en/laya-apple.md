@@ -1,14 +1,14 @@
 ---
 title: 'Adaptive Heterogeneous Inference on Apple Silicon'
 type: 'Systems Research · Inference Runtime'
-summary: 'Debugging Python’s GIL, Core ML execution, and host scheduling to build a self-recovering MLX GPU + Neural Engine runtime.'
+summary: 'Tracing latency through Python’s GIL, Core ML execution, and host scheduling, then building a self-recovering MLX GPU + Neural Engine runtime.'
 outcome: 'laya-apple 1.5 serves short requests on the Neural Engine through Core ML’s asynchronous API, detects a host-side slow state from its own request trace, and falls back to the known-safe 1.4 path. GPU result return fell from 4.28–8.60 ms to 0.035–0.043 ms across 154 validation episodes, with no mismatch, lost request or crash.'
 indexMeta: 'Apple M4 Max · MLX GPU + Neural Engine · Shipped in laya-apple 1.5 · Upstream: apple/coremltools#2876'
 evidence: 'laya-apple on GitHub · research map, preregistered gates, and the raw data behind every study'
 slug: 'laya-apple'
 locale: 'en'
 translationKey: 'laya-apple'
-order: 2
+order: 1
 draft: false
 kind: 'case-study'
 meta:

@@ -1,14 +1,14 @@
 ---
 title: 'Apple Silicon 上的自適應異質推論'
 type: '系統研究 · 推論 Runtime'
-summary: '從 Python GIL、Core ML 的執行方式一路追到 macOS 排程，最後做出一套會自己偵測、自己復原的 MLX GPU + Neural Engine 推論 runtime。'
-outcome: 'laya-apple 1.5 讓短請求透過 Core ML 非同步 API 交給 Neural Engine，並從自己的 `RequestTrace` 判斷主機是否變慢，一旦變慢就退回 1.4 路徑。在 154 段重疊時段的驗證中，GPU 結果回傳從 4.28–8.60 ms 降到 0.035–0.043 ms，沒有出現輸出不一致、掉請求或當機。'
+summary: '從 Python GIL、Core ML 的執行方式一路追到 macOS 排程，最後做出一套能自行偵測並復原的 MLX GPU + Neural Engine 推論 runtime。'
+outcome: 'laya-apple 1.5 讓短請求透過 Core ML 非同步 API 交給 Neural Engine，並從自己的 `RequestTrace` 判斷主機是否變慢，一旦變慢就退回已知安全的 1.4 路徑。在 154 段重疊時段的驗證中，GPU 結果回傳從 4.28–8.60 ms 降到 0.035–0.043 ms，沒有出現輸出不一致、掉請求或當機。'
 indexMeta: 'Apple M4 Max · MLX GPU + Neural Engine · 已於 laya-apple 1.5 發布 · 上游 PR：apple/coremltools#2876'
 evidence: 'GitHub 上的 laya-apple · 研究地圖、事先登錄的驗收標準，以及每項研究的原始資料'
 slug: 'laya-apple'
 locale: 'zh'
 translationKey: 'laya-apple'
-order: 2
+order: 1
 draft: false
 kind: 'case-study'
 meta:

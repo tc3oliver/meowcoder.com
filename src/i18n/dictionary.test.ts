@@ -110,7 +110,7 @@ describe('homepage SEO strings (PRD §30)', () => {
   it('matches the Chinese wording the PRD specifies verbatim', () => {
     expect(home.zh.title).toBe('Oliver Yu — AI 系統工程師與系統架構師');
     expect(home.zh.description).toBe(
-      '擁有 10+ 年軟體工程經驗的 AI 系統工程師與系統架構師，專注於 AI 系統、開發者工具、模型基礎架構與正式產品開發。',
+      'AI 系統工程師與系統架構師，有 10+ 年軟體工程經驗，開發 AI 系統、開發者工具、模型基礎架構與正式上線的軟體。',
     );
   });
 

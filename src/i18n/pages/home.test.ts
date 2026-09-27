@@ -79,20 +79,6 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     ]);
   });
 
-  it('presents exactly the four PRD §5 pillars, each with one explanation', () => {
-    expect(t.expertise.pillars).toHaveLength(4);
-    expect(t.expertise.pillars.every((pillar) => pillar.description.length > 0)).toBe(true);
-  });
-
-  it('keeps Engineering Focus to one short line per area (doc-2 §8)', () => {
-    // doc-2 §8 demotes this section below Shouri and Open Source, and short
-    // copy is half of how that reads. The old descriptions were technology
-    // inventories two to three times this long.
-    for (const pillar of t.expertise.pillars) {
-      expect(pillar.description.length).toBeLessThanOrEqual(64);
-    }
-  });
-
   it('carries only what doc-2 §7 leaves on the homepage', () => {
     // doc-2 §7 fixes the Skills half: eyebrow, heading, one statement, the
     // two skill names, the workflow visual, and two actions. The SignalForge
@@ -167,51 +153,21 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     //
     // The permitted mentions are links to published open-source work — the
     // opposite of the confidential employer systems this rule protects: doc-2
-    // §7's link to the AI Coding Skills case study, and any pillar whose
-    // evidence names a case study by slug. Each is exempted by identity rather
+    // §7's link to the AI Coding Skills case study, and the Featured Research
+    // projects' links to their own case studies. Each is exempted by identity rather
     // than by pattern, so any *other* case-study claim appearing anywhere in
     // the homepage strings still fails here.
     const CASE_STUDY = [/case study/i, /案例/];
     const permitted = new Set([
       t.openSource.caseStudyCta.label,
       t.openSource.signalforge.caseStudyCta.label,
-      ...t.expertise.pillars.flatMap((pillar) =>
-        pillar.evidence?.caseStudy ? [pillar.evidence.label] : [],
-      ),
+      t.systems.caseStudyCta.label,
     ]);
 
     for (const pattern of CASE_STUDY) {
       const claims = strings(t).filter((value) => pattern.test(value));
       expect(claims.filter((value) => !permitted.has(value))).toEqual([]);
     }
-  });
-
-  it('backs every evidenced pillar with a case study that exists', () => {
-    // Both locales, which is the point: the Chinese pillars have different
-    // names, so this cannot be enforced by matching the English ones.
-    //
-    // LLM Infrastructure used to be the exception, pointing at Study because
-    // PRD §12 wrote it as an expertise area whose strongest evidence sat in
-    // confidential employer systems. The reusable-state study is public and
-    // inspectable, so it now carries a case study like the other two, and no
-    // pillar falls back to Study.
-    //
-    // The slug must name a real Work entry; the component resolves it to a
-    // route, and a typo would ship a dead link from the homepage.
-    const PUBLISHED = new Set(['signalforge', 'llm-inference-systems']);
-
-    // PRD §5 fixes the order: the first three pillars carry evidence and
-    // Software Architecture, the fourth, deliberately carries none.
-    expect(t.expertise.pillars.filter((pillar) => pillar.evidence)).toHaveLength(3);
-    expect(t.expertise.pillars[3]?.evidence).toBeUndefined();
-
-    for (const pillar of t.expertise.pillars) {
-      if (!pillar.evidence) continue;
-      expect(pillar.evidence.caseStudy, `${pillar.name} points nowhere inspectable`).toBeDefined();
-      expect(PUBLISHED.has(pillar.evidence.caseStudy!), `${pillar.name}`).toBe(true);
-    }
-
-    expect(t.expertise.pillars[2]?.evidence?.caseStudy).toBe('llm-inference-systems');
   });
 
   it('carries only what doc-2 §9 leaves in the Research column', () => {
@@ -278,7 +234,7 @@ describe('requirement wording', () => {
   it('quotes the doc-2 §5 hero verbatim in English', () => {
     expect(home.en.hero.role).toBe('AI Systems Engineer · System Architect');
     expect(home.en.intro).toBe(
-      'I build reliable AI systems for developer workflows, knowledge retrieval, and model infrastructure.',
+      'I build AI products and the LLM inference systems under them, on Apple silicon and AMD GPUs, and trace performance problems to a measured cause.',
     );
     expect(home.en.hero.facts.at(-1)).toBe('10+ Years in Software Engineering');
     expect(home.en.hero.workCta).toBe('View Selected Work');
@@ -287,7 +243,7 @@ describe('requirement wording', () => {
 
   it('quotes the doc-2 §5 hero statement verbatim in Chinese', () => {
     expect(home.zh.intro).toBe(
-      '設計與打造可投入實際使用的 AI 系統，聚焦開發者工作流程、知識檢索與模型基礎架構。',
+      '我開發 AI 產品和底層的 LLM 推論系統，跑在 Apple silicon 與 AMD GPU 上；遇到效能問題，會一路追到有量測佐證的根因。',
     );
     // doc-2 §5 keeps the role line in English in both locales.
     expect(home.zh.hero.role).toBe('AI Systems Engineer · System Architect');
@@ -306,21 +262,6 @@ describe('requirement wording', () => {
     expect(home.zh.shouri.summary).toBe(
       '先完整保存，再依需要交給 AI 整理；原始內容始終保留，不會被 AI 整理結果覆蓋。',
     );
-  });
-
-  it('quotes the PRD §5 pillar names and doc-2 §8 descriptions verbatim in English', () => {
-    expect(home.en.expertise.pillars.map((pillar) => pillar.name)).toEqual([
-      'AI & Agent Systems',
-      'Knowledge Systems',
-      'LLM Infrastructure',
-      'Software Architecture',
-    ]);
-    expect(home.en.expertise.pillars.map((pillar) => pillar.description)).toEqual([
-      'Agent workflows, tool execution, evaluation and recovery.',
-      'Retrieval, grounding and agent-accessible knowledge.',
-      'Serving, optimization, benchmarking and reliability.',
-      'Systems, integration, cloud, security and delivery.',
-    ]);
   });
 
   it('quotes the doc-2 §10 credibility strip verbatim in English', () => {
@@ -436,7 +377,7 @@ describe('content language rules (PRD §34)', () => {
     t.shouri.summary,
     // The Shouri principles are no longer prose: doc-2 §6 reduces them to three
     // names, which PRD §34 exempts as product vocabulary.
-    ...t.expertise.pillars.map((pillar) => pillar.description),
+    ...t.systems.projects.map((project) => project.statement),
     t.openSource.statement,
     t.openSource.signalforge.statement,
     // doc-2 §9 leaves the Research column one prose block: `detail` moved to
@@ -467,6 +408,20 @@ describe('content language rules (PRD §34)', () => {
       'Pocock',
       'MIT',
       'License',
+      'Apple',
+      'silicon',
+      'AMD',
+      'Neural',
+      'Engine',
+      'Python',
+      'MLX',
+      'laya-apple',
+      'DeepSeek',
+      'V4',
+      'Flash',
+      'MI300X',
+      'Triton',
+      'AITER',
       // Established technical terminology.
       'AI',
       'Agent',
@@ -479,6 +434,14 @@ describe('content language rules (PRD §34)', () => {
       'ROCm',
       'CI',
       'CD',
+      'GPU',
+      'GIL',
+      'kernel',
+      'paged-MQA',
+      'MoE',
+      'GEMM',
+      'TP',
+      'gfx942',
     ]);
     // The publication's scheme and security-notion names — `LR-CBEET`,
     // `IND-CCA`, `OW-CCA` — are deliberately absent: doc-2 §9 moved the only
@@ -500,7 +463,9 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
       'laya-apple': { en: LAYA_EN, zh: LAYA_ZH },
       'llm-inference-systems': { en: INFERENCE_EN, zh: INFERENCE_ZH },
     };
-    for (const project of t.systems.projects) {
+    // The MI300X baseline has no case study; its 1,275 tok/s is quoted from
+    // the repository README's "Validated TP=2 results" table.
+    for (const project of t.systems.projects.filter((p) => p.id in CASE_STUDIES)) {
       const source = CASE_STUDIES[project.id][_locale];
       for (const number of project.stat.value.match(/\d+(?:\.\d+)?/g) ?? []) {
         expect(source).toContain(number);
@@ -508,10 +473,11 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
     }
   });
 
-  it('leads with the project that shipped', () => {
+  it('leads with the project that shipped, and is not Apple-only', () => {
     expect(t.systems.projects.map((project) => project.id)).toEqual([
       'laya-apple',
       'llm-inference-systems',
+      'deepseek-v4-flash-mi300x',
     ]);
   });
 });

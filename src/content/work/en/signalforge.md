@@ -8,7 +8,7 @@ evidence: 'signal.meowcoder.com · the live daily brief, plus the full source on
 slug: 'signalforge'
 locale: 'en'
 translationKey: 'signalforge'
-order: 1
+order: 3
 draft: false
 meta:
   - label: 'Status'

@@ -13,6 +13,9 @@ export const STUDY_URL = 'https://study.meowcoder.com';
 /** Implementation and open source proof (PRD §6). */
 export const GITHUB_URL = 'https://github.com/tc3oliver';
 
+/** The profile's full upstream pull-request record, regenerated weekly from GitHub. */
+export const UPSTREAM_PRS_URL = 'https://github.com/tc3oliver#more-oss-contributions';
+
 /** AI Coding Skills source repository. */
 export const SKILLS_URL = 'https://github.com/tc3oliver/skills';
 
@@ -58,6 +61,9 @@ export const LAYA_APPLE_URL = 'https://github.com/tc3oliver/laya-apple';
  */
 export const LAYA_APPLE_ARTICLE_URL =
   'https://study.meowcoder.com/posts/260927-laya-apple-gpu-ane-concurrency/';
+
+/** The DeepSeek V4 Flash serving baseline on 2× AMD MI300X — the ROCm proof. */
+export const MI300X_URL = 'https://github.com/tc3oliver/deepseek-v4-flash-mi300x';
 
 /** The LLM inference research repository — experiments, raw data and figures. */
 export const INFERENCE_SYSTEMS_URL = 'https://github.com/tc3oliver/llm-inference-systems';
