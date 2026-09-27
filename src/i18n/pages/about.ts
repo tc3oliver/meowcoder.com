@@ -217,7 +217,7 @@ export const about = {
     intro: '具 10+ 年軟體工程經驗，目前在台灣工作。',
     summary: [
       '技術背景涵蓋企業系統、雲端平台、行動與 Web 應用、軟體安全、機器學習與 AI 系統。',
-      '目前專注在 AI 基礎架構、以 agent 為核心的開發者系統、知識系統，以及正式上線的 AI 應用。',
+      '目前專注於 AI 基礎架構、以 agent 為核心的開發者系統、知識系統，以及實際上線的 AI 應用。',
     ],
     career: {
       heading: '職涯歷程',
@@ -226,7 +226,7 @@ export const about = {
         {
           period: '2014–2017',
           name: '應用程式工程',
-          description: '開發並交付 iOS、行動與 Web 應用，2017 年開始做 AI 應用。',
+          description: '開發並交付 iOS 與 Web 應用，2017 年開始投入 AI 應用開發。',
         },
         {
           period: '2018–2020',
@@ -253,7 +253,7 @@ export const about = {
     currentFocus: {
       heading: '目前方向 — 企業 AI 系統',
       description:
-        '目前的工作是企業 AI 系統，把工程知識、coding agent、模型基礎架構、安全驗證與持續評估串在一起。',
+        '目前專注於企業 AI 系統，將工程知識、coding agent、模型基礎架構、安全驗證與持續評估整合在同一套系統中。',
       alt: 'AI 驅動研發平台的概念架構，串接企業情境、agentic 開發、工程知識、模型閘道與評估機制。',
       caption: '這張概念架構圖說明我如何在系統層級設計 AI 驅動的研發平台。',
     },
@@ -281,7 +281,7 @@ export const about = {
     systemsResearch: {
       heading: '系統研究',
       description:
-        '我獨立做 LLM 推論的系統研究，平台涵蓋 Apple silicon 與 AMD GPU。laya-apple 同時用 MLX GPU 和 Apple Neural Engine 處理請求；研究查出一個 GPU 延遲退化的原因是 Python 的 GIL，修正已送交 Apple coremltools，成果隨 laya-apple 1.5 發布。另一條研究線以 oMLX 推論伺服器為對象，研究讓單一請求變快的最佳化，會如何改變後續請求的成本，過程中提交了十一個上游 PR：五個已合併，撰寫本文時另外六個仍開放審查中。在 AMD 上，我透過 kernel 層級的修正與 AITER GEMM 調校，讓 DeepSeek V4 Flash 從單張 MI300X 擴展到兩張。每項研究都連同資料公開。',
+        '我獨立做 LLM 推論的系統研究，平台涵蓋 Apple silicon 與 AMD GPU。laya-apple 同時用 MLX GPU 和 Apple Neural Engine 處理請求；研究查出一個 GPU 延遲退化的原因是 Python 的 GIL，修正已送交 Apple coremltools，成果隨 laya-apple 1.5 發布。另一條研究線以 oMLX 推論伺服器為對象，研究單一請求的最佳化會如何影響後續請求成本，過程中提交了十一個上游 PR：五個已合併，撰寫本文時另外六個仍開放審查中。在 AMD 上，我透過 kernel 層級的修正與 AITER GEMM 調校，讓 DeepSeek V4 Flash 從單張 MI300X 擴展到兩張。每項研究都連同資料公開。',
       cta: '在 GitHub 查看研究',
       href: GITHUB_URL,
     },
@@ -292,7 +292,7 @@ export const about = {
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
       detail:
-        '與他人合著，研究抗洩漏的憑證式加密：透過金鑰更新機制，讓系統在金鑰持續洩漏的情況下仍能保持安全。',
+        '共同發表的研究，探討抗洩漏憑證式加密：透過金鑰更新機制，讓系統在金鑰持續洩漏的情況下仍能維持安全性。',
       areasLabel: '研究主題',
       areas: ['抗洩漏密碼學', '憑證式加密', '側通道安全', '等值測試'],
       cta: '查看論文',

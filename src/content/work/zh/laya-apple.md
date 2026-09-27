@@ -93,7 +93,7 @@ Profile 只能說明兩件事同時發生，所以再用 2×2 實驗確認因果
 
 但放進實際的請求組合後，沒有一種能確定是安全的。獨立 process 在兩個模型上都沒過驗收：laya 的短請求 P99 多了 17.5%（上限 5%），typed-decisions 多了 73.3%。釋放 GIL 的 thread 在三個模型上全部失敗，代價轉嫁到 Neural Engine 的短請求。Prebound binding 在只測重疊時段的實驗流程下有兩個模型通過，但在同一個流程下，原本失敗的釋放 GIL thread 也通過了，所以這個 PASS 不能歸功於減少 Python 與 Objective-C 之間的來回。換成完整流程後，prebound binding 在 n = 12 時判定幾乎不可能達標，提前停止，短請求 P99 是 1.4 路徑的 1.409 倍。Core ML 非同步 API 在篩選實驗裡照樣會變慢（見下一節），所以只留作快速路徑的候選，不算解法。
 
-Prebound 的 PASS 和 FAIL 各自只在產生它的實驗流程下成立，事後沒有改寫任何一個。
+Prebound 的 PASS 與 FAIL 都只適用於各自的實驗流程，事後沒有重新分類任何結果。
 
 <div class="decision">
 
@@ -115,7 +115,7 @@ Core ML 非同步 API 讓 GPU 回傳維持在 0.035 ms，吞吐量也不輸 1.4 
 
 接著試了兩種排程介入：dependency QoS override，以及把 dispatcher 設為 USER_INITIATED QoS。兩種都確實生效（讀回的 QoS 是 0x19），但沒有一次把 Neural Engine dispatcher 從 E-core 移走。QoS 這條路到此為止。
 
-這是很強的相關，但不是已經證明的因果。目前沒有任何研究能說明 macOS 為什麼把這些 thread 排到 E-core，這裡也不去猜。
+相關性很強，但還不能視為已證明的因果關係。目前沒有證據能說明 macOS 為什麼把這些 thread 排到 E-core，這裡也不猜原因。
 
 ## 從預防改成復原
 

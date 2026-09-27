@@ -2,7 +2,7 @@
 title: 'LLM Inference Systems'
 type: '系統研究 · LLM 推論'
 summary: '持續進行中的推論系統研究：從真實的互動式 workload 出發，在 runtime 加上量測、找出背後的機制、檢查正確性，再把結果變成正式環境的決策或上游修正。目前完成三個實驗，另有三條研究線仍在進行。'
-outcome: '三個已完成的實驗：可重用狀態與互動延遲、推測解碼的成本模型、可重用 canonical 狀態的背景補回。另有三條仍在進行的研究線，各自寫明還缺哪些證據；十一個上游 pull request（五個已合併，六個仍開放審查，都不是草稿）；以及一套可重跑的量測工具，附上每張圖背後的完整資料集。'
+outcome: '目前完成三個實驗：可重用狀態與互動延遲、推測解碼成本模型，以及 canonical 狀態的背景重建。另外還有三條進行中的研究線、十一個上游 pull request（五個已合併、六個審查中），以及可重跑的量測工具與完整資料集。'
 indexMeta: 'Apple silicon · 三個實驗 · 三條進行中的研究線 · 上游 PR 五個已合併、六個審查中'
 evidence: 'GitHub 上的 llm-inference-systems · 實驗方法、request 層級 trace、原始資料與圖表'
 slug: 'llm-inference-systems'
@@ -154,7 +154,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 這個實驗問的是：**推測解碼在什麼條件下真的省時間？決定 break-even 的是 acceptance rate，還是一次 verify cycle 的成本？**
 
-答案是後者。acceptance rate 是這個機制最常被拿來報的數字，而 36 次量測之後的結論是：那是錯的數字——高 acceptance rate 並不保證變快。真正決定划不划算的是**一次 verify cycle 的代價，以 dense decode step 為單位**，而這個代價屬於模型本身，不屬於內容。
+答案是後者。36 次量測後，結果很明確：acceptance rate 本身不足以判斷是否加速，高 acceptance rate 並不保證變快。真正決定划不划算的是**一次 verify cycle 的代價，以 dense decode step 為單位**，而這個代價屬於模型本身，不屬於內容。
 
 - 在 35B-A3B MoE 上，一次驗證四個位置的 verify forward 相當於 2.43 個 dense step；固定 draft depth 3 在 code 上比 dense 慢 10%、在 prose 上慢 44%，而這兩格量到的 acceptance 分別是 56% 與 25%。
 - 在同一個 runtime 上，dense 27B 的同樣一次 forward 只相當於 1.37 個 dense step；在配對的 13.6K coding prompt 上，推測解碼 decode 快 1.81 倍（同一列的端到端是 1.05 倍）——acceptance 是 79%。
@@ -206,7 +206,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 ## 系統主題
 
-下面這兩條沒有做成實驗，因為它們各自還缺關鍵證據。第三條開著的研究線是跨 runtime 的比較，這裡沒有寫；那條線的內容本來就是一句話：受控比較不存在，也沒有人跑過。三條在 repo 裡都有支撐證據，但都還不是結論。
+下面這兩條沒有做成實驗，因為它們各自還缺關鍵證據。第三條研究線是跨 runtime 比較，這裡沒有展開，因為目前還沒有可用的受控比較資料。三條在 repo 裡都有支撐證據，但都還不是結論。
 
 ### 正確性：快而錯就是 regression
 

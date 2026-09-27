@@ -461,7 +461,7 @@ export const home = {
       'AI 系統工程師與系統架構師，有 10+ 年軟體工程經驗，開發 AI 系統、開發者工具、模型基礎架構與正式上線的軟體。',
     heading: 'Oliver Yu',
     intro:
-      '我開發 AI 產品和底層的 LLM 推論系統，跑在 Apple silicon 與 AMD GPU 上；遇到效能問題，會一路追到有量測佐證的根因。',
+      '我開發 AI 產品與 LLM 推論系統，跑在 Apple silicon 和 AMD GPU 上。遇到效能問題，就一路追到能用量測證明的原因。',
     hero: {
       // PRD §9.1 keeps the role line in English in the Chinese hero; it is a
       // standalone line, so it mixes no languages inside a prose block.
@@ -473,7 +473,7 @@ export const home = {
       ],
       workCta: '精選作品',
       writingCta: '技術文章',
-      noBreakSuffix: '佐證的根因。',
+      noBreakSuffix: '證明的原因。',
     },
     shouri: {
       eyebrow: '精選產品',
@@ -497,7 +497,7 @@ export const home = {
       signalforge: {
         heading: 'SignalForge',
         statement:
-          '以事件為單位的情報管線，每天早上執行：從多個來源收集資料，用跨日帳本追蹤事件發展，產出經程式驗證的每日重點。',
+          '事件導向的情報管線。每天早上從多個來源收集資料，用跨日紀錄追蹤事件發展，再產出經程式驗證的每日重點。',
         // Facts, not prose: licence, language, store, state (PRD §34).
         meta: 'MIT · TypeScript · Postgres · 線上運作中',
         liveCta: { label: '看今天的重點' },
@@ -505,7 +505,7 @@ export const home = {
         cta: { label: 'GitHub' },
       },
       statement:
-        '納入版本控管的工作流程：對齊需求、動手前才規劃、驗證結果，並用明確條件判斷是否完成。',
+        '可版本控管的 AI coding workflow：先對齊需求，執行前才規劃，依專案實際設定驗證，最後用明確條件判斷是否完成。',
       // The skill names are repository names, so they read the same in both
       // locales; the component joins them with a middot (doc-2 §7).
       skills: ['backlog-workflow', 'audit-claude-md'],
@@ -523,21 +523,21 @@ export const home = {
             name: 'apple/coremltools#2876',
             href: 'https://github.com/apple/coremltools/pull/2876',
             description:
-              '只在原生 Core ML prediction 呼叫期間釋放 GIL，是在 laya-apple 的研究中發現的問題。',
+              'laya-apple 的研究定位到 Core ML prediction 持有 GIL 的問題；修正方式是只在原生 prediction 呼叫期間釋放 GIL。',
           },
           {
             name: 'jundot/omlx#3685',
             href: 'https://github.com/jundot/omlx/pull/3685',
             merged: true,
             description:
-              '讓 SDPA256 prefill 固定走同一條路徑，同樣的請求在每個 process 裡的 temperature 0 輸出都相同。',
+              '讓 SDPA256 prefill 固定走一致的路徑，確保同一請求在不同 process 下的 temperature=0 輸出一致。',
           },
           {
             name: 'jundot/omlx#3840 + #3842',
             href: 'https://github.com/jundot/omlx/pull/3842',
             merged: true,
             description:
-              '讓 SpecPrefill 的 draft cache 在 attention 與 recurrent 混合架構的模型上產生可用的命中。',
+              '修正 hybrid attention/recurrent 模型上的 SpecPrefill draft cache reuse，讓 cache hit 真正生效。',
           },
           {
             name: 'jundot/omlx#3664',
@@ -561,10 +561,10 @@ export const home = {
           name: 'laya-apple',
           stat: {
             value: '7.67 → 0.14 ms',
-            label: 'GPU 結果回傳（P50），同步 Core ML 不再佔住 GIL 前後的對比',
+            label: 'GPU 結果回傳時間（P50）：同步 Core ML 釋放 GIL 前後的差異',
           },
           statement:
-            '同時用 MLX GPU 和 Apple Neural Engine 處理請求。研究查出 GPU 多出來的延遲來自 Python 的 GIL，並把修正送回上游；laya-apple 1.5 會從自己的請求紀錄判斷主機端是否變慢，一旦變慢就退回已知安全的路徑。',
+            '同時用 MLX GPU 和 Apple Neural Engine 處理請求。研究最後定位到 Core ML prediction 持有 Python GIL，導致 GPU 額外延遲，修正也已送回上游。laya-apple 1.5 會透過 RequestTrace 偵測主機端變慢，發生時自動退回已知安全的路徑。',
           meta: 'Apple M4 Max · MLX + Core ML · laya-apple 1.5 已發布於 PyPI',
           articleCta: { label: '閱讀長文' },
         },
@@ -573,10 +573,10 @@ export const home = {
           name: 'llm-inference-systems',
           stat: {
             value: '228.38 → 79.06 s',
-            label: '七輪 session 的累積延遲，改在閒置時重建可重用前綴狀態前後的對比',
+            label: '七輪 session 累積延遲：在閒置時重建可重用前綴狀態前後的差異',
           },
           statement:
-            '研究一次推論最佳化會替下一個請求留下什麼。三個實驗都公開原始資料與圖表，主題是可重用的前綴狀態、推測解碼的成本模型，以及背景補回。',
+            '研究單次推論的最佳化，會怎麼影響後續請求。三個實驗都公開原始資料與圖表，分別研究前綴狀態重用、推測解碼成本，以及背景重建。',
           meta: 'Apple M4 Max · oMLX · 三個實驗 · 原始資料與圖表',
         },
         {
@@ -584,10 +584,10 @@ export const home = {
           name: 'deepseek-v4-flash-mi300x',
           stat: {
             value: '1,275 tok/s',
-            label: '64 個並行請求的總輸出，2× MI300X、TP=2；數字只適用於當時那台主機與那個 image',
+            label: '64 個並行請求的總輸出，2× MI300X、TP=2；結果僅適用於該次測試環境',
           },
           statement:
-            '以單 GPU 版本為基礎，從 kernel 層級著手，讓 DeepSeek V4 Flash 能在兩張 MI300X 上服務：paged-MQA kernel 裡 20 處改用 64 位元定址，修正 Triton MoE 路徑漏傳的激活函數參數，並在 gfx942 上針對 TP=2 重新調校 84 組 AITER GEMM 形狀。',
+            '以單 GPU 版本為基礎，從 kernel 層級著手，讓 DeepSeek V4 Flash 能在兩張 MI300X 上服務：將 paged-MQA kernel 的 20 處定址改為 64 位元，補上 Triton MoE 路徑遺漏的 activation function 參數，並針對 gfx942 + TP=2 重新調校 84 組 AITER GEMM shape。',
           meta: 'AMD MI300X · ROCm · vLLM · AITER · Triton',
         },
       ],
@@ -602,7 +602,7 @@ export const home = {
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
       venue: 'Journal of Information Security and Applications · 2026',
-      summary: '與他人合著的研究，主題是在金鑰持續洩漏下仍能保持安全的憑證式加密。',
+      summary: '共同發表的研究，探討如何讓憑證式加密在金鑰持續洩漏的情況下維持安全性。',
       cta: { label: '閱讀論文' },
     },
     writing: {

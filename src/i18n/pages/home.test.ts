@@ -243,7 +243,7 @@ describe('requirement wording', () => {
 
   it('quotes the doc-2 §5 hero statement verbatim in Chinese', () => {
     expect(home.zh.intro).toBe(
-      '我開發 AI 產品和底層的 LLM 推論系統，跑在 Apple silicon 與 AMD GPU 上；遇到效能問題，會一路追到有量測佐證的根因。',
+      '我開發 AI 產品與 LLM 推論系統，跑在 Apple silicon 和 AMD GPU 上。遇到效能問題，就一路追到能用量測證明的原因。',
     );
     // doc-2 §5 keeps the role line in English in both locales.
     expect(home.zh.hero.role).toBe('AI Systems Engineer · System Architect');
@@ -442,6 +442,10 @@ describe('content language rules (PRD §34)', () => {
       'GEMM',
       'TP',
       'gfx942',
+      'Core',
+      'ML',
+      'prediction',
+      'RequestTrace',
     ]);
     // The publication's scheme and security-notion names — `LR-CBEET`,
     // `IND-CCA`, `OW-CCA` — are deliberately absent: doc-2 §9 moved the only
