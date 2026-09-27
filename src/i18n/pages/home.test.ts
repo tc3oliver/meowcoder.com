@@ -472,8 +472,8 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
       'laya-apple': { en: LAYA_EN, zh: LAYA_ZH },
       'llm-inference-systems': { en: INFERENCE_EN, zh: INFERENCE_ZH },
     };
-    // The MI300X baseline has no case study; its 1,275 tok/s is quoted from
-    // the repository README's "Validated TP=2 results" table.
+    // The MI300X baseline has no case study; its 1,474 tok/s is quoted from
+    // bench-results/README.md's concurrent sub-agent table (32 streams).
     for (const project of t.systems.projects.filter((p) => p.id in CASE_STUDIES)) {
       const source = CASE_STUDIES[project.id][_locale];
       for (const number of project.stat.value.match(/\d+(?:\.\d+)?/g) ?? []) {

@@ -419,9 +419,9 @@ export const home = {
           id: 'deepseek-v4-flash-mi300x',
           name: 'deepseek-v4-flash-mi300x',
           stat: {
-            value: '1,275 tok/s',
+            value: '1,474 tok/s',
             label:
-              'Aggregate output at 64 concurrent requests, 2× MI300X at TP=2; specific to that host and image',
+              'Aggregate output with 32 concurrent coding sub-agents, 2× MI300X at TP=2; specific to that host and image',
           },
           statement:
             'Kernel-level work to serve DeepSeek V4 Flash on two MI300X GPUs, building on a single-GPU stack: 64-bit addressing across 20 sites in the paged-MQA kernel, a dropped activation argument fixed in the Triton MoE path, and 84 AITER GEMM shapes retuned for TP=2 on gfx942.',
@@ -583,8 +583,9 @@ export const home = {
           id: 'deepseek-v4-flash-mi300x',
           name: 'deepseek-v4-flash-mi300x',
           stat: {
-            value: '1,275 tok/s',
-            label: '64 個並行請求的總輸出，2× MI300X、TP=2；結果僅適用於該次測試環境',
+            value: '1,474 tok/s',
+            label:
+              '32 個 coding sub-agent 同時執行時的總輸出，2× MI300X、TP=2；結果僅適用於該次測試環境',
           },
           statement:
             '以單 GPU 版本為基礎，從 kernel 層級著手，讓 DeepSeek V4 Flash 能在兩張 MI300X 上服務：將 paged-MQA kernel 的 20 處定址改為 64 位元，補上 Triton MoE 路徑遺漏的 activation function 參數，並針對 gfx942 + TP=2 重新調校 84 組 AITER GEMM shape。',
