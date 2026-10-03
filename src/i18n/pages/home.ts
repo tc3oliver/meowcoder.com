@@ -45,7 +45,8 @@ export interface CtaLabel {
 }
 
 /** The research programs the homepage features; each maps to its links in the component. */
-export type ResearchProjectId = 'laya-apple' | 'llm-inference-systems' | 'deepseek-v4-flash-mi300x';
+export type ResearchProjectId =
+  'laya-apple' | 'llm-inference-systems' | 'deepseek-v4-flash-mi300x' | 'qwen3.8-27b-5070ti-eval';
 
 /**
  * One research program: a name, the one measured result it leads with, one
@@ -205,8 +206,8 @@ export interface HomeStrings extends PageStrings {
     cta: CtaLabel;
   };
   /**
-   * The research proof: two programs, each led by one measured result, with
-   * three actions each — the case study, the Study article, and the repository.
+   * The research proof: four programs, each led by one measured result, with
+   * up to three actions — the case study, the Study article, and the repository.
    */
   systems: {
     eyebrow: string;
@@ -427,6 +428,18 @@ export const home = {
             'Kernel-level work to serve DeepSeek V4 Flash on two MI300X GPUs, building on a single-GPU stack: 64-bit addressing across 20 sites in the paged-MQA kernel, a dropped activation argument fixed in the Triton MoE path, and 84 AITER GEMM shapes retuned for TP=2 on gfx942.',
           meta: 'AMD MI300X · ROCm · vLLM · AITER · Triton',
         },
+        {
+          id: 'qwen3.8-27b-5070ti-eval',
+          name: 'qwen3.8-27b-5070ti-eval',
+          stat: {
+            value: '92.1 %',
+            label:
+              'HumanEval+ pass@1, 151 of 164 tasks (95 % CI 86.9–95.3 %), on a single 16 GB RTX 5070 Ti',
+          },
+          statement:
+            'A pre-registered evaluation of a 27B model on one 16 GB desktop GPU, published with its raw data and graders. Code decodes at a median 155 tok/s and Chinese at 74–81 tok/s; the speed tracks how many speculative-decoding drafts are accepted. Round 1 makes no comparison: the first competitor spilled out of VRAM mid-run, and that run was declared invalid.',
+          meta: 'RTX 5070 Ti 16 GB · llama.cpp + MTP · Round 1 · Raw data and graders',
+        },
       ],
       caseStudyCta: { label: 'View Case Study' },
       articleCta: { label: 'Read the Article (Chinese)' },
@@ -590,6 +603,18 @@ export const home = {
           statement:
             '以單 GPU 版本為基礎，從 kernel 層級著手，讓 DeepSeek V4 Flash 能在兩張 MI300X 上服務：將 paged-MQA kernel 的 20 處定址改為 64 位元，補上 Triton MoE 路徑遺漏的 activation function 參數，並針對 gfx942 + TP=2 重新調校 84 組 AITER GEMM shape。',
           meta: 'AMD MI300X · ROCm · vLLM · AITER · Triton',
+        },
+        {
+          id: 'qwen3.8-27b-5070ti-eval',
+          name: 'qwen3.8-27b-5070ti-eval',
+          stat: {
+            value: '92.1 %',
+            label:
+              'HumanEval+ pass@1：164 題通過 151 題（95 % CI 86.9–95.3 %），只用一張 16 GB 的 RTX 5070 Ti',
+          },
+          statement:
+            '先寫好評測協定再開跑，在一張 16 GB 的桌機顯示卡上實測 27B 模型，原始資料和評分程式都一起公開。寫程式的解碼速度中位數是 155 tok/s，寫中文是 74–81 tok/s，速度跟著推測解碼的草稿接受率走。第一個對手模型跑到一半 VRAM 溢出，那次結果作廢，所以第 1 輪不做任何比較。',
+          meta: 'RTX 5070 Ti 16 GB · llama.cpp + MTP · 第 1 輪 · 原始資料與評分程式',
         },
       ],
       caseStudyCta: { label: '查看完整案例' },

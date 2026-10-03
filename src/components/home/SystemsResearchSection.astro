@@ -1,7 +1,8 @@
 ---
 /**
- * Featured Research — laya-apple, LLM Inference Systems, and the MI300X
- * DeepSeek V4 Flash baseline: Apple silicon and AMD ROCm side by side.
+ * Featured Research — laya-apple, LLM Inference Systems, the MI300X
+ * DeepSeek V4 Flash baseline, and the Qwen3.8-27B evaluation on one RTX 5070
+ * Ti: Apple silicon, AMD ROCm and a consumer NVIDIA card side by side.
  *
  * The homepage had no route to the site's deepest engineering evidence: two
  * research programs with raw data behind every number, and the upstream fixes
@@ -17,7 +18,8 @@
  * Every number in `home.ts` for this section is quoted from the project's own
  * case study, which names the data it comes from — or, for the MI300X baseline,
  * which has no case study, from `bench-results/README.md`'s concurrent
- * sub-agent table.
+ * sub-agent table; for the RTX 5070 Ti evaluation, from the repository's
+ * `EVIDENCE-INDEX.md`, quoting each ID's value as written.
  */
 
 import type { Locale } from '../../i18n/locales';
@@ -29,6 +31,7 @@ import {
   LAYA_APPLE_ARTICLE_URL,
   LAYA_APPLE_URL,
   MI300X_URL,
+  QWEN38_5070TI_URL,
 } from '../../lib/external';
 import { localizePath, workDetailRoute } from '../../lib/i18n';
 import CtaLink from './CtaLink.astro';
@@ -62,6 +65,7 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
     repo: INFERENCE_SYSTEMS_URL,
   },
   'deepseek-v4-flash-mi300x': { repo: MI300X_URL },
+  'qwen3.8-27b-5070ti-eval': { repo: QWEN38_5070TI_URL },
 };
 ---
 
@@ -110,8 +114,9 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
 </HomeSection>
 
 <style>
-  /* Three projects in a row on a desktop, two on a tablet, one on a phone. `minmax(0, 1fr)` keeps a long number from forcing a 390px
-     viewport wider than the screen. */
+  /* Two projects in a row from a tablet up, so four sit as a 2 × 2 grid with
+     no card left alone on a row; one on a phone. `minmax(0, 1fr)` keeps a long
+     number from forcing a 390px viewport wider than the screen. */
   .research-projects {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -121,12 +126,6 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
   @media (width >= 48rem) {
     .research-projects {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (width >= 64rem) {
-    .research-projects {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 

@@ -451,6 +451,12 @@ describe('content language rules (PRD §34)', () => {
       'shape',
       'coding',
       'workflow',
+      // Units: `16 GB`, `155 tok/s`, and the B of a parameter count like 27B.
+      'GB',
+      'tok',
+      's',
+      'B',
+      'VRAM',
     ]);
     // The publication's scheme and security-notion names — `LR-CBEET`,
     // `IND-CCA`, `OW-CCA` — are deliberately absent: doc-2 §9 moved the only
@@ -473,7 +479,9 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
       'llm-inference-systems': { en: INFERENCE_EN, zh: INFERENCE_ZH },
     };
     // The MI300X baseline has no case study; its 1,474 tok/s is quoted from
-    // bench-results/README.md's concurrent sub-agent table (32 streams).
+    // bench-results/README.md's concurrent sub-agent table (32 streams). The
+    // RTX 5070 Ti evaluation has none either; its 92.1 % is E01 in the
+    // repository's EVIDENCE-INDEX.md.
     for (const project of t.systems.projects.filter((p) => p.id in CASE_STUDIES)) {
       const source = CASE_STUDIES[project.id][_locale];
       for (const number of project.stat.value.match(/\d+(?:\.\d+)?/g) ?? []) {
@@ -487,6 +495,7 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
       'laya-apple',
       'llm-inference-systems',
       'deepseek-v4-flash-mi300x',
+      'qwen3.8-27b-5070ti-eval',
     ]);
   });
 });
