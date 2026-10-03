@@ -31,6 +31,7 @@ import {
   LAYA_APPLE_ARTICLE_URL,
   LAYA_APPLE_URL,
   MI300X_URL,
+  QWEN38_5070TI_ARTICLE_URL,
   QWEN38_5070TI_URL,
 } from '../../lib/external';
 import { localizePath, workDetailRoute } from '../../lib/i18n';
@@ -65,7 +66,7 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
     repo: INFERENCE_SYSTEMS_URL,
   },
   'deepseek-v4-flash-mi300x': { repo: MI300X_URL },
-  'qwen3.8-27b-5070ti-eval': { repo: QWEN38_5070TI_URL },
+  'qwen3.8-27b-5070ti-eval': { article: QWEN38_5070TI_ARTICLE_URL, repo: QWEN38_5070TI_URL },
 };
 ---
 
@@ -95,7 +96,7 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
                   label={project.articleCta?.label ?? t.systems.articleCta.label}
                   external
                   indicator={externalIndicator}
-                  variant="text"
+                  variant={links.slug ? 'text' : 'outline'}
                 />
               )}
               <CtaLink
@@ -103,7 +104,7 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
                 label={t.systems.cta.label}
                 external
                 indicator={externalIndicator}
-                variant={links.slug ? 'text' : 'outline'}
+                variant={links.slug || links.article ? 'text' : 'outline'}
               />
             </div>
           </article>
@@ -173,8 +174,9 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
     letter-spacing: var(--tracking-normal);
   }
 
-  /* One outlined action per project, the case study; the article and the
-     repository are text links beside it, so each card has a clear primary. */
+  /* One outlined action per project: the case study, else the article, else
+     the repository. The rest are text links beside it, so each card has a
+     clear primary. */
   .project__actions {
     display: flex;
     flex-wrap: wrap;

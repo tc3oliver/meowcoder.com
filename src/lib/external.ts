@@ -68,6 +68,10 @@ export const MI300X_URL = 'https://github.com/tc3oliver/deepseek-v4-flash-mi300x
 /** The Qwen3.8-27B evaluation on one RTX 5070 Ti — the consumer-GPU proof. */
 export const QWEN38_5070TI_URL = 'https://github.com/tc3oliver/qwen3.8-27b-5070ti-eval';
 
+/** The long-form write-up of round 1 of the RTX 5070 Ti evaluation, in Chinese on Study. */
+export const QWEN38_5070TI_ARTICLE_URL =
+  'https://study.meowcoder.com/posts/261003-qwen38-27b-5070ti-round1/';
+
 /** The LLM inference research repository — experiments, raw data and figures. */
 export const INFERENCE_SYSTEMS_URL = 'https://github.com/tc3oliver/llm-inference-systems';
 
