@@ -84,8 +84,8 @@ export const about = {
     role: 'AI Systems Engineer · System Architect',
     intro: '10+ years of software engineering experience, based in Taiwan.',
     summary: [
-      'My background spans enterprise systems, cloud platforms, mobile and web applications, software security, machine learning, and AI systems.',
-      'I now focus on AI infrastructure, agentic developer systems, knowledge systems, and production AI applications.',
+      'I started with iOS and web apps, picked up applied AI in 2017, and moved through backend and cloud work into system architecture.',
+      'These days I build enterprise AI systems at work and do independent research on LLM inference.',
     ],
     career: {
       heading: 'Career',
@@ -116,9 +116,8 @@ export const about = {
             'Work on enterprise AI systems: coding agents, knowledge systems, model infrastructure, security validation, and continuous evaluation.',
         },
       ],
-      summary:
-        'AI has been part of my work since 2017, while my role moved from application delivery to architecture, technical leadership, and enterprise AI systems.',
-      cta: 'Explore Professional Engineering Experience',
+      summary: 'Representative systems from each stage are on a separate page.',
+      cta: 'More on my engineering work',
       href: '/work/professional-engineering/',
     },
     currentFocus: {
@@ -126,8 +125,7 @@ export const about = {
       description:
         'I currently work on enterprise AI systems that connect engineering knowledge, coding agents, model infrastructure, security validation, and continuous evaluation.',
       alt: 'Conceptual architecture of an AI-driven R&D platform connecting enterprise context, agentic development, engineering knowledge, model gateway, and evaluation.',
-      caption:
-        'A conceptual architecture showing how I design AI-driven R&D platforms at the system level.',
+      caption: 'A conceptual architecture for an AI-driven R&D platform.',
     },
     focus: {
       heading: 'Engineering Focus',
@@ -147,7 +145,7 @@ export const about = {
         },
         {
           name: 'Security & Application Engineering',
-          description: 'Security, privacy, web and mobile applications, and production software.',
+          description: 'Security and privacy, plus web and mobile apps.',
         },
       ],
     },
@@ -216,8 +214,8 @@ export const about = {
     role: 'AI 系統工程師 · 系統架構師',
     intro: '具 10+ 年軟體工程經驗，目前在台灣工作。',
     summary: [
-      '技術背景涵蓋企業系統、雲端平台、行動與 Web 應用、軟體安全、機器學習與 AI 系統。',
-      '目前專注於 AI 基礎架構、以 agent 為核心的開發者系統、知識系統，以及實際上線的 AI 應用。',
+      '我從 iOS 和 Web 應用做起，2017 年開始投入 AI 應用，之後負責後端和雲端，再轉到系統架構。',
+      '現在工作上做企業 AI 系統，另外獨立做 LLM 推論的研究。',
     ],
     career: {
       heading: '職涯歷程',
@@ -245,9 +243,8 @@ export const about = {
             '投入企業 AI 系統：coding agent、知識系統、模型基礎架構、安全驗證與持續評估。',
         },
       ],
-      summary:
-        '從 2017 年起，AI 就一直是我工作的一部分；職責則從應用交付，一路擴展到系統架構、技術領導與企業 AI\u00a0系統。',
-      cta: '查看專業工程經歷',
+      summary: '各階段做過的代表性系統，整理在另一頁。',
+      cta: '看更多工程經歷',
       href: '/zh/work/professional-engineering/',
     },
     currentFocus: {
@@ -255,7 +252,7 @@ export const about = {
       description:
         '目前專注於企業 AI 系統，將工程知識、coding agent、模型基礎架構、安全驗證與持續評估整合在同一套系統中。',
       alt: 'AI 驅動研發平台的概念架構，串接企業情境、agentic 開發、工程知識、模型閘道與評估機制。',
-      caption: '這張概念架構圖說明我如何在系統層級設計 AI 驅動的研發平台。',
+      caption: 'AI 驅動研發平台的概念架構圖。',
     },
     focus: {
       heading: '工程專長',
@@ -274,7 +271,7 @@ export const about = {
         },
         {
           name: '資安與應用開發',
-          description: '資安、隱私、Web／行動應用與正式上線的軟體。',
+          description: '資安、隱私，以及 Web／行動應用。',
         },
       ],
     },
