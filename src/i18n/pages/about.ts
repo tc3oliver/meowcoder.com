@@ -8,7 +8,7 @@ export interface Credential {
   note?: string;
 }
 
-export interface AboutStrings extends PageStrings {
+export interface AboutStrings extends Omit<PageStrings, 'intro'> {
   eyebrow: string;
   role: string;
   summary: readonly string[];
@@ -82,7 +82,6 @@ export const about = {
     eyebrow: 'About Oliver',
     heading: 'Oliver Yu',
     role: 'AI Systems Engineer · System Architect',
-    intro: 'Based in Taiwan.',
     summary: [
       'I started with iOS and web apps, picked up applied AI in 2017, and moved through backend and cloud work into system architecture.',
       'These days I build enterprise AI systems at work and do independent research on LLM inference.',
@@ -212,7 +211,6 @@ export const about = {
     eyebrow: '關於 Oliver',
     heading: 'Oliver Yu',
     role: 'AI 系統工程師 · 系統架構師',
-    intro: '目前在台灣工作。',
     summary: [
       '我從 iOS 和 Web 應用做起，2017 年開始投入 AI 應用，之後負責後端和雲端，再轉到系統架構。',
       '現在工作上做企業 AI 系統，另外獨立做 LLM 推論的研究。',

@@ -15,7 +15,6 @@ const { t } = Astro.props;
     <p class="about__eyebrow">{t.eyebrow}</p>
     <h1>{t.heading}</h1>
     <p class="about__role">{t.role}</p>
-    <p class="about__lede">{t.intro}</p>
     {t.summary.map((paragraph) => <p class="about__paragraph">{paragraph}</p>)}
   </header>
 
@@ -145,12 +144,6 @@ const { t } = Astro.props;
     font-size: var(--text-lg);
     font-weight: var(--weight-medium);
     line-height: var(--leading-snug);
-  }
-
-  .about__lede {
-    font-size: var(--text-md);
-    line-height: var(--leading-relaxed);
-    margin-block-start: var(--space-2);
   }
 
   .about__paragraph,
