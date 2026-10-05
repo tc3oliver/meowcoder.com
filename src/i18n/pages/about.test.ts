@@ -83,7 +83,7 @@ describe('credential wording', () => {
 describe('core positioning', () => {
   it('preserves the English principles and professional identity', () => {
     expect(about.en.role).toBe('AI Systems Engineer · System Architect');
-    expect(about.en.intro).toContain('10+ years');
+    expect(about.en.intro).toContain('Taiwan');
     expect(about.en.principles.statement).toBe(
       'Reliable AI systems require more than capable models.',
     );
@@ -99,7 +99,7 @@ describe('core positioning', () => {
 
   it('preserves the natural Chinese principles and professional identity', () => {
     expect(about.zh.role).toBe('AI 系統工程師 · 系統架構師');
-    expect(about.zh.intro).toContain('10+ 年');
+    expect(about.zh.intro).toContain('台灣');
     expect(about.zh.principles.statement).toBe('可靠的 AI 系統，靠的不只是夠強的模型。');
   });
 });

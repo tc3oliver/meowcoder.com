@@ -1,8 +1,8 @@
 ---
 title: 'Professional Engineering Experience'
-type: 'Professional Experience · 10+ Years'
-summary: '10+ years of software engineering experience, from application and enterprise systems to system architecture and AI systems.'
-outcome: 'A decade-long progression from application and enterprise engineering to system architecture and AI systems.'
+type: 'Professional Experience · 2014–Present'
+summary: 'From application and enterprise systems to system architecture and AI systems.'
+outcome: 'A progression from application and enterprise engineering to system architecture and AI systems.'
 indexMeta: 'Mobile · Enterprise · Cloud · Architecture · AI'
 kind: 'experience'
 slug: 'professional-engineering'
@@ -12,7 +12,7 @@ order: 5
 draft: false
 meta:
   - label: 'Experience'
-    value: '10+ Years'
+    value: '2014–Present'
   - label: 'Progression'
     value: 'Application Engineering → Enterprise Systems & Architecture → Enterprise AI Systems'
 ---

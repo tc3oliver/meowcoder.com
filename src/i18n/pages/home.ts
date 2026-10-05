@@ -89,8 +89,9 @@ export interface HomeStrings extends PageStrings {
    *
    * `facts` carried a second entry, `Taiwan`, also in English in both
    * locales. It was the only fact that was not about the work, which put a
-   * bare country name at the same weight as a decade of engineering, and in
-   * the Chinese hero it told a Taiwanese reader nothing, in English. A
+   * bare country name at the same weight as the work facts (a career-length
+   * fact sat beside it then and has since been dropped), and in the Chinese
+   * hero it told a Taiwanese reader nothing, in English. A
    * location is worth stating when it answers something — a timezone for
    * someone deciding whether to work together — and the bare name did not.
    */
@@ -308,11 +309,7 @@ export const home = {
       'I build AI products and the LLM inference systems under them, on Apple silicon and AMD GPUs, and trace performance problems to a measured cause.',
     hero: {
       role: 'AI Systems Engineer · System Architect',
-      facts: [
-        'laya-apple 1.5 on PyPI',
-        'Upstream: Apple coremltools · oMLX',
-        '10+ Years in Software Engineering',
-      ],
+      facts: ['laya-apple 1.5 on PyPI', 'Upstream: Apple coremltools · oMLX'],
       workCta: 'View Selected Work',
       writingCta: 'Technical Writing',
       noBreakSuffix: 'measured cause.',
@@ -462,7 +459,7 @@ export const home = {
       cta: { label: 'Explore Technical Writing' },
     },
     experience: {
-      heading: '10+ Years of Engineering',
+      heading: 'Engineering Background',
       progression: 'Software engineering → system architecture → AI systems',
       summary: 'Experience across enterprise software, cloud, security, mobile/web and applied AI.',
       cta: { label: 'About Oliver' },
@@ -479,11 +476,7 @@ export const home = {
       // PRD §9.1 keeps the role line in English in the Chinese hero; it is a
       // standalone line, so it mixes no languages inside a prose block.
       role: 'AI Systems Engineer · System Architect',
-      facts: [
-        'laya-apple 1.5 已發布到 PyPI',
-        '上游貢獻：Apple coremltools · oMLX',
-        '10+ 年軟體工程經驗',
-      ],
+      facts: ['laya-apple 1.5 已發布到 PyPI', '上游貢獻：Apple coremltools · oMLX'],
       workCta: '精選作品',
       writingCta: '技術文章',
       noBreakSuffix: '證明的原因。',
@@ -639,7 +632,7 @@ export const home = {
       cta: { label: '瀏覽技術文章' },
     },
     experience: {
-      heading: '10+ 年工程經驗',
+      heading: '工程背景',
       progression: '軟體工程 → 系統架構 → AI 系統',
       summary: '經歷涵蓋企業軟體、雲端、資安、行動／網頁應用與 AI 系統。',
       cta: { label: '關於 Oliver' },

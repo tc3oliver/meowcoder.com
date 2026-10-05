@@ -82,14 +82,14 @@ export const about = {
     eyebrow: 'About Oliver',
     heading: 'Oliver Yu',
     role: 'AI Systems Engineer · System Architect',
-    intro: '10+ years of software engineering experience, based in Taiwan.',
+    intro: 'Based in Taiwan.',
     summary: [
       'I started with iOS and web apps, picked up applied AI in 2017, and moved through backend and cloud work into system architecture.',
       'These days I build enterprise AI systems at work and do independent research on LLM inference.',
     ],
     career: {
       heading: 'Career',
-      label: '10+ Years',
+      label: '2014–Present',
       stages: [
         {
           period: '2014–2017',
@@ -212,14 +212,14 @@ export const about = {
     eyebrow: '關於 Oliver',
     heading: 'Oliver Yu',
     role: 'AI 系統工程師 · 系統架構師',
-    intro: '具 10+ 年軟體工程經驗，目前在台灣工作。',
+    intro: '目前在台灣工作。',
     summary: [
       '我從 iOS 和 Web 應用做起，2017 年開始投入 AI 應用，之後負責後端和雲端，再轉到系統架構。',
       '現在工作上做企業 AI 系統，另外獨立做 LLM 推論的研究。',
     ],
     career: {
       heading: '職涯歷程',
-      label: '10+ 年',
+      label: '2014–至今',
       stages: [
         {
           period: '2014–2017',

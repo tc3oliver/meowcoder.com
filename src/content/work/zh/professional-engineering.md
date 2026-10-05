@@ -1,8 +1,8 @@
 ---
 title: '專業工程經歷'
-type: '專業經歷 · 10+ 年'
-summary: '10+ 年軟體工程經驗，從應用程式與企業系統開發，逐步延伸至系統架構與 AI 系統。'
-outcome: '從應用程式與企業系統開發，逐步延伸至系統架構與 AI 系統的 10+ 年工程歷程。'
+type: '專業經歷 · 2014–至今'
+summary: '從應用程式與企業系統開發，逐步延伸至系統架構與 AI 系統。'
+outcome: '從應用程式與企業系統開發，逐步延伸至系統架構與 AI 系統的工程歷程。'
 indexMeta: 'Mobile · Enterprise · Cloud · Architecture · AI'
 kind: 'experience'
 slug: 'professional-engineering'
@@ -11,8 +11,8 @@ translationKey: 'professional-engineering'
 order: 5
 draft: false
 meta:
-  - label: '年資'
-    value: '10+ 年'
+  - label: '期間'
+    value: '2014–至今'
   - label: '歷程'
     value: '應用程式工程 → 企業系統與系統架構 → 企業 AI 系統'
 ---

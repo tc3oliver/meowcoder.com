@@ -39,14 +39,14 @@ const BY_LOCALE = LOCALES.map((locale) => [locale, home[locale]] as const);
 
 describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
   it('states only facts about the work in the hero', () => {
-    // Three verifiable facts: a shipped release, where the upstream work went,
-    // and the length of the career. `Taiwan` used to sit here — the only entry
-    // that was not about the work. Names rather than counts, because a count
-    // of pull requests is stale the week the next one merges.
-    expect(t.hero.facts).toHaveLength(3);
+    // Two verifiable facts: a shipped release and where the upstream work went.
+    // `Taiwan` used to sit here, the one entry not about the work; the length
+    // of the career went too, because the owner asked to stop leading with
+    // years. Names rather than counts, because a count of pull requests is
+    // stale the week the next one merges.
+    expect(t.hero.facts).toHaveLength(2);
     expect(t.hero.facts[0]).toMatch(/laya-apple 1\.5/);
     expect(t.hero.facts[1]).toMatch(/coremltools/);
-    expect(t.hero.facts[2]).toMatch(/10\+/);
     expect(t.hero.facts.join(' ')).not.toMatch(/\d+ (merged|pull requests|PRs)/i);
   });
 
@@ -236,7 +236,6 @@ describe('requirement wording', () => {
     expect(home.en.intro).toBe(
       'I build AI products and the LLM inference systems under them, on Apple silicon and AMD GPUs, and trace performance problems to a measured cause.',
     );
-    expect(home.en.hero.facts.at(-1)).toBe('10+ Years in Software Engineering');
     expect(home.en.hero.workCta).toBe('View Selected Work');
     expect(home.en.hero.writingCta).toBe('Technical Writing');
   });
@@ -247,7 +246,6 @@ describe('requirement wording', () => {
     );
     // doc-2 §5 keeps the role line in English in both locales.
     expect(home.zh.hero.role).toBe('AI Systems Engineer · System Architect');
-    expect(home.zh.hero.facts.at(-1)).toBe('10+ 年軟體工程經驗');
   });
 
   it('quotes the doc-2 §6 Shouri product statement verbatim in English', () => {
@@ -264,8 +262,10 @@ describe('requirement wording', () => {
     );
   });
 
-  it('quotes the doc-2 §10 credibility strip verbatim in English', () => {
-    expect(home.en.experience.heading).toBe('10+ Years of Engineering');
+  it('quotes the doc-2 §10 credibility strip in English', () => {
+    // The heading deliberately differs from doc-2 §10 ("10+ Years of Engineering"):
+    // the owner asked to stop leading with years. The arc below it carries the claim.
+    expect(home.en.experience.heading).toBe('Engineering Background');
     expect(home.en.experience.progression).toBe(
       'Software engineering → system architecture → AI systems',
     );
@@ -275,8 +275,9 @@ describe('requirement wording', () => {
     expect(home.en.experience.cta.label).toBe('About Oliver');
   });
 
-  it('quotes the doc-2 §10 credibility strip verbatim in Chinese', () => {
-    expect(home.zh.experience.heading).toBe('10+ 年工程經驗');
+  it('quotes the doc-2 §10 credibility strip in Chinese', () => {
+    // The heading deliberately differs from doc-2 §10: the owner asked to stop leading with years.
+    expect(home.zh.experience.heading).toBe('工程背景');
     expect(home.zh.experience.progression).toBe('軟體工程 → 系統架構 → AI 系統');
     expect(home.zh.experience.summary).toBe(
       '經歷涵蓋企業軟體、雲端、資安、行動／網頁應用與 AI 系統。',
