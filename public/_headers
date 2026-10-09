@@ -5,7 +5,8 @@
 #
 #   - zero executable JavaScript — every <script> is application/ld+json, a
 #     data block browsers do not execute
-#   - no images, no web fonts, no external resource loads
+#   - no external resource loads — images, video and the self-hosted web
+#     fonts all come from this origin
 #   - same-origin images and, on the case studies, same-origin video
 #     (`media-src 'self'`; without it the player stays blank)
 #   - inline <style> blocks from Astro's scoped styles, plus linked stylesheets

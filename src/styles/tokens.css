@@ -24,16 +24,21 @@
   /* ---------------------------------------------------------------------
    * Typography
    *
-   * System font stacks only: no web font means no render-blocking download and
-   * no swap-in reflow. The CJK families are listed explicitly so Traditional
-   * Chinese routes (PRD §7) get a designed face rather than a fallback.
+   * Self-hosted variable fonts (fontsource, imported in `global.css`): the
+   * woff2 files ship as build assets on this origin, so there is no
+   * third-party request, and their `font-display: swap` keeps text visible
+   * while they load. CJK rides the stack fallback — the CJK families are
+   * listed explicitly so Traditional Chinese routes (PRD §7) get a designed
+   * face rather than a fallback, and fontsource's per-subset unicode-ranges
+   * keep zh pages from downloading extra Latin subsets. The variable files
+   * cover weights 100–900; the site uses 400/500/600 only.
    * ------------------------------------------------------------------- */
   --font-sans:
-    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans TC',
-    'PingFang TC', 'Hiragino Sans CNS', 'Microsoft JhengHei', sans-serif;
+    'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+    'Noto Sans TC', 'PingFang TC', 'Hiragino Sans CNS', 'Microsoft JhengHei', sans-serif;
   --font-mono:
-    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans Mono',
-    monospace;
+    'JetBrains Mono Variable', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', 'Noto Sans Mono', monospace;
 
   /* Fluid scale. The clamp() midpoints grow with the viewport between the
      mobile and desktop ends of the shell, so headings stay proportional
@@ -61,7 +66,9 @@
      habit. Nothing inherits it: a component opts in. */
   --text-display: clamp(2.5rem, 1.73rem + 3.15vw, 4.25rem); /* 40 → 68px */
 
+  --leading-display: 1.05; /* the hero name, opted into by that one element */
   --leading-tight: 1.15;
+  --leading-heading: 1.2; /* h2: a 40px heading at 1.15 is too tight */
   --leading-snug: 1.3;
   --leading-normal: 1.5;
   /* Long-form prose needs more leading than UI text, and CJK needs more than
@@ -111,7 +118,7 @@
    * Layout — PRD §25 fixes both widths.
    * ------------------------------------------------------------------- */
   --width-content: 1160px; /* PRD §25: 1100–1200px */
-  --width-reading: 760px; /* PRD §25: 680–760px */
+  --width-reading: 720px; /* PRD §25: 680–760px */
   --gutter: clamp(1.25rem, 0.9rem + 1.75vw, 2.5rem);
 
   /* ---------------------------------------------------------------------
@@ -122,28 +129,30 @@
    * the ratio rather than trusting the comment.
    * ------------------------------------------------------------------- */
 
-  /* Page and surfaces. Warm off-white in light mode, warm near-black in dark. */
-  --color-bg: light-dark(#faf8f5, #14130f);
-  --color-surface: light-dark(#ffffff, #1c1b16);
-  --color-surface-subtle: light-dark(#f2eee8, #23221c);
+  /* Surfaces — light: soft off-white paper; dark: natural dark gray, never #000 */
+  --color-bg: light-dark(#fafaf8, #161616);
+  --color-surface: light-dark(#ffffff, #1e1e1e);
+  --color-surface-subtle: light-dark(#f2f2ee, #262626);
 
-  /* Text. `--color-text-muted` holds AA (≥4.5:1) on all three surfaces, so it
-     is safe for real prose, not only decoration. */
-  --color-text: light-dark(#1a1815, #f2efe8);
-  --color-text-muted: light-dark(#5b564d, #a9a296);
+  /* Text — 3 levels, all ≥4.5:1 on all three surfaces. `subtle` is the floor
+     for readable text; anything fainter must be `aria-hidden`. */
+  --color-text: light-dark(#1c1b19, #ededec);
+  --color-text-muted: light-dark(#57564f, #a5a5a0);
+  --color-text-subtle: light-dark(#6d6c64, #908f8a); /* timestamps, evidence labels, captions */
 
-  /* Borders. `--color-border` is the hairline used for structural separation;
-     `--color-border-strong` is the ≥3:1 variant required whenever a border is
-     the only thing defining an interactive control (WCAG 1.4.11). */
-  --color-border: light-dark(#e4dfd6, #33312a);
-  --color-border-strong: light-dark(#8b8478, #807a6c);
+  /* Borders — hairline structural vs ≥3:1 interactive (WCAG 1.4.11).
+     `--color-border` is the hairline used for structural separation;
+     `--color-border-strong` is the variant required whenever a border is the
+     only thing defining an interactive control. */
+  --color-border: light-dark(#e5e4de, #303030);
+  --color-border-strong: light-dark(#87867c, #7f7f79);
 
-  /* The single accent: a deep ink blue. Used for links, focus, and the rare
-     emphasized action — never as decoration. */
-  --color-accent: light-dark(#1d4e89, #8fb6e8);
-  --color-accent-strong: light-dark(#163c6b, #b0ccf0);
-  --color-on-accent: light-dark(#ffffff, #12141a);
-  --color-focus: light-dark(#1d4e89, #8fb6e8);
+  /* The ONE accent: low-saturation ink blue. Links, focus, solid CTA,
+     trajectory "after" bar. Never decoration. */
+  --color-accent: light-dark(#2f5e8f, #93b4e0);
+  --color-accent-strong: light-dark(#24486f, #b3cbe9);
+  --color-on-accent: light-dark(#ffffff, #14181e);
+  --color-focus: light-dark(#2f5e8f, #93b4e0);
 
   /* ---------------------------------------------------------------------
    * Borders and radii — thin lines, restrained rounding (PRD §25).

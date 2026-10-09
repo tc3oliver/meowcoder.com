@@ -6,6 +6,12 @@
  * size, or width is written literally.
  */
 
+/* Self-hosted variable fonts (fontsource). `standard-italic` is this package's
+   italic entry — there is no plain `italic` file. No mono italic: nothing on
+   the site sets italicized code. */
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/inter/standard-italic';
+@import '@fontsource-variable/jetbrains-mono';
 @import './tokens.css';
 
 /* -------------------------------------------------------------------------
@@ -106,6 +112,7 @@ button {
 
 :where(h2) {
   font-size: var(--text-2xl);
+  line-height: var(--leading-heading);
 }
 
 :where(h3) {
@@ -155,13 +162,17 @@ button {
 
 :where(a) {
   color: var(--color-accent);
+  text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
   transition: color var(--duration-fast) var(--ease-standard);
 }
 
+/* Thickness steps rather than animates on purpose: a smooth underline needs a
+   background-image trick the forbidden-visuals scan bans in any src file. */
 :where(a:hover) {
   color: var(--color-accent-strong);
+  text-decoration-thickness: 2px;
 }
 
 /* -------------------------------------------------------------------------
@@ -257,7 +268,7 @@ button {
   margin-block-start: var(--space-2);
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
-  color: var(--color-text-muted);
+  color: var(--color-text-subtle);
 }
 
 /* -------------------------------------------------------------------------
@@ -356,7 +367,7 @@ button {
   margin-block-start: var(--space-5);
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
-  color: var(--color-text-muted);
+  color: var(--color-text-subtle);
 }
 
 /* One state per line on a phone; a row once there is width for three columns.
@@ -452,7 +463,7 @@ button {
 .prose .mode-flow__caption {
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
-  color: var(--color-text-muted);
+  color: var(--color-text-subtle);
 }
 
 @media (min-width: 40rem) {
@@ -531,7 +542,7 @@ button {
 .prose .stage-domains {
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
-  color: var(--color-text-muted);
+  color: var(--color-text-subtle);
 }
 
 .prose .stage-metadata {
@@ -588,7 +599,7 @@ button {
   margin-block-start: var(--space-5);
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
-  color: var(--color-text-muted);
+  color: var(--color-text-subtle);
 }
 
 @media (width < 48rem) {
@@ -706,7 +717,7 @@ button {
 .prose .trajectory__caption {
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
-  color: var(--color-text-muted);
+  color: var(--color-text-subtle);
 }
 
 @media (min-width: 40rem) {
