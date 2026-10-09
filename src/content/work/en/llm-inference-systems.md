@@ -1,7 +1,7 @@
 ---
 title: 'LLM Inference Systems'
 type: 'Systems Research · LLM Inference'
-summary: 'Inference research on real workloads: instrument, isolate the mechanism, check correctness, then make a production decision or fix upstream.'
+summary: 'Inference research on real interactive workloads: instrument, isolate the mechanism, check correctness, then make a production decision or fix upstream.'
 outcome: 'Three finished experiments: reusable state dynamics, the cost model for speculative decoding, and background recovery of reusable canonical state. Also three open research threads, each stating the evidence it still lacks; upstream oMLX fixes, listed below; and a reproducible harness with the full dataset behind every figure.'
 indexMeta: 'Apple silicon · Three experiments · Three open research threads · Upstream oMLX fixes'
 evidence: 'llm-inference-systems on GitHub · methodology, request-level traces, raw data, and figures'

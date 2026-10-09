@@ -234,7 +234,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 上面這些 finding，只跑 benchmark 的人一個都拿不到。要走到這一步，得先把東西做出來——
 
 - **異質 prefill 路徑**：以 1024-token tile 把每一層的工作分攤到 GPU 與 neural engine，tile 對齊該部署設定裡 1024-token 的 cache block。
-- **疊加量測**：sparse prefill 疊上去之後，在隔離的驗證中兩者疊加後達到各自加速倍數乘積的 95–97%。
+- **疊加量測**：sparse prefill 疊上去之後，在隔離的驗證中達到兩者各自加速倍數乘積的 95–97%。
 - **量測式的受保護前綴邊界**：用兩個 throwaway 探針各 render 一次，取兩次一致的 token 前綴，取代減法推算。
 - **背景 dense 前綴補回與協作式排程器**：設計上 fail closed，讓背景切片對進來的請求讓路（前景 decode 從 13.5 回到 47 tok/s，這個數字只量過一次）。這是實驗分支，後來的檢視找出四個缺口，服務的 build 不帶這段程式。上面的 EXP-003 就是把這個分支重做過的版本：那四個缺口補上了，serving 安全性是量出來的，不是假設的。
 - **Request 層級量測**：checkpoint 位置與 uncached suffix，這是 trace 能成立的前提。
