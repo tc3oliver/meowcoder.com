@@ -76,5 +76,11 @@ const { locale, t, posts, externalIndicator } = Astro.props;
        end padding keeps the preceding action or visual off the rule, while
        `--space-section` provides the larger opening rhythm after it. */
     gap: 0;
+    /* One narrow column, left-aligned with the header's content edge: the
+       auto margin `.container` would apply is replaced by the same offset
+       without the centring of the narrower box. */
+    max-width: var(--width-reading);
+    margin-inline-start: max(0px, calc((100% - var(--width-content)) / 2));
+    margin-inline-end: auto;
   }
 </style>
