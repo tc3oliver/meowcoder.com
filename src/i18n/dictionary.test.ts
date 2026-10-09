@@ -103,14 +103,14 @@ describe('homepage SEO strings (PRD §30)', () => {
   it('matches the English wording the PRD specifies verbatim', () => {
     expect(home.en.title).toBe('Oliver Yu — AI Systems Engineer & System Architect');
     expect(home.en.description).toBe(
-      'AI Systems Engineer and System Architect with 10+ years of software engineering experience, building AI systems, developer tooling, model infrastructure, and production software.',
+      'AI Systems Engineer and System Architect with 10+ years of software engineering experience, building AI systems, developer tooling, and model infrastructure.',
     );
   });
 
   it('matches the Chinese wording the PRD specifies verbatim', () => {
     expect(home.zh.title).toBe('Oliver Yu — AI 系統工程師與系統架構師');
     expect(home.zh.description).toBe(
-      'AI 系統工程師與系統架構師，有 10+ 年軟體工程經驗，開發 AI 系統、開發者工具、模型基礎架構與正式上線的軟體。',
+      'AI 系統工程師與系統架構師，有 10 年以上軟體工程經驗，開發 AI 系統、開發者工具與模型基礎架構。',
     );
   });
 

@@ -14,7 +14,7 @@ export const STUDY_URL = 'https://study.meowcoder.com';
 export const GITHUB_URL = 'https://github.com/tc3oliver';
 
 /** The profile's full upstream pull-request record, regenerated weekly from GitHub. */
-export const UPSTREAM_PRS_URL = 'https://github.com/tc3oliver#more-oss-contributions';
+export const UPSTREAM_PRS_URL = 'https://github.com/tc3oliver#all-upstream-pull-requests';
 
 /** PiShip source repository. */
 export const PISHIP_URL = 'https://github.com/tc3oliver/piship';

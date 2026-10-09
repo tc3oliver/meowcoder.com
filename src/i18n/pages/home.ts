@@ -222,7 +222,7 @@ export const home = {
   en: {
     title: 'Oliver Yu — AI Systems Engineer & System Architect',
     description:
-      'AI Systems Engineer and System Architect with 10+ years of software engineering experience, building AI systems, developer tooling, model infrastructure, and production software.',
+      'AI Systems Engineer and System Architect with 10+ years of software engineering experience, building AI systems, developer tooling, and model infrastructure.',
     heading: 'Oliver Yu',
     intro:
       'I build AI products and the LLM inference systems under them, on Apple silicon and AMD GPUs, and trace performance problems to a measured cause.',
@@ -271,7 +271,7 @@ export const home = {
             value: '7.67 → 0.14 ms',
             label: 'GPU result return (P50), once synchronous Core ML stopped holding the GIL',
           },
-          articleCta: { label: 'Read the Article' },
+          articleCta: { label: 'Read the article on X' },
         },
         {
           id: 'llm-inference-systems',
@@ -357,7 +357,7 @@ export const home = {
   zh: {
     title: 'Oliver Yu — AI 系統工程師與系統架構師',
     description:
-      'AI 系統工程師與系統架構師，有 10+ 年軟體工程經驗，開發 AI 系統、開發者工具、模型基礎架構與正式上線的軟體。',
+      'AI 系統工程師與系統架構師，有 10 年以上軟體工程經驗，開發 AI 系統、開發者工具與模型基礎架構。',
     heading: 'Oliver Yu',
     intro:
       '我開發 AI 產品與 LLM 推論系統，跑在 Apple silicon 和 AMD GPU 上。遇到效能問題，就一路追到能用量測證明的原因。',
@@ -405,7 +405,7 @@ export const home = {
           name: 'laya-apple',
           stat: {
             value: '7.67 → 0.14 ms',
-            label: 'GPU 結果回傳時間（P50）：同步 Core ML 釋放 GIL 前後的差異',
+            label: 'GPU 結果回傳時間（P50），在同步 Core ML 不再佔住 GIL 之後',
           },
           articleCta: { label: '閱讀長文' },
         },
@@ -414,7 +414,7 @@ export const home = {
           name: 'llm-inference-systems',
           stat: {
             value: '228.38 → 79.06 s',
-            label: '七輪 session 累積延遲：在閒置時重建可重用前綴狀態前後的差異',
+            label: '七輪 session 的累積延遲，在閒置時重建可重用前綴狀態之後',
           },
         },
         {
@@ -446,7 +446,7 @@ export const home = {
             name: 'apple/coremltools#2876',
             href: 'https://github.com/apple/coremltools/pull/2876',
             description:
-              'laya-apple 的研究定位到 Core ML prediction 持有 GIL 的問題；修正方式是只在原生 prediction 呼叫期間釋放 GIL。',
+              'laya-apple 的研究中發現：Core ML prediction 持有 GIL。修正是只在原生 prediction 呼叫期間釋放 GIL。',
           },
           {
             name: 'jundot/omlx#3685',
