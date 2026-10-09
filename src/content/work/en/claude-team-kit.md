@@ -1,7 +1,7 @@
 ---
 title: 'Claude Team Kit'
 type: 'Open Source · Agent Tooling'
-summary: 'A Claude Code plugin that puts a hard limit on Agent Teams teammates and adds a read-only Mission Control pane for workers, task dependencies, and usage.'
+summary: 'A Claude Code plugin that caps native Agent Teams teammates and adds a read-only Mission Control pane for workers, task dependencies, and usage.'
 outcome: 'A teammate spawn above the worker limit is refused and its task stays pending. The limit counts native teammates only.'
 indexMeta: 'Public preview · Claude Code plugin · MIT'
 evidence: 'github.com/tc3oliver/claude-team-kit · docs/LIMITATIONS.md and the verification record in docs/REVIEW.md'
@@ -29,7 +29,7 @@ Claude Code's Agent Teams let one lead session hand work to several teammates, w
 
 ## What it does
 
-- **Hard worker limit.** The default is 5, settable from 1 to 12. A teammate spawn above the limit is refused with `TEAM_CAPACITY_REACHED` and its task stays pending. If the roster cannot be read, the spawn is refused with `TEAM_GUARD_FAILED` rather than allowed.
+- **Worker limit.** The default is 5, settable from 1 to 12. A teammate spawn above the limit is refused with `TEAM_CAPACITY_REACHED` and its task stays pending. If the roster cannot be read, the spawn is refused with `TEAM_GUARD_FAILED` rather than allowed.
 - **Mission Control.** A read-only pane opened from a line above the prompt. It shows workers, the task dependency graph, and usage, and it never starts, stops, or changes anything. A figure CTK could not observe reads `unavailable`, never a made-up zero.
 - **Usage HUD.** A team line above the prompt with the model, 5-hour and weekly usage, agents against the limit, tasks, and cost. It reads only what Claude Code passes it.
 - **Review and debugging.** `/ctk:review` scales reviewer depth to the risk of the change; `/ctk:debug` asks for a failing reproduction before a fix.
