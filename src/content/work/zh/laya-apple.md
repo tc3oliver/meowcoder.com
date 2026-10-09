@@ -15,7 +15,7 @@ meta:
   - label: '硬體'
     value: 'Apple M4 Max · MLX GPU + Apple Neural Engine'
   - label: 'Runtime'
-    value: 'laya-apple 1.5 · Python、MLX、Core ML'
+    value: 'laya-apple · Python、MLX、Core ML'
   - label: '範圍'
     value: 'GIL 與並行 · Core ML 執行 · macOS 排程 · 退回 1.4 路徑'
   - label: '上游'

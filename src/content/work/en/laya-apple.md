@@ -15,7 +15,7 @@ meta:
   - label: 'Platform'
     value: 'Apple M4 Max · MLX GPU + Apple Neural Engine'
   - label: 'Runtime'
-    value: 'laya-apple 1.5 · Python, MLX, Core ML'
+    value: 'laya-apple · Python, MLX, Core ML'
   - label: 'Scope'
     value: 'Concurrency · Core ML execution · Host scheduling · Adaptive fallback'
   - label: 'Upstream'

@@ -2,7 +2,7 @@
 title: 'Claude Team Kit'
 type: 'Open Source · Agent Tooling'
 summary: 'A Claude Code plugin that puts a hard limit on Agent Teams teammates and adds a read-only Mission Control pane for workers, task dependencies, and usage.'
-outcome: 'A spawn above the worker limit is refused and its task stays pending. In a documented probe, six concurrent spawns against a limit of three started three and refused three.'
+outcome: 'A spawn above the worker limit is refused and its task stays pending. The limit counts native teammates only.'
 indexMeta: 'Public preview · Claude Code plugin · MIT'
 evidence: 'github.com/tc3oliver/claude-team-kit · docs/LIMITATIONS.md and the verification record in docs/REVIEW.md'
 slug: 'claude-team-kit'
@@ -68,7 +68,7 @@ The README calls this a public preview, and `docs/LIMITATIONS.md` lists what is 
 
 - Agent Teams are experimental, and Mods, which carry the limit and the team line, are early access. A Claude Code update can break either without any change to CTK. Where Mods are missing, `/ctk:team` says the limit is off.
 - The limit counts native teammates only. Ordinary subagents are neither counted nor limited, and it caps how many teammates are alive, not what they spend.
-- The six-spawn probe above was observed live by the maintainers. The independent verification record covers the limit with simulated-host tests and mutation checks, not a live run.
+- The maintainers ran one live probe: six concurrent spawns against a limit of three started three and refused three. That result is reported, not reproduced; the independent verification covered the limit with simulated-host tests and mutation checks, and no live run.
 - A refused spawn can still be drawn as "Done" in the transcript. The skill treats the refusal text as not started, but it is a skill, so a model can still misread it.
 - Interactive use was tested on macOS. Linux and Windows are covered by CI only.
 - The README makes no speed, cost, or token-saving claim.
