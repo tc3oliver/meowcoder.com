@@ -2,8 +2,8 @@
 title: 'Apple Silicon 上的自適應異質推論'
 type: '系統研究 · 推論 Runtime'
 summary: '從 Python GIL、Core ML 的執行方式一路追到 macOS 排程，最後做出一套能自行偵測並復原的 MLX GPU + Neural Engine 推論 runtime。'
-outcome: 'laya-apple 1.5 讓短請求透過 Core ML 非同步 API 交給 Neural Engine，並從自己的 `RequestTrace` 判斷主機是否變慢，一旦變慢就退回已知安全的 1.4 路徑。在 154 段重疊時段的驗證中，GPU 結果回傳從 4.28–8.60 ms 降到 0.035–0.043 ms，沒有出現輸出不一致、掉請求或當機。'
-indexMeta: 'Apple M4 Max · MLX GPU + Neural Engine · 已於 laya-apple 1.5 發布 · 上游 PR：apple/coremltools#2876'
+outcome: 'laya-apple 在 1.5 引入的自適應執行，讓短請求透過 Core ML 非同步 API 交給 Neural Engine，並從自己的 `RequestTrace` 判斷主機是否變慢，一旦變慢就退回已知安全的 1.4 路徑。在 154 段重疊時段的驗證中，GPU 結果回傳從 4.28–8.60 ms 降到 0.035–0.043 ms，沒有出現輸出不一致、掉請求或當機。'
+indexMeta: 'Apple M4 Max · MLX GPU + Neural Engine · 於 laya-apple 1.5 引入 · 上游 PR：apple/coremltools#2876'
 evidence: 'GitHub 上的 laya-apple · 研究地圖、事先登錄的驗收標準，以及每項研究的原始資料'
 slug: 'laya-apple'
 locale: 'zh'
@@ -26,8 +26,8 @@ Oliver Yu 獨立完成研究、量測與發布。
 
 <a href="https://github.com/tc3oliver/laya-apple" target="_blank" rel="noopener noreferrer">laya-apple</a> 讓同一台 Mac 的 MLX GPU 和 Neural Engine 同時提供服務：長請求走 GPU，短請求透過 Core ML 交給 Apple Neural Engine。
 
-- **GPU 結果回傳 P50：7.67 → 0.14 ms**，來自針對 GIL 的因果實驗。
-- **1.5 驗證：4.28–8.60 → 0.035–0.043 ms**，對照 1.4 路徑，吞吐量是它的 1.038–1.042 倍。
+- **GPU 結果回傳 P50：7.67 → 0.14 ms**，由針對 GIL 的因果實驗測得。
+- **1.5 驗證：4.28–8.60 → 0.035–0.043 ms**，對照 1.4 路徑，吞吐量為 1.4 路徑的 1.038–1.042 倍。
 - **對照實驗中 12 次變慢全部復原**，從觸發到恢復最久 414 ms，事先訂的上限是 1.0 s。
 - **154 段重疊時段的驗證**，輸出不一致、路由錯誤、掉請求、當機都是 0。
 
@@ -60,7 +60,7 @@ Oliver Yu 獨立完成研究、量測與發布。
 
 ## 問題
 
-照原本的設計，兩個裝置應該各做各的：短請求不必排在長時間的 GPU 工作後面，GPU 也不受影響。實際跑起來並不是這樣。Neural Engine 在旁邊的 thread 上一起跑時，typed-decisions 的 GPU 服務時間變成原本的 1.04–1.64 倍，Neural Engine 自己卻幾乎沒受影響。
+照原本的設計，兩個裝置應該各做各的：短請求不必排在長時間的 GPU 工作後面，GPU 也不受影響。實際跑起來並不是這樣。Neural Engine 跑在旁邊的另一條 thread 時，typed-decisions 的 GPU 服務時間變成原本的 1.04–1.64 倍，Neural Engine 自己卻幾乎沒受影響。
 
 可能的原因有四個：GPU、Neural Engine、Python，或包在外層的 runtime。每一個的修法都不一樣，沒量過就只能猜。
 
@@ -70,7 +70,7 @@ Oliver Yu 獨立完成研究、量測與發布。
 
 先排除 GPU。16 條 GPU stream 裡有 15 條，MLX `mx.eval` 的時間最多只到原本的 1.04 倍，GPU 運算幾乎沒有變慢。
 
-Runtime 本來就會替每個請求記一筆 `RequestTrace`。從 trace 看，多出來的時間落在 GPU 的回傳階段，而且剛好對上 Neural Engine `predict` 結束的時間點：回傳從 0.05 ms 變成 7.41 ms，占增加時間的 91.1%。GPU 早就算完了，結果卻交不出去。
+Runtime 本來就會替每個請求記一筆 `RequestTrace`。從 trace 看，多出來的時間落在 GPU 的回傳階段，而且剛好對上 Neural Engine `predict` 結束的時間點：回傳從 0.05 ms 變成 7.41 ms，佔增加時間的 91.1%。GPU 早就算完了，結果卻交不出去。
 
 Thread profile 看得出它在等什麼。GPU dispatcher 已經讀到結果，卻卡在 `take_gil`，要等 Core ML 呼叫返回才拿得到 GIL。用 coremltools 時，有 872 個樣本停在 `take_gil`；換成會釋放 GIL 的 binding，一個也沒有。
 
@@ -80,7 +80,7 @@ Profile 只能說明兩件事同時發生，所以再用 2×2 實驗確認因果
 
 這不是 laya-apple 才有的問題。只要 Python 程式在一條 thread 上同步呼叫 Core ML，其他 thread 又需要 GIL，就可能卡在同一個地方。只在自己的 runtime 裡繞過去，其他 coremltools 使用者還是會遇到，所以修正直接送給 coremltools：<a href="https://github.com/apple/coremltools/pull/2876" target="_blank" rel="noopener noreferrer"><code>apple/coremltools#2876</code></a>。
 
-這個修改只在原生 `predictionFromFeatures:` 呼叫期間釋放 GIL，對呼叫端來說 `predict()` 仍然是同步的，並附上多 thread 的回歸測試。它必須等另一個修正（apple/coremltools#2827 或 #2829）先合併；那個修正處理的是 NumPy 輸入在沒拿到 GIL 時被釋放的問題。這個 PR 還沒合併，在它進入正式版 coremltools 之前，整段原生呼叫都會佔著 GIL，所以 1.5 不依賴它。
+這個修改只在原生 `predictionFromFeatures:` 呼叫期間釋放 GIL，對呼叫端來說 `predict()` 仍然是同步的，並附上多 thread 的迴歸測試。它建立在另一個修正之上，那個修正處理的是 NumPy 輸入在沒拿到 GIL 時被釋放的問題：apple/coremltools#2829 已在 2026-09-30 合併，#2827 則已關閉。這個 PR 還沒合併，在它進入正式版 coremltools 之前，整段原生呼叫都會佔著 GIL，所以 1.5 不依賴它。
 
 ## 拿掉 GIL 還不夠
 
@@ -91,7 +91,7 @@ Profile 只能說明兩件事同時發生，所以再用 2×2 實驗確認因果
 3. 改用 prebound binding，每次 forward 在 Python 與 Objective-C 之間的來回從 108 次降到 4 次；
 4. 改用 Core ML 官方的非同步 API。
 
-但放進實際的請求組合後，沒有一種能確定是安全的。獨立 process 在兩個模型上都沒過驗收：laya 的短請求 P99 多了 17.5%（上限 5%），typed-decisions 多了 73.3%。釋放 GIL 的 thread 在三個模型上全部失敗，代價轉嫁到 Neural Engine 的短請求。Prebound binding 在只測重疊時段的實驗流程下有兩個模型通過，但在同一個流程下，原本失敗的釋放 GIL thread 也通過了，所以這個 PASS 不能歸功於減少 Python 與 Objective-C 之間的來回。換成完整流程後，prebound binding 在 n = 12 時判定幾乎不可能達標，提前停止，短請求 P99 是 1.4 路徑的 1.409 倍。Core ML 非同步 API 在篩選實驗裡照樣會變慢（見下一節），所以只留作快速路徑的候選，不算解法。
+但放進實際的請求組合後，沒有一種能確定是安全的。獨立 process 在兩個模型上都沒過驗收：laya 的短請求 P99 多了 17.5%（上限 5%），typed-decisions 多了 73.3%。釋放 GIL 的 thread 在三個模型上全部失敗，代價轉嫁到 Neural Engine 的短請求。Prebound binding 在只測重疊時段的實驗流程下有兩個模型通過，但在同一個流程下，原本失敗的釋放 GIL thread 也通過了，所以這個 PASS 不能只歸功於減少 Python 與 Objective-C 之間的來回。換成完整流程後，prebound binding 在 n = 12 時判定幾乎不可能達標，提前停止，短請求 P99 是 1.4 路徑的 1.409 倍。Core ML 非同步 API 在篩選實驗裡照樣會變慢（見下一節），所以只留作快速路徑的候選，不算解法。
 
 Prebound 的 PASS 與 FAIL 都只適用於各自的實驗流程，事後沒有重新分類任何結果。
 
@@ -107,7 +107,7 @@ Prebound 的 PASS 與 FAIL 都只適用於各自的實驗流程，事後沒有�
 
 ## 主機端變慢
 
-完整流程還量到另一種狀態。以短請求 P99 來看，重疊的量測區間分成兩群：正常的在 10.4–12.3 ms，慢的在 13.6–21.2 ms。慢的時候，GPU thread 每次 forward 用掉的 CPU 時間從 1.8 ms 升到 6.1 ms，原生 Core ML `predict` 卻幾乎沒變（慢的 9.67 ms，正常的 9.62 ms）。變慢的是主機，不是 Neural Engine。
+完整流程還量到另一種狀態。以短請求 P99 來看，重疊的量測區間分成兩群：正常的在 10.4–12.3 ms，慢的在 13.6–21.2 ms。慢的時候，GPU thread 每次 forward 用掉的 CPU 時間從 1.8 ms 升到 6.1 ms，原生 Core ML `predict` 卻幾乎沒變（慢的 9.67 ms，正常的 9.62 ms）。主機慢了，Neural Engine 沒有。
 
 Core ML 非同步 API 讓 GPU 回傳維持在 0.035 ms，吞吐量也不輸 1.4 路徑，但三個量測區間裡還是有兩個變慢。事後分析這些區間，發現變慢集中在每段重疊時段剛開始的 0.8–3.4 秒；這段時間以外，非同步路徑反而比 1.4 快，P99 是 10.4 ms 對 11.9 ms。
 
@@ -142,7 +142,7 @@ Core ML 非同步 API 讓 GPU 回傳維持在 0.035 ms，吞吐量也不輸 1.4 
 
 ## 1.5 發布的內容
 
-在 `execution="workers"`、`device="auto"` 下，laya 和 laya-typed-decisions 預設啟用自適應執行。每段重疊時段先在 1.4 路徑上跑 64 次同步 forward，再切到有 C3 監控的 prebound 非同步 Core ML。一旦觸發，剩下的時間走 1.4 路徑；這段重疊時段結束後，斷路器重新待命。laya-multilingual 仍然用獨立 process，不走這套機制。
+`execution="workers"`、`device="auto"` 時，laya 和 laya-typed-decisions 預設啟用自適應執行。每段重疊時段先在 1.4 路徑上跑 64 次同步 forward，再切到有 C3 監控的 prebound 非同步 Core ML。一旦觸發，剩下的時間走 1.4 路徑；這段重疊時段結束後，斷路器重新待命。laya-multilingual 仍然用獨立 process，不走這套機制。
 
 驗證總共 154 段重疊時段，分三個階段，都和 1.4 路徑比較：
 
@@ -198,7 +198,7 @@ Core ML 非同步 API 讓 GPU 回傳維持在 0.035 ms，吞吐量也不輸 1.4 
 <figcaption class="state-flow__caption">過程中有好幾項研究以 FAIL 收場，全部照原樣留在紀錄裡。</figcaption>
 </figure>
 
-GIL 是證實的原因，所以修正送往上游；E-core 只有相關性，所以 runtime 不依賴對它的解釋，而是盯著看得到的症狀，把使用者受影響的時間壓在上限內。
+GIL 是證實的原因，所以修正送往上游；E-core 只有相關性，所以 runtime 不以解釋它為前提，只盯著看得到的症狀，把使用者受影響的時間壓在上限內。
 
 ## 證據與限制
 
@@ -213,7 +213,7 @@ GIL 是證實的原因，所以修正送往上游；E-core 只有相關性，所
 - <a href="https://github.com/tc3oliver/laya-apple/blob/main/research/README.md" target="_blank" rel="noopener noreferrer">研究地圖</a>：1.4 到 1.5 的 19 個問題，每一個都連到對應的研究、證據類型與結論。
 - <a href="https://github.com/tc3oliver/laya-apple/pull/46" target="_blank" rel="noopener noreferrer">#46</a>（GIL 因果實驗）、<a href="https://github.com/tc3oliver/laya-apple/pull/51" target="_blank" rel="noopener noreferrer">#51</a>（固定負載）、<a href="https://github.com/tc3oliver/laya-apple/pull/88" target="_blank" rel="noopener noreferrer">#88</a>（主機端變慢）、<a href="https://github.com/tc3oliver/laya-apple/pull/96" target="_blank" rel="noopener noreferrer">#96</a>（E-core）、<a href="https://github.com/tc3oliver/laya-apple/pull/103" target="_blank" rel="noopener noreferrer">#103</a>（保護期被推翻）、<a href="https://github.com/tc3oliver/laya-apple/issues/104" target="_blank" rel="noopener noreferrer">#104</a>（偵測與復原）、<a href="https://github.com/tc3oliver/laya-apple/pull/105" target="_blank" rel="noopener noreferrer">#105</a>（1.5 驗證）。
 - <a href="https://github.com/apple/coremltools/pull/2876" target="_blank" rel="noopener noreferrer"><code>apple/coremltools#2876</code></a>：原生 `MLModel.predict()` 執行期間釋放 GIL。
-- <a href="https://study.meowcoder.com/posts/260927-laya-apple-gpu-ane-concurrency/" target="_blank" rel="noopener noreferrer">為了讓 MLX GPU 與 Neural Engine 真正並行，我做了哪些事</a>：完整的長文版本。
+- <a href="https://study.meowcoder.com/posts/260927-laya-apple-gpu-ane-concurrency/" target="_blank" rel="noopener noreferrer">為了讓 MLX GPU 與 Neural Engine 真正並行，我做了哪些事</a>：完整的長文版本，發表在 Study。
 - <a href="https://github.com/tc3oliver/laya-apple" target="_blank" rel="noopener noreferrer">GitHub</a> 與 <a href="https://pypi.org/project/laya-apple/" target="_blank" rel="noopener noreferrer">PyPI</a> 上的 laya-apple：runtime 本身。
 
 </div>

@@ -2,8 +2,8 @@
 title: 'Adaptive Heterogeneous Inference on Apple Silicon'
 type: 'Systems Research · Inference Runtime'
 summary: 'Tracing latency through Python’s GIL, Core ML execution, and host scheduling, then building a self-recovering MLX GPU + Neural Engine runtime.'
-outcome: 'laya-apple 1.5 serves short requests on the Neural Engine through Core ML’s asynchronous API, detects a host-side slow state from its own request trace, and falls back to the known-safe 1.4 path. GPU result return fell from 4.28–8.60 ms to 0.035–0.043 ms across 154 validation episodes, with no mismatch, lost request or crash.'
-indexMeta: 'Apple M4 Max · MLX GPU + Neural Engine · Shipped in laya-apple 1.5 · Upstream: apple/coremltools#2876'
+outcome: 'laya-apple’s adaptive execution, introduced in 1.5, serves short requests on the Neural Engine through Core ML’s asynchronous API, detects a host-side slow state from its own request trace, and falls back to the known-safe 1.4 path. GPU result return fell from 4.28–8.60 ms to 0.035–0.043 ms across 154 validation episodes, with no mismatch, lost request or crash.'
+indexMeta: 'Apple M4 Max · MLX GPU + Neural Engine · Introduced in laya-apple 1.5 · Upstream: apple/coremltools#2876'
 evidence: 'laya-apple on GitHub · research map, preregistered gates, and the raw data behind every study'
 slug: 'laya-apple'
 locale: 'en'
@@ -80,7 +80,7 @@ A profile shows correlation, so a 2×2 intervention tested for cause. Holding th
 
 The GIL hold is not specific to laya-apple. Any Python process that runs synchronous Core ML prediction on one thread while other threads need the interpreter can hit the same wait. A workaround inside this runtime would not help other coremltools users, so the fix was proposed to the framework: <a href="https://github.com/apple/coremltools/pull/2876" target="_blank" rel="noopener noreferrer"><code>apple/coremltools#2876</code></a>.
 
-The change releases the GIL only around the native `predictionFromFeatures:` call and keeps `predict()` synchronous for its caller, with a threading regression test. It depends on a separate fix, apple/coremltools#2827 or #2829, for a NumPy-backed input being released without the GIL. #2876 is still open, and until it merges and ships, released coremltools holds the GIL for the whole native call. That is why 1.5 does not rely on it.
+The change releases the GIL only around the native `predictionFromFeatures:` call and keeps `predict()` synchronous for its caller, with a threading regression test. It builds on a separate fix for a NumPy-backed input being released without the GIL: apple/coremltools#2829, merged on 2026-09-30 after #2827 was closed. #2876 is still open, and until it merges and ships, released coremltools holds the GIL for the whole native call. That is why 1.5 does not rely on it.
 
 ## Removing the GIL wait wasn't enough
 
@@ -93,7 +93,7 @@ Four ways of removing the GIL wait were tried, and each one did remove it:
 
 None of them could be made safe on the product mix. Process isolation failed its gate on both models: laya's short-request P99 rose 17.5% against a 5% limit, and typed-decisions' rose 73.3%. The GIL-released thread failed on all three models, and the cost moved to the Neural Engine's short-request stream.
 
-The prebound binding passed on two models under a heterogeneous-only protocol, but the GIL-released thread, which had failed, passed under that protocol too. Under the full protocol the prebound binding stopped for futility at n = 12, with a short-request P99 of 1.409× the 1.4 path. Core ML's asynchronous API still went slow in its screen, described below; it stayed in play as the candidate fast path, not as a fix.
+The prebound binding passed on two models under a heterogeneous-only protocol, but the GIL-released thread, which had failed, passed under that protocol too, so the pass cannot be credited to fewer Python-to-Objective-C handoffs alone. Under the full protocol the prebound binding stopped for futility at n = 12, with a short-request P99 of 1.409× the 1.4 path. Core ML's asynchronous API still went slow in its screen, described below; it stayed in play as the candidate fast path, not as a fix.
 
 The prebound PASS and FAIL each stand under the protocol that produced them, and neither was rewritten after the fact.
 

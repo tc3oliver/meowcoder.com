@@ -1,9 +1,9 @@
 ---
 title: 'LLM Inference Systems'
 type: 'Systems Research · LLM Inference'
-summary: 'An ongoing inference-systems research program driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, and turn the result into a production decision or an upstream fix. Three completed experiments and three open research threads.'
-outcome: 'Three finished experiments: reusable state dynamics, the cost model for speculative decoding, and background recovery of reusable canonical state. Also three open research threads, each stating the evidence it still lacks; eleven upstream pull requests (five merged, six open, none a draft); and a reproducible harness with the full dataset behind every figure.'
-indexMeta: 'Apple silicon · Three experiments · Three open research threads · Five merged upstream PRs, six open'
+summary: 'Inference-systems research driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, then decide or fix upstream.'
+outcome: 'Three finished experiments: reusable state dynamics, the cost model for speculative decoding, and background recovery of reusable canonical state. Also three open research threads, each stating the evidence it still lacks; upstream oMLX fixes, listed below; and a reproducible harness with the full dataset behind every figure.'
+indexMeta: 'Apple silicon · Three experiments · Three open research threads · Upstream oMLX fixes'
 evidence: 'llm-inference-systems on GitHub · methodology, request-level traces, raw data, and figures'
 slug: 'llm-inference-systems'
 locale: 'en'
@@ -19,12 +19,12 @@ meta:
   - label: 'Scope'
     value: 'Runtime · Serving · Reusable state · Speculative execution · Correctness · Heterogeneous compute'
   - label: 'Evidence'
-    value: 'Public repository · published articles · eleven upstream pull requests: five merged, six open'
+    value: 'Public repository · published articles · upstream oMLX pull requests'
 ---
 
 Independently researched, measured, and submitted upstream by Oliver Yu.
 
-Inference optimizations often look good under an isolated benchmark and fail under a real interactive workload. This program investigates those failures: instrument the runtime, isolate the mechanism, validate correctness, and translate the finding into a production decision or an upstream improvement.
+Inference optimizations often look good under an isolated benchmark and fail under a real interactive workload. This program investigates those failures.
 
 The scope is runtime, serving, reusable state, speculative execution, correctness, and heterogeneous compute — all of it on one Apple silicon machine.
 
@@ -34,7 +34,7 @@ The scope is runtime, serving, reusable state, speculative execution, correctnes
 <ol class="state-flow__steps" role="list">
 <li class="state-flow__step">
 <span class="state-flow__name">Production observation</span>
-<span class="state-flow__detail">Behaviour that shows up in real traffic and not in a benchmark.</span>
+<span class="state-flow__detail">Behavior that shows up in real traffic and not in a benchmark.</span>
 </li>
 <li class="state-flow__step">
 <span class="state-flow__name">Runtime instrumentation</span>
@@ -60,7 +60,7 @@ The scope is runtime, serving, reusable state, speculative execution, correctnes
 <figcaption class="state-flow__caption">Each stage can break the one before it. The three experiments below each went the whole way round.</figcaption>
 </figure>
 
-Every claim in the repository carries an evidence level: observed, measured, derived, inferred, hypothesized, not established. The grading is the point — three subjects in the repository are filed as open research threads rather than experiments precisely because each one names the evidence it still lacks.
+Every claim in the repository carries an evidence level: observed, measured, derived, inferred, hypothesized, not established. Three subjects are filed as open threads, not experiments, because each names the evidence it still lacks.
 
 ## From baseline to optimized serving
 
@@ -169,7 +169,7 @@ Because the code under test was already choosing correctly, the finding came wit
 
 **Why** — Proposing a new policy before establishing whether the current one misdecides trades an unproven problem for an untested solution.
 
-**Consequence** — The measurement's product was a decision not to change anything, which is the harder result to publish and the cheaper one to ship.
+**Consequence** — The measurement's product was a decision not to change anything.
 
 </div>
 
@@ -189,7 +189,7 @@ Making it safe to serve was the larger half. A share-of-time budget bounds how _
 
 <div class="decision">
 
-### Returning the foreground to dense prefill was not the outcome. Leaving the next turn less to compute was.
+### The fastest configuration never returned to dense prefill; it left the next turn less to compute.
 
 **Why** — The feature was built to return the foreground to dense prefill once the prefix recovered. The fastest configuration measured was the one where that never happened, and the turns that did switch routes were the most expensive turns of their sessions.
 
@@ -204,7 +204,7 @@ No foreground latency target was set before those runs. The worst uninterruptibl
 
 ## Systems themes
 
-Neither of the two below is an experiment: one is a configuration history, the other is still missing its judgement. The third open thread, on cross-runtime observations, is not written up here — its content is the absence: no controlled comparison exists, and none was run. All three sit in the repository as supporting evidence, not as conclusions.
+Neither of the two below is an experiment: one is a configuration history, the other is still missing its judgment. The third open thread, on cross-runtime observations, is not written up here — its content is the absence: no controlled comparison exists, and none was run. All three sit in the repository as supporting evidence, not as conclusions.
 
 ### Correctness — fast but wrong is a regression
 
@@ -215,9 +215,9 @@ Every inference optimization changes something between the prompt and the answer
 - **The protected-prefix boundary.** The output changed, because the model's input changed — the one case that genuinely altered what the model saw, and the one that sounded most like bookkeeping.
 - **Speculative decoding.** The output changed and stopped being reproducible.
 
-Which of the four reaches the output is not guessable from how aggressive an optimization sounds. Reusing a cached prefix sounds risky and is exact. Speculative decoding sounds like the most dangerous of the four, and its guessing is the exactly-correct part — what moved the output was the arithmetic underneath.
+Which of the four reaches the output is not guessable from how aggressive an optimization sounds. Reusing a cached prefix sounds risky and is exact. Speculative decoding sounds like the riskiest of the four, and here its output changed and stopped repeating; the cause was not isolated.
 
-What this thread is missing is not the comparison but the judgement: once the output does change, every comparison so far can say whether the bytes differ, and none of them says whether the answer got worse.
+What this thread lacks is a judgment: once the output does change, every comparison so far can say whether the bytes differ, and none of them says whether the answer got worse.
 
 ### Heterogeneous compute — accelerator enabled ≠ accelerator executed
 
@@ -225,7 +225,7 @@ The clearest result here is a null one. The neural-engine prefill path compiles 
 
 None of that is visible in a throughput number. The configuration said "neural engine on", the server agreed it was on, and the contribution was exactly zero. The accelerator will not take a prefill width below 1024 tokens at all, and <a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a> — merged — makes that geometry report itself as impossible instead of warning about a shape it cannot accept. What made the path usable was a compiled tile and a cache block on the same grain — a matter of how work is divided, not how it is computed.
 
-The general form is worth keeping: on a heterogeneous device, the unit of work an accelerator compiles for and the unit of work the serving layer hands out are two different decisions, usually made by two different people.
+The general form is worth keeping: on a heterogeneous device, the unit of work an accelerator compiles for and the unit of work the serving layer hands out are two separate decisions.
 
 ## Engineering and upstream consequence
 
@@ -239,7 +239,7 @@ None of the findings above was available to someone who only ran benchmarks. Get
 - **A transport-level request policy**, added only after the real workload showed no single configuration was right for every request.
 - **A reproducible harness and dataset** — every figure is redrawn by three scripts that read nothing but `data/`, and nothing in it is smoothed, interpolated, or back-generated.
 
-Eleven pull requests went upstream. Five are merged; six were open at the time of writing, none of them drafts. An open pull request counts as a proposal, not a result:
+These pull requests went upstream to oMLX. An open pull request counts as a proposal, not a result:
 
 - <a href="https://github.com/jundot/omlx/pull/3756" target="_blank" rel="noopener noreferrer"><code>omlx#3756</code></a> — the correctness fix for the protected-prefix boundary. It was sent before the performance work because it is the only finding that changed the model's input rather than only its speed.
 - <a href="https://github.com/jundot/omlx/pull/3762" target="_blank" rel="noopener noreferrer"><code>omlx#3762</code></a> — per-request SpecPrefill fields on the Anthropic messages endpoint, matching what the OpenAI-compatible endpoint already had. It changes no upstream default.
@@ -275,4 +275,4 @@ One machine, one vendor, one runtime. EXP-001 is a single 27B dense model at 4-b
 
 </div>
 
-What I still cannot do is classify a request as it arrives. Until that changes, the caller declares the shape and the server honours it.
+What I still cannot do is classify a request as it arrives. Until that changes, the caller declares the shape and the server honors it.
