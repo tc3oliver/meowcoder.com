@@ -23,13 +23,11 @@
  *   one giant tab stop.
  * - **Shouri gets the largest visual area**, as doc-2 §11 requires. Its visual
  *   is wider than the reading measure without filling the entire content shell;
- *   the diagram entry sits in a narrower second column from 64rem up.
+ *   the other visuals sit in a narrower second column from 64rem up.
  *
- * Neither visual is new. The screenshot is the asset the homepage already
- * shows, through Astro's `<Image>` so it keeps build-time optimization and the
- * explicit dimensions that cost no layout shift; the workflow figure is
- * `WorkflowDiagram.astro`, reused unchanged with this page's own localized
- * stage names.
+ * The screenshot is the asset the homepage already shows, through Astro's
+ * `<Image>` so it keeps build-time optimization and the explicit dimensions
+ * that cost no layout shift.
  *
  * Entries arrive already filtered and ordered by `workEntriesForLocale`; this
  * layout only renders them.
@@ -38,7 +36,6 @@
 import { Image } from 'astro:assets';
 
 import { shouriScreenshot } from '../components/home/shouri-screenshot';
-import WorkflowDiagram from '../components/WorkflowDiagram.astro';
 import cacheCliff from '../assets/research/cache-cliff.svg';
 import { signalForgeScreenshot } from '../components/work/signalforge-screenshot';
 import type { Locale } from '../i18n/locales';
@@ -66,9 +63,8 @@ const t = work[locale];
  * copy alone, which is the same shape the index had before this redesign and is
  * the correct shape for the experience entry, which has no honest visual.
  */
-const VISUALS: Readonly<Record<string, 'screenshot' | 'workflow' | 'chart' | 'keyvisual'>> = {
+const VISUALS: Readonly<Record<string, 'screenshot' | 'chart' | 'keyvisual'>> = {
   shouri: 'screenshot',
-  'ai-coding-skills': 'workflow',
   'llm-inference-systems': 'chart',
   signalforge: 'keyvisual',
 };
@@ -181,16 +177,6 @@ function position(index: number): string {
                     />
                     <figcaption>{t.visuals.reusableState.caption}</figcaption>
                   </figure>
-                )}
-
-                {visual === 'workflow' && (
-                  <WorkflowDiagram
-                    boxed
-                    caption={t.visuals.aiCodingSkills.caption}
-                    start={t.visuals.aiCodingSkills.start}
-                    steps={t.visuals.aiCodingSkills.steps}
-                    end={t.visuals.aiCodingSkills.end}
-                  />
                 )}
               </li>
             );

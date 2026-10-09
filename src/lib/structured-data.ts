@@ -19,7 +19,6 @@ import {
   PUBLICATION_URL,
   SHOURI_URL,
   SIGNALFORGE_URL,
-  SKILLS_URL,
   STUDY_URL,
 } from './external';
 import { localizeUrl, workDetailRoute } from './i18n';
@@ -84,23 +83,6 @@ export function publicationSchema(locale: Locale): JsonLd {
         name: 'Journal of Information Security and Applications',
       },
     },
-  };
-}
-
-/** The open-source project featured by the AI Coding Skills case study. */
-export function aiCodingSkillsSchema(locale: Locale, description: string): JsonLd {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareSourceCode',
-    '@id': `${SITE_URL}/#ai-coding-skills`,
-    name: 'AI Coding Skills',
-    description,
-    url: localizeUrl(locale, workDetailRoute('ai-coding-skills')),
-    codeRepository: SKILLS_URL,
-    version: '1.2.0',
-    license: 'https://opensource.org/license/mit',
-    inLanguage: LOCALE_TAG[locale],
-    author: { '@id': `${SITE_URL}/#person` },
   };
 }
 

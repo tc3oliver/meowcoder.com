@@ -35,14 +35,6 @@ export interface WorkPageStrings extends PageStrings {
   visuals: {
     /** Alt text for the Shouri product screenshot. */
     shouri: { alt: string };
-    /** Stage names for the workflow diagram; see `WorkflowDiagram.astro`. */
-    aiCodingSkills: {
-      /** Accessible name for the diagram — it carries no visible caption. */
-      caption: string;
-      start: string;
-      steps: readonly string[];
-      end: string;
-    };
     /** Caption and alt text for the cache-cliff chart. */
     reusableState: { alt: string; caption: string };
     /** Alt text for the SignalForge key visual. */
@@ -93,13 +85,6 @@ export const work = {
       shouri: {
         alt: 'Shouri shown across desktop and mobile. The desktop views show a learning path and a saved cooking video organized into a structured recipe; the mobile views show the saved library and recipe details.',
       },
-      aiCodingSkills: {
-        caption:
-          'The workflow moves from a requirement through planning, execution, and validation to completion.',
-        start: 'Requirement',
-        steps: ['Plan', 'Execute', 'Validate'],
-        end: 'Complete',
-      },
       reusableState: {
         alt: 'A line chart of one session over twenty prefix-cache restores. The reusable checkpoint climbs to about 38,000 tokens, drops back to 28,672 at the eleventh restore, and stays flat for the rest of the session while the uncached suffix recomputed per request rises from a few hundred tokens to about 34,000.',
         caption:
@@ -133,12 +118,6 @@ export const work = {
     visuals: {
       shouri: {
         alt: '收理的桌機與行動版畫面。桌機畫面呈現學習路線，以及由料理影片整理出的結構化食譜；行動版畫面呈現收藏庫與食譜內容。',
-      },
-      aiCodingSkills: {
-        caption: '工作流程從需求開始，經過規劃、執行與驗證，最後完成交付。',
-        start: '需求',
-        steps: ['規劃', '執行', '驗證'],
-        end: '完成',
       },
       reusableState: {
         alt: '一個 session、20 次 prefix cache 還原的折線圖。可重用的 checkpoint 一路爬到約 38,000 token，在第 11 次還原掉回 28,672，之後整段 session 都是水平線；同時每個請求需要重算的未快取尾段，從幾百個 token 增加到約 34,000。',

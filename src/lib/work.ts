@@ -24,7 +24,8 @@ import { LOCALES, type Locale } from '../i18n/locales';
 /** Lowercase words joined by single hyphens — the URL segment form. */
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-const SLUG_MESSAGE = 'must be lowercase words joined by single hyphens, e.g. "ai-coding-skills"';
+const SLUG_MESSAGE =
+  'must be lowercase words joined by single hyphens, e.g. "llm-inference-systems"';
 
 /**
  * One row of project metadata, rendered beside the case study (doc-2 §12).
@@ -107,7 +108,7 @@ const workEntryShape = z.strictObject({
    * (PRD §27). The pairing is by this key, not by filename.
    */
   translationKey: z.string().regex(SLUG_PATTERN, `translationKey ${SLUG_MESSAGE}`),
-  /** Index position, ascending. PRD §10 lists Shouri before AI Coding Skills. */
+  /** Index position, ascending. PRD §10 lists Shouri first. */
   order: z.number().int().nonnegative(),
   /**
    * Project metadata for the detail-page sidebar, in display order (doc-2 §12).

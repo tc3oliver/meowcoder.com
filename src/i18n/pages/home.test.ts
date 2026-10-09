@@ -17,8 +17,6 @@
 
 import { describe, expect, it } from 'vitest';
 
-import AI_CODING_SKILLS_EN from '../../content/work/en/ai-coding-skills.md?raw';
-import AI_CODING_SKILLS_ZH from '../../content/work/zh/ai-coding-skills.md?raw';
 import SHOURI_EN from '../../content/work/en/shouri.md?raw';
 import SHOURI_ZH from '../../content/work/zh/shouri.md?raw';
 import INFERENCE_EN from '../../content/work/en/llm-inference-systems.md?raw';
@@ -86,7 +84,6 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     // line of facts, and its actions. Anything else belongs on a case study,
     // so the key sets are the assertion.
     expect(Object.keys(t.openSource).sort()).toEqual([
-      'caseStudyCta',
       'cta',
       'eyebrow',
       'heading',
@@ -152,14 +149,12 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     // at technical writing and nothing on the homepage suggests otherwise.
     //
     // The permitted mentions are links to published open-source work — the
-    // opposite of the confidential employer systems this rule protects: doc-2
-    // §7's link to the AI Coding Skills case study, and the Featured Research
-    // projects' links to their own case studies. Each is exempted by identity rather
-    // than by pattern, so any *other* case-study claim appearing anywhere in
+    // opposite of the confidential employer systems this rule protects:
+    // SignalForge's case-study link, and the Featured Research projects' links
+    // to their own case studies. Each is exempted by identity rather than by pattern, so any *other* case-study claim appearing anywhere in
     // the homepage strings still fails here.
     const CASE_STUDY = [/case study/i, /案例/];
     const permitted = new Set([
-      t.openSource.caseStudyCta.label,
       t.openSource.signalforge.caseStudyCta.label,
       t.systems.caseStudyCta.label,
     ]);
@@ -324,46 +319,6 @@ describe('requirement wording', () => {
     for (const locale of LOCALES) {
       expect(CASE_STUDY[locale]).toMatch(/^title: 'Shouri \/ 收理'$/m);
     }
-  });
-});
-
-/* -------------------------------------------------------------------------
- * Third-party attribution (PRD §9.4, doc-2 §7)
- *
- * doc-2 §7 removes the attribution paragraph from the homepage, and PRD §9.4
- * still requires the bundled `grilling` skill to keep clear attribution and
- * never to be presented as original work. Both can be true only because the
- * requirement now rests on the case study — so the guard follows it there
- * rather than being deleted with the paragraph.
- *
- * The markdown is pulled in as raw text through Vite, the same way
- * `design-system.test.ts` reads stylesheets: the project typechecks with
- * `astro check` and carries no `@types/node`, so a filesystem read would not
- * compile, and a moved or renamed case study breaks this import instead of
- * silently passing.
- * ---------------------------------------------------------------------- */
-
-describe('third-party attribution (PRD §9.4)', () => {
-  const CASE_STUDY: Record<Locale, string> = {
-    en: AI_CODING_SKILLS_EN,
-    zh: AI_CODING_SKILLS_ZH,
-  };
-
-  it.each(LOCALES)('attributes the bundled skill and its licence (%s)', (locale) => {
-    const source = CASE_STUDY[locale];
-
-    // `.claude/skills/grilling/SKILL.md` and the MIT `LICENSE` beside it are
-    // the source for all three of these. The notice is quoted verbatim on both
-    // localized pages, so all three read the same in either language.
-    expect(source).toContain('grilling');
-    expect(source).toContain('Matt Pocock');
-    expect(source).toContain('MIT License');
-  });
-
-  it.each(LOCALES)('gives the attribution a section of its own (%s)', (locale) => {
-    // A heading, not a sentence buried in a paragraph — a reader following
-    // `View Case Study` has to be able to find it.
-    expect(CASE_STUDY[locale]).toMatch(/^## (Attribution|出處與授權)$/m);
   });
 });
 

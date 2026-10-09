@@ -7,14 +7,10 @@
  * rather than a card here.
  *
  * doc-2 §7 compresses the section to a statement, the two skill names, a
- * workflow visual, and two actions. What used to be here — the seven-stage
- * pipeline, "What it defines", "What it demonstrates", and the attribution
- * paragraph — is not gone from the site; it is on the AI Coding Skills case
- * study, which `caseStudyCta` now links to. That includes PRD §9.4's
- * requirement that the bundled third-party `grilling` skill keeps its
- * attribution and licence and is never presented as original work: the case
- * study states it in full, so the homepage can stop restating it without the
- * site losing it.
+ * workflow visual, and its actions. The seven-stage pipeline, "What it
+ * defines", "What it demonstrates", and the attribution paragraph live in the
+ * skills repository, which is the only place the Skills block links to: the
+ * site no longer carries a case study for it.
  *
  * Beneath the two projects is the upstream half: pull requests to projects
  * this site's author does not maintain, which is the evidence the GitHub
@@ -47,17 +43,9 @@ interface Props {
 
 const { locale, t, externalIndicator } = Astro.props;
 
-/** The case studies' slugs — `src/content/work/{en,zh}/<slug>.md`. */
-const CASE_STUDY_SLUG = 'ai-coding-skills';
+/** The SignalForge case study's slug — `src/content/work/{en,zh}/<slug>.md`. */
 const SIGNALFORGE_SLUG = 'signalforge';
 const signalforgeHref = localizePath(locale, workDetailRoute(SIGNALFORGE_SLUG));
-
-/**
- * The case study in the reader's own locale. Routing goes through the same
- * helpers the Work index uses, so this link cannot drift from the page it
- * points at.
- */
-const caseStudyHref = localizePath(locale, workDetailRoute(CASE_STUDY_SLUG));
 
 /**
  * doc-2 §7 prints the two names as one compact line. The middot is a separator
@@ -111,13 +99,12 @@ const skills = t.openSource.skills.join(' · ');
       />
 
       <div class="oss__actions">
-        <CtaLink href={caseStudyHref} label={t.openSource.caseStudyCta.label} variant="outline" />
         <CtaLink
           href={SKILLS_URL}
           label={t.openSource.cta.label}
           external
           indicator={externalIndicator}
-          variant="text"
+          variant="outline"
         />
       </div>
     </div>

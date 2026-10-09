@@ -358,24 +358,6 @@ describe('work and publication structured data', () => {
       expect(articles[0].headline).toContain('leakage-resilient certificate-based encryption');
     }
   });
-
-  it('describes AI Coding Skills as source code on both detail pages', () => {
-    for (const file of [
-      'work/ai-coding-skills/index.html',
-      'zh/work/ai-coding-skills/index.html',
-    ]) {
-      const sourceCode = nodes(read(file)).filter((node) => node['@type'] === 'SoftwareSourceCode');
-
-      expect(sourceCode, `${file}`).toHaveLength(1);
-      expect(sourceCode[0]).toMatchObject({
-        name: 'AI Coding Skills',
-        codeRepository: 'https://github.com/tc3oliver/skills',
-        version: '1.2.0',
-        license: 'https://opensource.org/license/mit',
-        author: { '@id': `${SITE_URL}/#person` },
-      });
-    }
-  });
 });
 
 describe('sitemap', () => {

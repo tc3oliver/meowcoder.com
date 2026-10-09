@@ -149,13 +149,9 @@ export interface HomeStrings extends PageStrings {
    * doc-2 §7. The primary open-source proof; the site source is not (PRD §24).
    *
    * doc-2 §7 cuts this section back to a single statement, the two skill names,
-   * a workflow visual, and two actions. The seven-stage pipeline, the two
-   * bullet lists, and the attribution paragraph are not deleted from the site —
-   * they live on the AI Coding Skills case study, which is what the new
-   * `caseStudyCta` links to. That is also where PRD §9.4's attribution
-   * requirement is now met: the case study states in full that the bundled
-   * `grilling` skill is Matt Pocock's, used under the MIT License, so nothing
-   * here presents a third-party skill as original work.
+   * a workflow visual, and its actions. The seven-stage pipeline, the two
+   * bullet lists, and the attribution paragraph live in the skills repository
+   * the section links to; the site has no AI Coding Skills case study.
    */
   openSource: {
     eyebrow: string;
@@ -163,7 +159,7 @@ export interface HomeStrings extends PageStrings {
     /**
      * The second project in the section, first in reading order: the public
      * system proof. It has what Skills does not — a running instance — so it
-     * carries three actions where Skills carries two: the live reader, the
+     * carries three actions where Skills carries one: the live reader, the
      * case study, and the repository. `meta` is one compact line of facts
      * (licence, language, what runs), the same role `skills` plays beside it.
      */
@@ -202,8 +198,6 @@ export interface HomeStrings extends PageStrings {
       /** The full, generated record on the GitHub profile. */
       cta: CtaLabel;
     };
-    /** Internal; the case-study route is resolved by the component, not here. */
-    caseStudyCta: CtaLabel;
     cta: CtaLabel;
   };
   /**
@@ -382,7 +376,6 @@ export const home = {
         ],
         cta: { label: 'All upstream pull requests' },
       },
-      caseStudyCta: { label: 'View Case Study' },
       cta: { label: 'GitHub' },
     },
     systems: {
@@ -555,7 +548,6 @@ export const home = {
         ],
         cta: { label: '所有上游 PR' },
       },
-      caseStudyCta: { label: '查看完整案例' },
       cta: { label: 'GitHub' },
     },
     systems: {

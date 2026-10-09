@@ -11,3 +11,11 @@
 /work/reusable-state-economics     /work/llm-inference-systems/    301
 /zh/work/reusable-state-economics/ /zh/work/llm-inference-systems/ 301
 /zh/work/reusable-state-economics  /zh/work/llm-inference-systems/ 301
+
+# `/work/ai-coding-skills/` was the case study for the skills collection, which
+# the site no longer carries; its card went to PiShip, a different subject. The
+# old URL goes to the Work index rather than pretending to be the new page.
+/work/ai-coding-skills/    /work/    301
+/work/ai-coding-skills     /work/    301
+/zh/work/ai-coding-skills/ /zh/work/ 301
+/zh/work/ai-coding-skills  /zh/work/ 301

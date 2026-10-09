@@ -9,7 +9,7 @@ export interface SocialPreview {
   height: 630;
 }
 
-type SocialPreviewName = 'default' | 'shouri' | 'ai-coding-skills';
+type SocialPreviewName = 'default' | 'shouri';
 
 const ALT: Record<SocialPreviewName, Record<Locale, string>> = {
   default: {
@@ -19,10 +19,6 @@ const ALT: Record<SocialPreviewName, Record<Locale, string>> = {
   shouri: {
     en: 'Shouri product interface — an AI information organizer by Oliver Yu',
     zh: 'Shouri／收理產品介面 — Oliver Yu 打造的 AI 資訊整理工具',
-  },
-  'ai-coding-skills': {
-    en: 'AI Coding Skills workflow from requirements through planning, execution, validation, and completion',
-    zh: 'AI Coding Skills 從需求、規劃、執行、驗證到完成的工作流程',
   },
 };
 

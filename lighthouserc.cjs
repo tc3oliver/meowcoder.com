@@ -6,7 +6,7 @@ module.exports = {
         'http://localhost/',
         'http://localhost/zh/',
         'http://localhost/work/shouri/',
-        'http://localhost/zh/work/ai-coding-skills/',
+        'http://localhost/zh/work/piship/',
         'http://localhost/zh/about/',
       ],
       numberOfRuns: 3,
