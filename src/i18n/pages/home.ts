@@ -256,7 +256,7 @@ export const home = {
       claudeTeamKit: {
         heading: 'Claude Team Kit',
         statement:
-          'A Claude Code plugin that puts a hard limit on Agent Teams teammates and adds a read-only Mission Control pane for workers, task dependencies, and usage.',
+          'A Claude Code plugin that caps native Agent Teams teammates and adds a read-only Mission Control pane for workers, task dependencies, and usage.',
         cta: { label: 'GitHub' },
       },
     },
@@ -345,7 +345,8 @@ export const home = {
       year: '2026',
     },
     experience: {
-      progression: 'Software engineering → system architecture → AI systems',
+      progression:
+        'Application Engineering → Enterprise Systems & Architecture → Enterprise AI Systems',
       cta: { label: 'About Oliver' },
     },
     writing: {
@@ -392,7 +393,7 @@ export const home = {
       claudeTeamKit: {
         heading: 'Claude Team Kit',
         statement:
-          '一個 Claude Code plugin，替 Agent Teams 的 teammate 數量加上硬性上限，並提供唯讀的 Mission Control 面板，顯示 worker、任務相依與用量。',
+          '一個 Claude Code plugin，限制 Agent Teams 的 teammate 數量，並提供唯讀的 Mission Control 面板，顯示 worker、任務相依與用量。',
         cta: { label: 'GitHub' },
       },
     },
@@ -480,7 +481,7 @@ export const home = {
       year: '2026',
     },
     experience: {
-      progression: '軟體工程 → 系統架構 → AI 系統',
+      progression: '應用程式工程 → 企業系統與系統架構 → 企業 AI 系統',
       cta: { label: '關於 Oliver' },
     },
     writing: {

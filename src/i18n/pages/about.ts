@@ -104,7 +104,7 @@ export const about = {
         },
         {
           period: '2020–2025',
-          name: 'System Architecture & Technical Leadership',
+          name: 'Enterprise Systems & Architecture',
           description:
             'Owned system architecture, AI integration, engineering practice, and project delivery, and mentored other engineers.',
         },
@@ -231,7 +231,7 @@ export const about = {
         },
         {
           period: '2020–2025',
-          name: '系統架構與技術領導',
+          name: '企業系統與系統架構',
           description: '負責系統架構、AI 整合、工程實務與專案交付，並指導其他工程師。',
         },
         {

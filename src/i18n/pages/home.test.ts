@@ -170,10 +170,10 @@ describe('requirement wording', () => {
 
   it('keeps the career arc and About link that close the Writing section', () => {
     expect(home.en.experience.progression).toBe(
-      'Software engineering → system architecture → AI systems',
+      'Application Engineering → Enterprise Systems & Architecture → Enterprise AI Systems',
     );
     expect(home.en.experience.cta.label).toBe('About Oliver');
-    expect(home.zh.experience.progression).toBe('軟體工程 → 系統架構 → AI 系統');
+    expect(home.zh.experience.progression).toBe('應用程式工程 → 企業系統與系統架構 → 企業 AI 系統');
     expect(home.zh.experience.cta.label).toBe('關於 Oliver');
   });
 
