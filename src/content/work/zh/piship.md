@@ -2,8 +2,8 @@
 title: 'PiShip'
 type: '開源 · Agent 基礎設施'
 summary: '一套工具鏈，讓公司不必 fork Pi 就能把它做成自家的 coding agent，並補上 OIDC 登入、短效 gateway 憑證、policy、MCP 規則與 sandbox。'
-outcome: 'v0.13.0 是 pre-release，附 9 個有 attestation 的封存檔。qualification run 一次就通過，9 個封存檔各 build 兩次，payload 全部相同。'
-indexMeta: 'Pre-release v0.13.0 · Pi 1.1.0 · Linux、macOS、Windows'
+outcome: 'v0.13.0 的 qualification run 一次就通過：9 個附 attestation 的封存檔各 build 兩次，payload 全部相同。'
+indexMeta: 'Pre-release · Linux、macOS、Windows'
 evidence: 'github.com/tc3oliver/piship · docs/status.md、v0.13.0 release 與它的 qualification run'
 slug: 'piship'
 locale: 'zh'
@@ -12,13 +12,11 @@ order: 4
 draft: false
 meta:
   - label: '狀態'
-    value: 'Pre-release v0.13.0 · 2026-10-09'
+    value: 'Pre-release'
   - label: '建構於'
-    value: 'Pi 1.1.0，維持上游、未修改'
+    value: '上游 Pi，未修改'
   - label: '發行檔'
-    value: '9 個附 attestation 的封存檔 · linux-x64、darwin-arm64、win32-x64'
-  - label: '需要'
-    value: 'Node.js 22.19.0+（devcode：24.18+）'
+    value: '附 attestation 的封存檔 · linux-x64、darwin-arm64、win32-x64'
 ---
 
 由 Oliver Yu 獨立設計與開發。
@@ -71,7 +69,7 @@ PiShip 不取代公司的 identity provider、broker 或 gateway。公司需要�
 
 ## 每個版本怎麼驗證
 
-一次 release 有 9 個封存檔：3 個範例 distribution，各有 3 個平台的版本。每個都 build 兩次再互相比對。v0.13.0 的 qualification run 中，9 個全部 payload 一致。兩次 build 出來的 `devcode` 封存檔位元組不同，只是因為 `vulnerabilities.json` 記錄了掃描時間。同一次 run 驗證了 attestation，檢查了 registry 簽章，也跑過漏洞檢查（後兩項都是 9 個全過）；另外測試了拒絕被竄改的封存檔，以及離線安裝。
+v0.13.0 的一次 release 有 9 個封存檔：3 個範例 distribution，各有 3 個平台的版本。每個都 build 兩次再互相比對。v0.13.0 的 qualification run 中，9 個全部 payload 一致。兩次 build 出來的 `devcode` 封存檔位元組不同，只是因為 `vulnerabilities.json` 記錄了掃描時間。同一次 run 驗證了 attestation，檢查了 registry 簽章，也跑過漏洞檢查（後兩項都是 9 個全過）；另外測試了拒絕被竄改的封存檔，以及離線安裝。
 
 Run 37887824632 在打了 tag 的那個 commit 上第一次就通過：54 個 job 通過，2 個略過，因為回報 issue 的 job 只在排程時執行。
 

@@ -1,10 +1,10 @@
 /**
  * The Shouri product screenshot (MCD-4, PRD §9.2).
  *
- * PRD §9.2 asks the Featured Product section to show one polished product
- * screenshot. No image asset exists in this repository yet, and inventing one —
- * a generated mockup, a grey placeholder, or a hotlinked remote image — would
- * misrepresent the product, so the section renders without a figure until the
+ * The Work index shows one polished product screenshot for Shouri (the home
+ * page no longer does). If the image asset is missing, inventing one — a
+ * generated mockup, a grey placeholder, or a hotlinked remote image — would
+ * misrepresent the product, so the page renders without a figure until the
  * real screenshot is added.
  *
  * Adding it is two steps and no code change:

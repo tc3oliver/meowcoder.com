@@ -7,26 +7,23 @@
  * and the feed titles differ. That is what PRD §35 means by "the Chinese
  * version follows the same information architecture".
  *
- * The order below is doc-2 §5's order, which replaces PRD §35. It is the
- * visitor journey read top to bottom, and it now front-loads the two sections
- * that carry inspectable evidence:
+ * The page is text first, one narrow column like Study: no cards, grids,
+ * images or rules, and two boxed buttons in total (the hero's). The order is
+ * the visitor journey read top to bottom:
  *
- *   Hero                    Who is Oliver?
- *   Featured Product        Can he build a real product?
- *   Featured Research       Can he find and prove a root cause?
- *   Open Source + Upstream  Can I inspect his implementation, and does it
- *                           hold up in other people's projects?
- *   Research + Writing      Is there deeper technical credibility, and can I
- *                           inspect his technical thinking?
- *   Experience strip        What experience supports this?
+ *   Hero      Who is Oliver?
+ *   Research  Can he find and prove a root cause, and does it hold up in other
+ *             people's projects? Measured results and upstream pull requests
+ *             lead because they are the evidence a visitor can inspect.
+ *   Products  Can he build and operate a real product? Shouri, SignalForge and
+ *             PiShip, one row each; Shouri's screenshot lives on Work.
+ *   Writing   Can I read his technical thinking? Study posts, then the
+ *             journal paper.
  *
- * Engineering Focus, doc-2 §8's four areas with a line each, is gone. It was
- * a signalling section rather than evidence, and once Featured Research and
- * the upstream list carried the proof it only restated them: two of its
- * pillars linked to the same case study and a third to a project already
- * featured above it. Research and Technical Writing are one component rather
- * than two: doc-2 §9 makes them a single two-column band, which is
- * `ResearchWritingSection`.
+ * Shouri used to lead the page with its screenshot. Without the visual it is
+ * one row among three, so research now comes first. The experience strip,
+ * Engineering Focus and every section eyebrow are gone; the role line and
+ * About carry that background.
  *
  * The last item, the footer, is site chrome and is rendered by `SiteShell`
  * after this component — it is the same link row on every route (PRD §9.8).
@@ -68,9 +65,7 @@ const { locale, t, posts, externalIndicator } = Astro.props;
   .home {
     display: flex;
     flex-direction: column;
-    /* No gap. Each section owns the whitespace around its separator: a compact
-       end padding keeps the preceding action or visual off the rule, while
-       `--space-section` provides the larger opening rhythm after it. */
+    /* No gap. Each section opens with `--space-section` of its own padding. */
     gap: 0;
     /* One narrow column, left-aligned with the header's content edge: the
        auto margin `.container` would apply is replaced by the same offset

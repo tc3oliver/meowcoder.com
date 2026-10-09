@@ -2,8 +2,8 @@
 title: 'PiShip'
 type: 'Open Source · Agent Infrastructure'
 summary: 'A toolchain that lets a company ship Pi as its own coding agent without forking it, adding OIDC login, short-lived gateway credentials, policy, MCP rules, and a sandbox.'
-outcome: 'v0.13.0 is a pre-release of nine attested archives. Its qualification run passed on the first attempt: each archive was built twice, and all nine payloads are identical.'
-indexMeta: 'Pre-release v0.13.0 · Pi 1.1.0 · Linux, macOS, Windows'
+outcome: 'In the v0.13.0 qualification run, each of nine attested archives was built twice and all nine payloads were identical. The run passed on its first attempt.'
+indexMeta: 'Pre-release · Linux, macOS, Windows'
 evidence: 'github.com/tc3oliver/piship · docs/status.md, the v0.13.0 release, and its qualification run'
 slug: 'piship'
 locale: 'en'
@@ -12,13 +12,11 @@ order: 4
 draft: false
 meta:
   - label: 'Status'
-    value: 'Pre-release v0.13.0 · 2026-10-09'
+    value: 'Pre-release'
   - label: 'Built on'
-    value: 'Pi 1.1.0, upstream and unmodified'
+    value: 'Upstream Pi, unmodified'
   - label: 'Release'
-    value: '9 attested archives · linux-x64, darwin-arm64, win32-x64'
-  - label: 'Requires'
-    value: 'Node.js 22.19.0+ (devcode: 24.18+)'
+    value: 'Attested archives · linux-x64, darwin-arm64, win32-x64'
 ---
 
 Independently designed and built by Oliver Yu.
@@ -71,7 +69,7 @@ PiShip does not replace the identity provider, broker, or gateway. The endpoints
 
 ## How a release is checked
 
-A release is nine archives: three example distributions on three platforms. Each is built twice and the two builds are compared. In v0.13.0's qualification run, 9 of 9 were payload-equal. The two `devcode` builds differ in bytes only because `vulnerabilities.json` records the scan time. The same run verified the attestations, checked registry signatures and ran the vulnerability gate (both passed 9 of 9), and exercised tamper rejection and offline install.
+A v0.13.0 release is nine archives: three example distributions on three platforms. Each is built twice and the two builds are compared. In v0.13.0's qualification run, 9 of 9 were payload-equal. The two `devcode` builds differ in bytes only because `vulnerabilities.json` records the scan time. The same run verified the attestations, checked registry signatures and ran the vulnerability gate (both passed 9 of 9), and exercised tamper rejection and offline install.
 
 Run 37887824632 passed on the tagged commit on its first attempt: 54 jobs passed, and 2 were skipped because the issue-report jobs run only on schedule.
 
