@@ -131,6 +131,12 @@ export interface HomeStrings extends PageStrings {
       statement: string;
       cta: CtaLabel;
     };
+    /** The same shape as PiShip; the statement is the case-study card's summary. */
+    claudeTeamKit: {
+      heading: string;
+      statement: string;
+      cta: CtaLabel;
+    };
   };
   /**
    * The research proof: four programs, each a measured result linked to its
@@ -245,6 +251,12 @@ export const home = {
         heading: 'PiShip',
         statement:
           'A toolchain that lets a company ship Pi as its own coding agent without forking it, with OIDC sign-in, short-lived gateway credentials, policy, and a sandbox.',
+        cta: { label: 'GitHub' },
+      },
+      claudeTeamKit: {
+        heading: 'Claude Team Kit',
+        statement:
+          'A Claude Code plugin that puts a hard limit on Agent Teams teammates and adds a read-only Mission Control pane for workers, task dependencies, and usage.',
         cta: { label: 'GitHub' },
       },
     },
@@ -375,6 +387,12 @@ export const home = {
         heading: 'PiShip',
         statement:
           '讓公司不必 fork Pi，就能把它做成自家的 coding agent，並補上 OIDC 登入、短效 gateway 憑證、policy 與 sandbox。',
+        cta: { label: 'GitHub' },
+      },
+      claudeTeamKit: {
+        heading: 'Claude Team Kit',
+        statement:
+          '一個 Claude Code plugin，替 Agent Teams 的 teammate 數量加上硬性上限，並提供唯讀的 Mission Control 面板，顯示 worker、任務相依與用量。',
         cta: { label: 'GitHub' },
       },
     },

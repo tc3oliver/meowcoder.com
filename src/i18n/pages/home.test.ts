@@ -55,7 +55,12 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     // description) and one action; the principles, eyebrow, screenshot and the
     // case-study label left the homepage with the Shouri section.
     expect(Object.keys(t.shouri).sort()).toEqual(['cta', 'heading', 'summary']);
-    expect(Object.keys(t.products).sort()).toEqual(['heading', 'piship', 'signalforge']);
+    expect(Object.keys(t.products).sort()).toEqual([
+      'claudeTeamKit',
+      'heading',
+      'piship',
+      'signalforge',
+    ]);
     expect(Object.keys(t.products.piship).sort()).toEqual(['cta', 'heading', 'statement']);
     expect(Object.keys(t.products.signalforge).sort()).toEqual([
       'cta',
@@ -63,6 +68,14 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
       'liveCta',
       'statement',
     ]);
+  });
+
+  it('lists Claude Team Kit as a row with no version, date or count', () => {
+    const row = t.products.claudeTeamKit;
+    expect(Object.keys(row).sort()).toEqual(['cta', 'heading', 'statement']);
+    expect(row.heading).toBe('Claude Team Kit');
+    expect(row.cta.label).toBe('GitHub');
+    expect(`${row.heading} ${row.statement}`).not.toMatch(/\d/);
   });
 
   it('names PiShip with its statement and a GitHub link', () => {
@@ -211,6 +224,7 @@ describe('content language rules (PRD §34)', () => {
     t.shouri.summary,
     ...t.systems.projects.flatMap((project) => (project.note ? [project.note] : [])),
     t.products.piship.statement,
+    t.products.claudeTeamKit.statement,
     t.products.signalforge.statement,
   ];
 
@@ -228,6 +242,15 @@ describe('content language rules (PRD §34)', () => {
       // Product and proper names.
       'Study',
       'Pi',
+      'Claude',
+      'Code',
+      'plugin',
+      'Agent',
+      'Teams',
+      'teammate',
+      'Mission',
+      'Control',
+      'worker',
       'OIDC',
       'fork',
       'gateway',

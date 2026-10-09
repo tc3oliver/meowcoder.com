@@ -18,6 +18,7 @@ export const UPSTREAM_PRS_URL = 'https://github.com/tc3oliver#more-oss-contribut
 
 /** PiShip source repository. */
 export const PISHIP_URL = 'https://github.com/tc3oliver/piship';
+export const CLAUDE_TEAM_KIT_URL = 'https://github.com/tc3oliver/claude-team-kit';
 
 /** Professional profile, confirmed against the public résumé. */
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/oliver-yu-a554a9286';

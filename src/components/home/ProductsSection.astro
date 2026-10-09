@@ -1,6 +1,6 @@
 ---
 /**
- * Products — Shouri, SignalForge and PiShip as three plain rows: the name
+ * Products — Shouri, SignalForge, PiShip and Claude Team Kit as plain rows: the name
  * linked to its case study, one sentence, and text links out. The Shouri
  * screenshot is not shown here; it stays on the Work index
  * (`shouri-screenshot.ts`). PRD §24 keeps the meowcoder.com source out of this
@@ -9,7 +9,13 @@
 
 import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
-import { PISHIP_URL, SHOURI_URL, SIGNALFORGE_LIVE_URL, SIGNALFORGE_URL } from '../../lib/external';
+import {
+  CLAUDE_TEAM_KIT_URL,
+  PISHIP_URL,
+  SHOURI_URL,
+  SIGNALFORGE_LIVE_URL,
+  SIGNALFORGE_URL,
+} from '../../lib/external';
 import { localizePath, workDetailRoute } from '../../lib/i18n';
 import CtaLink from './CtaLink.astro';
 import HomeSection from './HomeSection.astro';
@@ -44,6 +50,12 @@ const products = [
     name: t.products.piship.heading,
     statement: t.products.piship.statement,
     links: [{ href: PISHIP_URL, label: t.products.piship.cta.label }],
+  },
+  {
+    slug: 'claude-team-kit',
+    name: t.products.claudeTeamKit.heading,
+    statement: t.products.claudeTeamKit.statement,
+    links: [{ href: CLAUDE_TEAM_KIT_URL, label: t.products.claudeTeamKit.cta.label }],
   },
 ];
 ---
