@@ -87,11 +87,13 @@ const statementStart =
 
   /* The page's focal point, and the only element that opts into the display
      step — doc-2 §4 puts the desktop hero name at 64–72px, above every
-     numbered step in the scale. Leading and tracking still come from the `h1`
-     baseline in `global.css`. */
+     numbered step in the scale. At that size the `h1` baseline leading is too
+     loose and the default tracking too wide, so this element overrides both. */
   .hero__name {
     margin-block-start: var(--space-2);
     font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: -0.025em;
   }
 
   .hero__statement {

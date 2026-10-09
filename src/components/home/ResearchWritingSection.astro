@@ -149,9 +149,11 @@ const entries = posts.map((post) => {
     }
   }
 
+  /* Dates and categories are metadata, so they step down to the subtle text
+     level; the title link beside them stays full contrast. */
   .entry__when,
   .entry__meta {
-    color: var(--color-text-muted);
+    color: var(--color-text-subtle);
     font-size: var(--text-sm);
   }
 
