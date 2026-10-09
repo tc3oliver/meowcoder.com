@@ -89,7 +89,9 @@ const preview = Astro.props.socialImage ?? socialPreview(locale);
 
     <slot name="head" />
   </head>
-  <body>
+  {/* Target of the footer's back-to-top anchor — the only way to do it with
+      zero client JavaScript. */}
+  <body id="top">
     {
       skipLinkLabel && (
         <a class="skip-link" href="#main">

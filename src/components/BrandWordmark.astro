@@ -15,10 +15,11 @@
  *
  * Two deliberate changes from the source asset:
  *
- *   - `font-family` was `Inter`, which this site does not load — no web font
- *     ships at all (PRD §26). It now uses the same system stack as
- *     `--font-sans`, so the wordmark is set in the same face as every other
- *     word on the page rather than silently falling back to something else.
+ *   - `font-family` is set from `--font-sans` rather than a bare family name,
+ *     so the wordmark is set in the same face as every other word on the page
+ *     (self-hosted Inter, per the redesign spec) and follows the token if the
+ *     stack ever changes. An SVG attribute cannot resolve `var()`, hence the
+ *     `style` attribute.
  *   - The asset's `<title id="title">` / `<desc id="desc">` were dropped in
  *     favour of `role="img"` + `aria-label`. Those ids are generic enough to
  *     collide with anything else on the page, and one accessible name is
@@ -62,7 +63,7 @@
     x="170"
     y="82"
     fill="currentColor"
-    font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif"
+    style="font-family: var(--font-sans)"
     font-size="62"
     font-weight="700"
     letter-spacing="-2.2">MeowCoder</text

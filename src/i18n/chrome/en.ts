@@ -25,5 +25,6 @@ export const chromeEn = {
     shouri: 'Shouri',
     email: 'Email',
     siteSource: 'Site Source',
+    backToTop: 'Back to top',
   },
 } satisfies ChromeDictionary;

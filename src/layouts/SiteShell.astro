@@ -116,7 +116,12 @@ const footerLinks = [
 
   <slot />
 
-  <Footer slot="footer" navLabel={t.footer.ariaLabel} links={footerLinks}>
+  <Footer
+    slot="footer"
+    navLabel={t.footer.ariaLabel}
+    links={footerLinks}
+    backToTopLabel={t.footer.backToTop}
+  >
     <BrandWordmark slot="meta" />
   </Footer>
 </BaseLayout>

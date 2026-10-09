@@ -53,5 +53,7 @@ export interface ChromeDictionary {
     email: string;
     /** The public meowcoder.com repository — secondary evidence (PRD §24). */
     siteSource: string;
+    /** Label for the pure-anchor back-to-top link (redesign spec). */
+    backToTop: string;
   };
 }

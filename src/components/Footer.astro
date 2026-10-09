@@ -19,9 +19,17 @@ interface Props {
   /** Accessible name for the footer navigation landmark. */
   navLabel?: string;
   links?: FooterLink[];
+  /**
+   * Localized back-to-top label. Omitted means no link is rendered. It is a
+   * plain anchor to `#top` — the id the document shell puts on `<body>` —
+   * because this site ships zero client JavaScript. Its class is deliberately
+   * not `site-footer__link`: the PRD §9.8 row is asserted by membership and
+   * order, and this is not one of its destinations.
+   */
+  backToTopLabel?: string;
 }
 
-const { navLabel, links = [] } = Astro.props;
+const { navLabel, links = [], backToTopLabel } = Astro.props;
 
 const hasMeta = Astro.slots.has('meta');
 ---
@@ -54,6 +62,14 @@ const hasMeta = Astro.slots.has('meta');
         <p class="site-footer__meta">
           <slot name="meta" />
         </p>
+      )
+    }
+
+    {
+      backToTopLabel && (
+        <a class="site-footer__top" href="#top">
+          {backToTopLabel}
+        </a>
       )
     }
 
@@ -95,7 +111,19 @@ const hasMeta = Astro.slots.has('meta');
   }
 
   .site-footer__meta {
+    color: var(--color-text-subtle);
+    font-size: var(--text-sm);
+  }
+
+  /* Chrome-link treatment, same as the nav row: muted, underline-less, and
+     the color transition comes from the global `a` rule. */
+  .site-footer__top {
     color: var(--color-text-muted);
     font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .site-footer__top:hover {
+    color: var(--color-text);
   }
 </style>

@@ -30,5 +30,6 @@ export const chromeZh = {
     shouri: 'Shouri',
     email: 'Email',
     siteSource: '網站原始碼',
+    backToTop: '回到頁首',
   },
 } satisfies ChromeDictionary;
