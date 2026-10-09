@@ -320,8 +320,8 @@ describe('accessibility baseline', () => {
   /*
    * A regression guard, not a preference. An inline `code` holding a long file
    * path has no break opportunity, so it sets the page's minimum width and
-   * every element on the page inherits a horizontal scroll — which is how the
-   * AI Coding Skills case study broke at 390px before MCD-13's QA pass.
+   * every element on the page inherits a horizontal scroll — which is how a
+   * case study broke at 390px before MCD-13's QA pass.
    *
    * `anywhere` specifically: `break-word` wraps the visible text but leaves the
    * intrinsic minimum width intact, so the page still overflows.

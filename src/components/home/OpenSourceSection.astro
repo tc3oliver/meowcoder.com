@@ -1,25 +1,15 @@
 ---
 /**
- * Open Source — AI Coding Skills (MCD-18, doc-2 §7).
+ * Open Source — SignalForge and PiShip (MCD-18, doc-2 §7).
  *
- * This is the primary open-source proof. PRD §24 keeps it that way: the
- * meowcoder.com source is secondary engineering evidence and gets a footer link
- * rather than a card here.
- *
- * doc-2 §7 compresses the section to a statement, the two skill names, a
- * workflow visual, and its actions. The seven-stage pipeline, "What it
- * defines", "What it demonstrates", and the attribution paragraph live in the
- * skills repository, which is the only place the Skills block links to: the
- * site no longer carries a case study for it.
+ * Two projects side by side, each a name, one statement, one line of facts and
+ * its actions. PRD §24 keeps the meowcoder.com source out of this section: it
+ * is secondary engineering evidence and gets a footer link rather than a card.
  *
  * Beneath the two projects is the upstream half: pull requests to projects
  * this site's author does not maintain, which is the evidence the GitHub
  * profile leads with. Four are named; the rest are one link away on the
  * profile, whose list is regenerated from GitHub rather than written by hand.
- *
- * `backlog-workflow` still leads and `audit-claude-md` still follows, in that
- * order and at that weight, because PRD §9.4 states the priority — they are now
- * one line rather than two blocks.
  */
 
 import type { Locale } from '../../i18n/locales';
@@ -27,11 +17,10 @@ import type { HomeStrings } from '../../i18n/pages/home';
 import {
   SIGNALFORGE_LIVE_URL,
   SIGNALFORGE_URL,
-  SKILLS_URL,
+  PISHIP_URL,
   UPSTREAM_PRS_URL,
 } from '../../lib/external';
 import { localizePath, workDetailRoute } from '../../lib/i18n';
-import WorkflowDiagram from '../WorkflowDiagram.astro';
 import CtaLink from './CtaLink.astro';
 import HomeSection from './HomeSection.astro';
 
@@ -43,16 +32,11 @@ interface Props {
 
 const { locale, t, externalIndicator } = Astro.props;
 
-/** The SignalForge case study's slug — `src/content/work/{en,zh}/<slug>.md`. */
+/** The case studies' slugs — `src/content/work/{en,zh}/<slug>.md`. */
 const SIGNALFORGE_SLUG = 'signalforge';
 const signalforgeHref = localizePath(locale, workDetailRoute(SIGNALFORGE_SLUG));
-
-/**
- * doc-2 §7 prints the two names as one compact line. The middot is a separator
- * between two proper names rather than punctuation in a sentence, so it is
- * joined here instead of being written into either locale's strings.
- */
-const skills = t.openSource.skills.join(' · ');
+const PISHIP_SLUG = 'piship';
+const pishipHref = localizePath(locale, workDetailRoute(PISHIP_SLUG));
 ---
 
 <HomeSection id="open-source" eyebrow={t.openSource.eyebrow} heading={t.openSource.heading}>
@@ -85,26 +69,21 @@ const skills = t.openSource.skills.join(' · ');
     </div>
 
     <div class="oss__project">
-      {/* A repository name, identical in both locales, so it is not in the dictionary. */}
-      <h3 class="oss__name">AI Coding Skills</h3>
-      <p class="oss__statement">{t.openSource.statement}</p>
-
-      <p class="oss__skills">{skills}</p>
-
-      <WorkflowDiagram
-        caption={t.openSource.workflow.caption}
-        start={t.openSource.workflow.start}
-        steps={t.openSource.workflow.steps}
-        end={t.openSource.workflow.end}
-      />
-
+      <h3 class="oss__name">{t.openSource.piship.heading}</h3>
+      <p class="oss__statement">{t.openSource.piship.statement}</p>
+      <p class="oss__skills">{t.openSource.piship.meta}</p>
       <div class="oss__actions">
         <CtaLink
-          href={SKILLS_URL}
-          label={t.openSource.cta.label}
+          href={pishipHref}
+          label={t.openSource.piship.caseStudyCta.label}
+          variant="outline"
+        />
+        <CtaLink
+          href={PISHIP_URL}
+          label={t.openSource.piship.cta.label}
           external
           indicator={externalIndicator}
-          variant="outline"
+          variant="text"
         />
       </div>
     </div>

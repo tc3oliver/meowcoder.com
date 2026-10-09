@@ -78,20 +78,23 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
   });
 
   it('carries only what doc-2 §7 leaves on the homepage', () => {
-    // doc-2 §7 fixes the Skills half: eyebrow, heading, one statement, the
-    // two skill names, the workflow visual, and two actions. The SignalForge
-    // half is the same shape one size smaller — a name, one statement, one
-    // line of facts, and its actions. Anything else belongs on a case study,
+    // doc-2 §7 fixes the section: eyebrow, heading, two projects and the
+    // upstream list. Each project is a name, one statement, one line of facts,
+    // and its actions. Anything else belongs on a case study,
     // so the key sets are the assertion.
     expect(Object.keys(t.openSource).sort()).toEqual([
-      'cta',
       'eyebrow',
       'heading',
+      'piship',
       'signalforge',
-      'skills',
-      'statement',
       'upstream',
-      'workflow',
+    ]);
+    expect(Object.keys(t.openSource.piship).sort()).toEqual([
+      'caseStudyCta',
+      'cta',
+      'heading',
+      'meta',
+      'statement',
     ]);
     expect(Object.keys(t.openSource.signalforge).sort()).toEqual([
       'caseStudyCta',
@@ -121,17 +124,12 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     expect(MOVED.filter((key) => key in t.openSource)).toEqual([]);
   });
 
-  it('draws the doc-2 §7 workflow as one opening stage, three steps and one close', () => {
-    expect(t.openSource.workflow.start.length).toBeGreaterThan(0);
-    expect(t.openSource.workflow.steps).toHaveLength(3);
-    expect(t.openSource.workflow.end.length).toBeGreaterThan(0);
-    // The diagram carries no visible caption, so this string is its only
-    // accessible name — see `WorkflowDiagram.astro`.
-    expect(t.openSource.workflow.caption.length).toBeGreaterThan(0);
-  });
-
-  it('leads with backlog-workflow and follows with audit-claude-md (PRD §9.4)', () => {
-    expect(t.openSource.skills).toEqual(['backlog-workflow', 'audit-claude-md']);
+  it('names PiShip with its facts and two actions', () => {
+    expect(t.openSource.piship.heading).toBe('PiShip');
+    expect(t.openSource.piship.meta).toBe('MIT · TypeScript · Pre-release v0.13.0');
+    expect(t.openSource.piship.statement.length).toBeGreaterThan(0);
+    expect(t.openSource.piship.caseStudyCta.label.length).toBeGreaterThan(0);
+    expect(t.openSource.piship.cta.label).toBe('GitHub');
   });
 
   it('discloses no employer or internal system (PRD §11)', () => {
@@ -156,6 +154,7 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     const CASE_STUDY = [/case study/i, /案例/];
     const permitted = new Set([
       t.openSource.signalforge.caseStudyCta.label,
+      t.openSource.piship.caseStudyCta.label,
       t.systems.caseStudyCta.label,
     ]);
 
@@ -334,7 +333,7 @@ describe('content language rules (PRD §34)', () => {
     // The Shouri principles are no longer prose: doc-2 §6 reduces them to three
     // names, which PRD §34 exempts as product vocabulary.
     ...t.systems.projects.map((project) => project.statement),
-    t.openSource.statement,
+    t.openSource.piship.statement,
     t.openSource.signalforge.statement,
     // doc-2 §9 leaves the Research column one prose block: `detail` moved to
     // About, and the Technical Writing intro went with the merge — the column
@@ -357,11 +356,12 @@ describe('content language rules (PRD §34)', () => {
     const ALLOWED = new Set([
       // Product and proper names.
       'Study',
-      'backlog-workflow',
-      'grilling',
-      'skill',
-      'Matt',
-      'Pocock',
+      'Pi',
+      'OIDC',
+      'fork',
+      'gateway',
+      'policy',
+      'sandbox',
       'MIT',
       'License',
       'Apple',

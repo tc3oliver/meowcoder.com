@@ -148,20 +148,18 @@ export interface HomeStrings extends PageStrings {
   /**
    * doc-2 §7. The primary open-source proof; the site source is not (PRD §24).
    *
-   * doc-2 §7 cuts this section back to a single statement, the two skill names,
-   * a workflow visual, and its actions. The seven-stage pipeline, the two
-   * bullet lists, and the attribution paragraph live in the skills repository
-   * the section links to; the site has no AI Coding Skills case study.
+   * doc-2 §7 cuts this section back to two projects, each a name, one
+   * statement, one line of facts, and its actions, plus the upstream list.
    */
   openSource: {
     eyebrow: string;
     heading: string;
     /**
      * The second project in the section, first in reading order: the public
-     * system proof. It has what Skills does not — a running instance — so it
-     * carries three actions where Skills carries one: the live reader, the
+     * system proof. It has what PiShip does not — a running instance — so it
+     * carries three actions where PiShip carries two: the live reader, the
      * case study, and the repository. `meta` is one compact line of facts
-     * (licence, language, what runs), the same role `skills` plays beside it.
+     * (licence, language, what runs).
      */
     signalforge: {
       heading: string;
@@ -172,17 +170,14 @@ export interface HomeStrings extends PageStrings {
       caseStudyCta: CtaLabel;
       cta: CtaLabel;
     };
-    /** doc-2 §7's one statement, in place of the old summary and lists. */
-    statement: string;
-    /** The published skills, in doc-2 §7's order: primary first. */
-    skills: readonly string[];
-    /** Labels for doc-2 §7's workflow visual; see `WorkflowDiagram.astro`. */
-    workflow: {
-      /** Accessible name for the diagram — it carries no visible caption. */
-      caption: string;
-      start: string;
-      steps: readonly string[];
-      end: string;
+    /** The third open-source project, the same shape as SignalForge without a live instance. */
+    piship: {
+      heading: string;
+      statement: string;
+      meta: string;
+      /** Internal; the case-study route is resolved by the component, not here. */
+      caseStudyCta: CtaLabel;
+      cta: CtaLabel;
     };
     /**
      * Pull requests to projects this site's author does not maintain — the
@@ -198,7 +193,6 @@ export interface HomeStrings extends PageStrings {
       /** The full, generated record on the GitHub profile. */
       cta: CtaLabel;
     };
-    cta: CtaLabel;
   };
   /**
    * The research proof: four programs, each led by one measured result, with
@@ -332,15 +326,13 @@ export const home = {
         caseStudyCta: { label: 'View Case Study' },
         cta: { label: 'GitHub' },
       },
-      statement:
-        'Versioned workflows for requirement alignment, just-in-time planning, validation, and explicit completion criteria.',
-      skills: ['backlog-workflow', 'audit-claude-md'],
-      workflow: {
-        caption:
-          'The workflow: a requirement is planned, executed, validated, and completed against explicit criteria.',
-        start: 'Requirement',
-        steps: ['Plan', 'Execute', 'Validate'],
-        end: 'Complete',
+      piship: {
+        heading: 'PiShip',
+        statement:
+          'A toolchain that lets a company ship Pi as its own coding agent without forking it, with OIDC sign-in, short-lived gateway credentials, policy, and a sandbox.',
+        meta: 'MIT · TypeScript · Pre-release v0.13.0',
+        caseStudyCta: { label: 'View Case Study' },
+        cta: { label: 'GitHub' },
       },
       upstream: {
         heading: 'Upstream',
@@ -376,7 +368,6 @@ export const home = {
         ],
         cta: { label: 'All upstream pull requests' },
       },
-      cta: { label: 'GitHub' },
     },
     systems: {
       eyebrow: 'Featured Research',
@@ -503,16 +494,14 @@ export const home = {
         caseStudyCta: { label: '查看完整案例' },
         cta: { label: 'GitHub' },
       },
-      statement:
-        '可版本控管的 AI coding workflow：先對齊需求，執行前才規劃，依專案實際設定驗證，最後用明確條件判斷是否完成。',
-      // The skill names are repository names, so they read the same in both
-      // locales; the component joins them with a middot (doc-2 §7).
-      skills: ['backlog-workflow', 'audit-claude-md'],
-      workflow: {
-        caption: '工作流程：需求經過規劃、執行與驗證，最後依明確條件完成。',
-        start: '需求',
-        steps: ['規劃', '執行', '驗證'],
-        end: '完成',
+      piship: {
+        heading: 'PiShip',
+        statement:
+          '讓公司不必 fork Pi，就能把它做成自家的 coding agent，並補上 OIDC 登入、短效 gateway 憑證、policy 與 sandbox。',
+        // Facts, not prose (PRD §34).
+        meta: 'MIT · TypeScript · Pre-release v0.13.0',
+        caseStudyCta: { label: '查看完整案例' },
+        cta: { label: 'GitHub' },
       },
       upstream: {
         heading: '上游貢獻',
@@ -548,7 +537,6 @@ export const home = {
         ],
         cta: { label: '所有上游 PR' },
       },
-      cta: { label: 'GitHub' },
     },
     systems: {
       eyebrow: '精選研究',

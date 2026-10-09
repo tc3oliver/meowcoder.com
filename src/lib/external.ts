@@ -16,8 +16,8 @@ export const GITHUB_URL = 'https://github.com/tc3oliver';
 /** The profile's full upstream pull-request record, regenerated weekly from GitHub. */
 export const UPSTREAM_PRS_URL = 'https://github.com/tc3oliver#more-oss-contributions';
 
-/** AI Coding Skills source repository. */
-export const SKILLS_URL = 'https://github.com/tc3oliver/skills';
+/** PiShip source repository. */
+export const PISHIP_URL = 'https://github.com/tc3oliver/piship';
 
 /** Professional profile, confirmed against the public résumé. */
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/oliver-yu-a554a9286';
