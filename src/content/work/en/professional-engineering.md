@@ -8,7 +8,7 @@ kind: 'experience'
 slug: 'professional-engineering'
 locale: 'en'
 translationKey: 'professional-engineering'
-order: 5
+order: 6
 draft: false
 meta:
   - label: 'Experience'

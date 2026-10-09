@@ -8,7 +8,7 @@ kind: 'experience'
 slug: 'professional-engineering'
 locale: 'zh'
 translationKey: 'professional-engineering'
-order: 5
+order: 6
 draft: false
 meta:
   - label: '期間'
