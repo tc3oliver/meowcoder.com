@@ -64,9 +64,12 @@
      running text and in headings that share a page with other headings; this
      one is not, and giving it its own name keeps it from being reached for by
      habit. Nothing inherits it: a component opts in. */
-  --text-display: clamp(2.5rem, 1.73rem + 3.15vw, 4.25rem); /* 40 → 68px */
+  --text-display: clamp(3.5rem, 8vw, 6rem); /* 56 → 96px */
 
   --leading-display: 1.05; /* the hero name, opted into by that one element */
+  /* The round-2 masthead tightens further: at 96px the name reads as one block
+     only with a line box under 1. */
+  --leading-masthead: 0.98;
   --leading-tight: 1.15;
   --leading-heading: 1.2; /* h2: a 40px heading at 1.15 is too tight */
   --leading-snug: 1.3;
@@ -76,6 +79,7 @@
   --leading-relaxed: 1.75;
 
   --tracking-tight: -0.02em;
+  --tracking-masthead: -0.03em; /* the display-size name only — tighter than any heading */
   --tracking-normal: 0;
   --tracking-wide: 0.04em;
 
@@ -112,7 +116,12 @@
      Both scale with the viewport so mobile does not waste a screen of empty
      space while desktop still breathes. */
   --space-page: clamp(3rem, 2rem + 5vw, 6.5rem);
-  --space-section: clamp(4.5rem, 2.97rem + 6.29vw, 8rem); /* 72 → 128px */
+  --space-section: clamp(6rem, 4.99rem + 4.16vw, 8rem); /* 96 → 128px */
+
+  /* The masthead's own vertical padding. Round 2 gives the homepage an opening
+     block with far more presence than a section break, so it gets its own step
+     rather than a multiple of `--space-section` written inline. */
+  --space-hero: clamp(4rem, 1.5rem + 10.34vw, 10rem); /* 64 → 160px */
 
   /* ---------------------------------------------------------------------
    * Layout — PRD §25 fixes both widths.

@@ -1,6 +1,6 @@
 ---
 /**
- * Technical Writing — one date-and-title list in Study's form: the latest
+ * Technical Writing — one date-and-title list in ledger form: the latest
  * Study posts, then the journal paper as the last row, then a link to all of
  * Study (PRD §9.5, §9.6).
  *
@@ -12,6 +12,11 @@
  * The paper is listed here rather than in a section of its own (PRD §9.5 and
  * §8 forbid promoting a single paper into its own navigation entry). Its link
  * resolves through the DOI, so it survives the article being moved.
+ *
+ * Round 2 renders each entry as a ledger row with the dates in the margin:
+ * mono `when` on the left, title and meta on the right, hairlines between the
+ * rows. The closing career-arc line is the page's colophon row — hairline-topped,
+ * progression left in mono, About link right, stacked on mobile.
  *
  * Three states are normal rather than exceptional:
  *
@@ -45,9 +50,11 @@ interface Props {
   posts: readonly StudyPost[];
   /** Localized off-site glyph, from the chrome dictionary. */
   externalIndicator: string;
+  /** Two-digit ledger index for the section heading row. */
+  index: string;
 }
 
-const { locale, t, posts, externalIndicator } = Astro.props;
+const { locale, t, posts, externalIndicator, index } = Astro.props;
 
 /* Built once per render rather than per post; `dateStyle: 'medium'` gives each
    locale its own conventional form instead of imposing one format on both. */
@@ -76,7 +83,7 @@ const entries = posts.map((post) => {
 });
 ---
 
-<HomeSection id="technical-writing" heading={t.writing.heading}>
+<HomeSection id="technical-writing" heading={t.writing.heading} index={index}>
   <ul class="writing" role="list">
     {
       entries.map((entry) => (
@@ -127,19 +134,25 @@ const entries = posts.map((post) => {
   .writing {
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  /* The date on the left and the title on the right from a tablet up; a stack
-     beneath that. `minmax(0, 1fr)` keeps a long unbroken title from widening
-     a 390px viewport. */
+  /* One ledger row per entry, hairlines above and below the stack. A stack
+     beneath 48rem; the date in the margin beside the title from a tablet up.
+     `minmax(0, 1fr)` keeps a long unbroken title from widening a 390px
+     viewport. */
   .entry {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-1);
+    padding-block: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .entry:last-child {
+    border-block-end: var(--border-width) solid var(--color-border);
   }
 
   @media (width >= 48rem) {
@@ -149,11 +162,12 @@ const entries = posts.map((post) => {
     }
   }
 
-  /* Dates and categories are metadata, so they step down to the subtle text
-     level; the title link beside them stays full contrast. */
+  /* Dates and categories are metadata, so they take the margin register: mono
+     at the subtle text level. The title link beside them stays full contrast. */
   .entry__when,
   .entry__meta {
     color: var(--color-text-subtle);
+    font-family: var(--font-mono);
     font-size: var(--text-sm);
   }
 
@@ -161,6 +175,7 @@ const entries = posts.map((post) => {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
+    min-width: 0;
   }
 
   .entry__meta {
@@ -177,11 +192,22 @@ const entries = posts.map((post) => {
 
   .writing__all {
     margin-block-start: var(--space-5);
+    font-family: var(--font-mono);
   }
 
+  /* The colophon row closing the page: career arc left in mono, About link
+     right; a stack on mobile. */
   .writing__about {
-    margin-block-start: var(--space-5);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-5);
+    margin-block-start: var(--space-7);
+    padding-block-start: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
     color: var(--color-text-muted);
+    font-family: var(--font-mono);
     font-size: var(--text-sm);
   }
 </style>

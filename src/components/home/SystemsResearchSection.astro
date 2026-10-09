@@ -1,13 +1,17 @@
 ---
 /**
- * Research — two plain lists in the text column: the measured results of four
- * projects (laya-apple, LLM Inference Systems, the MI300X DeepSeek V4 Flash
- * baseline, the Qwen3.8-27B evaluation on one RTX 5070 Ti), then the upstream
- * pull requests they produced.
+ * Research — a ruled ledger block in the reading column: the measured results
+ * of four projects (laya-apple, LLM Inference Systems, the MI300X DeepSeek V4
+ * Flash baseline, the Qwen3.8-27B evaluation on one RTX 5070 Ti), then the
+ * upstream pull requests they produced.
  *
  * It carries numbers rather than figures: research is proved by what it
  * measured, and a chart shrunk to homepage size is unreadable decoration. The
  * charts stay on the case study and the article.
+ *
+ * Round 2 sets the summary in the ledger register — hairline rules top and
+ * bottom of the block (never a box: a four-sided hairline is a card, and PRD
+ * §25 forbids them), the measured values in mono, the sub-headings quiet.
  *
  * Every number in `home.ts` for this section is quoted from the project's own
  * case study, which names the data it comes from — or, for the MI300X baseline,
@@ -37,9 +41,11 @@ interface Props {
   locale: Locale;
   t: HomeStrings;
   externalIndicator: string;
+  /** Two-digit ledger index for the section heading row. */
+  index: string;
 }
 
-const { locale, t, externalIndicator } = Astro.props;
+const { locale, t, externalIndicator, index } = Astro.props;
 
 /**
  * Where each project's links go. The name links to the case study, or to the
@@ -66,77 +72,93 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
 };
 ---
 
-<HomeSection id="featured-research" heading={t.systems.heading}>
-  <h3 class="list-heading">{t.systems.resultsHeading}</h3>
-  <ul class="results" role="list">
-    {
-      t.systems.projects.map((project) => {
-        const links = LINKS[project.id];
-        const href = links.slug ? localizePath(locale, workDetailRoute(links.slug)) : links.repo;
-        return (
-          <li class="result">
-            <p class="result__stat">{project.stat.value}</p>
-            <div class="result__body">
-              <p class="result__name">
-                <a
-                  href={href}
-                  target={links.slug ? undefined : '_blank'}
-                  rel={links.slug ? undefined : 'noopener noreferrer'}
-                >
-                  {project.name}
-                </a>
-              </p>
-              <p class="result__label">
-                {project.stat.label}
-                {links.article && (
-                  <>
-                    {' '}
-                    <CtaLink
-                      href={links.article}
-                      label={project.articleCta?.label ?? t.systems.articleCta.label}
-                      external
-                      indicator={externalIndicator}
-                    />
-                  </>
-                )}
-              </p>
-              {project.note && <p class="result__label">{project.note}</p>}
-            </div>
-          </li>
-        );
-      })
-    }
-  </ul>
+<HomeSection id="featured-research" heading={t.systems.heading} index={index}>
+  <div class="ledger">
+    <h3 class="list-heading">{t.systems.resultsHeading}</h3>
+    <ul class="results" role="list">
+      {
+        t.systems.projects.map((project) => {
+          const links = LINKS[project.id];
+          const href = links.slug ? localizePath(locale, workDetailRoute(links.slug)) : links.repo;
+          return (
+            <li class="result">
+              <p class="result__stat">{project.stat.value}</p>
+              <div class="result__body">
+                <p class="result__name">
+                  <a
+                    href={href}
+                    target={links.slug ? undefined : '_blank'}
+                    rel={links.slug ? undefined : 'noopener noreferrer'}
+                  >
+                    {project.name}
+                  </a>
+                </p>
+                <p class="result__label">
+                  {project.stat.label}
+                  {links.article && (
+                    <>
+                      {' '}
+                      <CtaLink
+                        href={links.article}
+                        label={project.articleCta?.label ?? t.systems.articleCta.label}
+                        external
+                        indicator={externalIndicator}
+                      />
+                    </>
+                  )}
+                </p>
+                {project.note && <p class="result__label">{project.note}</p>}
+              </div>
+            </li>
+          );
+        })
+      }
+    </ul>
 
-  <h3 class="list-heading">{t.systems.upstream.heading}</h3>
-  <ul class="upstream" role="list">
-    {
-      t.systems.upstream.items.map((item) => (
-        <li class="upstream__item">
-          <p class="upstream__name">
-            <a href={item.href} target="_blank" rel="noopener noreferrer">
-              {item.name}
-            </a>
-            {item.merged && <span class="upstream__state">{t.systems.upstream.merged}</span>}
-          </p>
-          <p class="upstream__description">{item.description}</p>
-        </li>
-      ))
-    }
-  </ul>
-  <p class="upstream__all">
-    <CtaLink
-      href={UPSTREAM_PRS_URL}
-      label={t.systems.upstream.cta.label}
-      external
-      indicator={externalIndicator}
-    />
-  </p>
+    <h3 class="list-heading">{t.systems.upstream.heading}</h3>
+    <ul class="upstream" role="list">
+      {
+        t.systems.upstream.items.map((item) => (
+          <li class="upstream__item">
+            <p class="upstream__name">
+              <a href={item.href} target="_blank" rel="noopener noreferrer">
+                {item.name}
+              </a>
+              {item.merged && <span class="upstream__state">{t.systems.upstream.merged}</span>}
+            </p>
+            <p class="upstream__description">{item.description}</p>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="upstream__all">
+      <CtaLink
+        href={UPSTREAM_PRS_URL}
+        label={t.systems.upstream.cta.label}
+        external
+        indicator={externalIndicator}
+      />
+    </p>
+  </div>
 </HomeSection>
 
 <style>
+  /* The ruled ledger block: reading-column width, hairline rules top and
+     bottom, no box. The rules span the block; the block never spans the
+     content width, which keeps prose at its measure inside a wide page. */
+  .ledger {
+    max-width: var(--width-reading);
+    padding-block: var(--space-6);
+    border-block: var(--border-width) solid var(--color-border);
+  }
+
+  /* Sub-headings take the quiet metadata register: mono at the subtle level.
+     No letter-spacing — these labels are visible on zh pages. */
   .list-heading {
-    font-size: var(--text-md);
+    color: var(--color-text-subtle);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-regular);
     letter-spacing: var(--tracking-normal);
   }
 
@@ -151,11 +173,11 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
   }
 
   .results {
-    margin-block: var(--space-6) var(--space-8);
+    margin-block: var(--space-4) var(--space-8);
   }
 
   .upstream {
-    margin-block-start: var(--space-6);
+    margin-block-start: var(--space-4);
   }
 
   /* The number on the left and the project on the right from a tablet up; a
@@ -174,7 +196,9 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
     }
   }
 
+  /* The measured value is the row's ledger entry: mono, tabular. */
   .result__stat {
+    font-family: var(--font-mono);
     font-size: var(--text-lg);
     font-weight: var(--weight-semibold);
     font-variant-numeric: tabular-nums;
@@ -185,9 +209,11 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
+    min-width: 0;
   }
 
   .result__name {
+    font-family: var(--font-mono);
     font-size: var(--text-md);
     overflow-wrap: anywhere;
   }
@@ -232,5 +258,6 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
 
   .upstream__all {
     margin-block-start: var(--space-5);
+    font-family: var(--font-mono);
   }
 </style>

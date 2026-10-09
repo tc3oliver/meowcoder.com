@@ -196,10 +196,10 @@ function readRemRange(css: string, name: string): { min: number; max: number } {
 }
 
 describe('type scale (doc-2 §4)', () => {
-  it('gives the hero name a 64–72px display step', () => {
+  it('gives the masthead name an 88–104px display step', () => {
     const display = readRemRange(TOKENS_CSS, 'text-display');
-    expect(display.max).toBeGreaterThanOrEqual(64);
-    expect(display.max).toBeLessThanOrEqual(72);
+    expect(display.max).toBeGreaterThanOrEqual(88);
+    expect(display.max).toBeLessThanOrEqual(104);
   });
 
   it('sizes h2 at 36–44px', () => {
@@ -216,10 +216,10 @@ describe('type scale (doc-2 §4)', () => {
   });
 
   /*
-   * The display step is the reason this matters: 68px of heading on a 390px
+   * The display step is the reason this matters: 96px of heading on a 390px
    * screen would set the page's minimum width from a single unbreakable word.
    * Each fluid step has to shrink, and the largest of them has to shrink to
-   * something a phone can hold.
+   * the 56px the masthead composition gives a phone.
    */
   it('scales every fluid step down for a 390px screen', () => {
     const fluid = [...TOKENS_CSS.matchAll(/--(text-[\w-]+):\s*clamp\(/g)].map(([, name]) => name);
@@ -230,7 +230,7 @@ describe('type scale (doc-2 §4)', () => {
       expect(step.min, `--${name} does not scale down`).toBeLessThan(step.max);
     }
 
-    expect(readRemRange(TOKENS_CSS, 'text-display').min).toBeLessThanOrEqual(48);
+    expect(readRemRange(TOKENS_CSS, 'text-display').min).toBeLessThanOrEqual(56);
   });
 
   it('keeps the scale ordered so a heading never outsizes the one above it', () => {
@@ -243,12 +243,10 @@ describe('type scale (doc-2 §4)', () => {
 });
 
 describe('section rhythm (doc-2 §4)', () => {
-  it('spaces sections 72–88px apart on mobile and 112–144px on desktop', () => {
+  it('spaces sections 96–128px apart', () => {
     const rhythm = readRemRange(TOKENS_CSS, 'space-section');
-    expect(rhythm.min).toBeGreaterThanOrEqual(72);
-    expect(rhythm.min).toBeLessThanOrEqual(88);
-    expect(rhythm.max).toBeGreaterThanOrEqual(112);
-    expect(rhythm.max).toBeLessThanOrEqual(144);
+    expect(rhythm.min).toBeGreaterThanOrEqual(96);
+    expect(rhythm.max).toBeLessThanOrEqual(128);
   });
 
   /*

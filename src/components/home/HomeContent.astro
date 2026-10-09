@@ -7,23 +7,29 @@
  * and the feed titles differ. That is what PRD §35 means by "the Chinese
  * version follows the same information architecture".
  *
- * The page is text first, one narrow column like Study: no cards, grids,
- * images or rules, and two boxed buttons in total (the hero's). The order is
- * the visitor journey read top to bottom:
+ * Round 2 composes the page as one wide "Engineering Ledger": the masthead and
+ * the section ledger rows span the full content width, while prose and reading
+ * blocks inside the sections stay at the narrow measure. That width contrast —
+ * wide structure, narrow text — is the identity; round 1 was one narrow column
+ * top to bottom. No cards, grids of boxes, images or decoration anywhere:
+ * `src/styles/design-system.test.ts` scans the source tree for each of them.
+ *
+ * The order is the visitor journey read top to bottom:
  *
  *   Hero      Who is Oliver?
  *   Research  Can he find and prove a root cause, and does it hold up in other
  *             people's projects? Measured results and upstream pull requests
  *             lead because they are the evidence a visitor can inspect.
  *   Products  Can he build and operate a real product? Shouri, SignalForge and
- *             PiShip, one row each.
+ *             PiShip, one ledger row each.
  *   Writing   Can I read his technical thinking? Study posts, then the
  *             journal paper, then the career-arc line and the About link.
  *
  * Shouri used to lead the page with its screenshot. Without the visual it is
  * one row among three, so research now comes first. The experience strip
  * (now a single line in Writing), Engineering Focus and every section eyebrow
- * are gone.
+ * string are gone; the numbered section indexes round 2 adds are decorative
+ * digits, not copy.
  *
  * The last item, the footer, is site chrome and is rendered by `SiteShell`
  * after this component — it is the same link row on every route (PRD §9.8).
@@ -51,12 +57,13 @@ const { locale, t, posts, externalIndicator } = Astro.props;
 
 <div class="container home">
   <HomeHero locale={locale} t={t} externalIndicator={externalIndicator} />
-  <SystemsResearchSection locale={locale} t={t} externalIndicator={externalIndicator} />
-  <ProductsSection locale={locale} t={t} externalIndicator={externalIndicator} />
+  <SystemsResearchSection locale={locale} t={t} index="01" externalIndicator={externalIndicator} />
+  <ProductsSection locale={locale} t={t} index="02" externalIndicator={externalIndicator} />
   <ResearchWritingSection
     locale={locale}
     t={t}
     posts={posts}
+    index="03"
     externalIndicator={externalIndicator}
   />
 </div>
@@ -65,13 +72,8 @@ const { locale, t, posts, externalIndicator } = Astro.props;
   .home {
     display: flex;
     flex-direction: column;
-    /* No gap. Each section opens with `--space-section` of its own padding. */
+    /* No gap. Each section opens with `--space-section` of its own padding,
+       and the masthead owns its own `--space-hero` band. */
     gap: 0;
-    /* One narrow column, left-aligned with the header's content edge: the
-       auto margin `.container` would apply is replaced by the same offset
-       without the centring of the narrower box. */
-    max-width: var(--width-reading);
-    margin-inline-start: max(0px, calc((100% - var(--width-content)) / 2));
-    margin-inline-end: auto;
   }
 </style>

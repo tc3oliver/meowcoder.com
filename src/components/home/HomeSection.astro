@@ -4,38 +4,38 @@
  *
  * The homepage is a sequence of equal-weight sections (PRD §35), so each gets
  * the same landmark treatment: generous whitespace and a heading that names
- * the section for the landmark list via `aria-labelledby`. There is no eyebrow
- * above the heading; the page is a text column and the heading says what the
- * section is.
+ * the section for the landmark list via `aria-labelledby`.
+ *
+ * Round 2 renders the heading through the shared `.section-header` ledger row
+ * in `global.css`: a full-width hairline, then the section's mono index number
+ * beside its name. The number is decoration — `aria-hidden`, a sibling of the
+ * `h2`, never inside it — so the section is still named by its heading alone.
  */
 
 interface Props {
   /** Id for the heading; also the section's `aria-labelledby` target. */
   id: string;
   heading: string;
+  /** Two-digit render-order index for the heading row (`01`, `02`, …). */
+  index: string;
 }
 
-const { id, heading } = Astro.props;
+const { id, heading, index } = Astro.props;
 ---
 
 <section class="home-section" aria-labelledby={id}>
-  <h2 class="home-section__heading" id={id}>{heading}</h2>
+  <div class="section-header">
+    <p class="section-index" aria-hidden="true">{index}</p>
+    <h2 id={id}>{heading}</h2>
+  </div>
   <slot />
 </section>
 
 <style>
   .home-section {
-    /* Whitespace only, no rule and never a card — PRD §25. The whitespace is
-       the section rhythm doc-2 §4 asks for: ~72px on a phone, ~128px on a
-       desktop. */
+    /* Whitespace only, never a card — PRD §25. The whitespace is the section
+       rhythm doc-2 §4 asks for: ~96px on a phone, ~128px on a desktop. */
     padding-block-start: var(--space-section);
     padding-block-end: var(--space-6);
-  }
-
-  /* The homepage is a text column like Study, so the heading steps down from
-     the `h2` baseline in `global.css` to `--text-xl`. */
-  .home-section__heading {
-    font-size: var(--text-xl);
-    margin-block-end: var(--space-6);
   }
 </style>

@@ -189,6 +189,35 @@ button {
 }
 
 /* -------------------------------------------------------------------------
+ * Ledger section header (round-2 design language)
+ *
+ * Every major section on home, work and about opens the same way: a hairline
+ * spanning the full width, then a row with the section's mono index number
+ * left of its heading. The number is decoration — `aria-hidden="true"`, a
+ * sibling of the heading, never inside it — so `aria-labelledby` wiring keeps
+ * pointing at the heading alone.
+ *
+ * Markup: `<div class="section-header"><p class="section-index"
+ * aria-hidden="true">01</p><h2 id="…">…</h2></div>`.
+ * ---------------------------------------------------------------------- */
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  margin-block-end: var(--space-6);
+  padding-block-start: var(--space-5);
+  border-block-start: var(--border-width) solid var(--color-border);
+}
+
+.section-index {
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* -------------------------------------------------------------------------
  * Shell
  * ---------------------------------------------------------------------- */
 

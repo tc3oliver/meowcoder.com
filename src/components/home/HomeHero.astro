@@ -1,6 +1,6 @@
 ---
 /**
- * Homepage hero (MCD-4, MCD-16, doc-2 §5).
+ * Homepage masthead (MCD-4, MCD-16, doc-2 §5; round-2 "Engineering Ledger").
  *
  * Typography and whitespace carry the whole section. PRD §9.1 and §25 rule out
  * every piece of the usual portfolio hero furniture — the large portrait, the
@@ -9,16 +9,18 @@
  * no client-side JavaScript here at all. `src/styles/design-system.test.ts`
  * scans the source tree for each of them by name.
  *
- * The facts beneath the statement are plain text, not badges: PRD §37 prefers
- * evidence over ornament, and a shipped release and upstream projects are
- * the evidence. The list renders however many facts the dictionary carries;
- * it does not assume a count.
+ * Round 2 composes the hero as an asymmetric ledger masthead: the oversized
+ * name leads a wide left column (role line in mono, statement under it), and a
+ * narrow right rail — desktop only — carries the hairline-separated mono facts
+ * and the two actions. The facts are plain text, not badges: PRD §37 prefers
+ * evidence over ornament, and a shipped release and upstream projects are the
+ * evidence. The list renders however many facts the dictionary carries; it does
+ * not assume a count.
  *
  * doc-2 §5 asks for a hero that is confident and spacious but not an empty
  * full-screen splash: the next section has to be reachable within about one
- * screen. Two things hold that. The name is the one element on the page that
- * takes `--text-display`, so the scale does the work a taller block would
- * otherwise do. The next section owns the larger opening rhythm after it.
+ * screen. `--space-hero` gives the block its presence while the name's display
+ * step does the rest; the next section owns the larger opening rhythm after it.
  */
 
 import type { Locale } from '../../i18n/locales';
@@ -43,62 +45,77 @@ const statementStart =
 ---
 
 <div class="hero">
-  <p class="hero__role">{t.hero.role}</p>
-  <h1 class="hero__name">{t.heading}</h1>
-  <p class="hero__statement">
-    {statementStart}{
-      noBreakSuffix && t.intro.endsWith(noBreakSuffix) && (
-        <span class="hero__statement-tail">{noBreakSuffix}</span>
-      )
-    }
-  </p>
+  <div class="hero__main">
+    <h1 class="hero__name">{t.heading}</h1>
+    <p class="hero__role">{t.hero.role}</p>
+    <p class="hero__statement">
+      {statementStart}{
+        noBreakSuffix && t.intro.endsWith(noBreakSuffix) && (
+          <span class="hero__statement-tail">{noBreakSuffix}</span>
+        )
+      }
+    </p>
+  </div>
 
-  <ul class="hero__facts" role="list">
-    {t.hero.facts.map((fact) => <li>{fact}</li>)}
-  </ul>
+  <div class="hero__rail">
+    <ul class="hero__facts" role="list">
+      {t.hero.facts.map((fact) => <li>{fact}</li>)}
+    </ul>
 
-  <div class="hero__actions">
-    <CtaLink href={localizePath(locale, '/work')} label={t.hero.workCta} variant="solid" />
-    <CtaLink
-      href={STUDY_URL}
-      label={t.hero.writingCta}
-      external
-      indicator={externalIndicator}
-      variant="outline"
-    />
+    <div class="hero__actions">
+      <CtaLink href={localizePath(locale, '/work')} label={t.hero.workCta} variant="solid" />
+      <CtaLink href={STUDY_URL} label={t.hero.writingCta} external indicator={externalIndicator} />
+    </div>
   </div>
 </div>
 
 <style>
+  /* One column on a phone; the asymmetric two-column masthead from 64rem. The
+     grid spans the full content width — the width contrast against the narrow
+     prose inside the sections below is part of the round-2 identity. */
   .hero {
-    /* A hero statement can use a slightly wider measure than long-form prose.
-       The extra width keeps the Traditional Chinese line from breaking inside
-       its final technical term at desktop and tablet sizes. */
-    max-width: min(52rem, 100%);
-    padding-block-end: var(--space-6);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-8);
+    padding-block: var(--space-hero);
   }
 
-  .hero__role {
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-medium);
-    letter-spacing: var(--tracking-wide);
+  @media (width >= 64rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+      column-gap: var(--space-9);
+    }
+  }
+
+  .hero__main {
+    min-width: 0;
   }
 
   /* The page's focal point, and the only element that opts into the display
-     step — doc-2 §4 puts the desktop hero name at 64–72px, above every
-     numbered step in the scale. At that size the `h1` baseline leading is too
-     loose and the default tracking too wide, so this element overrides both. */
+     step. At that size the `h1` baseline leading is too loose and the default
+     tracking too wide, so this element overrides both with the masthead tokens. */
   .hero__name {
-    margin-block-start: var(--space-2);
     font-size: var(--text-display);
-    line-height: var(--leading-display);
-    letter-spacing: -0.025em;
+    line-height: var(--leading-masthead);
+    letter-spacing: var(--tracking-masthead);
+  }
+
+  /* The role line is metadata under the ledger identity: mono, muted. No
+     letter-spacing — the line is visible on zh pages, where spacing Latin out
+     does nothing for the Chinese reader (PRD §7). */
+  .hero__role {
+    margin-block-start: var(--space-5);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
   }
 
   .hero__statement {
+    /* A statement measure, not a prose one: ~34em keeps the Traditional
+       Chinese line from breaking inside its final technical term. */
+    max-width: 34em;
     margin-block-start: var(--space-5);
-    font-size: var(--text-md);
+    font-size: var(--text-lg);
     line-height: var(--leading-relaxed);
   }
 
@@ -106,20 +123,36 @@ const statementStart =
     white-space: nowrap;
   }
 
+  /* The right rail: hairline-topped, its fact rows separated by hairlines. On
+     mobile the same stack simply follows the statement. */
+  .hero__rail {
+    min-width: 0;
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
   .hero__facts {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2) var(--space-5);
+    flex-direction: column;
     margin: 0;
-    margin-block-start: var(--space-5);
     color: var(--color-text-muted);
+    font-family: var(--font-mono);
     font-size: var(--text-sm);
   }
 
+  .hero__facts li {
+    padding-block: var(--space-3);
+  }
+
+  .hero__facts li + li {
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  /* The two actions, stacked: the solid work CTA and the quiet writing link. */
   .hero__actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3) var(--space-4);
-    margin-block-start: var(--space-7);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    margin-block-start: var(--space-6);
   }
 </style>
