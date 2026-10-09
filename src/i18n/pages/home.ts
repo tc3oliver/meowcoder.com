@@ -174,6 +174,16 @@ export interface HomeStrings extends PageStrings {
     year: string;
   };
   /**
+   * The career arc as one line (an arrow chain, not a sentence) and the link to
+   * About, closing the Writing section. PRD §11 still binds it: engineering
+   * domains and seniority only.
+   */
+  experience: {
+    progression: string;
+    /** Internal; the About route is resolved by the component, not here. */
+    cta: CtaLabel;
+  };
+  /**
    * PRD §9.6. Metadata pulled from Study; never article bodies. A date and
    * title list, with the journal paper as its last row.
    */
@@ -322,6 +332,10 @@ export const home = {
       venue: 'Journal of Information Security and Applications',
       year: '2026',
     },
+    experience: {
+      progression: 'Software engineering → system architecture → AI systems',
+      cta: { label: 'About Oliver' },
+    },
     writing: {
       heading: 'Technical Writing',
       languages: { en: 'English', zh: 'Chinese' },
@@ -446,6 +460,10 @@ export const home = {
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
       venue: 'Journal of Information Security and Applications',
       year: '2026',
+    },
+    experience: {
+      progression: '軟體工程 → 系統架構 → AI 系統',
+      cta: { label: '關於 Oliver' },
     },
     writing: {
       heading: '技術文章',

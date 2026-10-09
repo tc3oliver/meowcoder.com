@@ -154,6 +154,15 @@ describe('requirement wording', () => {
     );
   });
 
+  it('keeps the career arc and About link that close the Writing section', () => {
+    expect(home.en.experience.progression).toBe(
+      'Software engineering → system architecture → AI systems',
+    );
+    expect(home.en.experience.cta.label).toBe('About Oliver');
+    expect(home.zh.experience.progression).toBe('軟體工程 → 系統架構 → AI 系統');
+    expect(home.zh.experience.cta.label).toBe('關於 Oliver');
+  });
+
   it('keeps the publication identical across locales (PRD §7)', () => {
     // A paper title and a journal name are proper nouns; translating either
     // would invent a citation that does not exist.

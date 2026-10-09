@@ -33,6 +33,7 @@
 import { LOCALE_TAG, type Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
 import { PUBLICATION_URL, STUDY_URL } from '../../lib/external';
+import { localizePath } from '../../lib/i18n';
 import { resolveTitle, type StudyPost } from '../../lib/study-feed';
 import CtaLink from './CtaLink.astro';
 import HomeSection from './HomeSection.astro';
@@ -115,6 +116,11 @@ const entries = posts.map((post) => {
   <p class="writing__all">
     <CtaLink href={STUDY_URL} label={t.writing.cta.label} external indicator={externalIndicator} />
   </p>
+
+  <p class="writing__about">
+    {t.experience.progression}
+    <a href={localizePath(locale, '/about')}>{t.experience.cta.label}</a>
+  </p>
 </HomeSection>
 
 <style>
@@ -169,5 +175,11 @@ const entries = posts.map((post) => {
 
   .writing__all {
     margin-block-start: var(--space-5);
+  }
+
+  .writing__about {
+    margin-block-start: var(--space-5);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
   }
 </style>
