@@ -17,7 +17,7 @@ meta:
   - label: 'Runtime'
     value: 'laya-apple · Python、MLX、Core ML'
   - label: '範圍'
-    value: 'GIL 與並行 · Core ML 執行 · macOS 排程 · 自適應退回'
+    value: '並行 · Core ML 執行 · 主機端排程 · 自適應退回'
   - label: '上游'
     value: 'apple/coremltools#2876'
 ---
