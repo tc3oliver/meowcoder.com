@@ -8,9 +8,10 @@
  *
  * The page is a plain list in the homepage's reading column: a number on the
  * left, and on the right the title as the only link, then the type, the
- * outcome and the evidence label in muted text. No entry carries a visual, a
- * card or a button; the title is the one link, so a screen reader hears
- * distinct destinations without hidden suffixes.
+ * outcome and the evidence label in muted text — with the number and the
+ * evidence label, both metadata, one level fainter in subtle. No entry
+ * carries a visual, a card or a button; the title is the one link, so a
+ * screen reader hears distinct destinations without hidden suffixes.
  *
  * Entries arrive already filtered and ordered by `workEntriesForLocale`; this
  * layout only renders them.
@@ -123,7 +124,7 @@ function position(index: number): string {
   }
 
   .work-row__num {
-    color: var(--color-text-muted);
+    color: var(--color-text-subtle);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     letter-spacing: var(--tracking-wide);
@@ -149,6 +150,9 @@ function position(index: number): string {
   }
 
   .work-row__evidence {
+    /* An evidence label is metadata, so it sits one level below the outcome
+       sentence it annotates. */
+    color: var(--color-text-subtle);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     /* A host or package name has no break opportunity, and one unbreakable
