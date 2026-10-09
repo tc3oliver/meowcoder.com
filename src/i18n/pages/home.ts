@@ -367,7 +367,7 @@ export const home = {
       heading: '產品',
       signalforge: {
         heading: 'SignalForge',
-        statement: '事件導向的情報管線。',
+        statement: '事件導向的情報管線，每天早上從多個來源收集資料。',
         liveCta: { label: '看今天的重點' },
         cta: { label: 'GitHub' },
       },
