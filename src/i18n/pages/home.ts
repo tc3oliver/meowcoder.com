@@ -332,7 +332,7 @@ export const home = {
             href: 'https://github.com/jundot/omlx/pull/3664',
             merged: true,
             description:
-              'Keeps namespace tool groups intact through the Responses API, which is the format Codex uses for MCP servers.',
+              'Keeps namespace tool groups intact through the Responses API. Codex sends MCP servers in that form.',
           },
         ],
         cta: { label: 'All upstream pull requests' },
@@ -379,7 +379,7 @@ export const home = {
       heading: '產品',
       signalforge: {
         heading: 'SignalForge',
-        statement: '事件導向的情報管線，每天早上從多個來源收集資料。',
+        statement: '每天早上執行的事件導向情報管線。',
         liveCta: { label: '看今天的重點' },
         cta: { label: 'GitHub' },
       },
@@ -453,7 +453,7 @@ export const home = {
             href: 'https://github.com/jundot/omlx/pull/3685',
             merged: true,
             description:
-              '讓 SDPA256 prefill 固定走一致的路徑，確保同一請求在不同 process 下的 temperature=0 輸出一致。',
+              '讓 SDPA256 prefill 固定走同一條路徑，確保同一請求在不同 process 下的 temperature=0 輸出一致。',
           },
           {
             name: 'jundot/omlx#3840 + #3842',
