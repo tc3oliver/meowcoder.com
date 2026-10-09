@@ -9,7 +9,7 @@
  *   1. every semantic color pair clears WCAG AA (PRD §29);
  *   2. the shell widths stay inside the ranges PRD §25 fixes;
  *   3. the type scale and section rhythm hit doc-2 §4's target sizes;
- *   4. the section eyebrow is a separate element from its heading (doc-2 §16);
+ *   4. a homepage section is named by its own heading;
  *   5. none of the visual elements PRD §25 forbids appear in the source.
  *
  * Computing them here means editing a token re-derives the answer instead of
@@ -266,37 +266,18 @@ describe('section rhythm (doc-2 §4)', () => {
 });
 
 /* -------------------------------------------------------------------------
- * Eyebrow and heading are separate typographic elements (doc-2 §16)
- *
- * The eyebrow used to be a `display: block` span inside the `<h2>`. Both
- * halves of that are the defect: nested, it joins the heading's accessible
- * name, and 精選產品 / Shouri reads as one phrase rather than a label above a
- * title. A rendered-size check cannot catch a regression here, but the
- * structure can.
+ * A homepage section is named by its heading (doc-2 §16)
  * ---------------------------------------------------------------------- */
 
-describe('homepage section eyebrow', () => {
+describe('homepage section heading', () => {
   const markup = HOME_SECTION.slice(
     HOME_SECTION.indexOf('<section'),
     HOME_SECTION.indexOf('<style>'),
   );
 
-  it('renders the eyebrow before the heading, not inside it', () => {
-    expect(markup).toMatch(/<p class="home-section__eyebrow">[\s\S]*<h2/);
-    const heading = markup.match(/<h2[^>]*>([\s\S]*?)<\/h2>/);
-    expect(heading, 'no <h2> in the section markup').not.toBeNull();
-    expect(heading![1]).not.toMatch(/[<>]/);
-  });
-
   it('leaves the section named by its heading alone', () => {
     expect(markup).toMatch(/<section[^>]*aria-labelledby=\{id\}/);
     expect(markup).toMatch(/<h2[^>]*id=\{id\}/);
-  });
-
-  it('separates the two by more than a heading line box would', () => {
-    expect(HOME_SECTION).toMatch(
-      /\.home-section__eyebrow\s*\{[^}]*margin-block-end:\s*var\(--space-([4-9]|1\d)\)/,
-    );
   });
 });
 

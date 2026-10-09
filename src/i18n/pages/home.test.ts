@@ -2,13 +2,12 @@
  * Homepage content guarantees (MCD-4, MCD-16).
  *
  * The homepage is mostly judged by reading it. These rules are not judgement
- * calls, though — they are fixed counts, verbatim PRD wording, a required
- * attribution, and the absence of specific strings, and every one of them is
- * the kind of thing a later content edit can break silently:
+ * calls, though — they are fixed counts, verbatim PRD wording, and the
+ * absence of specific strings, and every one of them is the kind of thing a
+ * later content edit can break silently:
  *
  *   - PRD §5, §9.2, §9.4 fix how many items each section may contain;
- *   - PRD §9.4 requires third-party skills to keep attribution and licensing;
- *   - PRD §11 keeps employer detail out of Professional Experience;
+ *   - PRD §11 keeps employer detail off the homepage;
  *   - PRD §12 keeps LLM Infrastructure from implying a public case study;
  *   - PRD §34 forbids mixing languages inside one prose block.
  *
@@ -240,73 +239,31 @@ describe('content language rules (PRD §34)', () => {
     // is the form a Taiwan engineering reader expects to see untranslated.
     const ALLOWED = new Set([
       // Product and proper names.
-      'Study',
-      'Pi',
       'Claude',
       'Code',
-      'plugin',
       'Agent',
       'Teams',
-      'teammate',
       'Mission',
       'Control',
-      'worker',
+      'Pi',
       'OIDC',
-      'fork',
-      'gateway',
-      'policy',
-      'sandbox',
-      'MIT',
-      'License',
       'Apple',
       'silicon',
       'AMD',
-      'Neural',
-      'Engine',
-      'Python',
-      'MLX',
-      'laya-apple',
-      'DeepSeek',
-      'V4',
-      'Flash',
-      'MI300X',
-      'Triton',
-      'AITER',
       // Established technical terminology.
       'AI',
-      'Agent',
+      'LLM',
+      'GPU',
+      'VRAM',
       'agent',
       'coding',
-      'LLM',
-      'MCP',
-      'RAG',
-      'vLLM',
-      'ROCm',
-      'CI',
-      'CD',
-      'GPU',
-      'GIL',
-      'kernel',
-      'paged-MQA',
-      'MoE',
-      'GEMM',
-      'TP',
-      'gfx942',
-      'Core',
-      'ML',
-      'prediction',
-      'RequestTrace',
-      'activation',
-      'function',
-      'shape',
-      'coding',
-      'workflow',
-      // Units: `16 GB`, `155 tok/s`, and the B of a parameter count like 27B.
-      'GB',
-      'tok',
-      's',
-      'B',
-      'VRAM',
+      'fork',
+      'gateway',
+      'plugin',
+      'policy',
+      'sandbox',
+      'teammate',
+      'worker',
     ]);
     // The publication's scheme and security-notion names — `LR-CBEET`,
     // `IND-CCA`, `OW-CCA` — are deliberately absent: doc-2 §9 moved the only
@@ -351,6 +308,9 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
     expect(t.systems.projects.filter((p) => p.note).map((p) => p.id)).toEqual([
       'qwen3.8-27b-5070ti-eval',
     ]);
+    // The negative result stays stated as such, unhedged.
+    const note = t.systems.projects.find((p) => p.id === 'qwen3.8-27b-5070ti-eval')!.note!;
+    expect(note).toMatch(_locale === 'en' ? /invalid/i : /作廢|無效/);
   });
 
   it('lists the four upstream pull requests under Research, three of them merged', () => {
@@ -360,7 +320,9 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
       'jundot/omlx#3840 + #3842',
       'jundot/omlx#3664',
     ]);
-    expect(t.systems.upstream.items.filter((item) => item.merged)).toHaveLength(3);
+    expect(t.systems.upstream.items.filter((item) => item.merged).map((item) => item.name)).toEqual(
+      ['jundot/omlx#3685', 'jundot/omlx#3840 + #3842', 'jundot/omlx#3664'],
+    );
   });
 
   it('leads with the project that shipped, and is not Apple-only', () => {

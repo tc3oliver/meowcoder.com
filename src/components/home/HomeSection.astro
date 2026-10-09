@@ -3,31 +3,22 @@
  * One homepage section (MCD-4, MCD-15).
  *
  * The homepage is a sequence of equal-weight sections (PRD §35), so each gets
- * the same landmark treatment: generous whitespace and a heading that names the section for the landmark list via
- * `aria-labelledby`.
- *
- * The optional eyebrow is the section's role in the visitor journey — "Featured
- * Product", "Open Source" — while the heading is what that section is about.
- * It used to be rendered inside the labelled heading so the accessible name
- * carried both, and in Chinese that read as one merged phrase: 精選產品 and
- * Shouri, 開源 and SignalForge, ran together as though the eyebrow were
- * the heading's first line (doc-2 §16). It is now a sibling paragraph ahead of
- * the heading, which also gives the section the tighter accessible name —
- * "Shouri" rather than "Featured Product Shouri".
+ * the same landmark treatment: generous whitespace and a heading that names
+ * the section for the landmark list via `aria-labelledby`. There is no eyebrow
+ * above the heading; the page is a text column and the heading says what the
+ * section is.
  */
 
 interface Props {
   /** Id for the heading; also the section's `aria-labelledby` target. */
   id: string;
-  eyebrow?: string;
   heading: string;
 }
 
-const { id, eyebrow, heading } = Astro.props;
+const { id, heading } = Astro.props;
 ---
 
 <section class="home-section" aria-labelledby={id}>
-  {eyebrow && <p class="home-section__eyebrow">{eyebrow}</p>}
   <h2 class="home-section__heading" id={id}>{heading}</h2>
   <slot />
 </section>
@@ -46,32 +37,5 @@ const { id, eyebrow, heading } = Astro.props;
   .home-section__heading {
     font-size: var(--text-xl);
     margin-block-end: var(--space-6);
-  }
-
-  .home-section__eyebrow {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    /* Wide enough that the eyebrow reads as a label above the heading rather
-       than as part of it. The heading is now up to 40px, so the old --space-2
-       would have been swallowed by its own line box. */
-    margin-block-end: var(--space-4);
-    color: var(--color-text-muted);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
-  }
-
-  /* A short rule ahead of the label. The Latin eyebrow separates itself from
-     the heading by case and letter-spacing, but `text-transform` does nothing
-     to Chinese and CJK ignores tracking almost as completely — so on the
-     zh-Hant route the two would still differ only in size and colour. The rule
-     is a mark the label carries in both languages. */
-  .home-section__eyebrow::before {
-    content: '';
-    flex: none;
-    inline-size: var(--space-6);
-    border-block-start: var(--border-width) solid var(--color-border-strong);
   }
 </style>
