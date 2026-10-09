@@ -82,13 +82,7 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     // upstream list. Each project is a name, one statement, one line of facts,
     // and its actions. Anything else belongs on a case study,
     // so the key sets are the assertion.
-    expect(Object.keys(t.openSource).sort()).toEqual([
-      'eyebrow',
-      'heading',
-      'piship',
-      'signalforge',
-      'upstream',
-    ]);
+    expect(Object.keys(t.openSource).sort()).toEqual(['heading', 'piship', 'signalforge']);
     expect(Object.keys(t.openSource.piship).sort()).toEqual([
       'caseStudyCta',
       'cta',
@@ -155,7 +149,6 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     const permitted = new Set([
       t.openSource.signalforge.caseStudyCta.label,
       t.openSource.piship.caseStudyCta.label,
-      t.systems.caseStudyCta.label,
     ]);
 
     for (const pattern of CASE_STUDY) {
@@ -332,7 +325,7 @@ describe('content language rules (PRD §34)', () => {
     t.shouri.summary,
     // The Shouri principles are no longer prose: doc-2 §6 reduces them to three
     // names, which PRD §34 exempts as product vocabulary.
-    ...t.systems.projects.map((project) => project.statement),
+    ...t.systems.projects.flatMap((project) => (project.note ? [project.note] : [])),
     t.openSource.piship.statement,
     t.openSource.signalforge.statement,
     // doc-2 §9 leaves the Research column one prose block: `detail` moved to
@@ -444,6 +437,29 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
         expect(source).toContain(number);
       }
     }
+  });
+
+  it('carries only a number, its label and an optional note per project', () => {
+    // The statements and fact lines are gone: the case study and the article
+    // carry them. A negative result stays beside its number as `note`.
+    for (const project of t.systems.projects) {
+      expect(Object.keys(project).sort()).toEqual(
+        ['articleCta', 'id', 'name', 'note', 'stat'].filter((key) => key in project),
+      );
+    }
+    expect(t.systems.projects.filter((p) => p.note).map((p) => p.id)).toEqual([
+      'qwen3.8-27b-5070ti-eval',
+    ]);
+  });
+
+  it('lists the four upstream pull requests under Research, three of them merged', () => {
+    expect(t.systems.upstream.items.map((item) => item.name)).toEqual([
+      'apple/coremltools#2876',
+      'jundot/omlx#3685',
+      'jundot/omlx#3840 + #3842',
+      'jundot/omlx#3664',
+    ]);
+    expect(t.systems.upstream.items.filter((item) => item.merged)).toHaveLength(3);
   });
 
   it('leads with the project that shipped, and is not Apple-only', () => {

@@ -14,12 +14,7 @@
 
 import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
-import {
-  SIGNALFORGE_LIVE_URL,
-  SIGNALFORGE_URL,
-  PISHIP_URL,
-  UPSTREAM_PRS_URL,
-} from '../../lib/external';
+import { SIGNALFORGE_LIVE_URL, SIGNALFORGE_URL, PISHIP_URL } from '../../lib/external';
 import { localizePath, workDetailRoute } from '../../lib/i18n';
 import CtaLink from './CtaLink.astro';
 import HomeSection from './HomeSection.astro';
@@ -39,7 +34,7 @@ const PISHIP_SLUG = 'piship';
 const pishipHref = localizePath(locale, workDetailRoute(PISHIP_SLUG));
 ---
 
-<HomeSection id="open-source" eyebrow={t.openSource.eyebrow} heading={t.openSource.heading}>
+<HomeSection id="open-source" heading={t.openSource.heading}>
   <div class="oss oss--two">
     <div class="oss__project">
       <h3 class="oss__name">{t.openSource.signalforge.heading}</h3>
@@ -88,34 +83,6 @@ const pishipHref = localizePath(locale, workDetailRoute(PISHIP_SLUG));
       </div>
     </div>
   </div>
-
-  <div class="upstream">
-    <h3 class="oss__name">{t.openSource.upstream.heading}</h3>
-    <ul class="upstream__list" role="list">
-      {
-        t.openSource.upstream.items.map((item) => (
-          <li class="upstream__item">
-            <p class="upstream__name">
-              <a href={item.href} target="_blank" rel="noopener noreferrer">
-                {item.name}
-              </a>
-              {item.merged && <span class="upstream__state">{t.openSource.upstream.merged}</span>}
-            </p>
-            <p class="upstream__description">{item.description}</p>
-          </li>
-        ))
-      }
-    </ul>
-    <div class="oss__actions">
-      <CtaLink
-        href={UPSTREAM_PRS_URL}
-        label={t.openSource.upstream.cta.label}
-        external
-        indicator={externalIndicator}
-        variant="text"
-      />
-    </div>
-  </div>
 </HomeSection>
 
 <style>
@@ -158,55 +125,6 @@ const pishipHref = localizePath(locale, workDetailRoute(PISHIP_SLUG));
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     letter-spacing: var(--tracking-normal);
-  }
-
-  .upstream {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-    margin-block-start: var(--space-8);
-  }
-
-  /* Two columns of pull requests from the same breakpoint as the projects
-     above, so the list lines up under them rather than running full width. */
-  .upstream__list {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-5) var(--space-8);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  @media (width >= 48rem) {
-    .upstream__list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  .upstream__name {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--space-3);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    letter-spacing: var(--tracking-normal);
-    /* A repository path has no spaces to break at; let it wrap anywhere
-       rather than push a 390px viewport sideways. */
-    overflow-wrap: anywhere;
-  }
-
-  .upstream__state {
-    color: var(--color-text-muted);
-    font-family: var(--font-sans);
-    font-size: var(--text-xs);
-  }
-
-  .upstream__description {
-    margin-block-start: var(--space-2);
-    color: var(--color-text-muted);
-    line-height: var(--leading-relaxed);
   }
 
   .oss__actions {

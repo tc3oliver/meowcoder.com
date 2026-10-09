@@ -49,17 +49,16 @@ export type ResearchProjectId =
   'laya-apple' | 'llm-inference-systems' | 'deepseek-v4-flash-mi300x' | 'qwen3.8-27b-5070ti-eval';
 
 /**
- * One research program: a name, the one measured result it leads with, one
- * statement, and one line of facts. `stat.value` must be quoted from the
- * project's case study, which names the data behind it.
+ * One research program: a name and the one measured result it leads with.
+ * `stat.value` must be quoted from the project's case study, which names the
+ * data behind it. `note` is a negative result that stays beside the number.
  */
 export interface ResearchProject {
   id: ResearchProjectId;
   /** A repository name, identical in both locales. */
   name: string;
   stat: { value: string; label: string };
-  statement: string;
-  meta: string;
+  note?: string;
   /**
    * Overrides the section's `articleCta` when this project's article exists in
    * the reader's language: the section label marks an article as Chinese-only.
@@ -152,7 +151,6 @@ export interface HomeStrings extends PageStrings {
    * statement, one line of facts, and its actions, plus the upstream list.
    */
   openSource: {
-    eyebrow: string;
     heading: string;
     /**
      * The second project in the section, first in reading order: the public
@@ -179,11 +177,28 @@ export interface HomeStrings extends PageStrings {
       caseStudyCta: CtaLabel;
       cta: CtaLabel;
     };
+  };
+  /**
+   * The research proof: four programs, each a measured result linked to its
+   * case study (or repository) and, where one exists, its Study article; then
+   * the upstream pull requests.
+   */
+  systems: {
+    heading: string;
+    /** Heading of the measured-results list. */
+    resultsHeading: string;
     /**
-     * Pull requests to projects this site's author does not maintain — the
-     * upstream half of the section. Only pull requests whose state cannot go
-     * stale are marked: `merged` is final, and an open one carries no status
-     * rather than one that would be wrong the day it merges.
+     * The research programs, laya-apple first: it is the one that shipped. The
+     * MI300X baseline is here so the section does not read as Apple-only work.
+     */
+    projects: readonly ResearchProject[];
+    /** The Study article. Both are published in Chinese only, which `en` says. */
+    articleCta: CtaLabel;
+    /**
+     * Pull requests to projects this site's author does not maintain. Only
+     * pull requests whose state cannot go stale are marked: `merged` is final,
+     * and an open one carries no status rather than one that would be wrong the
+     * day it merges.
      */
     upstream: {
       heading: string;
@@ -193,24 +208,6 @@ export interface HomeStrings extends PageStrings {
       /** The full, generated record on the GitHub profile. */
       cta: CtaLabel;
     };
-  };
-  /**
-   * The research proof: four programs, each led by one measured result, with
-   * up to three actions — the case study, the Study article, and the repository.
-   */
-  systems: {
-    eyebrow: string;
-    heading: string;
-    /**
-     * The research programs, laya-apple first: it is the one that shipped. The
-     * MI300X baseline is here so the section does not read as Apple-only work.
-     */
-    projects: readonly ResearchProject[];
-    /** Internal; each case-study route is resolved by the component, not here. */
-    caseStudyCta: CtaLabel;
-    /** The Study article. Both are published in Chinese only, which `en` says. */
-    articleCta: CtaLabel;
-    cta: CtaLabel;
   };
   /**
    * PRD §9.5, doc-2 §9. One publication, and deliberately no navigation entry
@@ -315,7 +312,6 @@ export const home = {
       cta: { label: 'Visit Shouri' },
     },
     openSource: {
-      eyebrow: 'Open Source',
       heading: 'Open Source and Upstream',
       signalforge: {
         heading: 'SignalForge',
@@ -334,6 +330,50 @@ export const home = {
         caseStudyCta: { label: 'View Case Study' },
         cta: { label: 'GitHub' },
       },
+    },
+    systems: {
+      heading: 'Inference Systems Research',
+      resultsHeading: 'Results',
+      projects: [
+        {
+          id: 'laya-apple',
+          name: 'laya-apple',
+          stat: {
+            value: '7.67 → 0.14 ms',
+            label: 'GPU result return (P50), once synchronous Core ML stopped holding the GIL',
+          },
+          articleCta: { label: 'Read the Article' },
+        },
+        {
+          id: 'llm-inference-systems',
+          name: 'llm-inference-systems',
+          stat: {
+            value: '228.38 → 79.06 s',
+            label:
+              'Cumulative latency of a seven-turn session, once reusable prefix state is rebuilt in idle time',
+          },
+        },
+        {
+          id: 'deepseek-v4-flash-mi300x',
+          name: 'deepseek-v4-flash-mi300x',
+          stat: {
+            value: '1,474 tok/s',
+            label:
+              'Aggregate output with 32 concurrent coding sub-agents, 2× MI300X at TP=2; specific to that host and image',
+          },
+        },
+        {
+          id: 'qwen3.8-27b-5070ti-eval',
+          name: 'qwen3.8-27b-5070ti-eval',
+          stat: {
+            value: '92.1 %',
+            label:
+              'HumanEval+ pass@1, 151 of 164 tasks (95 % CI 86.9–95.3 %), on a single 16 GB RTX 5070 Ti',
+          },
+          note: 'Round 1 makes no comparison: the first competitor spilled out of VRAM mid-run, and that run was declared invalid.',
+        },
+      ],
+      articleCta: { label: 'Read the Article (Chinese)' },
       upstream: {
         heading: 'Upstream',
         merged: 'Merged',
@@ -368,63 +408,6 @@ export const home = {
         ],
         cta: { label: 'All upstream pull requests' },
       },
-    },
-    systems: {
-      eyebrow: 'Featured Research',
-      heading: 'Inference Systems Research',
-      projects: [
-        {
-          id: 'laya-apple',
-          name: 'laya-apple',
-          stat: {
-            value: '7.67 → 0.14 ms',
-            label: 'GPU result return (P50), once synchronous Core ML stopped holding the GIL',
-          },
-          statement:
-            'Serves requests on the MLX GPU and the Apple Neural Engine at the same time. The research traced the added GPU latency to Python’s GIL and sent the fix upstream. laya-apple 1.5 detects a host-side slow state from its own request trace and falls back to the known-safe path.',
-          meta: 'Apple M4 Max · MLX + Core ML · laya-apple 1.5 on PyPI',
-          articleCta: { label: 'Read the Article' },
-        },
-        {
-          id: 'llm-inference-systems',
-          name: 'llm-inference-systems',
-          stat: {
-            value: '228.38 → 79.06 s',
-            label:
-              'Cumulative latency of a seven-turn session, once reusable prefix state is rebuilt in idle time',
-          },
-          statement:
-            'Measures what an inference optimization leaves behind for the next request. Three experiments, each published with its raw data and figures, cover reusable prefix state, the cost model of speculative decoding, and background recovery.',
-          meta: 'Apple M4 Max · oMLX · Three experiments · Raw data and figures',
-        },
-        {
-          id: 'deepseek-v4-flash-mi300x',
-          name: 'deepseek-v4-flash-mi300x',
-          stat: {
-            value: '1,474 tok/s',
-            label:
-              'Aggregate output with 32 concurrent coding sub-agents, 2× MI300X at TP=2; specific to that host and image',
-          },
-          statement:
-            'Kernel-level work to serve DeepSeek V4 Flash on two MI300X GPUs, building on a single-GPU stack: 64-bit addressing across 20 sites in the paged-MQA kernel, a dropped activation argument fixed in the Triton MoE path, and 84 AITER GEMM shapes retuned for TP=2 on gfx942.',
-          meta: 'AMD MI300X · ROCm · vLLM · AITER · Triton',
-        },
-        {
-          id: 'qwen3.8-27b-5070ti-eval',
-          name: 'qwen3.8-27b-5070ti-eval',
-          stat: {
-            value: '92.1 %',
-            label:
-              'HumanEval+ pass@1, 151 of 164 tasks (95 % CI 86.9–95.3 %), on a single 16 GB RTX 5070 Ti',
-          },
-          statement:
-            'A pre-registered evaluation of a 27B model on one 16 GB desktop GPU, published with its raw data and graders. Code decodes at a median 155 tok/s and Chinese at 74–81 tok/s; the speed tracks how many speculative-decoding drafts are accepted. Round 1 makes no comparison: the first competitor spilled out of VRAM mid-run, and that run was declared invalid.',
-          meta: 'RTX 5070 Ti 16 GB · llama.cpp + MTP · Round 1 · Raw data and graders',
-        },
-      ],
-      caseStudyCta: { label: 'View Case Study' },
-      articleCta: { label: 'Read the Article (Chinese)' },
-      cta: { label: 'GitHub' },
     },
     research: {
       eyebrow: 'Research',
@@ -482,7 +465,6 @@ export const home = {
       cta: { label: '前往 Shouri' },
     },
     openSource: {
-      eyebrow: '開源',
       heading: '開源與上游貢獻',
       signalforge: {
         heading: 'SignalForge',
@@ -503,6 +485,49 @@ export const home = {
         caseStudyCta: { label: '查看完整案例' },
         cta: { label: 'GitHub' },
       },
+    },
+    systems: {
+      heading: '推論系統研究',
+      resultsHeading: '成果',
+      projects: [
+        {
+          id: 'laya-apple',
+          name: 'laya-apple',
+          stat: {
+            value: '7.67 → 0.14 ms',
+            label: 'GPU 結果回傳時間（P50）：同步 Core ML 釋放 GIL 前後的差異',
+          },
+          articleCta: { label: '閱讀長文' },
+        },
+        {
+          id: 'llm-inference-systems',
+          name: 'llm-inference-systems',
+          stat: {
+            value: '228.38 → 79.06 s',
+            label: '七輪 session 累積延遲：在閒置時重建可重用前綴狀態前後的差異',
+          },
+        },
+        {
+          id: 'deepseek-v4-flash-mi300x',
+          name: 'deepseek-v4-flash-mi300x',
+          stat: {
+            value: '1,474 tok/s',
+            label:
+              '32 個 coding sub-agent 同時執行時的總輸出，2× MI300X、TP=2；結果僅適用於該次測試環境',
+          },
+        },
+        {
+          id: 'qwen3.8-27b-5070ti-eval',
+          name: 'qwen3.8-27b-5070ti-eval',
+          stat: {
+            value: '92.1 %',
+            label:
+              'HumanEval+ pass@1：164 題通過 151 題（95 % CI 86.9–95.3 %），只用一張 16 GB 的 RTX 5070 Ti',
+          },
+          note: '第一個對手模型跑到一半 VRAM 溢出，那次結果作廢，所以第 1 輪不做任何比較。',
+        },
+      ],
+      articleCta: { label: '閱讀長文' },
       upstream: {
         heading: '上游貢獻',
         merged: '已合併',
@@ -537,62 +562,6 @@ export const home = {
         ],
         cta: { label: '所有上游 PR' },
       },
-    },
-    systems: {
-      eyebrow: '精選研究',
-      heading: '推論系統研究',
-      projects: [
-        {
-          id: 'laya-apple',
-          name: 'laya-apple',
-          stat: {
-            value: '7.67 → 0.14 ms',
-            label: 'GPU 結果回傳時間（P50）：同步 Core ML 釋放 GIL 前後的差異',
-          },
-          statement:
-            '同時用 MLX GPU 和 Apple Neural Engine 處理請求。研究最後定位到 Core ML prediction 持有 Python GIL，導致 GPU 額外延遲，修正也已送回上游。laya-apple 1.5 會透過 RequestTrace 偵測主機端變慢，發生時自動退回已知安全的路徑。',
-          meta: 'Apple M4 Max · MLX + Core ML · laya-apple 1.5 已發布於 PyPI',
-          articleCta: { label: '閱讀長文' },
-        },
-        {
-          id: 'llm-inference-systems',
-          name: 'llm-inference-systems',
-          stat: {
-            value: '228.38 → 79.06 s',
-            label: '七輪 session 累積延遲：在閒置時重建可重用前綴狀態前後的差異',
-          },
-          statement:
-            '研究單次推論的最佳化，會怎麼影響後續請求。三個實驗都公開原始資料與圖表，分別研究前綴狀態重用、推測解碼成本，以及背景重建。',
-          meta: 'Apple M4 Max · oMLX · 三個實驗 · 原始資料與圖表',
-        },
-        {
-          id: 'deepseek-v4-flash-mi300x',
-          name: 'deepseek-v4-flash-mi300x',
-          stat: {
-            value: '1,474 tok/s',
-            label:
-              '32 個 coding sub-agent 同時執行時的總輸出，2× MI300X、TP=2；結果僅適用於該次測試環境',
-          },
-          statement:
-            '以單 GPU 版本為基礎，從 kernel 層級著手，讓 DeepSeek V4 Flash 能在兩張 MI300X 上服務：將 paged-MQA kernel 的 20 處定址改為 64 位元，補上 Triton MoE 路徑遺漏的 activation function 參數，並針對 gfx942 + TP=2 重新調校 84 組 AITER GEMM shape。',
-          meta: 'AMD MI300X · ROCm · vLLM · AITER · Triton',
-        },
-        {
-          id: 'qwen3.8-27b-5070ti-eval',
-          name: 'qwen3.8-27b-5070ti-eval',
-          stat: {
-            value: '92.1 %',
-            label:
-              'HumanEval+ pass@1：164 題通過 151 題（95 % CI 86.9–95.3 %），只用一張 16 GB 的 RTX 5070 Ti',
-          },
-          statement:
-            '先寫好評測協定再開跑，在一張 16 GB 的桌機顯示卡上實測 27B 模型，原始資料和評分程式都一起公開。寫程式的解碼速度中位數是 155 tok/s，寫中文是 74–81 tok/s，速度跟著推測解碼的草稿接受率走。第一個對手模型跑到一半 VRAM 溢出，那次結果作廢，所以第 1 輪不做任何比較。',
-          meta: 'RTX 5070 Ti 16 GB · llama.cpp + MTP · 第 1 輪 · 原始資料與評分程式',
-        },
-      ],
-      caseStudyCta: { label: '查看完整案例' },
-      articleCta: { label: '閱讀長文' },
-      cta: { label: 'GitHub' },
     },
     research: {
       eyebrow: '研究',

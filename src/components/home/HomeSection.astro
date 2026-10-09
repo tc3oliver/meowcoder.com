@@ -3,8 +3,7 @@
  * One homepage section (MCD-4, MCD-15).
  *
  * The homepage is a sequence of equal-weight sections (PRD §35), so each gets
- * the same landmark treatment as `AboutSection`: a hairline rule, generous
- * whitespace, and a heading that names the section for the landmark list via
+ * the same landmark treatment: generous whitespace and a heading that names the section for the landmark list via
  * `aria-labelledby`.
  *
  * The optional eyebrow is the section's role in the visitor journey — "Featured
@@ -35,18 +34,18 @@ const { id, eyebrow, heading } = Astro.props;
 
 <style>
   .home-section {
-    /* Whitespace plus one hairline, never a card — PRD §25. The whitespace is
+    /* Whitespace only, no rule and never a card — PRD §25. The whitespace is
        the section rhythm doc-2 §4 asks for: ~72px on a phone, ~128px on a
        desktop. */
-    border-block-start: var(--border-width) solid var(--color-border);
     padding-block-start: var(--space-section);
     padding-block-end: var(--space-6);
   }
 
-  /* Size and tracking come from the `h2` baseline in `global.css`, which now
-     carries doc-2 §4's 36–44px band. */
+  /* The homepage is a text column like Study, so the heading steps down from
+     the `h2` baseline in `global.css` to `--text-xl`. */
   .home-section__heading {
-    margin-block-end: var(--space-5);
+    font-size: var(--text-xl);
+    margin-block-end: var(--space-6);
   }
 
   .home-section__eyebrow {

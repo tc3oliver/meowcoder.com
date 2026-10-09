@@ -1,19 +1,13 @@
 ---
 /**
- * Featured Research — laya-apple, LLM Inference Systems, the MI300X
- * DeepSeek V4 Flash baseline, and the Qwen3.8-27B evaluation on one RTX 5070
- * Ti: Apple silicon, AMD ROCm and a consumer NVIDIA card side by side.
+ * Research — two plain lists in the text column: the measured results of four
+ * projects (laya-apple, LLM Inference Systems, the MI300X DeepSeek V4 Flash
+ * baseline, the Qwen3.8-27B evaluation on one RTX 5070 Ti), then the upstream
+ * pull requests they produced.
  *
- * The homepage had no route to the site's deepest engineering evidence: two
- * research programs with raw data behind every number, and the upstream fixes
- * they produced, were reachable only from the Work index. This section puts
- * them directly beneath Shouri, as the homepage's second lead proof.
- *
- * It carries numbers rather than figures. A product is proved by what it looks
- * like, so Shouri keeps its screenshot; research is proved by what it measured,
- * and a chart shrunk to homepage size is unreadable decoration. Each project
- * leads with one measured result, stated large, and its charts stay on the case
- * study and the article where they can be read.
+ * It carries numbers rather than figures: research is proved by what it
+ * measured, and a chart shrunk to homepage size is unreadable decoration. The
+ * charts stay on the case study and the article.
  *
  * Every number in `home.ts` for this section is quoted from the project's own
  * case study, which names the data it comes from — or, for the MI300X baseline,
@@ -33,6 +27,7 @@ import {
   MI300X_URL,
   QWEN38_5070TI_ARTICLE_URL,
   QWEN38_5070TI_URL,
+  UPSTREAM_PRS_URL,
 } from '../../lib/external';
 import { localizePath, workDetailRoute } from '../../lib/i18n';
 import CtaLink from './CtaLink.astro';
@@ -47,8 +42,9 @@ interface Props {
 const { locale, t, externalIndicator } = Astro.props;
 
 /**
- * Where each project's actions go. A project without a case study or an
- * article simply has fewer actions; the repository is always there. The slug is the case study's —
+ * Where each project's links go. The name links to the case study, or to the
+ * repository when there is none; the article, where one exists, trails the
+ * row. The slug is the case study's —
  * `src/content/work/{en,zh}/<slug>.md` — and is routed through the same helpers
  * the Work index uses, so these links cannot drift from the pages they name.
  */
@@ -70,118 +66,171 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
 };
 ---
 
-<HomeSection id="featured-research" eyebrow={t.systems.eyebrow} heading={t.systems.heading}>
-  <div class="research-projects">
+<HomeSection id="featured-research" heading={t.systems.heading}>
+  <h3 class="list-heading">{t.systems.resultsHeading}</h3>
+  <ul class="results" role="list">
     {
       t.systems.projects.map((project) => {
         const links = LINKS[project.id];
+        const href = links.slug ? localizePath(locale, workDetailRoute(links.slug)) : links.repo;
         return (
-          <article class="project">
-            <h3 class="project__name">{project.name}</h3>
-            <p class="project__stat">{project.stat.value}</p>
-            <p class="project__stat-label">{project.stat.label}</p>
-            <p class="project__statement">{project.statement}</p>
-            <p class="project__meta">{project.meta}</p>
-            <div class="project__actions">
-              {links.slug && (
-                <CtaLink
-                  href={localizePath(locale, workDetailRoute(links.slug))}
-                  label={t.systems.caseStudyCta.label}
-                  variant="outline"
-                />
-              )}
-              {links.article && (
-                <CtaLink
-                  href={links.article}
-                  label={project.articleCta?.label ?? t.systems.articleCta.label}
-                  external
-                  indicator={externalIndicator}
-                  variant={links.slug ? 'text' : 'outline'}
-                />
-              )}
-              <CtaLink
-                href={links.repo}
-                label={t.systems.cta.label}
-                external
-                indicator={externalIndicator}
-                variant={links.slug || links.article ? 'text' : 'outline'}
-              />
+          <li class="result">
+            <p class="result__stat">{project.stat.value}</p>
+            <div class="result__body">
+              <p class="result__name">
+                <a
+                  href={href}
+                  target={links.slug ? undefined : '_blank'}
+                  rel={links.slug ? undefined : 'noopener noreferrer'}
+                >
+                  {project.name}
+                </a>
+              </p>
+              <p class="result__label">
+                {project.stat.label}
+                {links.article && (
+                  <>
+                    {' '}
+                    <CtaLink
+                      href={links.article}
+                      label={project.articleCta?.label ?? t.systems.articleCta.label}
+                      external
+                      indicator={externalIndicator}
+                    />
+                  </>
+                )}
+              </p>
+              {project.note && <p class="result__label">{project.note}</p>}
             </div>
-          </article>
+          </li>
         );
       })
     }
-  </div>
+  </ul>
+
+  <h3 class="list-heading">{t.systems.upstream.heading}</h3>
+  <ul class="upstream" role="list">
+    {
+      t.systems.upstream.items.map((item) => (
+        <li class="upstream__item">
+          <p class="upstream__name">
+            <a href={item.href} target="_blank" rel="noopener noreferrer">
+              {item.name}
+            </a>
+            {item.merged && <span class="upstream__state">{t.systems.upstream.merged}</span>}
+          </p>
+          <p class="upstream__description">{item.description}</p>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="upstream__all">
+    <CtaLink
+      href={UPSTREAM_PRS_URL}
+      label={t.systems.upstream.cta.label}
+      external
+      indicator={externalIndicator}
+    />
+  </p>
 </HomeSection>
 
 <style>
-  /* Two projects in a row from a tablet up, so four sit as a 2 × 2 grid with
-     no card left alone on a row; one on a phone. `minmax(0, 1fr)` keeps a long
-     number from forcing a 390px viewport wider than the screen. */
-  .research-projects {
+  .list-heading {
+    font-size: var(--text-md);
+    letter-spacing: var(--tracking-normal);
+  }
+
+  .results,
+  .upstream {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .results {
+    margin-block: var(--space-6) var(--space-8);
+  }
+
+  .upstream {
+    margin-block-start: var(--space-6);
+  }
+
+  /* The number on the left and the project on the right from a tablet up; a
+     stack beneath that. `minmax(0, 1fr)` keeps a long repository name in the
+     right column from widening a 390px viewport. */
+  .result {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-8);
+    gap: var(--space-1);
   }
 
   @media (width >= 48rem) {
-    .research-projects {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .result {
+      grid-template-columns: 9rem minmax(0, 1fr);
+      column-gap: var(--space-5);
     }
   }
 
-  .project {
-    display: flex;
-    flex-direction: column;
-    max-width: var(--width-reading);
-  }
-
-  .project__name {
-    font-size: var(--text-md);
-    letter-spacing: var(--tracking-normal);
-  }
-
-  /* The measured result is the section's visual: large, tabular, and the
-     first thing the eye lands on after the name. */
-  .project__stat {
-    margin-block-start: var(--space-5);
-    font-size: var(--text-2xl);
+  .result__stat {
+    font-size: var(--text-lg);
     font-weight: var(--weight-semibold);
     font-variant-numeric: tabular-nums;
-    line-height: 1.1;
-    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-snug);
   }
 
-  .project__stat-label {
-    margin-block-start: var(--space-2);
+  .result__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .result__name {
+    font-size: var(--text-md);
+    overflow-wrap: anywhere;
+  }
+
+  .result__label {
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     line-height: var(--leading-relaxed);
   }
 
-  .project__statement {
-    margin-block-start: var(--space-5);
-    font-size: var(--text-md);
-    line-height: var(--leading-relaxed);
+  .upstream__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
   }
 
-  /* Facts, not prose: the same muted monospace line Open Source uses. */
-  .project__meta {
-    margin-block-start: var(--space-4);
-    color: var(--color-text-muted);
+  .upstream__name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     letter-spacing: var(--tracking-normal);
+    /* A repository path has no spaces to break at; let it wrap anywhere
+       rather than push a 390px viewport sideways. */
+    overflow-wrap: anywhere;
   }
 
-  /* One outlined action per project: the case study, else the article, else
-     the repository. The rest are text links beside it, so each card has a
-     clear primary. */
-  .project__actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3);
+  .upstream__state {
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+
+  .upstream__description {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  .upstream__all {
     margin-block-start: var(--space-5);
   }
 </style>
