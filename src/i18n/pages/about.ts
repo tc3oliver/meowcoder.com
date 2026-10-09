@@ -151,7 +151,7 @@ export const about = {
     systemsResearch: {
       heading: 'Systems Research',
       description:
-        'I run independent systems research on LLM inference, on Apple silicon and on AMD GPUs. laya-apple serves requests on the MLX GPU and the Apple Neural Engine at the same time. Its research traced a GPU latency regression to Python’s GIL and sent the fix to Apple coremltools; the result shipped as laya-apple 1.5. A second program, on the oMLX server, studies how an optimization that speeds up one request changes the cost of the requests that follow it. On AMD, I took DeepSeek V4 Flash from one MI300X to two with kernel-level fixes and AITER GEMM tuning.',
+        'I run independent systems research on LLM inference, on Apple silicon and on AMD GPUs. laya-apple serves requests on the MLX GPU and the Apple Neural Engine at the same time. Its research traced a GPU latency regression to Python’s GIL and sent the fix to Apple coremltools as a pull request; laya-apple 1.5 introduced adaptive execution that does not depend on it. A second program, on the oMLX server, studies how an optimization that speeds up one request changes the cost of the requests that follow it. On AMD, I took DeepSeek V4 Flash from one MI300X to two with kernel-level fixes and AITER GEMM tuning.',
       cta: 'View the research on GitHub',
       href: GITHUB_URL,
     },
@@ -247,7 +247,7 @@ export const about = {
     },
     currentFocus: {
       heading: '目前方向 — 企業 AI 系統',
-      description: '目前專注於企業 AI 系統，也就是上述各項的組合。',
+      description: '目前專注於上方經歷中描述的企業 AI 系統。',
       alt: 'AI 驅動研發平台的概念架構，串接企業情境、agentic 開發、工程知識、模型閘道與評估機制。',
       caption: 'AI 驅動研發平台的概念架構圖。',
     },
@@ -275,7 +275,7 @@ export const about = {
     systemsResearch: {
       heading: '系統研究',
       description:
-        '我獨立做 LLM 推論的系統研究，平台涵蓋 Apple silicon 與 AMD GPU。laya-apple 同時用 MLX GPU 和 Apple Neural Engine 處理請求；研究查出一個 GPU 延遲退化的原因是 Python 的 GIL，修正已送交 Apple coremltools，成果在 laya-apple 1.5 發布時一併推出。另一條研究線以 oMLX 推論伺服器為對象，研究單一請求的最佳化會如何影響後續請求成本。在 AMD 上，我透過 kernel 層級的修正與 AITER GEMM 調校，讓 DeepSeek V4 Flash 從單張 MI300X 擴展到兩張。',
+        '我獨立做 LLM 推論的系統研究，平台涵蓋 Apple silicon 與 AMD GPU。laya-apple 同時用 MLX GPU 和 Apple Neural Engine 處理請求；研究查出一個 GPU 延遲退化的原因是 Python 的 GIL，修正以 pull request 送交 Apple coremltools；laya-apple 1.5 引入的自適應執行不依賴這個修正。另一條研究線以 oMLX 推論伺服器為對象，研究單一請求的最佳化會如何影響後續請求成本。在 AMD 上，我透過 kernel 層級的修正與 AITER GEMM 調校，讓 DeepSeek V4 Flash 從單張 MI300X 擴展到兩張。',
       cta: '在 GitHub 查看研究',
       href: GITHUB_URL,
     },
