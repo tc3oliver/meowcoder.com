@@ -1,7 +1,7 @@
 ---
 title: 'LLM Inference Systems'
 type: '系統研究 · LLM 推論'
-summary: '從真實互動式 workload 出發的推論系統研究：量測 runtime、找出機制、檢查正確性，再做出 production 決策或送上游修正。目前完成三個實驗。'
+summary: '從真實互動式 workload 出發的推論系統研究：量測 runtime、找出機制、檢查正確性，再做出 production 決策或送上游修正。'
 outcome: '目前完成三個實驗：可重用狀態與互動延遲、推測解碼成本模型，以及 canonical 狀態的背景重建。另外還有三條進行中的研究線、列在下方的 oMLX 上游修正，以及可重跑的量測工具與完整資料集。'
 indexMeta: 'Apple silicon · 三個實驗 · 三條進行中的研究線 · 上游 oMLX 修正'
 evidence: 'GitHub 上的 llm-inference-systems · 實驗方法、request 層級 trace、原始資料與圖表'
