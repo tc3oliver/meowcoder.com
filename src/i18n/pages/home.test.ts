@@ -117,10 +117,9 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
 /* -------------------------------------------------------------------------
  * Verbatim requirement wording
  *
- * PRD §9 writes parts of the English homepage copy out in full, and doc-2 §5,
- * §8 and §10 rewrite the hero, Engineering Focus and the credibility strip the
- * same way — in both languages for the strip. All of it is quoted rather than
- * paraphrased and asserted literally here.
+ * PRD §9 writes parts of the English homepage copy out in full, and doc-2 §5
+ * rewrites the hero the same way. All of it is quoted rather than paraphrased
+ * and asserted literally here.
  * ---------------------------------------------------------------------- */
 
 describe('requirement wording', () => {
@@ -153,29 +152,6 @@ describe('requirement wording', () => {
     expect(home.zh.shouri.summary).toBe(
       '先完整保存，再依需要交給 AI 整理；原始內容始終保留，不會被 AI 整理結果覆蓋。',
     );
-  });
-
-  it('quotes the doc-2 §10 credibility strip in English', () => {
-    // The heading deliberately differs from doc-2 §10 ("10+ Years of Engineering"):
-    // the owner asked to stop leading with years. The arc below it carries the claim.
-    expect(home.en.experience.heading).toBe('Engineering Background');
-    expect(home.en.experience.progression).toBe(
-      'Software engineering → system architecture → AI systems',
-    );
-    expect(home.en.experience.summary).toBe(
-      'Experience across enterprise software, cloud, security, mobile/web and applied AI.',
-    );
-    expect(home.en.experience.cta.label).toBe('About Oliver');
-  });
-
-  it('quotes the doc-2 §10 credibility strip in Chinese', () => {
-    // The heading deliberately differs from doc-2 §10: the owner asked to stop leading with years.
-    expect(home.zh.experience.heading).toBe('工程背景');
-    expect(home.zh.experience.progression).toBe('軟體工程 → 系統架構 → AI 系統');
-    expect(home.zh.experience.summary).toBe(
-      '經歷涵蓋企業軟體、雲端、資安、行動／網頁應用與 AI 系統。',
-    );
-    expect(home.zh.experience.cta.label).toBe('關於 Oliver');
   });
 
   it('keeps the publication identical across locales (PRD §7)', () => {
@@ -225,8 +201,6 @@ describe('content language rules (PRD §34)', () => {
     ...t.systems.projects.flatMap((project) => (project.note ? [project.note] : [])),
     t.products.piship.statement,
     t.products.signalforge.statement,
-    t.experience.progression,
-    t.experience.summary,
   ];
 
   it('keeps English prose free of Chinese', () => {

@@ -35,7 +35,6 @@
 import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
 import type { StudyPost } from '../../lib/study-feed';
-import ExperienceSection from './ExperienceSection.astro';
 import HomeHero from './HomeHero.astro';
 import ProductsSection from './ProductsSection.astro';
 import ResearchWritingSection from './ResearchWritingSection.astro';
@@ -63,7 +62,6 @@ const { locale, t, posts, externalIndicator } = Astro.props;
     posts={posts}
     externalIndicator={externalIndicator}
   />
-  <ExperienceSection locale={locale} t={t} />
 </div>
 
 <style>

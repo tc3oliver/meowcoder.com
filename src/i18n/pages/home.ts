@@ -194,24 +194,6 @@ export interface HomeStrings extends PageStrings {
     /** The link to all of Study. */
     cta: CtaLabel;
   };
-  /**
-   * doc-2 §10. One horizontal credibility strip, not a section.
-   *
-   * The large "Enterprise Engineering / Current direction" block is gone. What
-   * remains is the claim (`heading`), the arc that backs it (`progression`),
-   * one sentence of scope (`summary`), and the way to read more (`cta` → the
-   * localized About route). PRD §11 still binds every one of them: engineering
-   * domains and seniority only, never an employer, an internal project, an
-   * infrastructure detail, a private measurement, or a customer.
-   */
-  experience: {
-    heading: string;
-    /** The career arc as one line: an arrow chain, not a sentence. */
-    progression: string;
-    summary: string;
-    /** Internal; the About route is resolved by the component, not here. */
-    cta: CtaLabel;
-  };
 }
 
 /**
@@ -345,12 +327,6 @@ export const home = {
       languages: { en: 'English', zh: 'Chinese' },
       cta: { label: 'All writing' },
     },
-    experience: {
-      heading: 'Engineering Background',
-      progression: 'Software engineering → system architecture → AI systems',
-      summary: 'Experience across enterprise software, cloud, security, mobile/web and applied AI.',
-      cta: { label: 'About Oliver' },
-    },
   },
   zh: {
     title: 'Oliver Yu — AI 系統工程師與系統架構師',
@@ -475,12 +451,6 @@ export const home = {
       heading: '技術文章',
       languages: { en: '英文', zh: '中文' },
       cta: { label: '全部文章' },
-    },
-    experience: {
-      heading: '工程背景',
-      progression: '軟體工程 → 系統架構 → AI 系統',
-      summary: '經歷涵蓋企業軟體、雲端、資安、行動／網頁應用與 AI 系統。',
-      cta: { label: '關於 Oliver' },
     },
   },
 } satisfies HomeDictionary;
