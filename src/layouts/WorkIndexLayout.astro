@@ -6,38 +6,16 @@
  * `/zh/work/`, so the two indexes cannot drift into listing different things
  * in different shapes.
  *
- * doc-2 §11 replaces what this page used to be — a text list of type, linked
- * title, and summary — with large entries. The list is short on purpose: it is
- * not padded out into a card wall and no project is invented to balance a row.
- *
- * doc-3 revises the third entry as career-depth evidence. It keeps the same
- * visual weight and action treatment as the other entries, while concise
- * metadata and an experience-specific CTA describe its destination.
- *
- * Two further rules shape the markup:
- *
- * - **One link per entry.** The project's own title is appended to the action
- *   out of sight, so a screen reader reading a list of links hears distinct
- *   destinations instead of the same phrase repeated. Nothing wraps the entry,
- *   so there is no nested interactive element and the whole 1160px block is not
- *   one giant tab stop.
- * - **Shouri gets the largest visual area**, as doc-2 §11 requires. Its visual
- *   is wider than the reading measure without filling the entire content shell;
- *   the other visuals sit in a narrower second column from 64rem up.
- *
- * The screenshot goes through Astro's
- * `<Image>` so it keeps build-time optimization and the explicit dimensions
- * that cost no layout shift.
+ * The page is a plain list in the homepage's reading column: a number on the
+ * left, and on the right the title as the only link, then the type, the
+ * outcome and the evidence label in muted text. No entry carries a visual, a
+ * card or a button; the title is the one link, so a screen reader hears
+ * distinct destinations without hidden suffixes.
  *
  * Entries arrive already filtered and ordered by `workEntriesForLocale`; this
  * layout only renders them.
  */
 
-import { Image } from 'astro:assets';
-
-import { shouriScreenshot } from '../components/home/shouri-screenshot';
-import cacheCliff from '../assets/research/cache-cliff.svg';
-import { signalForgeScreenshot } from '../components/work/signalforge-screenshot';
 import type { Locale } from '../i18n/locales';
 import { work } from '../i18n/pages/work';
 import { localizePath, workDetailRoute } from '../lib/i18n';
@@ -53,30 +31,14 @@ const { locale, entries } = Astro.props;
 
 const t = work[locale];
 
-/**
- * Which visual belongs to which case study.
- *
- * Keyed by slug because that is what the pairing actually is: a fact about two
- * specific projects, not something an entry could declare about itself — the
- * screenshot is an asset in this repository and the diagram is a component, and
- * neither is expressible in frontmatter. An entry not named here renders as
- * copy alone, which is the same shape the index had before this redesign and is
- * the correct shape for the experience entry, which has no honest visual.
- */
-const VISUALS: Readonly<Record<string, 'screenshot' | 'chart' | 'keyvisual'>> = {
-  shouri: 'screenshot',
-  'llm-inference-systems': 'chart',
-  signalforge: 'keyvisual',
-};
-
-/** `01`, `02` — the position doc-2 §11 numbers each entry by. */
+/** `01`, `02` — the position each entry is numbered by. */
 function position(index: number): string {
   return String(index + 1).padStart(2, '0');
 }
 ---
 
 <SiteShell locale={locale} route="/work" title={t.title} description={t.description}>
-  <div class="container">
+  <div class="container work-index-page">
     <header class="work-index__header">
       <h1>{t.heading}</h1>
       <p class="work-index__intro">{t.intro}</p>
@@ -88,96 +50,24 @@ function position(index: number): string {
       ) : (
         <ul class="work-index" role="list">
           {entries.map((entry, index) => {
-            const visual = VISUALS[entry.data.slug];
-            const isExperience = entry.data.kind === 'experience';
+            const label = entry.data.indexMeta ?? entry.data.evidence;
 
             return (
-              <li
-                class:list={[
-                  'work-entry',
-                  visual !== undefined && 'work-entry--illustrated',
-                  isExperience && 'work-entry--experience',
-                ]}
-              >
-                <div class="work-entry__copy">
-                  <p class="work-entry__label">
-                    {/* Decoration: the list already carries the ordering, so
-                        announcing "zero one" before the type would repeat it
-                        as a number nobody asked for. */}
-                    <span class="work-entry__position" aria-hidden="true">
-                      {position(index)}
-                    </span>
-                    {entry.data.type}
-                  </p>
-                  <h2 class="work-entry__title">{entry.data.title}</h2>
-                  <p class="work-entry__outcome">{entry.data.outcome ?? entry.data.summary}</p>
-                  {(entry.data.indexMeta ?? entry.data.evidence) && (
-                    <p class="work-entry__evidence">
-                      {entry.data.indexMeta ?? entry.data.evidence}
-                    </p>
-                  )}
-                  {isExperience && (
-                    <div class="work-entry__progression" aria-label={t.experienceProgression.label}>
-                      <ol class="work-entry__progression-stages" role="list">
-                        {t.experienceProgression.stages.map((stage) => (
-                          <li>{stage}</li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
-                  <a
-                    class="work-entry__cta"
-                    href={localizePath(locale, workDetailRoute(entry.data.slug))}
-                  >
-                    {isExperience ? t.experienceCta : t.caseStudyCta}
-                    <span class="visually-hidden"> — {entry.data.title}</span>
-                    {isExperience && (
-                      <span class="work-entry__arrow" aria-hidden="true">
-                        →
-                      </span>
-                    )}
-                  </a>
+              <li class="work-row">
+                {/* Decoration: the list already carries the ordering. */}
+                <span class="work-row__num" aria-hidden="true">
+                  {position(index)}
+                </span>
+                <div class="work-row__body">
+                  <h2 class="work-row__title">
+                    <a href={localizePath(locale, workDetailRoute(entry.data.slug))}>
+                      {entry.data.title}
+                    </a>
+                  </h2>
+                  <p class="work-row__type">{entry.data.type}</p>
+                  <p class="work-row__outcome">{entry.data.outcome ?? entry.data.summary}</p>
+                  {label && <p class="work-row__evidence">{label}</p>}
                 </div>
-
-                {visual === 'screenshot' && shouriScreenshot && (
-                  <figure class="work-entry__figure">
-                    <Image
-                      src={shouriScreenshot}
-                      alt={t.visuals.shouri.alt}
-                      widths={[480, 640, 960, 1280]}
-                      sizes="(min-width: 64rem) 30vw, 100vw"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </figure>
-                )}
-
-                {visual === 'keyvisual' && signalForgeScreenshot && (
-                  <figure class="work-entry__figure">
-                    <Image
-                      src={signalForgeScreenshot}
-                      alt={t.visuals.signalforge.alt}
-                      widths={[480, 640, 960, 1280]}
-                      sizes="(min-width: 64rem) 30vw, 100vw"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </figure>
-                )}
-
-                {visual === 'chart' && (
-                  <figure class="work-entry__figure work-entry__figure--chart">
-                    <img
-                      src={cacheCliff.src}
-                      width={cacheCliff.width}
-                      height={cacheCliff.height}
-                      alt={t.visuals.reusableState.alt}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <figcaption>{t.visuals.reusableState.caption}</figcaption>
-                  </figure>
-                )}
               </li>
             );
           })}
@@ -188,208 +78,82 @@ function position(index: number): string {
 </SiteShell>
 
 <style>
-  /* The page is the full content width now, but its prose is not: the heading
-     and the intro stay on the reading measure so widening the shell buys the
-     entries room without stretching a paragraph across 1160px. */
-  .work-index__header {
+  /* Same column as the homepage: reading measure, left-aligned with the
+     header's content edge. */
+  .work-index-page {
     max-width: var(--width-reading);
-    margin-block-end: var(--space-9);
+    margin-inline-start: max(0px, calc((100% - var(--width-content)) / 2));
+    margin-inline-end: auto;
+  }
+
+  .work-index__header {
+    margin-block-end: var(--space-8);
   }
 
   .work-index__intro {
     margin-block-start: var(--space-3);
-    font-size: var(--text-lg);
-    line-height: var(--leading-relaxed);
     color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
   }
 
   .work-index {
-    display: grid;
-    gap: var(--space-9);
-    margin: 0;
-  }
-
-  /* A hairline between entries this large. At this size the gap alone leaves it
-     ambiguous where one ends and the next begins. */
-  .work-entry + .work-entry {
-    padding-block-start: var(--space-9);
-    border-block-start: var(--border-width) solid var(--color-border);
-  }
-
-  /* One column by default, copy before visual — the order a phone shows and the
-     order a screen reader hears, with no `order` juggling to keep them equal. */
-  .work-entry {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-7);
-  }
-
-  .work-entry__copy {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-4);
-    max-width: var(--width-reading);
+    gap: var(--space-7);
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  /* The position and the type are one label above the title, not two lines of
-     metadata: the numeral is what gives an entry its "01 / 02" identity, and it
-     only reads that way sitting against the category it belongs to. */
-  .work-entry__label {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-3);
+  /* The number on the left and the entry on the right from a tablet up; a
+     stack beneath that. `minmax(0, 1fr)` keeps a long unbroken label from
+     widening a 390px viewport. */
+  .work-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+  }
+
+  @media (width >= 48rem) {
+    .work-row {
+      grid-template-columns: 4rem minmax(0, 1fr);
+      column-gap: var(--space-5);
+    }
+  }
+
+  .work-row__num {
     color: var(--color-text-muted);
-    font-size: var(--text-sm);
-  }
-
-  .work-entry__position {
     font-family: var(--font-mono);
+    font-size: var(--text-sm);
     letter-spacing: var(--tracking-wide);
   }
 
-  /* Monospace and muted, the treatment this site gives a row of labels rather
-     than a sentence — it is what can be checked, not another claim. */
-  .work-entry__evidence {
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    line-height: var(--leading-relaxed);
-    letter-spacing: var(--tracking-normal);
-    /* A label naming a host or a package has no break opportunity in it, and
-       one unbreakable token would set the page's minimum width at 390px. */
-    overflow-wrap: anywhere;
+  .work-row__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
   }
 
-  .work-entry__outcome {
-    font-size: var(--text-lg);
-    line-height: var(--leading-relaxed);
-  }
-
-  /* Same weight the outline actions elsewhere on the site carry: the border is
-     the only thing defining the control, so it owes WCAG 1.4.11 its 3:1. */
-  .work-entry__cta {
-    display: inline-flex;
-    gap: var(--space-2);
-    margin-block-start: var(--space-2);
-    padding: var(--space-3) var(--space-5);
-    border: var(--border-width) solid var(--color-border-strong);
-    border-radius: var(--radius-md);
-    color: var(--color-text);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-medium);
+  .work-row__title {
+    font-size: var(--text-md);
     line-height: var(--leading-snug);
-    text-decoration: none;
   }
 
-  .work-entry__cta:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-  }
-
-  .work-entry__arrow {
-    font-family: var(--font-mono);
-  }
-
-  .work-entry__progression {
-    inline-size: 100%;
-    padding-block: var(--space-4);
-    border-block: var(--border-width) solid var(--color-border);
-  }
-
-  .work-entry__progression-stages {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2) var(--space-3);
-    margin: 0;
+  .work-row__type,
+  .work-row__outcome,
+  .work-row__evidence {
     color: var(--color-text-muted);
     font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
   }
 
-  .work-entry__progression-stages li {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-3);
-  }
-
-  .work-entry__progression-stages li:not(:last-child)::after {
-    content: '→';
+  .work-row__evidence {
     font-family: var(--font-mono);
-  }
-
-  @media (width < 48rem) {
-    .work-entry__progression-stages {
-      flex-direction: column;
-      gap: var(--space-2);
-    }
-
-    .work-entry__progression-stages li {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--space-1);
-    }
-
-    .work-entry__progression-stages li:not(:last-child)::after {
-      rotate: 90deg;
-    }
-  }
-
-  /* Every illustrated entry gets the same figure box. An earlier revision made
-     the screenshot span up to 1000px while the other visuals took a third of
-     that, which read as one entry shouting over the rest; the cap is now the
-     column they all share. */
-  .work-entry__figure {
-    width: 100%;
-    max-width: 44rem;
-    margin: 0;
-    margin-inline: auto;
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    background-color: var(--color-surface);
-  }
-
-  /*
-   * The chart is ink on paper: its strokes and labels are dark, and it carries
-   * no background of its own. A fixed light surface underneath is what keeps it
-   * legible in dark mode, where `--color-surface` would put dark ink on a dark
-   * panel. The padding is the chart's own margin, which the asset does not have.
-   */
-  .work-entry__figure--chart {
-    padding: var(--space-4);
-    background-color: #fff;
-  }
-
-  .work-entry__figure--chart figcaption {
-    margin-block-start: var(--space-3);
-    color: #4a4a4a;
     font-size: var(--text-xs);
-    line-height: var(--leading-snug);
-  }
-
-  /* The rendered box is the column, not the asset's own pixel width. Astro
-     still writes `width` and `height` onto the tag, so the aspect ratio is
-     known before the bytes arrive and the image reserves its own space. */
-  .work-entry__figure :global(img),
-  .work-entry__figure > img {
-    display: block;
-    inline-size: 100%;
-    block-size: auto;
-  }
-
-  /* From 64rem an illustrated entry runs its figure beside the copy rather than
-     under it, so each one reads as a single row. Below the breakpoint they
-     stack, which is also the 390px case.
-
-     Keyed on having a visual at all rather than on which visual, so the
-     experience entry — which has none — is not given a two-column grid with an
-     empty second column. */
-  @media (min-width: 64rem) {
-    .work-entry--illustrated {
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-      align-items: start;
-      gap: var(--space-8);
-    }
+    /* A host or package name has no break opportunity, and one unbreakable
+       token would set the page's minimum width at 390px. */
+    overflow-wrap: anywhere;
   }
 
   .work-index__empty {
