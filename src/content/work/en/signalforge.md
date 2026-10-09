@@ -29,7 +29,7 @@ A feed reader gives you today's articles. That is the wrong unit.
 
 Five outlets writing about one release is one event, not five things to read.
 An article published today is frequently not new information: it is commentary
-on something reported last week, a rumour that has now been confirmed, or a
+on something reported last week, a rumor that has now been confirmed, or a
 number that moved in a direction already being tracked. Sorting that out is the
 work, and it is the work a summarizer does not do — summarizing five articles
 produces five summaries.
@@ -39,16 +39,16 @@ is **event-centric, not article-centric**. Every story persists in a ledger,
 today is compared against what was already known, and what gets recorded is
 what _changed_:
 
-| Change type          | Meaning                                              |
-| -------------------- | ---------------------------------------------------- |
-| `NEW`                | First time this event has been seen                  |
-| `UPDATE`             | Genuinely new detail on a known story                |
-| `ESCALATION`         | The situation got more serious                       |
-| `RESOLUTION`         | It concluded                                         |
-| `REVERSAL`           | It went the other way                                |
-| `CONFIRMATION`       | A rumour or single-source report is now corroborated |
-| `RUMOR`              | Reported, but not yet from a source that settles it  |
-| `NO_MATERIAL_CHANGE` | Coverage happened; information did not               |
+| Change type          | Meaning                                             |
+| -------------------- | --------------------------------------------------- |
+| `NEW`                | First time this event has been seen                 |
+| `UPDATE`             | Genuinely new detail on a known story               |
+| `ESCALATION`         | The situation got more serious                      |
+| `RESOLUTION`         | It concluded                                        |
+| `REVERSAL`           | It went the other way                               |
+| `CONFIRMATION`       | A rumor or single-source report is now corroborated |
+| `RUMOR`              | Reported, but not yet from a source that settles it |
+| `NO_MATERIAL_CHANGE` | Coverage happened; information did not              |
 
 `NO_MATERIAL_CHANGE` is the load-bearing one. A story in that state is updated
 in the ledger and deliberately kept out of the brief. That is the difference
@@ -84,7 +84,7 @@ two short-lived agent sessions that read and write it through tools.
 <span class="state-flow__part"><span class="state-flow__part-label">Output</span>Daily brief, story rows, emerging signals</span>
 </li>
 </ol>
-<figcaption class="state-flow__caption">A solid outline is collected or validated content; a dashed outline is model judgement or model prose. The two never share a row: the reader renders published rows and never invokes a model.</figcaption>
+<figcaption class="state-flow__caption">A solid outline is collected or validated content; a dashed outline is model judgment or model prose. The two never share a row: the reader renders published rows and never invokes a model.</figcaption>
 </figure>
 
 Postgres is the canonical store. Collected items, decisions, the cross-day
@@ -160,7 +160,7 @@ validation is rejected with a reason the session can act on.
 
 ### No editorial filtering before the agent
 
-**Why** — "Looks unimportant" is the curator's judgement. Making it earlier, in
+**Why** — "Looks unimportant" is the curator's judgment. Making it earlier, in
 a collector, is how a pipeline silently stops seeing things. A collector may
 drop an item only for being an exact duplicate, corrupt, unsupported, or a
 source-policy violation.
@@ -175,7 +175,7 @@ much reaches the brief, and that is the single largest operating cost.
 
 ### Similarity narrows the field; it never decides
 
-**Why** — Whether two items describe the same real-world event is a judgement
+**Why** — Whether two items describe the same real-world event is a judgment
 made from the text, and it is recorded explicitly. There is no similarity
 threshold anywhere that merges two items on its own.
 
@@ -220,7 +220,7 @@ Stated plainly, because they decide whether the design is worth adapting.
   in front of the reader. The public instance is read-only and serves only
   what the pipeline has already published.
 - **Brief quality is bounded by the model and the source coverage.** The
-  pipeline is deterministic where it can be; the judgement is not.
+  pipeline is deterministic where it can be; the judgment is not.
 - **Personalization is specified but not yet wired.** The interest profile is
   validated but not consumed by the agents, and nothing learns from what is
   read.
