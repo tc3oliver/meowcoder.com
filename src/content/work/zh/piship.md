@@ -31,11 +31,41 @@ meta:
 
 ## 它做什麼
 
-- **登入。** OIDC 搭配 PKCE。PiShip 拿身分 token 去公司的 credential broker 換一張短效的 gateway 憑證，存進作業系統的 keychain、自動續期，登出時撤銷。gateway 只看得到這張憑證。
+- **登入。** OIDC 搭配 PKCE。PiShip 拿身分 token 去公司的 credential broker 換一張短效的 gateway 憑證，預設存進作業系統的 keychain、自動續期，登出時撤銷。gateway 只看得到這張憑證。
 - **模型。** 請求送往公司內部、相容 OpenAI API 的 gateway，而且只能用 manifest 允許的模型。
 - **Policy。** 工具呼叫、檔案存取、shell 指令與 MCP 工具在執行前先檢查，`policy explain` 會指出是哪一條規則做的決定。runtime 無法強制執行的 `deny` 或 `ask` 規則，會讓啟動直接失敗，並回報 `POLICY_UNENFORCEABLE`。
 - **Sandbox。** bubblewrap、Seatbelt 或遠端 backend。manifest 要求 sandbox、但 sandbox 無法啟動時，指令不會在主機上執行。
 - **Audit。** 只含 metadata 的 audit 事件會送到公司自己架的 HTTP collector。
+
+<figure class="state-flow">
+<ol class="state-flow__steps" role="list">
+<li class="state-flow__step">
+<span class="state-flow__name">OIDC 登入</span>
+<span class="state-flow__detail">開發者透過公司的 identity provider 登入。</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">公司身分系統</span>
+<span class="state-flow__detail">簽發身分 token。</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Credential broker</span>
+<span class="state-flow__detail">用身分 token 換一張 gateway 憑證。</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Gateway 憑證</span>
+<span class="state-flow__detail">短效，預設存在作業系統的 keychain。</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Pi runtime</span>
+<span class="state-flow__detail">帶著這張憑證送出模型請求。</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">公司 LLM gateway</span>
+<span class="state-flow__detail">只會看到這張憑證，筆電上沒有模型供應商的 API key。</span>
+</li>
+</ol>
+<figcaption class="state-flow__caption">從登入到公司 gateway 的路徑。</figcaption>
+</figure>
 
 PiShip 不取代公司的 identity provider、broker 或 gateway。公司需要提供哪些 endpoint，寫在 <a href="https://github.com/tc3oliver/piship/blob/main/docs/enterprise-integration.md" target="_blank" rel="noopener noreferrer"><code>docs/enterprise-integration.md</code></a>。
 

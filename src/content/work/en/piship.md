@@ -31,11 +31,41 @@ With <a href="https://github.com/tc3oliver/piship" target="_blank" rel="noopener
 
 ## What it does
 
-- **Sign-in.** OIDC with PKCE. PiShip trades the identity token at the company's credential broker for a short-lived gateway credential, keeps it in the OS keychain, renews it, and revokes it on logout. The gateway sees only that credential.
+- **Sign-in.** OIDC with PKCE. PiShip trades the identity token at the company's credential broker for a short-lived gateway credential, keeps it in the OS keychain by default, renews it, and revokes it on logout. The gateway sees only that credential.
 - **Models.** Requests go to the company's OpenAI-compatible gateway, and only to the models the manifest allows.
 - **Policy.** Tool calls, file access, shell commands, and MCP tools are checked before they run, and `policy explain` names the rule that decided. A `deny` or `ask` rule the runtime cannot enforce fails the launch with `POLICY_UNENFORCEABLE`.
 - **Sandbox.** bubblewrap, Seatbelt, or a remote backend. If the manifest requires a sandbox and it cannot start, the command does not run on the host.
 - **Audit.** Metadata-only audit events go to an HTTP collector the company runs.
+
+<figure class="state-flow">
+<ol class="state-flow__steps" role="list">
+<li class="state-flow__step">
+<span class="state-flow__name">OIDC login</span>
+<span class="state-flow__detail">The developer signs in through the company’s identity provider.</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Company identity</span>
+<span class="state-flow__detail">Issues an identity token.</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Credential broker</span>
+<span class="state-flow__detail">Exchanges the token for a gateway credential.</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Gateway credential</span>
+<span class="state-flow__detail">Short-lived, kept in the OS keychain by default.</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Pi runtime</span>
+<span class="state-flow__detail">Sends model requests with that credential.</span>
+</li>
+<li class="state-flow__step">
+<span class="state-flow__name">Company LLM gateway</span>
+<span class="state-flow__detail">Sees only that credential; no provider API key is on the laptop.</span>
+</li>
+</ol>
+<figcaption class="state-flow__caption">The path from login to the company gateway.</figcaption>
+</figure>
 
 PiShip does not replace the identity provider, broker, or gateway. The endpoints a company has to provide are specified in <a href="https://github.com/tc3oliver/piship/blob/main/docs/enterprise-integration.md" target="_blank" rel="noopener noreferrer"><code>docs/enterprise-integration.md</code></a>.
 
