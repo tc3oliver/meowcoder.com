@@ -243,7 +243,7 @@ button {
 
 /* A screenshot or recording inside the prose: the file's own pixels, one hairline
    border, no shadow. */
-.prose :where(img) {
+.prose :where(img, video) {
   width: 100%;
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-lg);

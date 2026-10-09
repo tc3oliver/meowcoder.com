@@ -21,6 +21,13 @@ meta:
 
 由 Oliver Yu 獨立設計與開發。
 
+<figure class="shot">
+<video controls muted loop playsinline preload="none" width="1040" height="752" poster="/videos/claude-team-kit-session.jpg" aria-label="Claude Code 錄製畫面：一句話啟動 worker 團隊，接著在旁邊開啟 Mission Control。">
+<source src="/videos/claude-team-kit-session.mp4" type="video/mp4">
+</video>
+<figcaption class="shot__caption">真實的 Claude Code session：一句話啟動團隊，點一下開啟 Mission Control。這是在小型範例專案上錄下的一次執行，帳號資訊已遮蔽，每次結果不盡相同。維護者錄製。</figcaption>
+</figure>
+
 ## 問題
 
 Claude Code 的 Agent Teams 讓一個 lead session 把工作分給多個 teammate；teammate 是各自獨立的 session，共用一份任務清單。Claude Code 的文件裡沒有任何設定可以限制同時存活的 teammate 數量，而且團隊在跑的時候，除了對話記錄之外幾乎沒有東西可看：誰在做什麼、哪個任務在等哪個任務、用量額度已經用掉多少。
@@ -55,11 +62,6 @@ Claude Code 的 Agent Teams 讓一個 lead session 把工作分給多個 teammat
 </li>
 </ol>
 <figcaption class="state-flow__caption">CTK 團隊的四個步驟。團隊與任務清單由 Claude Code 提供，引導 lead 的 skill 是模型讀了照著做的流程，真正會強制執行的只有 plugin 的 mod（掛在 `agent.spawn` 上的 hook），它強制的是上限。</figcaption>
-</figure>
-
-<figure class="shot">
-<img src="/images/claude-team-kit/mission-control.svg" width="1040" height="752" alt="Claude Code 終端機錄製畫面：左側是三個 worker 組成的團隊，右側停靠著 Mission Control 窗格，顯示名額、worker、任務與用量。" loading="lazy" decoding="async">
-<figcaption class="shot__caption">Mission Control 停靠在三個 worker 的團隊旁。維護者錄製的畫面。</figcaption>
 </figure>
 
 ## 證據與限制

@@ -58,6 +58,13 @@ Oliver Yu 獨立完成研究、量測與發布。
 <figcaption class="trajectory__caption">「GPU 結果回傳」是 GPU worker 算完一個請求，到結果交回呼叫端的時間，不含 GPU 運算。第一列是研究階段的實驗，後兩列是 1.5 正式版驗證時和 1.4 路徑的比較。</figcaption>
 </figure>
 
+<figure class="shot">
+<video controls muted loop playsinline preload="none" width="960" height="540" poster="/videos/laya-apple-release.jpg" aria-label="laya-apple 1.5 的動畫：GPU 的結果卡在 GIL 上，非同步 Core ML 消除了這段等待，遇到慢速狀態時退回 1.4 路徑。">
+<source src="/videos/laya-apple-release.mp4" type="video/mp4">
+</video>
+<figcaption class="shot__caption">1.5 版的過程，濃縮成 28 秒動畫：GIL 的等待、非同步 Core ML，以及退回 1.4 路徑。前十秒和路由切換圖是標明為示意的圖解；畫面上每個數字都由 repo 裡的結果檔算出。</figcaption>
+</figure>
+
 ## 問題
 
 照原本的設計，兩個裝置應該各做各的：短請求不必排在長時間的 GPU 工作後面，GPU 也不受影響。實際跑起來並不是這樣。Neural Engine 跑在旁邊的另一條 thread 時，typed-decisions 的 GPU 服務時間變成原本的 1.04–1.64 倍，Neural Engine 自己卻幾乎沒受影響。

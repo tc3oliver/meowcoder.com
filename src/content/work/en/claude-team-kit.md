@@ -21,6 +21,13 @@ meta:
 
 Independently designed and built by Oliver Yu.
 
+<figure class="shot">
+<video controls muted loop playsinline preload="none" width="1040" height="752" poster="/videos/claude-team-kit-session.jpg" aria-label="Recording of a Claude Code session: one sentence starts a team of workers, then Mission Control is opened beside it.">
+<source src="/videos/claude-team-kit-session.mp4" type="video/mp4">
+</video>
+<figcaption class="shot__caption">A real Claude Code session: one sentence starts a team, one click opens Mission Control. One recorded run on a small fixture; account details are masked, and results vary from run to run. Recorded by the maintainers.</figcaption>
+</figure>
+
 ## The problem
 
 Claude Code's Agent Teams let one lead session hand work to several teammates, which are separate sessions sharing a task list. Claude Code documents no setting that limits how many teammates are alive at once, and while a team runs there is little to see beyond the transcript.
@@ -55,11 +62,6 @@ Claude Code's Agent Teams let one lead session hand work to several teammates, w
 </li>
 </ol>
 <figcaption class="state-flow__caption">The four steps of a CTK team. Claude Code provides the team and its task list, a skill the model follows guides the lead, and only the plugin's mod, a hook on `agent.spawn`, enforces anything: the limit.</figcaption>
-</figure>
-
-<figure class="shot">
-<img src="/images/claude-team-kit/mission-control.svg" width="1040" height="752" alt="Terminal recording of a Claude Code session with a three-worker team on the left and the Mission Control pane docked on the right, showing slots, workers, tasks, and usage." loading="lazy" decoding="async">
-<figcaption class="shot__caption">Mission Control docked beside a team of three workers. A recording by the maintainers.</figcaption>
 </figure>
 
 ## Evidence and limits

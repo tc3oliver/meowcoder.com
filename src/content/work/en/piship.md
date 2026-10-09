@@ -21,6 +21,13 @@ meta:
 
 Independently designed and built by Oliver Yu.
 
+<figure class="shot">
+<video controls muted loop playsinline preload="none" width="720" height="404" poster="/videos/piship-overview.jpg" aria-label="Animation: upstream Pi is wrapped by PiShip and connected to an identity provider, a credential broker, an LLM gateway, and a sandbox.">
+<source src="/videos/piship-overview.mp4" type="video/mp4">
+</video>
+<figcaption class="shot__caption">An animation from the PiShip README: upstream Pi, wrapped by PiShip, connected to identity, a credential broker, an LLM gateway, and a sandbox.</figcaption>
+</figure>
+
 ## The problem
 
 A company that puts its developers on a coding agent like <a href="https://github.com/earendil-works/pi" target="_blank" rel="noopener noreferrer">Pi</a> soon wants four things the agent does not ship with: single sign-on, no provider API keys on laptops, a sandbox around every command, and a record of what the agent did. The usual route is a fork, which means merging every upstream release for as long as the company uses it.

@@ -21,6 +21,13 @@ meta:
 
 由 Oliver Yu 獨立設計與開發。
 
+<figure class="shot">
+<video controls muted loop playsinline preload="none" width="720" height="404" poster="/videos/piship-overview.jpg" aria-label="動畫：上游 Pi 由 PiShip 包起來，接上身分系統、credential broker、LLM gateway 與 sandbox。">
+<source src="/videos/piship-overview.mp4" type="video/mp4">
+</video>
+<figcaption class="shot__caption">PiShip README 裡的動畫：上游 Pi 由 PiShip 包起來，接上身分系統、credential broker、LLM gateway 與 sandbox。</figcaption>
+</figure>
+
 ## 問題
 
 公司讓開發者用上 <a href="https://github.com/earendil-works/pi" target="_blank" rel="noopener noreferrer">Pi</a> 這類 coding agent 之後，很快會需要四樣它沒有內建的東西：單一登入、筆電上不放任何模型供應商的 API key、每條指令都套上 sandbox，以及 agent 做過什麼的紀錄。常見做法是 fork，代價是只要還在用，就得持續合併每一個上游版本。

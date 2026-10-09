@@ -58,6 +58,13 @@ Upstream: <a href="https://github.com/apple/coremltools/pull/2876" target="_blan
 <figcaption class="trajectory__caption">GPU result return is the time from the GPU worker finishing a request to its result reaching the caller. It is not GPU compute time. The first row is the research intervention; the other two are 1.5 against the 1.4 path in production validation.</figcaption>
 </figure>
 
+<figure class="shot">
+<video controls muted loop playsinline preload="none" width="960" height="540" poster="/videos/laya-apple-release.jpg" aria-label="Animation of the laya-apple 1.5 story: the GPU result waits on the GIL, asynchronous Core ML removes the wait, and a slow state triggers a fallback to the 1.4 path.">
+<source src="/videos/laya-apple-release.mp4" type="video/mp4">
+</video>
+<figcaption class="shot__caption">The 1.5 story as a 28-second animation: the GIL wait, asynchronous Core ML, and the fallback to the 1.4 path. The first ten seconds and the route-switch diagram are labeled schematics; every number on screen is computed from the repository’s result files.</figcaption>
+</figure>
+
 ## The problem
 
 The two devices were supposed to work in parallel. Short requests would stop queueing behind long GPU work, and the GPU would carry on as before. It did not: with the Neural Engine on a thread beside it, GPU service time on typed-decisions rose to 1.04–1.64× its solo level, while the Neural Engine itself was barely affected.
