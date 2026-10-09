@@ -2,7 +2,7 @@
 title: 'Claude Team Kit'
 type: 'Open Source · Agent Tooling'
 summary: 'A Claude Code plugin that puts a hard limit on Agent Teams teammates and adds a read-only Mission Control pane for workers, task dependencies, and usage.'
-outcome: 'A spawn above the worker limit is refused and its task stays pending. The limit counts native teammates only.'
+outcome: 'A teammate spawn above the worker limit is refused and its task stays pending. The limit counts native teammates only.'
 indexMeta: 'Public preview · Claude Code plugin · MIT'
 evidence: 'github.com/tc3oliver/claude-team-kit · docs/LIMITATIONS.md and the verification record in docs/REVIEW.md'
 slug: 'claude-team-kit'

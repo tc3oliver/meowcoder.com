@@ -2,7 +2,7 @@
 title: 'Claude Team Kit'
 type: '開源 · Agent 工具'
 summary: '一個 Claude Code plugin，替 Agent Teams 的 teammate 數量加上硬性上限，並提供唯讀的 Mission Control 面板，顯示 worker、任務相依與用量。'
-outcome: '超過 worker 上限的 spawn 會被拒絕，任務維持待處理。上限只計算原生 teammate。'
+outcome: '超過 worker 上限的 teammate spawn 會被拒絕，任務維持待處理。上限只計算原生 teammate。'
 indexMeta: '公開預覽 · Claude Code plugin · MIT'
 evidence: 'github.com/tc3oliver/claude-team-kit · docs/LIMITATIONS.md 與 docs/REVIEW.md 的驗證紀錄'
 slug: 'claude-team-kit'
