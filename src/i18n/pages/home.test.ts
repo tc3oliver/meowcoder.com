@@ -20,6 +20,10 @@ import SHOURI_EN from '../../content/work/en/shouri.md?raw';
 import SHOURI_ZH from '../../content/work/zh/shouri.md?raw';
 import INFERENCE_EN from '../../content/work/en/llm-inference-systems.md?raw';
 import INFERENCE_ZH from '../../content/work/zh/llm-inference-systems.md?raw';
+import CTK_EN from '../../content/work/en/claude-team-kit.md?raw';
+import CTK_ZH from '../../content/work/zh/claude-team-kit.md?raw';
+import PISHIP_EN from '../../content/work/en/piship.md?raw';
+import PISHIP_ZH from '../../content/work/zh/piship.md?raw';
 import LAYA_EN from '../../content/work/en/laya-apple.md?raw';
 import LAYA_ZH from '../../content/work/zh/laya-apple.md?raw';
 import { LOCALES, type Locale } from '../locales';
@@ -154,18 +158,24 @@ describe('requirement wording', () => {
     expect(home.zh.hero.role).toBe('AI Systems Engineer · System Architect');
   });
 
-  it('quotes the doc-2 §6 Shouri product statement verbatim in English', () => {
-    expect(home.en.shouri.summary).toBe(
-      'Save first. Organize with AI when needed. Keep the original as the source of truth.',
-    );
-  });
-
-  it('quotes the doc-2 §6 Shouri product statement verbatim in Chinese', () => {
-    // doc-2 §6 writes both languages out in full, so neither is a translation
-    // decision left to this file.
-    expect(home.zh.shouri.summary).toBe(
-      '先完整保存，再依需要交給 AI 整理；原始內容始終保留，不會被 AI 整理結果覆蓋。',
-    );
+  it('uses each product card summary word for word as its home sentence', () => {
+    // Shouri's sentence is also the structured-data description. The card is
+    // the source; a home sentence that drifts from it says two things.
+    const CARDS: Record<Locale, Record<string, string>> = {
+      en: { shouri: SHOURI_EN, piship: PISHIP_EN, claudeTeamKit: CTK_EN },
+      zh: { shouri: SHOURI_ZH, piship: PISHIP_ZH, claudeTeamKit: CTK_ZH },
+    };
+    for (const locale of LOCALES) {
+      const t = home[locale];
+      const sentences: Record<string, string> = {
+        shouri: t.shouri.summary,
+        piship: t.products.piship.statement,
+        claudeTeamKit: t.products.claudeTeamKit.statement,
+      };
+      for (const [product, sentence] of Object.entries(sentences)) {
+        expect(CARDS[locale][product]).toContain(`summary: '${sentence}'`);
+      }
+    }
   });
 
   it('keeps the career arc and About link that close the Writing section', () => {

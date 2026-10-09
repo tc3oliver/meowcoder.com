@@ -236,7 +236,7 @@ export const home = {
     shouri: {
       heading: 'Shouri / 收理',
       summary:
-        'Save first. Organize with AI when needed. Keep the original as the source of truth.',
+        'Saves webpages, files, and media first, then uses AI to turn them into structured, searchable knowledge. The original is always kept and can be exported.',
       cta: { label: 'Visit Shouri' },
     },
     products: {
@@ -250,7 +250,7 @@ export const home = {
       piship: {
         heading: 'PiShip',
         statement:
-          'A toolchain that lets a company ship Pi as its own coding agent without forking it, with OIDC sign-in, short-lived gateway credentials, policy, and a sandbox.',
+          'A toolchain that lets a company ship Pi as its own coding agent without forking it, adding OIDC login, short-lived gateway credentials, policy, and a sandbox.',
         cta: { label: 'GitHub' },
       },
       claudeTeamKit: {
@@ -373,7 +373,8 @@ export const home = {
     },
     shouri: {
       heading: 'Shouri / 收理',
-      summary: '先完整保存，再依需要交給 AI 整理；原始內容始終保留，不會被 AI 整理結果覆蓋。',
+      summary:
+        '先完整保存網頁、檔案與媒體，再由 AI 整理成結構化、可搜尋的知識。原始內容一律完整保留，也隨時可以匯出。',
       cta: { label: '前往 Shouri' },
     },
     products: {
@@ -387,13 +388,13 @@ export const home = {
       piship: {
         heading: 'PiShip',
         statement:
-          '讓公司不必 fork Pi，就能把它做成自家的 coding agent，並補上 OIDC 登入、短效 gateway 憑證、policy 與 sandbox。',
+          '一套工具鏈，讓公司不必 fork Pi 就能把它做成自家的 coding agent，並補上 OIDC 登入、短效 gateway 憑證、policy 與 sandbox。',
         cta: { label: 'GitHub' },
       },
       claudeTeamKit: {
         heading: 'Claude Team Kit',
         statement:
-          '一個 Claude Code plugin，限制 Agent Teams 的 teammate 數量，並提供唯讀的 Mission Control 面板，顯示 worker、任務相依與用量。',
+          '一個 Claude Code plugin，限制 Agent Teams 原生 teammate 的數量，並提供唯讀的 Mission Control 面板，顯示 worker、任務相依與用量。',
         cta: { label: 'GitHub' },
       },
     },
