@@ -103,78 +103,32 @@ export interface HomeStrings extends PageStrings {
     noBreakSuffix?: string;
   };
   /**
-   * doc-2 §6 (PRD §9.2). The one product that proves design → ship → operate,
-   * and the homepage's visual centrepiece.
-   *
-   * doc-2 §6 fixes the copy at exactly six things: the eyebrow, the bilingual
-   * name, one product statement, three principle names, and two actions. The
-   * per-principle sentences and the six-item "Engineering areas" list are gone
-   * from the homepage — not from the site. Both were claims rather than
-   * evidence at this size, and the engineering detail behind them is on the
-   * Shouri case study, which `caseStudyCta` now links to.
-   *
-   * `summary` keeps its name rather than becoming `statement`: it is also the
-   * `SoftwareApplication` description in `src/lib/structured-data.ts`, and the
-   * schema wants the product's own one-line description, which is exactly what
-   * doc-2 §6's statement is.
+   * Shouri's row in Products. `heading` and `summary` are also the
+   * `SoftwareApplication` name and description in `src/lib/structured-data.ts`,
+   * which wants the product's own one-line description.
    */
   shouri: {
-    eyebrow: string;
     /** Intentional bilingual identity, explicitly allowed by PRD §34. */
     heading: string;
     summary: string;
-    /**
-     * The product screenshot PRD §9.2 asks for, as an asset/alt-text pair.
-     *
-     * Absent until both halves exist: the image at `src/assets/shouri/` (see
-     * `src/components/home/shouri-screenshot.ts`) and the alt text describing
-     * that specific image. Writing alt text for an image that does not exist
-     * yet would describe something nobody has seen, so this stays optional and
-     * the figure renders only once both are supplied.
-     */
-    screenshot?: { alt: string };
-    /**
-     * The three principle names, as doc-2 §6's compact row. Names only: they
-     * are the product's own vocabulary and stay in English in both locales,
-     * which is why they are plain strings rather than `NamedItem`s now that
-     * the localized explanation beneath each one has moved to the case study.
-     */
-    principles: readonly string[];
-    /** Internal; the case-study route is resolved by the component, not here. */
-    caseStudyCta: CtaLabel;
     cta: CtaLabel;
   };
   /**
-   * doc-2 §7. The primary open-source proof; the site source is not (PRD §24).
-   *
-   * doc-2 §7 cuts this section back to two projects, each a name, one
-   * statement, one line of facts, and its actions, plus the upstream list.
+   * The products list: SignalForge and PiShip after Shouri. Each row is a name
+   * linked to its case study (resolved by the component), one sentence, and
+   * text links. The upstream half moved to `systems`.
    */
-  openSource: {
+  products: {
     heading: string;
-    /**
-     * The second project in the section, first in reading order: the public
-     * system proof. It has what PiShip does not — a running instance — so it
-     * carries three actions where PiShip carries two: the live reader, the
-     * case study, and the repository. `meta` is one compact line of facts
-     * (licence, language, what runs).
-     */
     signalforge: {
       heading: string;
       statement: string;
-      meta: string;
       liveCta: CtaLabel;
-      /** Internal; the case-study route is resolved by the component, not here. */
-      caseStudyCta: CtaLabel;
       cta: CtaLabel;
     };
-    /** The third open-source project, the same shape as SignalForge without a live instance. */
     piship: {
       heading: string;
       statement: string;
-      meta: string;
-      /** Internal; the case-study route is resolved by the component, not here. */
-      caseStudyCta: CtaLabel;
       cta: CtaLabel;
     };
   };
@@ -300,34 +254,23 @@ export const home = {
       noBreakSuffix: 'measured cause.',
     },
     shouri: {
-      eyebrow: 'Featured Product',
       heading: 'Shouri / 收理',
       summary:
         'Save first. Organize with AI when needed. Keep the original as the source of truth.',
-      screenshot: {
-        alt: 'Shouri on desktop and phone. The web app works through a five-unit learning path; behind it the product page shows a saved cooking video beside the structured recipe it became. Two phone screens show the saved library and that recipe broken into summary, ingredients, and steps.',
-      },
-      principles: ['Save First', 'Explicit AI', 'Recoverable by Design'],
-      caseStudyCta: { label: 'View Case Study' },
       cta: { label: 'Visit Shouri' },
     },
-    openSource: {
-      heading: 'Open Source and Upstream',
+    products: {
+      heading: 'Products',
       signalforge: {
         heading: 'SignalForge',
-        statement:
-          'An event-centric intelligence pipeline that runs every morning. It collects from multiple sources, tracks stories across days in a ledger, and writes a daily brief that is validated by code.',
-        meta: 'MIT · TypeScript · Postgres · Live',
+        statement: 'An event-centric intelligence pipeline that runs every morning.',
         liveCta: { label: 'Read Today' },
-        caseStudyCta: { label: 'View Case Study' },
         cta: { label: 'GitHub' },
       },
       piship: {
         heading: 'PiShip',
         statement:
           'A toolchain that lets a company ship Pi as its own coding agent without forking it, with OIDC sign-in, short-lived gateway credentials, policy, and a sandbox.',
-        meta: 'MIT · TypeScript · Pre-release v0.13.0',
-        caseStudyCta: { label: 'View Case Study' },
         cta: { label: 'GitHub' },
       },
     },
@@ -449,40 +392,22 @@ export const home = {
       noBreakSuffix: '證明的原因。',
     },
     shouri: {
-      eyebrow: '精選產品',
       heading: 'Shouri / 收理',
       summary: '先完整保存，再依需要交給 AI 整理；原始內容始終保留，不會被 AI 整理結果覆蓋。',
-      screenshot: {
-        alt: '收理在桌機與手機上的畫面。網頁應用正進行五個單元的學習路線；後方的產品頁把一段收下的料理影片與整理後的結構化食譜並列。兩個手機畫面則是收藏庫，以及拆成摘要、材料與步驟的同一份食譜。',
-      },
-      // The principle names are the product's own vocabulary and stay in
-      // English in both locales — PRD §34 allows exactly that, and they are a
-      // row of names rather than a prose block.
-      principles: ['Save First', 'Explicit AI', 'Recoverable by Design'],
-      // Word for word the label Open Source uses for the same action, so the
-      // two case-study links on the homepage cannot read as different things.
-      caseStudyCta: { label: '查看完整案例' },
       cta: { label: '前往 Shouri' },
     },
-    openSource: {
-      heading: '開源與上游貢獻',
+    products: {
+      heading: '產品',
       signalforge: {
         heading: 'SignalForge',
-        statement:
-          '事件導向的情報管線。每天早上從多個來源收集資料，用跨日紀錄追蹤事件發展，再產出經程式驗證的每日重點。',
-        // Facts, not prose: licence, language, store, state (PRD §34).
-        meta: 'MIT · TypeScript · Postgres · 線上運作中',
+        statement: '事件導向的情報管線。',
         liveCta: { label: '看今天的重點' },
-        caseStudyCta: { label: '查看完整案例' },
         cta: { label: 'GitHub' },
       },
       piship: {
         heading: 'PiShip',
         statement:
           '讓公司不必 fork Pi，就能把它做成自家的 coding agent，並補上 OIDC 登入、短效 gateway 憑證、policy 與 sandbox。',
-        // Facts, not prose (PRD §34).
-        meta: 'MIT · TypeScript · Pre-release v0.13.0',
-        caseStudyCta: { label: '查看完整案例' },
         cta: { label: 'GitHub' },
       },
     },

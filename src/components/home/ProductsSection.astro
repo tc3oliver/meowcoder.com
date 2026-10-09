@@ -1,0 +1,102 @@
+---
+/**
+ * Products — Shouri, SignalForge and PiShip as three plain rows: the name
+ * linked to its case study, one sentence, and text links out. The Shouri
+ * screenshot is not shown here; it stays on the Work index
+ * (`shouri-screenshot.ts`). PRD §24 keeps the meowcoder.com source out of this
+ * section: it gets a footer link.
+ */
+
+import type { Locale } from '../../i18n/locales';
+import type { HomeStrings } from '../../i18n/pages/home';
+import { PISHIP_URL, SHOURI_URL, SIGNALFORGE_LIVE_URL, SIGNALFORGE_URL } from '../../lib/external';
+import { localizePath, workDetailRoute } from '../../lib/i18n';
+import CtaLink from './CtaLink.astro';
+import HomeSection from './HomeSection.astro';
+
+interface Props {
+  locale: Locale;
+  t: HomeStrings;
+  externalIndicator: string;
+}
+
+const { locale, t, externalIndicator } = Astro.props;
+
+/** `slug` is the case study's — `src/content/work/{en,zh}/<slug>.md`. */
+const products = [
+  {
+    slug: 'shouri',
+    name: t.shouri.heading,
+    statement: t.shouri.summary,
+    links: [{ href: SHOURI_URL, label: t.shouri.cta.label }],
+  },
+  {
+    slug: 'signalforge',
+    name: t.products.signalforge.heading,
+    statement: t.products.signalforge.statement,
+    links: [
+      { href: SIGNALFORGE_LIVE_URL, label: t.products.signalforge.liveCta.label },
+      { href: SIGNALFORGE_URL, label: t.products.signalforge.cta.label },
+    ],
+  },
+  {
+    slug: 'piship',
+    name: t.products.piship.heading,
+    statement: t.products.piship.statement,
+    links: [{ href: PISHIP_URL, label: t.products.piship.cta.label }],
+  },
+];
+---
+
+<HomeSection id="products" heading={t.products.heading}>
+  <ul class="products" role="list">
+    {
+      products.map((product) => (
+        <li class="product">
+          <p class="product__name">
+            <a href={localizePath(locale, workDetailRoute(product.slug))}>{product.name}</a>
+          </p>
+          <p class="product__statement">{product.statement}</p>
+          <p class="product__links">
+            {product.links.map((link) => (
+              <CtaLink href={link.href} label={link.label} external indicator={externalIndicator} />
+            ))}
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+</HomeSection>
+
+<style>
+  .products {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .product {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .product__name {
+    font-size: var(--text-md);
+  }
+
+  .product__statement {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  .product__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-5);
+  }
+</style>

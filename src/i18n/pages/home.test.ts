@@ -48,82 +48,25 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     expect(t.hero.facts.join(' ')).not.toMatch(/\d+ (merged|pull requests|PRs)/i);
   });
 
-  it('names the three Shouri product principles doc-2 §6 lists', () => {
-    // Names only, and identical in both locales: they are the product's own
-    // vocabulary, which is why the row reads the same in English and Chinese.
-    // The third is `Recoverable by Design` — doc-2 §6 renames what PRD §9.2
-    // called `Recoverable Architecture`.
-    expect(t.shouri.principles).toEqual(['Save First', 'Explicit AI', 'Recoverable by Design']);
-  });
-
-  it('carries only what doc-2 §6 leaves on the homepage', () => {
-    // doc-2 §6 fixes the whole section: eyebrow, bilingual name, one product
-    // statement, three principle names, and two actions. The six-item
-    // "Engineering areas" list, its heading, and the sentence under each
-    // principle are gone from here — the Shouri case study carries that
-    // engineering detail — so the key set is the assertion.
-    //
-    // `screenshot` is excluded because it is legitimately optional; the guard
-    // below covers it.
-    const keys = Object.keys(t.shouri).filter((key) => key !== 'screenshot');
-
-    expect(keys.sort()).toEqual([
-      'caseStudyCta',
-      'cta',
-      'eyebrow',
-      'heading',
-      'principles',
-      'summary',
-    ]);
-  });
-
-  it('carries only what doc-2 §7 leaves on the homepage', () => {
-    // doc-2 §7 fixes the section: eyebrow, heading, two projects and the
-    // upstream list. Each project is a name, one statement, one line of facts,
-    // and its actions. Anything else belongs on a case study,
-    // so the key sets are the assertion.
-    expect(Object.keys(t.openSource).sort()).toEqual(['heading', 'piship', 'signalforge']);
-    expect(Object.keys(t.openSource.piship).sort()).toEqual([
-      'caseStudyCta',
-      'cta',
-      'heading',
-      'meta',
-      'statement',
-    ]);
-    expect(Object.keys(t.openSource.signalforge).sort()).toEqual([
-      'caseStudyCta',
+  it('carries only what the Products list shows', () => {
+    // Shouri keeps its name, its sentence (also the structured-data
+    // description) and one action; the principles, eyebrow, screenshot and the
+    // case-study label left the homepage with the Shouri section.
+    expect(Object.keys(t.shouri).sort()).toEqual(['cta', 'heading', 'summary']);
+    expect(Object.keys(t.products).sort()).toEqual(['heading', 'piship', 'signalforge']);
+    expect(Object.keys(t.products.piship).sort()).toEqual(['cta', 'heading', 'statement']);
+    expect(Object.keys(t.products.signalforge).sort()).toEqual([
       'cta',
       'heading',
       'liveCta',
-      'meta',
       'statement',
     ]);
   });
 
-  it('no longer unpacks the implementation detail doc-2 §7 moves off the homepage', () => {
-    // The seven-stage pipeline, "What it defines", "What it demonstrates" and
-    // the attribution paragraph. The key-set test above would already fail if
-    // one came back, but naming them is what makes the failure legible.
-    const MOVED = [
-      'pipeline',
-      'highlights',
-      'highlightsHeading',
-      'secondaryLabel',
-      'secondaryName',
-      'secondaryHeading',
-      'secondaryPoints',
-      'attribution',
-    ];
-
-    expect(MOVED.filter((key) => key in t.openSource)).toEqual([]);
-  });
-
-  it('names PiShip with its facts and two actions', () => {
-    expect(t.openSource.piship.heading).toBe('PiShip');
-    expect(t.openSource.piship.meta).toBe('MIT · TypeScript · Pre-release v0.13.0');
-    expect(t.openSource.piship.statement.length).toBeGreaterThan(0);
-    expect(t.openSource.piship.caseStudyCta.label.length).toBeGreaterThan(0);
-    expect(t.openSource.piship.cta.label).toBe('GitHub');
+  it('names PiShip with its statement and a GitHub link', () => {
+    expect(t.products.piship.heading).toBe('PiShip');
+    expect(t.products.piship.statement.length).toBeGreaterThan(0);
+    expect(t.products.piship.cta.label).toBe('GitHub');
   });
 
   it('discloses no employer or internal system (PRD §11)', () => {
@@ -140,20 +83,11 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     // PRD §12: the strongest evidence is confidential, so public proof points
     // at technical writing and nothing on the homepage suggests otherwise.
     //
-    // The permitted mentions are links to published open-source work — the
-    // opposite of the confidential employer systems this rule protects:
-    // SignalForge's case-study link, and the Featured Research projects' links
-    // to their own case studies. Each is exempted by identity rather than by pattern, so any *other* case-study claim appearing anywhere in
-    // the homepage strings still fails here.
+    // The case-study links are the project names themselves, so no string
+    // on the homepage mentions a case study at all.
     const CASE_STUDY = [/case study/i, /案例/];
-    const permitted = new Set([
-      t.openSource.signalforge.caseStudyCta.label,
-      t.openSource.piship.caseStudyCta.label,
-    ]);
-
     for (const pattern of CASE_STUDY) {
-      const claims = strings(t).filter((value) => pattern.test(value));
-      expect(claims.filter((value) => !permitted.has(value))).toEqual([]);
+      expect(strings(t).filter((value) => pattern.test(value))).toEqual([]);
     }
   });
 
@@ -196,14 +130,6 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     // that needed it most.
     for (const language of LOCALES) {
       expect(t.writing.languages[language].length).toBeGreaterThan(0);
-    }
-  });
-
-  it('promises no screenshot it cannot show (PRD §9.2)', () => {
-    // The alt text ships with the image, never before it — see
-    // `src/components/home/shouri-screenshot.ts`.
-    if (t.shouri.screenshot) {
-      expect(t.shouri.screenshot.alt.length).toBeGreaterThan(0);
     }
   });
 });
@@ -323,11 +249,9 @@ describe('content language rules (PRD §34)', () => {
   const proseFor = (t: HomeStrings) => [
     t.intro,
     t.shouri.summary,
-    // The Shouri principles are no longer prose: doc-2 §6 reduces them to three
-    // names, which PRD §34 exempts as product vocabulary.
     ...t.systems.projects.flatMap((project) => (project.note ? [project.note] : [])),
-    t.openSource.piship.statement,
-    t.openSource.signalforge.statement,
+    t.products.piship.statement,
+    t.products.signalforge.statement,
     // doc-2 §9 leaves the Research column one prose block: `detail` moved to
     // About, and the Technical Writing intro went with the merge — the column
     // now shows Study as its label instead of stating it in a sentence.

@@ -37,9 +37,8 @@ import type { HomeStrings } from '../../i18n/pages/home';
 import type { StudyPost } from '../../lib/study-feed';
 import ExperienceSection from './ExperienceSection.astro';
 import HomeHero from './HomeHero.astro';
-import OpenSourceSection from './OpenSourceSection.astro';
+import ProductsSection from './ProductsSection.astro';
 import ResearchWritingSection from './ResearchWritingSection.astro';
-import ShouriSection from './ShouriSection.astro';
 import SystemsResearchSection from './SystemsResearchSection.astro';
 
 interface Props {
@@ -56,9 +55,8 @@ const { locale, t, posts, externalIndicator } = Astro.props;
 
 <div class="container home">
   <HomeHero locale={locale} t={t} externalIndicator={externalIndicator} />
-  <ShouriSection locale={locale} t={t} externalIndicator={externalIndicator} />
   <SystemsResearchSection locale={locale} t={t} externalIndicator={externalIndicator} />
-  <OpenSourceSection locale={locale} t={t} externalIndicator={externalIndicator} />
+  <ProductsSection locale={locale} t={t} externalIndicator={externalIndicator} />
   <ResearchWritingSection
     locale={locale}
     t={t}
