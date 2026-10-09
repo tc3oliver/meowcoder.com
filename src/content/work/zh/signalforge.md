@@ -23,6 +23,8 @@ meta:
 
 由 Oliver Yu 獨立設計、開發、維運。
 
+![SignalForge 產品圖，瀏覽器中的每日簡報頁。](../../../assets/signalforge/product.png)
+
 ## 問題
 
 Feed reader 給你的是「今天的文章」，但「文章」這個單位不對。

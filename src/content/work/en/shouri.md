@@ -21,6 +21,8 @@ meta:
 
 Independently designed, built, and operated by Oliver Yu.
 
+![Shouri product visual: the desktop learning path, the landing page, and the mobile library and reading views.](../../../assets/shouri/product.png)
+
 ## Problem
 
 Saving is the easy half. A twelve-minute cooking video, a PDF specification, a

@@ -57,9 +57,19 @@ Claude Code's Agent Teams let one lead session hand work to several teammates, w
 <figcaption class="state-flow__caption">The four steps of a CTK team. Claude Code provides the team and its task list, a skill the model follows guides the lead, and only the plugin's mod, a hook on `agent.spawn`, enforces anything: the limit.</figcaption>
 </figure>
 
+<figure class="shot">
+<img src="/images/claude-team-kit/mission-control.svg" width="1040" height="752" alt="Terminal recording of a Claude Code session with a three-worker team on the left and the Mission Control pane docked on the right, showing slots, workers, tasks, and usage." loading="lazy" decoding="async">
+<figcaption class="shot__caption">Mission Control docked beside a team of three workers. A recording by the maintainers.</figcaption>
+</figure>
+
 ## Evidence and limits
 
 The README calls this a public preview, and `docs/LIMITATIONS.md` lists what is unverified, with an evidence level for each claim: run live, reported by the maintainers, covered by tests, read in code only, or not verified.
+
+<figure class="shot">
+<img src="/images/claude-team-kit/limit-refusal.svg" width="1040" height="680" alt="Terminal recording of a Claude Code session in which a teammate spawn is refused with TEAM_CAPACITY_REACHED, live=3 and max=3." loading="lazy" decoding="async">
+<figcaption class="shot__caption">A recording by the maintainers with the limit at 3. Two finished teammates still held slots, so the next spawn was refused.</figcaption>
+</figure>
 
 - Agent Teams are experimental, and Mods, which carry the limit and the team line, are early access. A Claude Code update can break either without any change to CTK. Where Mods are missing, `/ctk:team` says the limit is off.
 - The limit counts native teammates only. Ordinary subagents are neither counted nor limited, and it caps how many teammates are alive, not what they spend.

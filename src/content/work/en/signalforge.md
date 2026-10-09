@@ -23,6 +23,8 @@ meta:
 
 Independently designed, built, and operated by Oliver Yu.
 
+![SignalForge product visual with the daily briefing page in a browser.](../../../assets/signalforge/product.png)
+
 ## Problem
 
 A feed reader gives you today's articles. That is the wrong unit.

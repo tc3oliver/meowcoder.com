@@ -241,6 +241,25 @@ button {
   margin-block-start: var(--space-2);
 }
 
+/* A screenshot or recording inside the prose: the file's own pixels, one hairline
+   border, no shadow. */
+.prose :where(img) {
+  width: 100%;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.prose .shot {
+  margin-inline: 0;
+}
+
+.prose .shot__caption {
+  margin-block-start: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-muted);
+}
+
 /* -------------------------------------------------------------------------
  * Case-study registers (MCD-22, doc-2 §12)
  *

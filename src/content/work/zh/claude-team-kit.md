@@ -57,9 +57,19 @@ Claude Code 的 Agent Teams 讓一個 lead session 把工作分給多個 teammat
 <figcaption class="state-flow__caption">CTK 團隊的四個步驟。團隊與任務清單由 Claude Code 提供，引導 lead 的 skill 是模型讀了照著做的流程，真正會強制執行的只有 plugin 的 mod（掛在 `agent.spawn` 上的 hook），它強制的是上限。</figcaption>
 </figure>
 
+<figure class="shot">
+<img src="/images/claude-team-kit/mission-control.svg" width="1040" height="752" alt="Claude Code 終端機錄製畫面：左側是三個 worker 組成的團隊，右側停靠著 Mission Control 窗格，顯示名額、worker、任務與用量。" loading="lazy" decoding="async">
+<figcaption class="shot__caption">Mission Control 停靠在三個 worker 的團隊旁。維護者錄製的畫面。</figcaption>
+</figure>
+
 ## 證據與限制
 
 README 自己寫明這是公開預覽。`docs/LIMITATIONS.md` 逐項列出尚未驗證的部分，每項說法都標有證據等級：實機執行過、維護者回報、有測試覆蓋、只讀過程式碼，或尚未驗證。
+
+<figure class="shot">
+<img src="/images/claude-team-kit/limit-refusal.svg" width="1040" height="680" alt="Claude Code 終端機錄製畫面：一個 teammate spawn 遭 TEAM_CAPACITY_REACHED 拒絕，live=3、max=3。" loading="lazy" decoding="async">
+<figcaption class="shot__caption">維護者錄製的畫面，上限為 3。兩位已完成的 teammate 仍佔著名額，下一個 spawn 因此被拒絕。</figcaption>
+</figure>
 
 - Agent Teams 仍是實驗性功能，負責上限與團隊狀態列的 Mods 則是搶先體驗。Claude Code 更新後，即使 CTK 沒有任何改動，兩者都可能壞掉。沒有 Mods 的環境中，`/ctk:team` 會告知上限未啟用。
 - 上限只計算原生 teammate。一般 subagent 既不計入也不受限，而且它限制的是同時存活的 teammate 數量，不是花費。
