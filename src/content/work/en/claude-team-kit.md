@@ -63,9 +63,9 @@ The README calls this a public preview, and `docs/LIMITATIONS.md` lists what is 
 
 - Agent Teams are experimental, and Mods, which carry the limit and the team line, are early access. A Claude Code update can break either without any change to CTK. Where Mods are missing, `/ctk:team` says the limit is off.
 - The limit counts native teammates only. Ordinary subagents are neither counted nor limited, and it caps how many teammates are alive, not what they spend.
-- The independent verification covered the limit with simulated-host tests and mutation checks, plus one live probe with a limit of 1, run once on one Claude Code version, in which the extra teammate spawns were refused.
+- The independent verification used simulated-host tests and mutation checks, and one live probe with a limit of 1, run once on one Claude Code version. The extra teammate spawns were refused.
 - The maintainers also report a live run of six concurrent spawns against a limit of three, with three started and three refused. That result is reported, not reproduced.
-- The same probe found a bypass: a named spawn that Claude Code does not treat as a teammate, for example one with `isolation: worktree`, starts above the limit. The guard cannot refuse it and only counts it.
+- The independent live probe also found a bypass: a named spawn that Claude Code does not treat as a teammate, for example one with `isolation: worktree`, starts above the limit. The guard cannot refuse it and only counts it.
 - The `/ctk:team` workflow has not been run end to end with live agents.
 - A refused spawn can still be drawn as "Done" in the transcript. The skill treats the refusal text as not started, but it is a skill, so a model can still misread it.
 - Interactive use was tested on macOS. Linux and Windows are covered by CI only.

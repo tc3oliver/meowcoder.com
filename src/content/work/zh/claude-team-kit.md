@@ -63,9 +63,9 @@ README 自己寫明這是公開預覽。`docs/LIMITATIONS.md` 逐項列出尚未
 
 - Agent Teams 仍是實驗性功能，承載上限與團隊狀態列的 Mods 則是搶先體驗。Claude Code 更新後，即使 CTK 沒有任何改動，兩者都可能壞掉。沒有 Mods 的環境中，`/ctk:team` 會告知上限未啟用。
 - 上限只計算原生 teammate。一般 subagent 既不計入也不受限，而且它限制的是同時存活的 teammate 數量，不是花費。
-- 獨立驗證對上限做了模擬主機的測試和 mutation 檢查，另有一次把上限設為 1 的實機探測，只跑過一次、只在一個 Claude Code 版本上，多出來的 teammate spawn 都被拒絕。
+- 獨立驗證對上限做了模擬主機的測試和 mutation 檢查，另有一次把上限設為 1 的實機探測，只跑過一次、只在一個 Claude Code 版本上，結果多出來的 teammate spawn 都被拒絕。
 - 維護者另外回報過一次實機測試：上限為 3、同時送出 6 個 spawn，3 個啟動、3 個被拒。這項結果是維護者回報的，沒有重現過。
-- 同一次探測也發現一個繞過方式：有名字、但 Claude Code 不當成 teammate 的 spawn（例如帶 `isolation: worktree`）會在上限之上啟動。守衛無法拒絕它，只會計數。
+- 獨立的實機探測也發現一個繞過方式：有名字、但 Claude Code 不當成 teammate 的 spawn（例如帶 `isolation: worktree`）會在上限之上啟動。守衛無法拒絕它，只會計數。
 - `/ctk:team` 流程還沒有用實機 agent 完整跑過一遍。
 - 被拒絕的 spawn 在對話記錄裡仍可能被畫成「Done」。skill 會把拒絕訊息視為尚未啟動，但它終究只是 skill，模型仍可能誤讀。
 - 互動式使用只在 macOS 上測過。Linux 與 Windows 只有 CI 覆蓋。
