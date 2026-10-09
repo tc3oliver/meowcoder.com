@@ -332,7 +332,7 @@ export const home = {
             href: 'https://github.com/jundot/omlx/pull/3664',
             merged: true,
             description:
-              'Keeps namespace tool groups intact through the Responses API. Codex sends MCP servers in that form.',
+              'Keeps namespace tool groups intact through the Responses API. Codex represents MCP servers this way.',
           },
         ],
         cta: { label: 'All upstream pull requests' },
