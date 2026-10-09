@@ -1,7 +1,7 @@
 ---
 title: 'PiShip'
 type: 'Open Source · Agent Infrastructure'
-summary: 'A toolchain that lets a company ship Pi as its own coding agent without forking it, adding OIDC login, short-lived gateway credentials, policy, MCP rules, and a sandbox.'
+summary: 'A toolchain that lets a company ship Pi as its own coding agent without forking it, adding OIDC login, short-lived gateway credentials, policy, and a sandbox.'
 outcome: 'In the v0.13.0 qualification run, each of nine attested archives was built twice and all nine payloads were identical. The run passed on its first attempt.'
 indexMeta: 'Pre-release · Linux, macOS, Windows'
 evidence: 'github.com/tc3oliver/piship · docs/status.md, the v0.13.0 release, and its qualification run'

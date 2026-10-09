@@ -1,7 +1,7 @@
 ---
 title: 'Shouri / 收理'
 type: 'Independent Product · AI Systems'
-summary: 'An organizer that saves webpages, files, and media first, then uses AI to turn them into structured, searchable knowledge. The original is always kept.'
+summary: 'Saves webpages, files, and media first, then uses AI to turn them into structured, searchable knowledge. The original is always kept and can be exported.'
 outcome: 'Built end to end: capture, AI organization, search, mobile sharing, and plans.'
 indexMeta: 'Save First · Explicit AI · Recoverable by Design'
 evidence: 'shouri.app · Product, plans, privacy, terms, and refund policy'

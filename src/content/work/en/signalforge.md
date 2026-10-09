@@ -1,7 +1,7 @@
 ---
 title: 'SignalForge'
 type: 'Open Source · Knowledge & Agent Systems'
-summary: 'A self-hosted intelligence pipeline that turns noisy multi-source feeds into deduplicated events, tracked changes, emerging signals, and a source-grounded daily brief.'
+summary: 'A self-hosted intelligence pipeline that turns noisy feeds into deduplicated events, tracked changes, emerging signals, and a source-grounded daily brief.'
 outcome: 'Runs unattended every morning on a two-session agent architecture, with every source reference and every number in the brief validated by code before publication.'
 indexMeta: 'MIT · TypeScript · Postgres · Two-session agent runtime'
 evidence: 'signal.meowcoder.com · the live daily brief, plus the full source on GitHub'

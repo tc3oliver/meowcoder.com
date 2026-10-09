@@ -1,7 +1,7 @@
 ---
 title: 'PiShip'
 type: '開源 · Agent 基礎設施'
-summary: '一套工具鏈，讓公司不必 fork Pi 就能把它做成自家的 coding agent，並補上 OIDC 登入、短效 gateway 憑證、policy、MCP 規則與 sandbox。'
+summary: '一套工具鏈，讓公司不必 fork Pi 就能把它做成自家的 coding agent，並補上 OIDC 登入、短效 gateway 憑證、policy 與 sandbox。'
 outcome: 'v0.13.0 的 qualification run 一次就通過：9 個附 attestation 的封存檔各 build 兩次，payload 全部相同。'
 indexMeta: 'Pre-release · Linux、macOS、Windows'
 evidence: 'github.com/tc3oliver/piship · docs/status.md、v0.13.0 release 與它的 qualification run'
@@ -88,7 +88,7 @@ Run 37887824632 在打了 tag 的那個 commit 上第一次就通過：54 個 jo
 <div class="evidence">
 
 - <a href="https://github.com/tc3oliver/piship" target="_blank" rel="noopener noreferrer"><code>github.com/tc3oliver/piship</code></a>
-  — 原始碼、範例與 變更紀錄。
+  — 原始碼、範例與變更紀錄。
 - <a href="https://github.com/tc3oliver/piship/blob/main/docs/status.md" target="_blank" rel="noopener noreferrer"><code>docs/status.md</code></a>
   — 支援範圍、每項主張背後的證據，以及已知限制。
 - <a href="https://github.com/tc3oliver/piship/releases/tag/v0.13.0" target="_blank" rel="noopener noreferrer">v0.13.0 pre-release</a>

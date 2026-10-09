@@ -1,7 +1,7 @@
 ---
 title: 'Professional Engineering Experience'
 type: 'Professional Experience · 2014–Present'
-summary: 'From mobile and web applications to enterprise systems and architecture, and enterprise AI: coding agents, knowledge retrieval, and LLM infrastructure.'
+summary: 'From mobile and web applications through enterprise systems and architecture to enterprise AI: coding agents, knowledge retrieval, and LLM infrastructure.'
 outcome: 'Ownership widened from client apps to backend, cloud, identity, and CI/CD, then to the systems around the model.'
 indexMeta: 'Mobile · Enterprise · Cloud · Architecture · AI'
 kind: 'experience'
