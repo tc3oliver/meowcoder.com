@@ -19,7 +19,7 @@ meta:
   - label: 'Scope'
     value: 'Concurrency · Core ML execution · Host scheduling · Adaptive fallback'
   - label: 'Upstream'
-    value: 'apple/coremltools#2876 · open'
+    value: 'apple/coremltools#2876'
 ---
 
 Independently researched, measured, and shipped by Oliver Yu.

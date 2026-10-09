@@ -23,7 +23,7 @@ Independently designed and built by Oliver Yu.
 
 ## The problem
 
-Claude Code's Agent Teams let one lead session hand work to several teammates, which are separate sessions sharing a task list. Claude Code documents no setting that limits how many teammates are alive at once, and while a team runs there is little to look at except the transcript: who is working on what, which tasks wait on which, and how much of the usage window is gone.
+Claude Code's Agent Teams let one lead session hand work to several teammates, which are separate sessions sharing a task list. Claude Code documents no setting that limits how many teammates are alive at once, and while a team runs there is little to see beyond the transcript.
 
 <a href="https://github.com/tc3oliver/claude-team-kit" target="_blank" rel="noopener noreferrer">Claude Team Kit</a> (CTK) is a plugin that adds a limit and a view. It does not add a scheduler; Claude Code still runs the team.
 
@@ -31,10 +31,9 @@ Claude Code's Agent Teams let one lead session hand work to several teammates, w
 
 - **Hard worker limit.** The default is 5, settable from 1 to 12. A teammate spawn above the limit is refused with `TEAM_CAPACITY_REACHED` and its task stays pending. If the roster cannot be read, the spawn is refused with `TEAM_GUARD_FAILED` rather than allowed.
 - **Mission Control.** A read-only pane opened from a line above the prompt. It shows workers, the task dependency graph, and usage, and it never starts, stops, or changes anything. A figure CTK could not observe reads `unavailable`, never a made-up zero.
-- **Usage HUD.** A team line above the prompt with the model, 5-hour and weekly usage, agents against the limit, tasks, and cost. It reads only what Claude Code passes it, with no network or model calls.
-- **Risk-based review.** `/ctk:review` scales reviewer depth to the risk of the change.
-- **Debugging workflow.** `/ctk:debug` asks for a failing reproduction before a fix.
-- **Portable configuration.** Options are set through the plugin manager, and an optional CLI syncs a profile between machines through a git repository you own, with a secrets scan before every publish.
+- **Usage HUD.** A team line above the prompt with the model, 5-hour and weekly usage, agents against the limit, tasks, and cost. It reads only what Claude Code passes it.
+- **Review and debugging.** `/ctk:review` scales reviewer depth to the risk of the change; `/ctk:debug` asks for a failing reproduction before a fix.
+- **Portable configuration.** Options are set through the plugin manager; an optional CLI syncs a profile between machines through your own git repository, with a secrets scan before every publish.
 
 <figure class="state-flow">
 <ol class="state-flow__steps" role="list">
@@ -55,12 +54,8 @@ Claude Code's Agent Teams let one lead session hand work to several teammates, w
 <span class="state-flow__detail">The lead runs the final check before calling the goal done.</span>
 </li>
 </ol>
-<figcaption class="state-flow__caption">The four steps of a CTK team. Claude Code provides the team and its task list, a skill guides the lead, and the plugin's mod enforces the limit.</figcaption>
+<figcaption class="state-flow__caption">The four steps of a CTK team. Claude Code provides the team and its task list, a skill the model follows guides the lead, and only the plugin's mod, a hook on `agent.spawn`, enforces anything: the limit.</figcaption>
 </figure>
-
-## Who does what
-
-CTK separates three layers and labels each claim with one. Claude Code itself provides the team, the shared task list, and the rule that a task with open blockers cannot be claimed. CTK's skills are Markdown procedures that the model reads and follows. CTK's mod, a hook on `agent.spawn`, is the only part that enforces anything, and what it enforces is the limit on teammate spawns.
 
 ## Evidence and limits
 
@@ -68,7 +63,10 @@ The README calls this a public preview, and `docs/LIMITATIONS.md` lists what is 
 
 - Agent Teams are experimental, and Mods, which carry the limit and the team line, are early access. A Claude Code update can break either without any change to CTK. Where Mods are missing, `/ctk:team` says the limit is off.
 - The limit counts native teammates only. Ordinary subagents are neither counted nor limited, and it caps how many teammates are alive, not what they spend.
-- The maintainers ran one live probe: six concurrent spawns against a limit of three started three and refused three. That result is reported, not reproduced; the independent verification covered the limit with simulated-host tests and mutation checks, and no live run.
+- The independent verification covered the limit with simulated-host tests and mutation checks, plus one live probe with a limit of 1, run once on one Claude Code version, in which the extra teammate spawns were refused.
+- The maintainers also report a live run of six concurrent spawns against a limit of three, with three started and three refused. That result is reported, not reproduced.
+- The same probe found a bypass: a named spawn that Claude Code does not treat as a teammate, for example one with `isolation: worktree`, starts above the limit. The guard cannot refuse it and only counts it.
+- The `/ctk:team` workflow has not been run end to end with live agents.
 - A refused spawn can still be drawn as "Done" in the transcript. The skill treats the refusal text as not started, but it is a skill, so a model can still misread it.
 - Interactive use was tested on macOS. Linux and Windows are covered by CI only.
 - The README makes no speed, cost, or token-saving claim.

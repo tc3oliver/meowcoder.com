@@ -17,9 +17,9 @@ meta:
   - label: 'Runtime'
     value: 'laya-apple · Python、MLX、Core ML'
   - label: '範圍'
-    value: 'GIL 與並行 · Core ML 執行 · macOS 排程 · 退回 1.4 路徑'
+    value: 'GIL 與並行 · Core ML 執行 · macOS 排程 · 自適應退回'
   - label: '上游'
-    value: 'apple/coremltools#2876 · 尚未合併'
+    value: 'apple/coremltools#2876'
 ---
 
 Oliver Yu 獨立完成研究、量測與發布。

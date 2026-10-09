@@ -31,9 +31,8 @@ Claude Code 的 Agent Teams 讓一個 lead session 把工作分給多個 teammat
 
 - **硬性 worker 上限。** 預設 5，可設為 1 到 12。超過上限的 teammate spawn 會被拒絕並回報 `TEAM_CAPACITY_REACHED`，該任務維持待處理。讀不到 roster 時，spawn 會被拒絕並回報 `TEAM_GUARD_FAILED`，不會放行。
 - **Mission Control。** 唯讀面板，點提示列上方那一行就會開啟，顯示 worker、任務相依圖與用量，不會啟動、停止或更動任何東西。CTK 沒有觀察到的數字會顯示 `unavailable`，不會編一個 0。
-- **用量 HUD。** 提示列上方的團隊狀態列，顯示模型、5 小時與每週用量、agent 數對上限、任務與費用。它只讀 Claude Code 傳來的資料，不發網路請求，也不呼叫模型。
-- **依風險分級的 review。** `/ctk:review` 依變更的風險決定 reviewer 的深度。
-- **除錯流程。** `/ctk:debug` 要求先有能重現問題的失敗測試，再動手修。
+- **用量 HUD。** 提示列上方的團隊狀態列，顯示模型、5 小時與每週用量、agent 數對上限、任務與費用，只讀 Claude Code 傳來的資料。
+- **Review 與除錯。** `/ctk:review` 依變更風險決定 reviewer 的深度；`/ctk:debug` 要求先有能重現問題的失敗測試，再動手修。
 - **可攜的設定。** 選項透過 plugin 管理介面設定；另有選用的 CLI，可經由你自己的 git 儲存庫在不同機器間同步設定檔，每次發布前都會先掃描 secrets。
 
 <figure class="state-flow">
@@ -55,12 +54,8 @@ Claude Code 的 Agent Teams 讓一個 lead session 把工作分給多個 teammat
 <span class="state-flow__detail">lead 跑完最後的檢查，才宣告目標完成。</span>
 </li>
 </ol>
-<figcaption class="state-flow__caption">CTK 團隊的四個步驟。團隊與任務清單由 Claude Code 提供，skill 引導 lead，上限則由 plugin 的 mod 強制執行。</figcaption>
+<figcaption class="state-flow__caption">CTK 團隊的四個步驟。團隊與任務清單由 Claude Code 提供，引導 lead 的 skill 是模型讀了照著做的流程，真正會強制執行的只有 plugin 的 mod（掛在 `agent.spawn` 上的 hook），它強制的是上限。</figcaption>
 </figure>
-
-## 誰負責什麼
-
-CTK 把三層分開，每項說法都標明屬於哪一層。團隊、共用任務清單，以及「還有未解除阻擋的任務不能被認領」這條規則，是 Claude Code 本身提供的。CTK 的 skill 是模型讀了照著做的 Markdown 流程。CTK 的 mod 是掛在 `agent.spawn` 上的 hook，是唯一真正會強制執行的部分，它強制的是 teammate spawn 的上限。
 
 ## 證據與限制
 
@@ -68,7 +63,10 @@ README 自己寫明這是公開預覽。`docs/LIMITATIONS.md` 逐項列出尚未
 
 - Agent Teams 仍是實驗性功能，承載上限與團隊狀態列的 Mods 則是搶先體驗。Claude Code 更新後，即使 CTK 沒有任何改動，兩者都可能壞掉。沒有 Mods 的環境中，`/ctk:team` 會告知上限未啟用。
 - 上限只計算原生 teammate。一般 subagent 既不計入也不受限，而且它限制的是同時存活的 teammate 數量，不是花費。
-- 維護者在實機上做過一次探測：上限為 3、同時送出 6 個 spawn，3 個啟動、3 個被拒。這項結果只是回報，沒有被重現；獨立驗證對上限只做了模擬主機的測試和 mutation 檢查，沒有在實機上跑過。
+- 獨立驗證對上限做了模擬主機的測試和 mutation 檢查，另有一次把上限設為 1 的實機探測，只跑過一次、只在一個 Claude Code 版本上，多出來的 teammate spawn 都被拒絕。
+- 維護者另外回報過一次實機測試：上限為 3、同時送出 6 個 spawn，3 個啟動、3 個被拒。這項結果是維護者回報的，沒有重現過。
+- 同一次探測也發現一個繞過方式：有名字、但 Claude Code 不當成 teammate 的 spawn（例如帶 `isolation: worktree`）會在上限之上啟動。守衛無法拒絕它，只會計數。
+- `/ctk:team` 流程還沒有用實機 agent 完整跑過一遍。
 - 被拒絕的 spawn 在對話記錄裡仍可能被畫成「Done」。skill 會把拒絕訊息視為尚未啟動，但它終究只是 skill，模型仍可能誤讀。
 - 互動式使用只在 macOS 上測過。Linux 與 Windows 只有 CI 覆蓋。
 - README 沒有任何關於速度、費用或節省 token 的宣稱。
