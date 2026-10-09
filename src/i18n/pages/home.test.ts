@@ -91,19 +91,8 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     }
   });
 
-  it('carries only what doc-2 §9 leaves in the Research column', () => {
-    // doc-2 §9 fixes the column: the research area as the heading, the venue
-    // and year, one summary, the exact title as secondary metadata, and one
-    // action. `detail` — the IND-CCA / OW-CCA analysis — is the one that had to
-    // go, so the key set is the assertion.
-    expect(Object.keys(t.research).sort()).toEqual([
-      'cta',
-      'eyebrow',
-      'heading',
-      'paper',
-      'summary',
-      'venue',
-    ]);
+  it('keeps the paper row to a year, a venue and the title', () => {
+    expect(Object.keys(t.research).sort()).toEqual(['paper', 'venue', 'year']);
   });
 
   it('leaves the cryptographic security notions to About (doc-2 §9)', () => {
@@ -113,15 +102,6 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     for (const notion of ['IND-CCA', 'OW-CCA', 'LR-CBEET']) {
       expect(strings(t).filter((value) => value.includes(notion))).toEqual([]);
     }
-  });
-
-  it('keeps the research area above the paper title in the hierarchy', () => {
-    // doc-2 §9 makes the exact title secondary metadata rather than the
-    // column's largest line. The rendered sizes are `ResearchWritingSection`'s
-    // to get right; what belongs here is that the two are different strings, so
-    // a later edit cannot collapse them into one headline.
-    expect(t.research.heading).not.toBe(t.research.paper);
-    expect(t.research.paper.length).toBeGreaterThan(t.research.heading.length);
   });
 
   it('names a language for every locale a title could arrive in (doc-2 §9)', () => {
@@ -205,16 +185,9 @@ describe('requirement wording', () => {
       expect(home[locale].research.paper).toBe(
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
       );
-      expect(home[locale].research.venue).toBe(
-        'Journal of Information Security and Applications · 2026',
-      );
+      expect(home[locale].research.venue).toBe('Journal of Information Security and Applications');
+      expect(home[locale].research.year).toBe('2026');
     }
-  });
-
-  it('quotes the doc-2 §9 research summary verbatim in English', () => {
-    expect(home.en.research.summary).toBe(
-      'Co-authored research on certificate-based encryption designed to remain secure under continual key leakage.',
-    );
   });
 
   it('keeps the bilingual product identity in both locales (PRD §34)', () => {
@@ -252,10 +225,6 @@ describe('content language rules (PRD §34)', () => {
     ...t.systems.projects.flatMap((project) => (project.note ? [project.note] : [])),
     t.products.piship.statement,
     t.products.signalforge.statement,
-    // doc-2 §9 leaves the Research column one prose block: `detail` moved to
-    // About, and the Technical Writing intro went with the merge — the column
-    // now shows Study as its label instead of stating it in a sentence.
-    t.research.summary,
     t.experience.progression,
     t.experience.summary,
   ];

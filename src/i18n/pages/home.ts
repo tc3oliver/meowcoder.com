@@ -164,39 +164,20 @@ export interface HomeStrings extends PageStrings {
     };
   };
   /**
-   * PRD §9.5, doc-2 §9. One publication, and deliberately no navigation entry
-   * for it — it is the left column of the merged editorial section.
-   *
-   * `heading` is the research area and `paper` the exact citation, which is the
-   * hierarchy doc-2 §9 asks for: the area is the headline a visitor reads, the
-   * title stays as secondary metadata beneath it.
-   *
-   * There is no `detail` field. It carried the IND-CCA / OW-CCA analysis, which
-   * doc-2 §9 rules out here — "unnecessary for homepage credibility and belongs
-   * on About" — and `about.ts` now states it in full in both locales, so the
-   * site keeps the sentence and the homepage does not.
+   * PRD §9.5. One publication, and deliberately no navigation entry for it:
+   * it is the last row of the Writing list, a year, a venue and a linked title.
    */
   research: {
-    eyebrow: string;
-    heading: string;
     /** Publication title — a proper noun, so it is never translated. */
     paper: string;
     venue: string;
-    summary: string;
-    /** PRD §9.5's `View Publication ↗`, resolving through the DOI. */
-    cta: CtaLabel;
+    year: string;
   };
   /**
-   * PRD §9.6, doc-2 §9. Metadata pulled from Study; never article bodies.
-   *
-   * The section's old intro paragraph is gone. It said that Study is the
-   * canonical platform for this writing, which the column now shows rather than
-   * states: `eyebrow` names Study above the heading and the call to action goes
-   * there. That is doc-2's copy reduction applied without losing the fact.
+   * PRD §9.6. Metadata pulled from Study; never article bodies. A date and
+   * title list, with the journal paper as its last row.
    */
   writing: {
-    /** The platform, as the column's label. A proper noun in both locales. */
-    eyebrow: string;
     heading: string;
     /**
      * Language names for the badge on a title published in another language,
@@ -210,6 +191,7 @@ export interface HomeStrings extends PageStrings {
      * title on the Chinese homepage is marked the same way.
      */
     languages: Record<Locale, string>;
+    /** The link to all of Study. */
     cta: CtaLabel;
   };
   /**
@@ -353,20 +335,15 @@ export const home = {
       },
     },
     research: {
-      eyebrow: 'Research',
-      heading: 'Leakage-Resilient Cryptography',
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
-      venue: 'Journal of Information Security and Applications · 2026',
-      summary:
-        'Co-authored research on certificate-based encryption designed to remain secure under continual key leakage.',
-      cta: { label: 'View Publication' },
+      venue: 'Journal of Information Security and Applications',
+      year: '2026',
     },
     writing: {
-      eyebrow: 'Study',
       heading: 'Technical Writing',
       languages: { en: 'English', zh: 'Chinese' },
-      cta: { label: 'Explore Technical Writing' },
+      cta: { label: 'All writing' },
     },
     experience: {
       heading: 'Engineering Background',
@@ -489,21 +466,15 @@ export const home = {
       },
     },
     research: {
-      eyebrow: '研究',
-      heading: '抗洩漏密碼學',
-      // Publication title and journal name are proper nouns (PRD §7).
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
-      venue: 'Journal of Information Security and Applications · 2026',
-      summary: '共同發表的研究，探討如何讓憑證式加密在金鑰持續洩漏的情況下維持安全性。',
-      cta: { label: '閱讀論文' },
+      venue: 'Journal of Information Security and Applications',
+      year: '2026',
     },
     writing: {
-      // The platform's own name, so it reads the same in both locales.
-      eyebrow: 'Study',
       heading: '技術文章',
       languages: { en: '英文', zh: '中文' },
-      cta: { label: '瀏覽技術文章' },
+      cta: { label: '全部文章' },
     },
     experience: {
       heading: '工程背景',
