@@ -1,7 +1,7 @@
 ---
 title: 'LLM Inference Systems'
 type: 'Systems Research · LLM Inference'
-summary: 'Inference-systems research driven by real interactive workloads: instrument the runtime, isolate the mechanism, check correctness, then decide or fix upstream.'
+summary: 'Inference research on real workloads: instrument, isolate the mechanism, check correctness, then make a production decision or fix upstream.'
 outcome: 'Three finished experiments: reusable state dynamics, the cost model for speculative decoding, and background recovery of reusable canonical state. Also three open research threads, each stating the evidence it still lacks; upstream oMLX fixes, listed below; and a reproducible harness with the full dataset behind every figure.'
 indexMeta: 'Apple silicon · Three experiments · Three open research threads · Upstream oMLX fixes'
 evidence: 'llm-inference-systems on GitHub · methodology, request-level traces, raw data, and figures'
@@ -215,7 +215,7 @@ Every inference optimization changes something between the prompt and the answer
 - **The protected-prefix boundary.** The output changed, because the model's input changed — the one case that genuinely altered what the model saw, and the one that sounded most like bookkeeping.
 - **Speculative decoding.** The output changed and stopped being reproducible.
 
-Which of the four reaches the output is not guessable from how aggressive an optimization sounds. Reusing a cached prefix sounds risky and is exact. Speculative decoding sounds like the riskiest of the four, and here its output changed and stopped repeating; the cause was not isolated.
+Which of the four reaches the output is not guessable from how aggressive an optimization sounds. Reusing a cached prefix sounds risky and is exact. Speculative decoding sounds like the riskiest of the four, and here its output changed and stopped being reproducible; the cause was not isolated.
 
 What this thread lacks is a judgment: once the output does change, every comparison so far can say whether the bytes differ, and none of them says whether the answer got worse.
 

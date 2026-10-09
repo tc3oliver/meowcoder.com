@@ -1,7 +1,7 @@
 ---
 title: 'LLM Inference Systems'
 type: '系統研究 · LLM 推論'
-summary: '從真實互動式 workload 出發的推論系統研究：量測 runtime、找出機制、檢查正確性，再決定或送上游修正。'
+summary: '從真實互動式 workload 出發的推論系統研究：量測 runtime、找出機制、檢查正確性，再做出 production 決策或送上游修正。目前完成三個實驗。'
 outcome: '目前完成三個實驗：可重用狀態與互動延遲、推測解碼成本模型，以及 canonical 狀態的背景重建。另外還有三條進行中的研究線、列在下方的 oMLX 上游修正，以及可重跑的量測工具與完整資料集。'
 indexMeta: 'Apple silicon · 三個實驗 · 三條進行中的研究線 · 上游 oMLX 修正'
 evidence: 'GitHub 上的 llm-inference-systems · 實驗方法、request 層級 trace、原始資料與圖表'
@@ -130,7 +130,7 @@ meta:
 
 這個實驗問的是：**一次 request 的加速，會不會因為破壞了可重用狀態，反而讓整個互動 session 變慢？**
 
-Sparse prefill（此處為 SpecPrefill，一種 attention-based 機制）在冷啟動長 prompt 上效果很實在：16K 首個 token 從 57.84 秒降到 19.24 秒，32K 從 122.7 秒降到 33.5 秒。但一個 agent 的下一個 request，有很大一部分就是上一個 request 再來一次——偏偏 稀疏化過的尾巴，並不會把平常可以重用的 dense prefix state 往前推。
+Sparse prefill（此處為 SpecPrefill，一種 attention-based 機制）在冷啟動長 prompt 上效果很實在：16K 首個 token 從 57.84 秒降到 19.24 秒，32K 從 122.7 秒降到 33.5 秒。但一個 agent 的下一個 request，有很大一部分就是上一個 request 再來一次——偏偏經過稀疏化的那段尾巴，不會把平常可以重用的 dense prefix state 往前推。
 
 Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 token 後塌回 28,672，接下來十個 request 都釘在那裡；同一段期間，每個 request 必須重算的 uncached suffix 從 17,060 長到 33,979。那次塌陷發生在 sparse 進場之前，所以 sparse 不是塌陷的成因；但塌陷之後的每一個 uncached suffix 都被 sparse 化，checkpoint 再也沒有回復，累積下來的重算就是 prefix-cache 的欠債。
 
@@ -189,7 +189,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 <div class="decision">
 
-### 前景從未退回 dense prefill，下一輪要算的東西卻變少了
+### 最快的設定從未退回 dense prefill，下一輪要算的東西卻變少了
 
 **原因** — 這個功能本來是為了在前綴補回之後，讓前景能退回 dense prefill。但量到最快的那個設定，正好是從來沒有退回去的那個；而真的換了路徑的那幾輪，都是各自 session 裡最貴的一輪。
 
@@ -208,7 +208,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 下面這兩條沒有做成實驗：一條是設定的歷程，另一條還缺最後的判斷。第三條研究線是跨 runtime 比較，這裡沒有展開，因為目前還沒有可用的受控比較資料。三條在 repo 裡都有支撐證據，但都還不是結論。
 
-### 正確性：快而錯，就是迴歸錯誤
+### 正確性：快而錯，就是退化
 
 每一個推論最佳化都在改動產生答案的那段運算，所以每一個都要回答同一個問題：這個差異最後會不會影響到輸出？目前四個案例給出四種不同的答案——
 
@@ -223,7 +223,7 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 ### 異質運算：accelerator 有開，不等於有跑
 
-最清楚的結果是一個零效果的結果。Neural engine 的 prefill 路徑是照固定的 tile 長度編譯的，而 serving 層把 prefill 切成 cache block。部署的 block 是 512 token、編譯的 tile 是 2048 token，這時沒有任何一個送進來的 chunk 填得滿一個 tile：這條路徑完成初始化、完成編譯、回報自己已啟用，然後一個 tile 都沒有執行過。
+最清楚的結果是「沒有效果」。Neural engine 的 prefill 路徑是照固定的 tile 長度編譯的，而 serving 層把 prefill 切成 cache block。部署的 block 是 512 token、編譯的 tile 是 2048 token，這時沒有任何一個送進來的 chunk 填得滿一個 tile：這條路徑完成初始化、完成編譯、回報自己已啟用，然後一個 tile 都沒有執行過。
 
 這件事在任何 throughput 數字上都看不出來——設定寫著「neural engine on」，伺服器也回報它是 on，貢獻正好是零。accelerator 根本不接受小於 1024 token 的 prefill 寬度，而<a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a>（已合併）讓這種配置直接回報「不可能」，而不是去建議一個它根本收不下的形狀。讓這條路徑真的能用的，是編譯的 tile 和 cache block 落在同一個粒度上：關鍵在工作怎麼被切分，計算本身並沒有改。
 

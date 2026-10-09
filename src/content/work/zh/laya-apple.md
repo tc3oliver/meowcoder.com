@@ -80,7 +80,7 @@ Profile 只能說明兩件事同時發生，所以再用 2×2 實驗確認因果
 
 這不是 laya-apple 才有的問題。只要 Python 程式在一條 thread 上同步呼叫 Core ML，其他 thread 又需要 GIL，就可能卡在同一個地方。只在自己的 runtime 裡繞過去，其他 coremltools 使用者還是會遇到，所以修正直接送給 coremltools：<a href="https://github.com/apple/coremltools/pull/2876" target="_blank" rel="noopener noreferrer"><code>apple/coremltools#2876</code></a>。
 
-這個修改只在原生 `predictionFromFeatures:` 呼叫期間釋放 GIL，對呼叫端來說 `predict()` 仍然是同步的，並附上多 thread 的迴歸測試。它建立在另一個修正之上，那個修正處理的是 NumPy 輸入在沒拿到 GIL 時被釋放的問題：apple/coremltools#2829 已在 2026-09-30 合併，#2827 則已關閉。這個 PR 還沒合併，在它進入正式版 coremltools 之前，整段原生呼叫都會佔著 GIL，所以 1.5 不依賴它。
+這個修改只在原生 `predictionFromFeatures:` 呼叫期間釋放 GIL，對呼叫端來說 `predict()` 仍然是同步的，並附上多 thread 的迴歸測試。它建立在另一個修正之上，那個修正處理的是 NumPy 輸入在沒拿到 GIL 時被釋放的問題：apple/coremltools#2829 已在 2026-09-30 合併，#2827 則在那之後關閉。這個 PR 還沒合併，在它進入正式版 coremltools 之前，整段原生呼叫都會佔著 GIL，所以 1.5 不依賴它。
 
 ## 拿掉 GIL 還不夠
 
