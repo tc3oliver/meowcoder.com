@@ -1,8 +1,8 @@
 ---
 title: 'Professional Engineering Experience'
 type: 'Professional Experience · 2014–Present'
-summary: 'From application and enterprise systems to system architecture and AI systems.'
-outcome: 'A progression from application and enterprise engineering to system architecture and AI systems.'
+summary: 'From mobile and web applications to enterprise systems and architecture, and enterprise AI: coding agents, knowledge retrieval, and LLM infrastructure.'
+outcome: 'Ownership widened from client apps to backend, cloud, identity, and CI/CD, then to the systems around the model.'
 indexMeta: 'Mobile · Enterprise · Cloud · Architecture · AI'
 kind: 'experience'
 slug: 'professional-engineering'
@@ -35,9 +35,8 @@ expanded into system integration, architecture, and enterprise AI systems.
 Early work focused on mobile and web applications, including user-facing
 experiences for connected products.
 
-This stage established end-to-end delivery across client applications and the
-services behind them, expanding responsibility from a single platform to APIs,
-backend services, and cloud integration.
+This stage established end-to-end delivery, owning the client app and the APIs,
+backend services, and cloud integration behind it.
 
 <p class="stage-domains"><span>Representative Systems</span> Mobile / Web · Smart Home · Connected Products</p>
 
@@ -49,9 +48,7 @@ Work later expanded into enterprise systems and platform architecture, covering
 backend services, cloud environments, system integration, identity and access,
 software delivery, and production operations.
 
-The focus shifted from individual applications to the design and delivery of
-integrated systems, including identity and access, reliability, security, CI/CD,
-and production operations.
+The focus shifted from individual applications to integrated systems.
 
 AI capabilities also continued to be integrated into products and enterprise
 workflows during this stage, alongside broader responsibility for system
@@ -67,8 +64,7 @@ sharing.
 
 <p class="stage-metadata">Agent · Knowledge · Conversational AI · LLM</p>
 
-More recently, the primary focus has shifted toward enterprise AI systems,
-including coding agents, knowledge retrieval, LLM infrastructure, and model
+The focus is now enterprise AI systems, including coding agents, knowledge retrieval, LLM infrastructure, and model
 serving, with model capabilities integrated into products and developer
 workflows.
 

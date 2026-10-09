@@ -1,8 +1,8 @@
 ---
 title: 'Shouri / 收理'
 type: 'Independent Product · AI Systems'
-summary: 'An organizer that saves webpages, files, and media first, then uses AI to turn them into structured, searchable knowledge.'
-outcome: 'Built end to end: content capture, source preservation, AI structuring, retrieval, mobile integration, and production operations.'
+summary: 'An organizer that saves webpages, files, and media first, then uses AI to turn them into structured, searchable knowledge. The original is always kept.'
+outcome: 'Built end to end: capture, AI organization, search, mobile sharing, and plans.'
 indexMeta: 'Save First · Explicit AI · Recoverable by Design'
 evidence: 'shouri.app · Product, plans, privacy, terms, and refund policy'
 slug: 'shouri'
@@ -197,7 +197,7 @@ current plan details remain on the Shouri website.
 
 AI-generated output is not guaranteed to be correct. The product states directly that generated titles,
 summaries, key points, classifications, and tags can be wrong, that the original
-is always kept in full, and that the original is the authority for any judgement
+is always kept in full, and that the original is the authority for any judgment
 that matters. User content is not used to train models.
 
 ## Search & Retrieval
@@ -262,7 +262,7 @@ outcome.
 user's own collection, not to act as a general downloader, and are rate-limited
 on that basis.
 
-**Availability is described honestly.** The service is offered as-is with no
+**Availability has no guarantee.** The service is offered as-is with no
 uptime guarantee, backups are taken regularly, and users are told to keep their
 own copy of anything important rather than treat Shouri as the only place a file
 exists.
@@ -276,9 +276,8 @@ refunded.
 
 ## Result
 
-Shouri now provides a complete product flow from content capture and source
-preservation through AI structuring, full-text retrieval, mobile sharing,
-metering, storage, data lifecycle, and production operations.
+Shouri is live with capture, AI organization, search, Review, export and plans,
+and its privacy and terms pages are published.
 
 - <a href="https://shouri.app" target="_blank" rel="noopener noreferrer">shouri.app</a> is publicly available.
 - The working interface covers capture, AI organization, search, Review, and export.
@@ -296,6 +295,3 @@ metering, storage, data lifecycle, and production operations.
   <a href="https://shouri.app/refund" target="_blank" rel="noopener noreferrer">shouri.app/refund</a>
 
 </div>
-
-These links provide the current product, plan, privacy, terms, and refund
-information for Shouri.
