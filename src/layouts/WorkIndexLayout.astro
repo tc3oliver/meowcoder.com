@@ -6,12 +6,14 @@
  * `/zh/work/`, so the two indexes cannot drift into listing different things
  * in different shapes.
  *
- * The page is a plain list in the homepage's reading column: a number on the
- * left, and on the right the title as the only link, then the type, the
- * outcome and the evidence label in muted text — with the number and the
- * evidence label, both metadata, one level fainter in subtle. No entry
- * carries a visual, a card or a button; the title is the one link, so a
- * screen reader hears distinct destinations without hidden suffixes.
+ * Round 2 renders the page in the site's ledger language: the heading sits in
+ * the shared `.section-header` row (hairline above, mono index beside it, the
+ * entry count as quiet context on the right), and each entry is a full-width
+ * hairline-separated row — number on the left, title as the only link, then
+ * the type and the outcome in muted text, with the evidence label in the
+ * right margin on desktop. No entry carries a visual, a card or a button; the
+ * title is the one link, so a screen reader hears distinct destinations
+ * without hidden suffixes.
  *
  * Entries arrive already filtered and ordered by `workEntriesForLocale`; this
  * layout only renders them.
@@ -41,7 +43,15 @@ function position(index: number): string {
 <SiteShell locale={locale} route="/work" title={t.title} description={t.description}>
   <div class="container work-index-page">
     <header class="work-index__header">
-      <h1>{t.heading}</h1>
+      <div class="section-header">
+        <p class="section-index" aria-hidden="true">01</p>
+        <h1>{t.heading}</h1>
+        {
+          /* Decoration: the row count as quiet margin context, like the ledger
+            headers on the homepage. */
+        }
+        <p class="work-index__count" aria-hidden="true">{entries.length}</p>
+      </div>
       <p class="work-index__intro">{t.intro}</p>
     </header>
 
@@ -67,8 +77,8 @@ function position(index: number): string {
                   </h2>
                   <p class="work-row__type">{entry.data.type}</p>
                   <p class="work-row__outcome">{entry.data.outcome ?? entry.data.summary}</p>
-                  {label && <p class="work-row__evidence">{label}</p>}
                 </div>
+                {label && <p class="work-row__evidence">{label}</p>}
               </li>
             );
           })}
@@ -79,19 +89,29 @@ function position(index: number): string {
 </SiteShell>
 
 <style>
-  /* Same column as the homepage: reading measure, left-aligned with the
-     header's content edge. */
-  .work-index-page {
-    max-width: var(--width-reading);
-    margin-inline-start: max(0px, calc((100% - var(--width-content)) / 2));
-    margin-inline-end: auto;
+  /* Round 2 spans the content width like the homepage ledger: rows run wide,
+     the sentences inside them stay at a reading measure. */
+  .work-index__header {
+    margin-block-end: var(--space-7);
   }
 
-  .work-index__header {
-    margin-block-end: var(--space-8);
+  /* The page title sits in the shared ledger header row; the entry count is
+     the quiet right-side context the utility leaves room for. */
+  .work-index-page :global(.section-header) h1 {
+    font-size: var(--text-2xl);
+    line-height: var(--leading-heading);
+  }
+
+  .work-index__count {
+    margin-inline-start: auto;
+    color: var(--color-text-subtle);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
   }
 
   .work-index__intro {
+    max-width: var(--width-reading);
     margin-block-start: var(--space-3);
     color: var(--color-text-muted);
     font-size: var(--text-sm);
@@ -101,25 +121,33 @@ function position(index: number): string {
   .work-index {
     display: flex;
     flex-direction: column;
-    gap: var(--space-7);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  /* The number on the left and the entry on the right from a tablet up; a
-     stack beneath that. `minmax(0, 1fr)` keeps a long unbroken label from
-     widening a 390px viewport. */
+  /* One ledger row per entry, hairlines above and below the stack, `--space-6`
+     of rhythm inside each row. A stack beneath 48rem; from a tablet up the
+     number sits in the left margin and the evidence label in the right one.
+     `minmax(0, …)` keeps a long unbroken label from widening a 390px
+     viewport. */
   .work-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-1);
+    gap: var(--space-2);
+    padding-block: var(--space-6);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .work-row:last-child {
+    border-block-end: var(--border-width) solid var(--color-border);
   }
 
   @media (width >= 48rem) {
     .work-row {
-      grid-template-columns: 4rem minmax(0, 1fr);
+      grid-template-columns: 4rem minmax(0, 1fr) minmax(0, 18rem);
       column-gap: var(--space-5);
+      align-items: start;
     }
   }
 
@@ -133,31 +161,52 @@ function position(index: number): string {
   .work-row__body {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: var(--space-2);
+    min-width: 0;
   }
 
+  /* The title is the row's focal point, rescaled from running text to a ledger
+     entry: the same register as the homepage product rows (--text-xl, weight
+     600), tracking nudged tight per the round-2 brief — no token sits at
+     −0.01em, and the two neighbors (0, −0.02em) are both further than the row
+     wants. Hover comes from the global `a` rule. */
   .work-row__title {
-    font-size: var(--text-md);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
     line-height: var(--leading-snug);
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
   }
 
   .work-row__type,
-  .work-row__outcome,
-  .work-row__evidence {
+  .work-row__outcome {
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     line-height: var(--leading-relaxed);
   }
 
+  .work-row__outcome {
+    /* The row is wide, the sentence is not. */
+    max-width: 46em;
+  }
+
   .work-row__evidence {
     /* An evidence label is metadata, so it sits one level below the outcome
-       sentence it annotates. */
+       sentence it annotates — and on desktop it takes the right margin, where
+       the ledger keeps its annotations. */
     color: var(--color-text-subtle);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
+    line-height: var(--leading-relaxed);
     /* A host or package name has no break opportunity, and one unbreakable
        token would set the page's minimum width at 390px. */
     overflow-wrap: anywhere;
+  }
+
+  @media (width >= 48rem) {
+    .work-row__evidence {
+      text-align: end;
+    }
   }
 
   .work-index__empty {

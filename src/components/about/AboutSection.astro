@@ -7,32 +7,41 @@
  * by giving one of them a louder treatment than the rest. The heading id is
  * supplied by the caller and reused for `aria-labelledby`, which is what gives
  * each `<section>` an accessible name in the landmark list.
+ *
+ * Round 2 renders the heading through the shared `.section-header` ledger row
+ * in `global.css`: a full-width hairline, then the section's mono index number
+ * beside its name. The number is decoration — `aria-hidden`, a sibling of the
+ * `h2`, never inside it — so the section is still named by its heading alone.
  */
 
 interface Props {
   /** Id for the heading; also the section's `aria-labelledby` target. */
   id: string;
   heading: string;
+  /** Two-digit render-order index for the heading row (`01`, `02`, …). */
+  index: string;
   prominence?: 'default' | 'strong';
 }
 
-const { id, heading, prominence = 'default' } = Astro.props;
+const { id, heading, index, prominence = 'default' } = Astro.props;
 ---
 
 <section
   class:list={['about-section', { 'about-section--strong': prominence === 'strong' }]}
   aria-labelledby={id}
 >
-  <h2 class="about-section__heading" id={id}>{heading}</h2>
+  <div class="section-header">
+    <p class="section-index" aria-hidden="true">{index}</p>
+    <h2 class="about-section__heading" id={id}>{heading}</h2>
+  </div>
   <slot />
 </section>
 
 <style>
   .about-section {
-    /* The separator between sections is the whitespace plus one hairline —
-       PRD §25 asks for thin borders and large whitespace, not cards. */
-    border-block-start: var(--border-width) solid var(--color-border);
-    padding-block-start: var(--space-7);
+    /* The hairline above the section and the whitespace around it come from
+       the shared `.section-header` row — PRD §25 asks for thin rules and
+       large whitespace, not cards. */
     /* Paired sections are grid items in the doc-2 §14 composition, and a grid
        item's `auto` minimum lets long content push past its track. */
     min-width: 0;
@@ -43,7 +52,6 @@ const { id, heading, prominence = 'default' } = Astro.props;
        hierarchy, while the sections stay peers of one another. */
     font-size: var(--text-lg);
     letter-spacing: var(--tracking-normal);
-    margin-block-end: var(--space-5);
   }
 
   .about-section--strong .about-section__heading {

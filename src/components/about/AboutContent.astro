@@ -13,12 +13,12 @@ const { t } = Astro.props;
 <div class="container about">
   <header class="about__opening">
     <p class="about__eyebrow">{t.eyebrow}</p>
-    <h1>{t.heading}</h1>
+    <h1 class="about__name">{t.heading}</h1>
     <p class="about__role">{t.role}</p>
     {t.summary.map((paragraph) => <p class="about__paragraph">{paragraph}</p>)}
   </header>
 
-  <AboutSection id="career" heading={t.career.heading} prominence="strong">
+  <AboutSection id="career" heading={t.career.heading} index="01" prominence="strong">
     <CareerProgression career={t.career} id="career-progression" />
 
     <div class="current-focus">
@@ -38,7 +38,7 @@ const { t } = Astro.props;
     </div>
   </AboutSection>
 
-  <AboutSection id="engineering-focus" heading={t.focus.heading}>
+  <AboutSection id="engineering-focus" heading={t.focus.heading} index="02">
     <div class="focus-grid">
       {
         t.focus.items.map((item) => (
@@ -51,7 +51,7 @@ const { t } = Astro.props;
     </div>
   </AboutSection>
 
-  <AboutSection id="systems-research" heading={t.systemsResearch.heading}>
+  <AboutSection id="systems-research" heading={t.systemsResearch.heading} index="03">
     <div class="systems-research">
       <p class="systems-research__description">{t.systemsResearch.description}</p>
       <a
@@ -65,7 +65,7 @@ const { t } = Astro.props;
     </div>
   </AboutSection>
 
-  <AboutSection id="research" heading={t.research.heading} prominence="strong">
+  <AboutSection id="research" heading={t.research.heading} index="04" prominence="strong">
     <div class="research">
       <p class="research__venue">{t.research.venue}</p>
       <p class="research__record">{t.research.record}</p>
@@ -86,14 +86,14 @@ const { t } = Astro.props;
   </AboutSection>
 
   <div class="about__credentials-row">
-    <AboutSection id="education" heading={t.education.heading}>
+    <AboutSection id="education" heading={t.education.heading} index="05">
       <div class="education">
         <p class="education__degree">{t.education.degree}</p>
         <p class="education__institution">{t.education.institution}</p>
       </div>
     </AboutSection>
 
-    <AboutSection id="selected-credentials" heading={t.credentials.heading}>
+    <AboutSection id="selected-credentials" heading={t.credentials.heading} index="06">
       <ul class="credentials" role="list">
         {
           t.credentials.items.map((credential) => (
@@ -108,7 +108,7 @@ const { t } = Astro.props;
     </AboutSection>
   </div>
 
-  <AboutSection id="engineering-principles" heading={t.principles.heading}>
+  <AboutSection id="engineering-principles" heading={t.principles.heading} index="07">
     <div class="principles">
       <p class="principles__statement">{t.principles.statement}</p>
       <ul class="principles__list" role="list">
@@ -125,11 +125,20 @@ const { t } = Astro.props;
     gap: var(--space-8);
   }
 
+  /* Masthead-lite: the name at nearly-hero size, the role in mono beneath it.
+     The hairline that closes the header is section 01's `.section-header`
+     rule — one line, shared with every section that follows. */
   .about__opening {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    max-width: var(--width-reading);
+  }
+
+  .about__name {
+    font-size: clamp(3rem, 2.4rem + 2.5vw, 3.5rem); /* 48 → 56px */
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    overflow-wrap: anywhere;
   }
 
   /* Labels are set apart by size, weight and tracking, never by uppercasing:
@@ -137,9 +146,9 @@ const { t } = Astro.props;
      `text-transform` does nothing (the `.decision` lead-in in `global.css` is
      the same call). */
   .about__eyebrow {
-    color: var(--color-text-muted);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
+    color: var(--color-text-subtle);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
     letter-spacing: var(--tracking-wide);
   }
 
@@ -151,9 +160,13 @@ const { t } = Astro.props;
     letter-spacing: var(--tracking-wide);
   }
 
+  /* The role line is metadata under the name, so it takes the masthead
+     register from `HomeHero`: mono, muted, no letter-spacing (the line is
+     visible on zh pages, PRD §7). */
   .about__role {
-    font-size: var(--text-lg);
-    font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
     line-height: var(--leading-snug);
   }
 
@@ -164,6 +177,13 @@ const { t } = Astro.props;
   .current-focus__description {
     color: var(--color-text-muted);
     line-height: var(--leading-relaxed);
+  }
+
+  /* The masthead spans the content width, but the statement paragraphs inside
+     it stay at the reading measure — the wide-structure / narrow-text contrast
+     the rest of round 2 builds on. */
+  .about__paragraph {
+    max-width: var(--width-reading);
   }
 
   .current-focus {

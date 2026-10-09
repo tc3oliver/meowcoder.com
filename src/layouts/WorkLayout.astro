@@ -117,7 +117,8 @@ const ogType = isExperience ? 'website' : 'article';
   {schemas.length > 0 && <StructuredData slot="head" schemas={schemas} />}
   <article class:list={['container', 'work', isExperience && 'work--experience']}>
     <header class="work__header">
-      <h1>{entry.title}</h1>
+      <p class="work__eyebrow">{entry.type}</p>
+      <h1 class="work__title">{entry.title}</h1>
       <p class="work__summary">{entry.summary}</p>
       {
         isExperience && entry.meta && (
@@ -163,8 +164,37 @@ const ogType = isExperience ? 'website' : 'article';
     max-width: var(--width-reading);
   }
 
+  /* The header's text stays at the reading measure while the hairline that
+     closes it runs the full width of the page — the same ledger rule every
+     section header on the site opens with. */
   .work__header {
+    padding-block-end: var(--space-6);
+    border-block-end: var(--border-width) solid var(--color-border);
+  }
+
+  .work__eyebrow,
+  .work__title,
+  .work__summary {
     max-width: var(--width-reading);
+  }
+
+  /* The entry's own type line, in the margin register the ledger uses for
+     metadata. No letter-spacing: the line is Chinese on zh pages, where
+     spacing Latin out does nothing for the reader (PRD §7). */
+  .work__eyebrow {
+    margin-block-end: var(--space-3);
+    color: var(--color-text-subtle);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  /* `--text-display` is the homepage masthead's step; an article title gets
+     the size just under it, tightened to match (round-2 spec). */
+  .work__title {
+    font-size: clamp(2.25rem, 1.5rem + 2.7vw, 3.25rem); /* 36 → 52px */
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    overflow-wrap: anywhere;
   }
 
   .work__summary {

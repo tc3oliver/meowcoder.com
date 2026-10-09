@@ -13,6 +13,11 @@
  * No client JavaScript (PRD §26, §29). Plain anchors do the scrolling, the
  * global `:focus-visible` ring makes each one keyboard-visible, and
  * `scroll-padding-top` in `global.css` keeps a target off the viewport edge.
+ *
+ * Round 2 turns the desktop list into the ledger index: mono at the smallest
+ * step, subtle labels, and the reader's current section marked in text color
+ * with a 2px accent left border — driven by the URL fragment and `:has()`,
+ * still without a line of script.
  */
 
 import type { MarkdownHeading } from 'astro';
@@ -27,6 +32,25 @@ interface Props {
 const { headings, label } = Astro.props;
 
 const sections = headings.filter((heading) => heading.depth === 2);
+
+/*
+ * The ledger index marks the section the reader is in — with no client
+ * JavaScript to watch the scroll. What the document does carry is the URL
+ * fragment: clicking a contents link (or the article's own anchor) makes one
+ * heading `:target`, and one generated rule per section turns that into the
+ * marked nav entry via `:has()`. Attribute selectors rather than `#slug` keep
+ * slugs that are Chinese text or start with a digit valid. Progressive by
+ * nature: a browser without `:has()` simply shows no mark.
+ */
+const currentRules = sections
+  .map(
+    (section) =>
+      `body:has([id="${section.slug}"]:target) .section-nav__list a[href="#${section.slug}"] {
+        color: var(--color-text);
+        border-inline-start-color: var(--color-accent);
+      }`,
+  )
+  .join('\n');
 ---
 
 {
@@ -45,6 +69,14 @@ const sections = headings.filter((heading) => heading.depth === 2);
     </nav>
   )
 }
+
+{
+  /* Generated, one rule per section: the reader's current section in text
+    color with its accent rule lit. Unscoped by necessity — the selectors come
+    from the article's own headings at build time, so Astro's scope hash
+    cannot apply. */
+}
+{sections.length > 0 && <style set:html={currentRules} />}
 
 <style>
   .section-nav {
@@ -83,7 +115,10 @@ const sections = headings.filter((heading) => heading.depth === 2);
   }
 
   /* Matches the sidebar breakpoint in `WorkLayout.astro`: once the sidebar is a
-     column of its own, the list becomes a column too. */
+     column of its own, the list becomes a column too — and a ledger index:
+     mono at the smallest step, subtle, each entry carrying the transparent
+     2px rule the `:target` rules below light up in accent for the section the
+     reader is in. */
   @media (min-width: 72rem) {
     .section-nav {
       border-block: 0;
@@ -95,6 +130,7 @@ const sections = headings.filter((heading) => heading.depth === 2);
       margin-block-end: var(--space-3);
       padding: 0;
       color: var(--color-text-muted);
+      font-family: var(--font-mono);
       font-size: var(--text-xs);
       cursor: default;
       pointer-events: none;
@@ -114,8 +150,16 @@ const sections = headings.filter((heading) => heading.depth === 2);
       flex-direction: column;
       gap: var(--space-3);
       padding-block-end: 0;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
       /* Long section names wrap inside the column rather than widening it. */
       text-wrap: pretty;
+    }
+
+    .section-nav__list a {
+      color: var(--color-text-subtle);
+      padding-inline-start: var(--space-3);
+      border-inline-start: 2px solid transparent;
     }
   }
 </style>
