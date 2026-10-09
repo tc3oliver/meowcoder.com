@@ -38,7 +38,7 @@ export const work = {
      * version once one entry has none and says so.
      */
     intro:
-      'Selected work across product engineering, LLM inference systems research, open source, and professional experience. The research case studies name the data behind every number.',
+      'Selected work across product engineering, LLM inference systems research, open source, and professional experience. The research case studies name the data behind their numbers.',
     empty: 'No work is published yet.',
     aboutOliver: 'About Oliver',
     experienceOverviewLabel: 'Experience overview',
@@ -50,10 +50,10 @@ export const work = {
   zh: {
     title: '精選作品 — Oliver Yu',
     description:
-      '精選工程作品，涵蓋產品工程、LLM 推論系統研究、開源專案，以及 10+ 年系統、架構與 AI 的工程經歷。',
+      '精選工程作品，涵蓋產品工程、LLM 推論系統研究、開源專案，以及 10 年以上系統、架構與 AI 的工程經歷。',
     heading: '作品',
     intro:
-      '精選作品，涵蓋產品工程、LLM 推論系統研究、開源專案與專業工程經歷。研究案例中的數據都附有原始資料來源。',
+      '精選作品，涵蓋產品工程、LLM 推論系統研究、開源專案與專業工程經歷。研究案例中的每個數字，都會註明背後的資料。',
     empty: '目前還沒有公開的作品。',
     aboutOliver: '關於 Oliver',
     experienceOverviewLabel: '工程經歷摘要',

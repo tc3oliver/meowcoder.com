@@ -60,7 +60,7 @@ export function publicationSchema(locale: Locale): JsonLd {
   const description =
     locale === 'en'
       ? 'Co-authored research on leakage-resilient certificate-based encryption designed to remain secure under continual key leakage.'
-      : '共同研究抗洩漏憑證式加密，透過金鑰更新機制提升系統在持續金鑰洩漏情境下的安全性。';
+      : '共同研究抗洩漏憑證式加密，目標是在金鑰持續洩漏的情況下仍維持安全性。';
 
   return {
     '@context': 'https://schema.org',

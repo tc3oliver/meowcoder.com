@@ -106,7 +106,7 @@ export const about = {
           period: '2020–2025',
           name: 'System Architecture & Technical Leadership',
           description:
-            'Owned system architecture, AI integration, engineering practices, project delivery, and cross-system integration, and mentored other engineers.',
+            'Owned system architecture, AI integration, engineering practice, and project delivery, and mentored other engineers.',
         },
         {
           period: '2025–Present',
@@ -122,7 +122,7 @@ export const about = {
     currentFocus: {
       heading: 'Current Focus — Enterprise AI Systems',
       description:
-        'I currently work on enterprise AI systems that connect engineering knowledge, coding agents, model infrastructure, security validation, and continuous evaluation.',
+        'I currently work on the enterprise AI systems described in the career stages above.',
       alt: 'Conceptual architecture of an AI-driven R&D platform connecting enterprise context, agentic development, engineering knowledge, model gateway, and evaluation.',
       caption: 'A conceptual architecture for an AI-driven R&D platform.',
     },
@@ -151,7 +151,7 @@ export const about = {
     systemsResearch: {
       heading: 'Systems Research',
       description:
-        'I run independent systems research on LLM inference, on Apple silicon and on AMD GPUs. laya-apple serves requests on the MLX GPU and the Apple Neural Engine at the same time. Its research traced a GPU latency regression to Python’s GIL and sent the fix to Apple coremltools; the result shipped as laya-apple 1.5. A second program, on the oMLX server, studies how an optimization that speeds up one request changes the cost of the requests that follow it. It produced eleven upstream pull requests: five merged, and six open at the time of writing. On AMD, I took DeepSeek V4 Flash from one MI300X to two with kernel-level fixes and AITER GEMM tuning. Each is published with its data.',
+        'I run independent systems research on LLM inference, on Apple silicon and on AMD GPUs. laya-apple serves requests on the MLX GPU and the Apple Neural Engine at the same time. Its research traced a GPU latency regression to Python’s GIL and sent the fix to Apple coremltools; the result shipped as laya-apple 1.5. A second program, on the oMLX server, studies how an optimization that speeds up one request changes the cost of the requests that follow it. On AMD, I took DeepSeek V4 Flash from one MI300X to two with kernel-level fixes and AITER GEMM tuning.',
       cta: 'View the research on GitHub',
       href: GITHUB_URL,
     },
@@ -193,7 +193,7 @@ export const about = {
     },
     principles: {
       heading: 'Engineering Principles',
-      statement: 'Reliable AI systems require more than capable models.',
+      statement: 'Reliable AI needs more than a capable model.',
       items: [
         'Traceable',
         'Testable',
@@ -207,7 +207,7 @@ export const about = {
   zh: {
     title: '關於 Oliver Yu — AI 系統工程師與系統架構師',
     description:
-      'Oliver Yu 是 AI 系統工程師與系統架構師，具 10+ 年軟體、雲端、架構、資安與 AI 系統工程經驗。',
+      'Oliver Yu 是 AI 系統工程師與系統架構師，具 10 年以上軟體、雲端、架構、資安與 AI 系統工程經驗。',
     eyebrow: '關於 Oliver',
     heading: 'Oliver Yu',
     role: 'AI 系統工程師 · 系統架構師',
@@ -232,7 +232,7 @@ export const about = {
         {
           period: '2020–2025',
           name: '系統架構與技術領導',
-          description: '負責系統架構、AI 整合、工程實務、專案交付與跨系統整合，並指導其他工程師。',
+          description: '負責系統架構、AI 整合、工程實務與專案交付，並指導其他工程師。',
         },
         {
           period: '2025–至今',
@@ -247,8 +247,7 @@ export const about = {
     },
     currentFocus: {
       heading: '目前方向 — 企業 AI 系統',
-      description:
-        '目前專注於企業 AI 系統，將工程知識、coding agent、模型基礎架構、安全驗證與持續評估整合在同一套系統中。',
+      description: '目前專注於企業 AI 系統，也就是上述各項的組合。',
       alt: 'AI 驅動研發平台的概念架構，串接企業情境、agentic 開發、工程知識、模型閘道與評估機制。',
       caption: 'AI 驅動研發平台的概念架構圖。',
     },
@@ -276,7 +275,7 @@ export const about = {
     systemsResearch: {
       heading: '系統研究',
       description:
-        '我獨立做 LLM 推論的系統研究，平台涵蓋 Apple silicon 與 AMD GPU。laya-apple 同時用 MLX GPU 和 Apple Neural Engine 處理請求；研究查出一個 GPU 延遲退化的原因是 Python 的 GIL，修正已送交 Apple coremltools，成果隨 laya-apple 1.5 發布。另一條研究線以 oMLX 推論伺服器為對象，研究單一請求的最佳化會如何影響後續請求成本，過程中提交了十一個上游 PR：五個已合併，撰寫本文時另外六個仍開放審查中。在 AMD 上，我透過 kernel 層級的修正與 AITER GEMM 調校，讓 DeepSeek V4 Flash 從單張 MI300X 擴展到兩張。每項研究都連同資料公開。',
+        '我獨立做 LLM 推論的系統研究，平台涵蓋 Apple silicon 與 AMD GPU。laya-apple 同時用 MLX GPU 和 Apple Neural Engine 處理請求；研究查出一個 GPU 延遲退化的原因是 Python 的 GIL，修正已送交 Apple coremltools，成果在 laya-apple 1.5 發布時一併推出。另一條研究線以 oMLX 推論伺服器為對象，研究單一請求的最佳化會如何影響後續請求成本。在 AMD 上，我透過 kernel 層級的修正與 AITER GEMM 調校，讓 DeepSeek V4 Flash 從單張 MI300X 擴展到兩張。',
       cta: '在 GitHub 查看研究',
       href: GITHUB_URL,
     },
@@ -286,8 +285,7 @@ export const about = {
       record: 'Volume 99 · Article 104422',
       paper:
         'On the construction of a leakage-resilient certificate-based encryption with equality test scheme',
-      detail:
-        '共同發表的研究，探討抗洩漏憑證式加密：透過金鑰更新機制，讓系統在金鑰持續洩漏的情況下仍能維持安全性。',
+      detail: '共同發表的研究，探討抗洩漏憑證式加密，目標是在金鑰持續洩漏的情況下仍維持安全性。',
       areasLabel: '研究主題',
       areas: ['抗洩漏密碼學', '憑證式加密', '側通道安全', '等值測試'],
       cta: '查看論文',
@@ -302,7 +300,7 @@ export const about = {
       heading: '專業證照',
       items: [
         {
-          name: 'AI應用規劃師（機器學習）－中級能力鑑定',
+          name: 'AI應用規劃師（機器學習）— 中級能力鑑定',
           meta: '經濟部 · 2025',
         },
         {
@@ -313,8 +311,8 @@ export const about = {
     },
     principles: {
       heading: '工程原則',
-      statement: '可靠的 AI 系統，靠的不只是夠強的模型。',
-      items: ['可追溯', '可測試', '可觀測', '權限受控', '可替換', '可復原'],
+      statement: '可靠的 AI 系統，光有好模型不夠。',
+      items: ['可追溯', '可測試', '可觀測', '權限感知', '可替換', '可復原'],
     },
   },
 } satisfies AboutDictionary;

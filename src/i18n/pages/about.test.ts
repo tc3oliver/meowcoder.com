@@ -74,7 +74,7 @@ describe('bilingual parity', () => {
 describe('credential wording', () => {
   it('uses the source credential name without Specialist Level', () => {
     expect(about.en.credentials.items[0]?.name).toBe('AI應用規劃師（機器學習）— 中級能力鑑定');
-    expect(about.zh.credentials.items[0]?.name).toBe('AI應用規劃師（機器學習）－中級能力鑑定');
+    expect(about.zh.credentials.items[0]?.name).toBe('AI應用規劃師（機器學習）— 中級能力鑑定');
     expect(about.en.credentials.items[0]).not.toHaveProperty('note');
     expect(about.zh.credentials.items[0]).not.toHaveProperty('note');
   });
@@ -83,9 +83,7 @@ describe('credential wording', () => {
 describe('core positioning', () => {
   it('preserves the English principles and professional identity', () => {
     expect(about.en.role).toBe('AI Systems Engineer · System Architect');
-    expect(about.en.principles.statement).toBe(
-      'Reliable AI systems require more than capable models.',
-    );
+    expect(about.en.principles.statement).toBe('Reliable AI needs more than a capable model.');
     expect(about.en.principles.items).toEqual([
       'Traceable',
       'Testable',
@@ -98,6 +96,6 @@ describe('core positioning', () => {
 
   it('preserves the natural Chinese principles and professional identity', () => {
     expect(about.zh.role).toBe('AI 系統工程師 · 系統架構師');
-    expect(about.zh.principles.statement).toBe('可靠的 AI 系統，靠的不只是夠強的模型。');
+    expect(about.zh.principles.statement).toBe('可靠的 AI 系統，光有好模型不夠。');
   });
 });
