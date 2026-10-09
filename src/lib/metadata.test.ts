@@ -360,6 +360,18 @@ describe('work and publication structured data', () => {
   });
 });
 
+describe('home career line', () => {
+  it.each(['index.html', 'zh/index.html'])(
+    'separates the arc from the About link in %s',
+    (file) => {
+      // Astro drops the whitespace between an expression and an element, which
+      // once rendered "…AI SystemsAbout Oliver" as one run of text.
+      const html = read(file);
+      expect(html).toMatch(/<p class="writing__about"[^>]*>[^<]+ <a href="[^"]*\/about\/"/);
+    },
+  );
+});
+
 describe('sitemap', () => {
   it('lists every route in every locale', () => {
     const xml = readFileSync(join(DIST, 'sitemap-0.xml'), 'utf-8');
