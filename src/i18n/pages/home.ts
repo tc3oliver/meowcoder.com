@@ -222,7 +222,7 @@ export const home = {
       'I build AI products and the LLM inference systems under them, on Apple silicon and AMD GPUs, and trace performance problems to a measured cause.',
     hero: {
       role: 'AI Systems Engineer · System Architect',
-      facts: ['laya-apple 1.5 on PyPI', 'Upstream: Apple coremltools · oMLX'],
+      facts: ['laya-apple on PyPI', 'Upstream: Apple coremltools · oMLX'],
       workCta: 'View Selected Work',
       writingCta: 'Technical Writing',
       noBreakSuffix: 'measured cause.',
@@ -353,7 +353,7 @@ export const home = {
       // PRD §9.1 keeps the role line in English in the Chinese hero; it is a
       // standalone line, so it mixes no languages inside a prose block.
       role: 'AI Systems Engineer · System Architect',
-      facts: ['laya-apple 1.5 已發布到 PyPI', '上游貢獻：Apple coremltools · oMLX'],
+      facts: ['laya-apple 已發布到 PyPI', '上游貢獻：Apple coremltools · oMLX'],
       workCta: '精選作品',
       writingCta: '技術文章',
       noBreakSuffix: '證明的原因。',

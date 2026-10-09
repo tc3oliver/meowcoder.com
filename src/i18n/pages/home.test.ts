@@ -43,7 +43,9 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     // years. Names rather than counts, because a count of pull requests is
     // stale the week the next one merges.
     expect(t.hero.facts).toHaveLength(2);
-    expect(t.hero.facts[0]).toMatch(/laya-apple 1\.5/);
+    expect(t.hero.facts[0]).toMatch(/laya-apple.*PyPI/);
+    // No version: it would be stale the day the next release ships.
+    expect(t.hero.facts[0]).not.toMatch(/\d/);
     expect(t.hero.facts[1]).toMatch(/coremltools/);
     expect(t.hero.facts.join(' ')).not.toMatch(/\d+ (merged|pull requests|PRs)/i);
   });
