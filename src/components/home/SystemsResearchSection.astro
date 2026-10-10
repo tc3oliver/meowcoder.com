@@ -3,7 +3,7 @@
  * Research — a ruled ledger block in the reading column: the measured results
  * of four projects (laya-apple, LLM Inference Systems, the MI300X DeepSeek V4
  * Flash baseline, the Qwen3.8-27B evaluation on one RTX 5070 Ti), then the
- * upstream pull requests they produced.
+ * OSS project summaries. The detailed PR ledger lives on GitHub.
  *
  * It carries numbers rather than figures: research is proved by what it
  * measured, and a chart shrunk to homepage size is unreadable decoration. The
@@ -124,7 +124,6 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
               <a href={item.href} target="_blank" rel="noopener noreferrer">
                 {item.name}
               </a>
-              {item.merged && <span class="upstream__state">{t.systems.upstream.merged}</span>}
             </p>
             <p class="upstream__description">{item.description}</p>
           </li>
@@ -247,16 +246,8 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     letter-spacing: var(--tracking-normal);
-    /* A repository path has no spaces to break at; let it wrap anywhere
-       rather than push a 390px viewport sideways. */
+    /* Project names wrap if they outgrow a narrow viewport. */
     overflow-wrap: anywhere;
-  }
-
-  .upstream__state {
-    color: var(--color-text);
-    font-family: var(--font-sans);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-medium);
   }
 
   .upstream__description {
