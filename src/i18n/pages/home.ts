@@ -66,12 +66,10 @@ export interface ResearchProject {
   articleCta?: CtaLabel;
 }
 
-/** One upstream pull request, or a stacked pair shown as one item. */
-export interface UpstreamItem {
-  /** `owner/repo#number`, as GitHub prints it; never translated. */
+/** One upstream OSS project, linked to its repository with a short contribution summary. */
+export interface UpstreamProject {
   name: string;
   href: string;
-  merged?: boolean;
   description: string;
 }
 
@@ -140,7 +138,7 @@ export interface HomeStrings extends PageStrings {
   /**
    * The research proof: four programs, each a measured result linked to its
    * case study (or repository) and, where one exists, its Study article; then
-   * the upstream pull requests.
+   * the upstream project contributions.
    */
   systems: {
     heading: string;
@@ -154,17 +152,13 @@ export interface HomeStrings extends PageStrings {
     /** The Study article. Both are published in Chinese only, which `en` says. */
     articleCta: CtaLabel;
     /**
-     * Pull requests to projects this site's author does not maintain. Only
-     * pull requests whose state cannot go stale are marked: `merged` is final,
-     * and an open one carries no status rather than one that would be wrong the
-     * day it merges.
+     * Selected upstream projects. The homepage presents one summary per
+     * project; the GitHub profile owns individual PRs and their live status.
      */
     upstream: {
       heading: string;
-      items: readonly UpstreamItem[];
-      /** The state label printed beside a merged pull request. */
-      merged: string;
-      /** The full, generated record on the GitHub profile. */
+      items: readonly UpstreamProject[];
+      /** The full, generated PR record on the GitHub profile. */
       cta: CtaLabel;
     };
   };
@@ -300,45 +294,28 @@ export const home = {
       ],
       articleCta: { label: 'Read the Article (Chinese)' },
       upstream: {
-        heading: 'Upstream',
-        merged: 'Merged',
+        heading: 'OSS Contributions',
         items: [
           {
-            name: 'apple/coremltools#2876',
-            href: 'https://github.com/apple/coremltools/pull/2876',
+            name: 'MLX',
+            href: 'https://github.com/ml-explore/mlx',
             description:
-              'Releases the GIL only for the duration of the native Core ML prediction call. Found during the laya-apple research.',
+              'Fixed lost rank output in the distributed launcher by draining both pipes after the process exits.',
           },
           {
-            name: 'ml-explore/mlx#4615',
-            href: 'https://github.com/ml-explore/mlx/pull/4615',
-            merged: true,
+            name: 'oMLX',
+            href: 'https://github.com/jundot/omlx',
             description:
-              'Fixes lost rank output in the distributed launcher by draining both pipes after the process exits.',
+              'Improved SpecPrefill cache reuse, deterministic prefill routing, and Responses API tool routing.',
           },
           {
-            name: 'jundot/omlx#3685',
-            href: 'https://github.com/jundot/omlx/pull/3685',
-            merged: true,
+            name: 'Apple coremltools',
+            href: 'https://github.com/apple/coremltools',
             description:
-              'Keeps SDPA256 prefill on one route, so an identical request gives the same temperature-0 output in every process.',
-          },
-          {
-            name: 'jundot/omlx#3840 + #3842',
-            href: 'https://github.com/jundot/omlx/pull/3842',
-            merged: true,
-            description:
-              'Makes the SpecPrefill draft cache produce usable hits on hybrid attention–recurrent models.',
-          },
-          {
-            name: 'jundot/omlx#3664',
-            href: 'https://github.com/jundot/omlx/pull/3664',
-            merged: true,
-            description:
-              'Keeps namespace tool groups intact through the Responses API. Codex represents MCP servers this way.',
+              'Proposed releasing the Python GIL during native Core ML prediction to prevent other threads from stalling. Under review.',
           },
         ],
-        cta: { label: 'All upstream pull requests' },
+        cta: { label: 'View all upstream pull requests' },
       },
     },
     research: {
@@ -441,45 +418,28 @@ export const home = {
       ],
       articleCta: { label: '閱讀長文' },
       upstream: {
-        heading: '上游貢獻',
-        merged: '已合併',
+        heading: '開源貢獻',
         items: [
           {
-            name: 'apple/coremltools#2876',
-            href: 'https://github.com/apple/coremltools/pull/2876',
+            name: 'MLX',
+            href: 'https://github.com/ml-explore/mlx',
             description:
-              'laya-apple 的研究中發現：Core ML prediction 持有 GIL。修正是只在原生 prediction 呼叫期間釋放 GIL。',
+              '修正 distributed launcher 在 rank 行程結束後遺失最後輸出的問題，確保兩條輸出管線完整讀取。',
           },
           {
-            name: 'ml-explore/mlx#4615',
-            href: 'https://github.com/ml-explore/mlx/pull/4615',
-            merged: true,
+            name: 'oMLX',
+            href: 'https://github.com/jundot/omlx',
             description:
-              '修正 distributed launcher 在 rank 行程結束後遺失最後輸出的問題，持續讀取兩條 pipe 直到 EOF。',
+              '改善 SpecPrefill 快取重用、prefill 路徑一致性，以及 Responses API 的工具路由。',
           },
           {
-            name: 'jundot/omlx#3685',
-            href: 'https://github.com/jundot/omlx/pull/3685',
-            merged: true,
+            name: 'Apple coremltools',
+            href: 'https://github.com/apple/coremltools',
             description:
-              '讓 SDPA256 prefill 固定走同一條路徑，確保同一請求在不同 process 下的 temperature=0 輸出一致。',
-          },
-          {
-            name: 'jundot/omlx#3840 + #3842',
-            href: 'https://github.com/jundot/omlx/pull/3842',
-            merged: true,
-            description:
-              '修正 hybrid attention/recurrent 模型上的 SpecPrefill draft cache reuse，讓 cache hit 真正生效。',
-          },
-          {
-            name: 'jundot/omlx#3664',
-            href: 'https://github.com/jundot/omlx/pull/3664',
-            merged: true,
-            description:
-              '讓 Responses API 完整保留 namespace 工具群組；Codex 就是用這種格式接 MCP server。',
+              '提交在 Core ML 原生推論期間釋放 Python GIL 的修正，避免其他執行緒被阻塞；目前審查中。',
           },
         ],
-        cta: { label: '所有上游 PR' },
+        cta: { label: '查看完整上游 PR 紀錄' },
       },
     },
     research: {

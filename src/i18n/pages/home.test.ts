@@ -326,17 +326,20 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
     expect(note).toMatch(_locale === 'en' ? /invalid/i : /作廢|無效/);
   });
 
-  it('lists the five featured upstream entries under Research, four of them merged', () => {
-    expect(t.systems.upstream.items.map((item) => item.name)).toEqual([
-      'apple/coremltools#2876',
-      'ml-explore/mlx#4615',
-      'jundot/omlx#3685',
-      'jundot/omlx#3840 + #3842',
-      'jundot/omlx#3664',
+  it('shows three OSS projects, with summaries and repository links but no PR ledger', () => {
+    const upstream = t.systems.upstream;
+    expect(upstream.heading).toBe(_locale === 'en' ? 'OSS Contributions' : '開源貢獻');
+    expect(upstream.items.map((item) => item.name)).toEqual(['MLX', 'oMLX', 'Apple coremltools']);
+    expect(upstream.items.map((item) => item.href)).toEqual([
+      'https://github.com/ml-explore/mlx',
+      'https://github.com/jundot/omlx',
+      'https://github.com/apple/coremltools',
     ]);
-    expect(t.systems.upstream.items.filter((item) => item.merged).map((item) => item.name)).toEqual(
-      ['ml-explore/mlx#4615', 'jundot/omlx#3685', 'jundot/omlx#3840 + #3842', 'jundot/omlx#3664'],
-    );
+    expect(upstream.items.every((item) => item.description.length > 0)).toBe(true);
+    expect(upstream.items.every((item) => !/\/pull\/\d+/.test(item.href))).toBe(true);
+    expect(upstream.items.every((item) => !/\bPR\s*#?\d+/.test(item.description))).toBe(true);
+    expect(upstream.items.every((item) => !('merged' in item))).toBe(true);
+    expect(upstream.cta.label).toMatch(_locale === 'en' ? /pull requests/i : /PR/);
   });
 
   it('leads with the project that shipped, and is not Apple-only', () => {
