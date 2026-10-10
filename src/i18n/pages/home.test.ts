@@ -329,11 +329,7 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
   it('shows three OSS projects, with summaries and repository links but no PR ledger', () => {
     const upstream = t.systems.upstream;
     expect(upstream.heading).toBe(_locale === 'en' ? 'OSS Contributions' : '開源貢獻');
-    expect(upstream.items.map((item) => item.name)).toEqual([
-      'MLX',
-      'oMLX',
-      'Apple coremltools',
-    ]);
+    expect(upstream.items.map((item) => item.name)).toEqual(['MLX', 'oMLX', 'Apple coremltools']);
     expect(upstream.items.map((item) => item.href)).toEqual([
       'https://github.com/ml-explore/mlx',
       'https://github.com/jundot/omlx',
