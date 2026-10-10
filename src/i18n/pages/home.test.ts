@@ -340,8 +340,8 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
       'https://github.com/apple/coremltools',
     ]);
     expect(upstream.items.every((item) => item.description.length > 0)).toBe(true);
-    expect(upstream.items.every((item) => !/\\/pull\\/\\d+/.test(item.href))).toBe(true);
-    expect(upstream.items.every((item) => !/\\bPR\\s*#?\\d+/.test(item.description))).toBe(true);
+    expect(upstream.items.every((item) => !/\/pull\/\d+/.test(item.href))).toBe(true);
+    expect(upstream.items.every((item) => !/\bPR\s*#?\d+/.test(item.description))).toBe(true);
     expect(upstream.items.every((item) => !('merged' in item))).toBe(true);
     expect(upstream.cta.label).toMatch(_locale === 'en' ? /pull requests/i : /PR/);
   });
