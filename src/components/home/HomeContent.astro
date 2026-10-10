@@ -23,13 +23,14 @@
  *   Products  Can he build and operate a real product? Shouri, SignalForge and
  *             PiShip, one ledger row each.
  *   Writing   Can I read his technical thinking? Study posts, then the
- *             journal paper, then the career-arc line and the About link.
+ *             journal paper, then the link to all writing.
+ *   AboutNav  Where do I read more? One full-width link closes the page;
+ *             round 3 moved it out of Writing's colophon into its own block.
  *
  * Shouri used to lead the page with its screenshot. Without the visual it is
- * one row among three, so research now comes first. The experience strip
- * (now a single line in Writing), Engineering Focus and every section eyebrow
- * string are gone; the numbered section indexes round 2 adds are decorative
- * digits, not copy.
+ * one row among three, so research now comes first. The experience strip,
+ * Engineering Focus and every section eyebrow string are gone; the numbered
+ * section indexes round 2 adds are decorative digits, not copy.
  *
  * The last item, the footer, is site chrome and is rendered by `SiteShell`
  * after this component — it is the same link row on every route (PRD §9.8).
@@ -38,6 +39,7 @@
 import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
 import type { StudyPost } from '../../lib/study-feed';
+import AboutNav from './AboutNav.astro';
 import HomeHero from './HomeHero.astro';
 import ProductsSection from './ProductsSection.astro';
 import ResearchWritingSection from './ResearchWritingSection.astro';
@@ -56,7 +58,7 @@ const { locale, t, posts, externalIndicator } = Astro.props;
 ---
 
 <div class="container home">
-  <HomeHero locale={locale} t={t} externalIndicator={externalIndicator} />
+  <HomeHero t={t} />
   <SystemsResearchSection locale={locale} t={t} index="01" externalIndicator={externalIndicator} />
   <ProductsSection locale={locale} t={t} index="02" externalIndicator={externalIndicator} />
   <ResearchWritingSection
@@ -66,6 +68,7 @@ const { locale, t, posts, externalIndicator } = Astro.props;
     index="03"
     externalIndicator={externalIndicator}
   />
+  <AboutNav locale={locale} t={t} />
 </div>
 
 <style>

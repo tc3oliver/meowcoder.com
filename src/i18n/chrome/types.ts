@@ -53,7 +53,16 @@ export interface ChromeDictionary {
     email: string;
     /** The public meowcoder.com repository — secondary evidence (PRD §24). */
     siteSource: string;
-    /** Label for the pure-anchor back-to-top link (redesign spec). */
-    backToTop: string;
+    /**
+     * Accessible name for the footer's wordmark link back to the locale home
+     * page. The wordmark SVG carries its own `aria-label` ("meowcoder.com"),
+     * so this names the wrapping anchor — what a screen reader announces.
+     */
+    homeLabel: string;
+    /**
+     * The `© 2026 Oliver Yu` line. Identical in both locales: a legal line
+     * built from a proper noun, not translated (PRD §7).
+     */
+    copyright: string;
   };
 }

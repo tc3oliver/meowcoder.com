@@ -30,6 +30,8 @@ export const chromeZh = {
     shouri: 'Shouri',
     email: 'Email',
     siteSource: '網站原始碼',
-    backToTop: '回到頁首',
+    homeLabel: 'meowcoder.com 首頁',
+    // Proper-noun legal line, left untranslated per PRD §7.
+    copyright: '© 2026 Oliver Yu',
   },
 } satisfies ChromeDictionary;

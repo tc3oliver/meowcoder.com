@@ -80,8 +80,9 @@ export interface HomeStrings extends PageStrings {
    * doc-2 §5. `heading` is the name and `intro` the statement beneath it, so
    * the hero adds only what `PageStrings` has no field for.
    *
-   * doc-2 §5 keeps the name, the role line, the facts, and exactly two
-   * actions, and replaces only the supporting statement. `role` stays in
+   * doc-2 §5 keeps the name, the role line and the facts, and replaces only
+   * the supporting statement; round 3 drops the two hero actions, because the
+   * numbered sections below are the page's navigation. `role` stays in
    * English in both locales: PRD §9.1 writes the Chinese hero that way, and it
    * is its own standalone line rather than a prose block, so no block mixes
    * languages (PRD §34).
@@ -97,8 +98,6 @@ export interface HomeStrings extends PageStrings {
   hero: {
     role: string;
     facts: readonly string[];
-    workCta: string;
-    writingCta: string;
     /** Optional sentence suffix that should remain intact when CJK text wraps. */
     noBreakSuffix?: string;
   };
@@ -180,14 +179,13 @@ export interface HomeStrings extends PageStrings {
     year: string;
   };
   /**
-   * The career arc as one line (an arrow chain, not a sentence) and the link to
-   * About, closing the Writing section. PRD §11 still binds it: engineering
-   * domains and seniority only.
+   * The page-closing About block (round 3 replaces the career-arc colophon):
+   * a title and one line saying what About carries. PRD §11 still binds
+   * both. Internal; the About route is resolved by the component, not here.
    */
-  experience: {
-    progression: string;
-    /** Internal; the About route is resolved by the component, not here. */
-    cta: CtaLabel;
+  aboutNav: {
+    title: string;
+    description: string;
   };
   /**
    * PRD §9.6. Metadata pulled from Study; never article bodies. A date and
@@ -225,13 +223,11 @@ export const home = {
       'AI Systems Engineer and System Architect with 10+ years of software engineering experience, building AI systems, developer tooling, and model infrastructure.',
     heading: 'Oliver Yu',
     intro:
-      'I build AI products and the LLM inference systems under them, on Apple silicon and AMD GPUs, and trace performance problems to a measured cause.',
+      'I design and build AI products, AI agents, and LLM inference systems across AMD and NVIDIA GPUs and Apple Silicon, with a focus on system architecture, inference performance, and engineering.',
     hero: {
       role: 'AI Systems Engineer · System Architect',
       facts: ['laya-apple on PyPI', 'Upstream: Apple coremltools · oMLX'],
-      workCta: 'View Selected Work',
-      writingCta: 'Technical Writing',
-      noBreakSuffix: 'measured cause.',
+      noBreakSuffix: 'engineering.',
     },
     shouri: {
       heading: 'Shouri / 收理',
@@ -344,10 +340,9 @@ export const home = {
       venue: 'Journal of Information Security and Applications',
       year: '2026',
     },
-    experience: {
-      progression:
-        'Application Engineering → Enterprise Systems & Architecture → Enterprise AI Systems',
-      cta: { label: 'About Oliver' },
+    aboutNav: {
+      title: 'About Oliver',
+      description: 'More about my engineering background and research interests.',
     },
     writing: {
       heading: 'Technical Writing',
@@ -361,15 +356,13 @@ export const home = {
       'AI 系統工程師與系統架構師，有 10 年以上軟體工程經驗，開發 AI 系統、開發者工具與模型基礎架構。',
     heading: 'Oliver Yu',
     intro:
-      '我開發 AI 產品與 LLM 推論系統，跑在 Apple silicon 和 AMD GPU 上。遇到效能問題，就一路追到能用量測證明的原因。',
+      '我專注於 AI 產品、AI Agent 與 LLM 推論系統的設計與開發，涵蓋 AMD、NVIDIA GPU 及 Apple Silicon 平台，主要投入系統架構、推論效能優化與工程實作。',
     hero: {
       // PRD §9.1 keeps the role line in English in the Chinese hero; it is a
       // standalone line, so it mixes no languages inside a prose block.
       role: 'AI Systems Engineer · System Architect',
       facts: ['laya-apple 已發布到 PyPI', '上游貢獻：Apple coremltools · oMLX'],
-      workCta: '精選作品',
-      writingCta: '技術文章',
-      noBreakSuffix: '證明的原因。',
+      noBreakSuffix: '工程實作。',
     },
     shouri: {
       heading: 'Shouri / 收理',
@@ -481,9 +474,9 @@ export const home = {
       venue: 'Journal of Information Security and Applications',
       year: '2026',
     },
-    experience: {
-      progression: '應用程式工程 → 企業系統與系統架構 → 企業 AI 系統',
-      cta: { label: '關於 Oliver' },
+    aboutNav: {
+      title: '關於 Oliver',
+      description: '更多關於我的工程背景與研究方向。',
     },
     writing: {
       heading: '技術文章',

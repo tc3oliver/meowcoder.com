@@ -25,6 +25,7 @@ export const chromeEn = {
     shouri: 'Shouri',
     email: 'Email',
     siteSource: 'Site Source',
-    backToTop: 'Back to top',
+    homeLabel: 'meowcoder.com home',
+    copyright: '© 2026 Oliver Yu',
   },
 } satisfies ChromeDictionary;

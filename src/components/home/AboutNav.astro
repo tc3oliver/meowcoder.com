@@ -1,0 +1,96 @@
+---
+/**
+ * The page-closing About block (round 3).
+ *
+ * One hairline-topped row where the whole row is a single link to the About
+ * page: title and one description line on the left, an in-page arrow on the
+ * right. It replaces round 2's career-arc colophon — the arc lives on About,
+ * where its stage figure can be read properly, and the homepage only needs
+ * the exit.
+ *
+ * The arrow is the literal in-page '→', the same glyph `CareerProgression`
+ * uses for its on-site CTA. It is deliberately NOT the `externalIndicator`
+ * from the chrome dictionary: on this site '↗' means off-site, and About is
+ * on-site, so borrowing it would mislabel the destination. The glyph is
+ * `aria-hidden` — the link's accessible name comes from its `aria-label`.
+ *
+ * A single wrapping `<a>` rather than a heading link: one focus stop, one
+ * click target the full width of the ledger, and the global focus ring
+ * already covers it. No card, background or shadow (PRD §25) — the hairline
+ * and the whitespace are the whole treatment.
+ */
+
+import type { Locale } from '../../i18n/locales';
+import type { HomeStrings } from '../../i18n/pages/home';
+import { localizePath } from '../../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  t: HomeStrings;
+}
+
+const { locale, t } = Astro.props;
+---
+
+<a
+  class="about-nav"
+  href={localizePath(locale, '/about')}
+  aria-label={`${t.aboutNav.title} — ${t.aboutNav.description}`}
+>
+  <span class="about-nav__text">
+    <span class="about-nav__title">{t.aboutNav.title}</span>
+    <span class="about-nav__description">{t.aboutNav.description}</span>
+  </span>
+  <span class="about-nav__arrow" aria-hidden="true">→</span>
+</a>
+
+<style>
+  /* Full ledger width; hairline above; the block stacks on mobile with the
+     arrow still on the right of the title line. `min-width: 0` on the text
+     column is what keeps a long unbroken line from widening a 390px
+     viewport. */
+  .about-nav {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-block-start: var(--space-8);
+    padding-block: var(--space-6);
+    border-block-start: var(--border-width) solid var(--color-border);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .about-nav__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .about-nav__title {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+  }
+
+  /* Reading measure, muted: the description is supporting copy, not a
+     heading, so it drops a level of contrast like the section summaries. */
+  .about-nav__description {
+    max-width: 42em;
+    color: var(--color-text-muted);
+    line-height: var(--leading-relaxed);
+  }
+
+  .about-nav__arrow {
+    color: var(--color-accent);
+    font-size: var(--text-xl);
+    line-height: 1;
+  }
+
+  /* The global `a:hover` thickens an underline this link has suppressed; the
+     accent on the arrow gives hover its own visible response. */
+  .about-nav:hover .about-nav__arrow {
+    color: var(--color-accent-strong);
+  }
+</style>

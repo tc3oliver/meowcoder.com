@@ -360,16 +360,19 @@ describe('work and publication structured data', () => {
   });
 });
 
-describe('home career line', () => {
-  it.each(['index.html', 'zh/index.html'])(
-    'separates the arc from the About link in %s',
-    (file) => {
-      // Astro drops the whitespace between an expression and an element, which
-      // once rendered "…AI SystemsAbout Oliver" as one run of text.
-      const html = read(file);
-      expect(html).toMatch(/<p class="writing__about"[^>]*>[^<]+ <a href="[^"]*\/about\/"/);
-    },
-  );
+describe('home About nav (round 3)', () => {
+  it.each([
+    ['index.html', '/about/'],
+    ['zh/index.html', '/zh/about/'],
+  ])('closes %s with one About-nav link to %s', (file, href) => {
+    // The career-arc colophon it replaced is gone: the arc lives on About,
+    // and the homepage ends with a single full-width ledger link. One anchor
+    // wrapping spans has no expression/element adjacency, so the whitespace
+    // bug this test once guarded cannot recur in this shape.
+    const html = read(file);
+    expect(html).toMatch(new RegExp(`<a class="about-nav" href="${href}"`));
+    expect(html).not.toContain('writing__about');
+  });
 });
 
 describe('sitemap', () => {

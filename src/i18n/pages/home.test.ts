@@ -144,15 +144,13 @@ describe('requirement wording', () => {
   it('quotes the doc-2 §5 hero verbatim in English', () => {
     expect(home.en.hero.role).toBe('AI Systems Engineer · System Architect');
     expect(home.en.intro).toBe(
-      'I build AI products and the LLM inference systems under them, on Apple silicon and AMD GPUs, and trace performance problems to a measured cause.',
+      'I design and build AI products, AI agents, and LLM inference systems across AMD and NVIDIA GPUs and Apple Silicon, with a focus on system architecture, inference performance, and engineering.',
     );
-    expect(home.en.hero.workCta).toBe('View Selected Work');
-    expect(home.en.hero.writingCta).toBe('Technical Writing');
   });
 
   it('quotes the doc-2 §5 hero statement verbatim in Chinese', () => {
     expect(home.zh.intro).toBe(
-      '我開發 AI 產品與 LLM 推論系統，跑在 Apple silicon 和 AMD GPU 上。遇到效能問題，就一路追到能用量測證明的原因。',
+      '我專注於 AI 產品、AI Agent 與 LLM 推論系統的設計與開發，涵蓋 AMD、NVIDIA GPU 及 Apple Silicon 平台，主要投入系統架構、推論效能優化與工程實作。',
     );
     // doc-2 §5 keeps the role line in English in both locales.
     expect(home.zh.hero.role).toBe('AI Systems Engineer · System Architect');
@@ -178,13 +176,14 @@ describe('requirement wording', () => {
     }
   });
 
-  it('keeps the career arc and About link that close the Writing section', () => {
-    expect(home.en.experience.progression).toBe(
-      'Application Engineering → Enterprise Systems & Architecture → Enterprise AI Systems',
-    );
-    expect(home.en.experience.cta.label).toBe('About Oliver');
-    expect(home.zh.experience.progression).toBe('應用程式工程 → 企業系統與系統架構 → 企業 AI 系統');
-    expect(home.zh.experience.cta.label).toBe('關於 Oliver');
+  it('keeps the About block that closes the page', () => {
+    // Round 3 replaced the career-arc colophon with a full-width About link:
+    // a title and one description line, no progression string on the homepage
+    // (the arc lives on About, where about.test.ts asserts it in full).
+    expect(home.en.aboutNav.title).toBe('About Oliver');
+    expect(home.en.aboutNav.description.length).toBeGreaterThan(0);
+    expect(home.zh.aboutNav.title).toBe('關於 Oliver');
+    expect(home.zh.aboutNav.description.length).toBeGreaterThan(0);
   });
 
   it('keeps the publication identical across locales (PRD §7)', () => {
@@ -258,8 +257,11 @@ describe('content language rules (PRD §34)', () => {
       'Pi',
       'OIDC',
       'Apple',
-      'silicon',
+      // Proper nouns in the hero statement: NVIDIA the vendor, Apple Silicon
+      // the platform (capital S — the round-3 intro writes it that way).
+      'Silicon',
       'AMD',
+      'NVIDIA',
       // Established technical terminology.
       'AI',
       'LLM',

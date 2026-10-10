@@ -15,8 +15,8 @@
  *
  * Round 2 renders each entry as a ledger row with the dates in the margin:
  * mono `when` on the left, title and meta on the right, hairlines between the
- * rows. The closing career-arc line is the page's colophon row — hairline-topped,
- * progression left in mono, About link right, stacked on mobile.
+ * rows. Round 3 moves the page's closing About link into its own `AboutNav`
+ * block after this section; the list ends with the link to all writing.
  *
  * Three states are normal rather than exceptional:
  *
@@ -38,7 +38,6 @@
 import { LOCALE_TAG, type Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
 import { PUBLICATION_URL, STUDY_URL } from '../../lib/external';
-import { localizePath } from '../../lib/i18n';
 import { resolveTitle, type StudyPost } from '../../lib/study-feed';
 import CtaLink from './CtaLink.astro';
 import HomeSection from './HomeSection.astro';
@@ -123,11 +122,6 @@ const entries = posts.map((post) => {
   <p class="writing__all">
     <CtaLink href={STUDY_URL} label={t.writing.cta.label} external indicator={externalIndicator} />
   </p>
-
-  <p class="writing__about">
-    {t.experience.progression}{' '}
-    <a href={localizePath(locale, '/about')}>{t.experience.cta.label}</a>
-  </p>
 </HomeSection>
 
 <style>
@@ -193,21 +187,5 @@ const entries = posts.map((post) => {
   .writing__all {
     margin-block-start: var(--space-5);
     font-family: var(--font-mono);
-  }
-
-  /* The colophon row closing the page: career arc left in mono, About link
-     right; a stack on mobile. */
-  .writing__about {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-2) var(--space-5);
-    margin-block-start: var(--space-7);
-    padding-block-start: var(--space-5);
-    border-block-start: var(--border-width) solid var(--color-border);
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
   }
 </style>

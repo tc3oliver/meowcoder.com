@@ -11,11 +11,13 @@
  *
  * Round 2 composes the hero as an asymmetric ledger masthead: the oversized
  * name leads a wide left column (role line in mono, statement under it), and a
- * narrow right rail — desktop only — carries the hairline-separated mono facts
- * and the two actions. The facts are plain text, not badges: PRD §37 prefers
- * evidence over ornament, and a shipped release and upstream projects are the
- * evidence. The list renders however many facts the dictionary carries; it does
- * not assume a count.
+ * narrow right rail — desktop only — carries the hairline-separated mono
+ * facts. Round 3 drops the two hero actions: the numbered sections below are
+ * the page's navigation, and a masthead with nothing to click reads calmer.
+ * The facts are plain text, not badges: PRD §37 prefers evidence over
+ * ornament, and a shipped release and upstream projects are the evidence. The
+ * list renders however many facts the dictionary carries; it does not assume a
+ * count.
  *
  * doc-2 §5 asks for a hero that is confident and spacious but not an empty
  * full-screen splash: the next section has to be reachable within about one
@@ -23,20 +25,13 @@
  * step does the rest; the next section owns the larger opening rhythm after it.
  */
 
-import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
-import { localizePath } from '../../lib/i18n';
-import { STUDY_URL } from '../../lib/external';
-import CtaLink from './CtaLink.astro';
 
 interface Props {
-  locale: Locale;
   t: HomeStrings;
-  /** Localized off-site glyph, from the chrome dictionary. */
-  externalIndicator: string;
 }
 
-const { locale, t, externalIndicator } = Astro.props;
+const { t } = Astro.props;
 const noBreakSuffix = t.hero.noBreakSuffix;
 const statementStart =
   noBreakSuffix && t.intro.endsWith(noBreakSuffix)
@@ -61,23 +56,23 @@ const statementStart =
     <ul class="hero__facts" role="list">
       {t.hero.facts.map((fact) => <li>{fact}</li>)}
     </ul>
-
-    <div class="hero__actions">
-      <CtaLink href={localizePath(locale, '/work')} label={t.hero.workCta} variant="solid" />
-      <CtaLink href={STUDY_URL} label={t.hero.writingCta} external indicator={externalIndicator} />
-    </div>
   </div>
 </div>
 
 <style>
   /* One column on a phone; the asymmetric two-column masthead from 64rem. The
      grid spans the full content width — the width contrast against the narrow
-     prose inside the sections below is part of the round-2 identity. */
+     prose inside the sections below is part of the round-2 identity.
+
+     Round 3 trims the bottom padding to `--space-10`: with no CTA to anchor
+     the eye at the end of the masthead, the "01" eyebrow of the research
+     section has to appear within about one screen (doc-2 §5) instead of below
+     a full second hero band. The top keeps the full `--space-hero` presence. */
   .hero {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-8);
-    padding-block: var(--space-hero);
+    padding-block: var(--space-hero) var(--space-10);
   }
 
   @media (width >= 64rem) {
@@ -124,7 +119,10 @@ const statementStart =
   }
 
   /* The right rail: hairline-topped, its fact rows separated by hairlines. On
-     mobile the same stack simply follows the statement. */
+     mobile the same stack simply follows the statement. The facts are now the
+     rail's whole content, so their rows get the taller `--space-4` padding —
+     two tight rows under a hairline would read as leftovers from the removed
+     actions rather than as a deliberate metadata block. */
   .hero__rail {
     min-width: 0;
     border-block-start: var(--border-width) solid var(--color-border);
@@ -140,19 +138,10 @@ const statementStart =
   }
 
   .hero__facts li {
-    padding-block: var(--space-3);
+    padding-block: var(--space-4);
   }
 
   .hero__facts li + li {
     border-block-start: var(--border-width) solid var(--color-border);
-  }
-
-  /* The two actions, stacked: the solid work CTA and the quiet writing link. */
-  .hero__actions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-4);
-    margin-block-start: var(--space-6);
   }
 </style>

@@ -1,12 +1,16 @@
 ---
 /**
- * Site footer shell (MCD-2).
+ * Site footer shell (MCD-2, two-column rebuild per redesign spec r3).
  *
  * Same contract as `Header.astro`: structure and styling only, with every
  * string injected by the caller so MCD-3 can supply the localized `footer`
- * dictionary. The link row matches the shape PRD §9.8 describes (a single row
- * of destinations above the wordmark) without committing to its contents here.
+ * dictionary. Left block is the clickable wordmark plus the copyright line,
+ * right block is the link row PRD §9.8 fixes — its membership and order are
+ * asserted against every built page by `metadata.test.ts`, so `SiteShell`'s
+ * `footerLinks` array is the only place that order is decided.
  */
+
+import BrandWordmark from './BrandWordmark.astro';
 
 interface FooterLink {
   href: string;
@@ -19,23 +23,36 @@ interface Props {
   /** Accessible name for the footer navigation landmark. */
   navLabel?: string;
   links?: FooterLink[];
+  /** Locale home page the wordmark links back to. Omitted means no link. */
+  homeHref?: string;
   /**
-   * Localized back-to-top label. Omitted means no link is rendered. It is a
-   * plain anchor to `#top` — the id the document shell puts on `<body>` —
-   * because this site ships zero client JavaScript. Its class is deliberately
-   * not `site-footer__link`: the PRD §9.8 row is asserted by membership and
-   * order, and this is not one of its destinations.
+   * Accessible name for the wordmark link. The wordmark is an image with its
+   * own `aria-label`, so the wrapping anchor's label is what a screen reader
+   * announces for the link itself.
    */
-  backToTopLabel?: string;
+  homeLabel?: string;
+  /** The `© 2026 Oliver Yu` line — a legal string, identical in both locales. */
+  copyright?: string;
 }
 
-const { navLabel, links = [], backToTopLabel } = Astro.props;
-
-const hasMeta = Astro.slots.has('meta');
+const { navLabel, links = [], homeHref, homeLabel, copyright } = Astro.props;
 ---
 
 <footer class="site-footer">
   <div class="container site-footer__inner">
+    {
+      (homeHref || copyright) && (
+        <div class="site-footer__brand">
+          {homeHref && (
+            <a class="site-footer__logo" href={homeHref} aria-label={homeLabel}>
+              <BrandWordmark />
+            </a>
+          )}
+          {copyright && <p class="site-footer__meta">{copyright}</p>}
+        </div>
+      )
+    }
+
     {
       links.length > 0 && (
         <nav class="site-footer__nav" aria-label={navLabel}>
@@ -56,24 +73,6 @@ const hasMeta = Astro.slots.has('meta');
         </nav>
       )
     }
-
-    {
-      hasMeta && (
-        <p class="site-footer__meta">
-          <slot name="meta" />
-        </p>
-      )
-    }
-
-    {
-      backToTopLabel && (
-        <a class="site-footer__top" href="#top">
-          {backToTopLabel}
-        </a>
-      )
-    }
-
-    <slot />
   </div>
 </footer>
 
@@ -85,17 +84,46 @@ const hasMeta = Astro.slots.has('meta');
     background-color: var(--color-bg);
   }
 
+  /* Two-column split: brand left, links right. `flex-wrap` is what keeps the
+     390px case overflow-free — the nav simply drops to its own line and stays
+     right-aligned via `margin-inline-start: auto`. */
   .site-footer__inner {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4) var(--space-5);
     padding-block: var(--space-7);
+  }
+
+  .site-footer__brand {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .site-footer__logo {
+    /* The wordmark paints with `currentColor`; keep it in the muted chrome
+       color rather than the accent so it reads as a mark, not a text link. */
+    color: var(--color-text-muted);
+    display: block;
+    text-decoration: none;
+  }
+
+  .site-footer__logo:hover {
+    color: var(--color-text);
+  }
+
+  .site-footer__nav {
+    margin-inline-start: auto;
   }
 
   .site-footer__list {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: flex-end;
     gap: var(--space-2) var(--space-5);
     margin: 0;
   }
@@ -113,17 +141,5 @@ const hasMeta = Astro.slots.has('meta');
   .site-footer__meta {
     color: var(--color-text-subtle);
     font-size: var(--text-sm);
-  }
-
-  /* Chrome-link treatment, same as the nav row: muted, underline-less, and
-     the color transition comes from the global `a` rule. */
-  .site-footer__top {
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    text-decoration: none;
-  }
-
-  .site-footer__top:hover {
-    color: var(--color-text);
   }
 </style>
