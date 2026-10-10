@@ -226,7 +226,7 @@ export const home = {
       'I design and build AI products, AI agents, and LLM inference systems across AMD and NVIDIA GPUs and Apple Silicon, with a focus on system architecture, inference performance, and engineering.',
     hero: {
       role: 'AI Systems Engineer · System Architect',
-      facts: ['laya-apple on PyPI', 'Upstream: Apple coremltools · oMLX'],
+      facts: ['laya-apple on PyPI', 'Upstream: MLX · oMLX · coremltools'],
       noBreakSuffix: 'engineering.',
     },
     shouri: {
@@ -310,6 +310,13 @@ export const home = {
               'Releases the GIL only for the duration of the native Core ML prediction call. Found during the laya-apple research.',
           },
           {
+            name: 'ml-explore/mlx#4615',
+            href: 'https://github.com/ml-explore/mlx/pull/4615',
+            merged: true,
+            description:
+              'Fixes lost rank output in the distributed launcher by draining both pipes after the process exits.',
+          },
+          {
             name: 'jundot/omlx#3685',
             href: 'https://github.com/jundot/omlx/pull/3685',
             merged: true,
@@ -361,7 +368,7 @@ export const home = {
       // PRD §9.1 keeps the role line in English in the Chinese hero; it is a
       // standalone line, so it mixes no languages inside a prose block.
       role: 'AI Systems Engineer · System Architect',
-      facts: ['laya-apple 已發布到 PyPI', '上游貢獻：Apple coremltools · oMLX'],
+      facts: ['laya-apple 已發布到 PyPI', '上游貢獻：MLX · oMLX · coremltools'],
       noBreakSuffix: '工程實作。',
     },
     shouri: {
@@ -442,6 +449,13 @@ export const home = {
             href: 'https://github.com/apple/coremltools/pull/2876',
             description:
               'laya-apple 的研究中發現：Core ML prediction 持有 GIL。修正是只在原生 prediction 呼叫期間釋放 GIL。',
+          },
+          {
+            name: 'ml-explore/mlx#4615',
+            href: 'https://github.com/ml-explore/mlx/pull/4615',
+            merged: true,
+            description:
+              '修正 distributed launcher 在 rank 行程結束後遺失最後輸出的問題，持續讀取兩條 pipe 直到 EOF。',
           },
           {
             name: 'jundot/omlx#3685',

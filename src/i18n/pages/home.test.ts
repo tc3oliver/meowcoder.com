@@ -50,6 +50,7 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     // No version: it would be stale the day the next release ships.
     expect(t.hero.facts[0]).not.toMatch(/\d/);
     expect(t.hero.facts[1]).toMatch(/coremltools/);
+    expect(t.hero.facts[1]).toMatch(/MLX/);
     expect(t.hero.facts.join(' ')).not.toMatch(/\d+ (merged|pull requests|PRs)/i);
   });
 
@@ -325,15 +326,16 @@ describe.each(BY_LOCALE)('Featured Research (%s)', (_locale, t: HomeStrings) => 
     expect(note).toMatch(_locale === 'en' ? /invalid/i : /作廢|無效/);
   });
 
-  it('lists the four upstream pull requests under Research, three of them merged', () => {
+  it('lists the five featured upstream entries under Research, four of them merged', () => {
     expect(t.systems.upstream.items.map((item) => item.name)).toEqual([
       'apple/coremltools#2876',
+      'ml-explore/mlx#4615',
       'jundot/omlx#3685',
       'jundot/omlx#3840 + #3842',
       'jundot/omlx#3664',
     ]);
     expect(t.systems.upstream.items.filter((item) => item.merged).map((item) => item.name)).toEqual(
-      ['jundot/omlx#3685', 'jundot/omlx#3840 + #3842', 'jundot/omlx#3664'],
+      ['ml-explore/mlx#4615', 'jundot/omlx#3685', 'jundot/omlx#3840 + #3842', 'jundot/omlx#3664'],
     );
   });
 
