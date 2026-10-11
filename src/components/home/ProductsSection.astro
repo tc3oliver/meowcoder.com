@@ -1,16 +1,9 @@
 ---
 /**
- * Products — Shouri, SignalForge, PiShip and Claude Team Kit as ledger rows:
- * the name linked to its case study, one sentence, and text links out; there
- * are no images, cards or backgrounds. PRD §24 keeps the meowcoder.com source
- * out of this section: it gets a footer link.
- *
- * Round 2 gives each product a full-width row — hairline above, title block
- * left, mono actions right — spanning the content width while the statement
- * stays at a reading measure. The row carries no number of its own; the
- * section's ledger index does that.
+ * Two fully realized systems lead; two smaller tools follow in a denser
+ * register. This hierarchy distinguishes product/platform ownership from
+ * useful OSS utilities without removing any public evidence.
  */
-
 import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
 import {
@@ -28,20 +21,29 @@ interface Props {
   locale: Locale;
   t: HomeStrings;
   externalIndicator: string;
-  /** Two-digit ledger index for the section heading row. */
   index: string;
 }
 
 const { locale, t, externalIndicator, index } = Astro.props;
 
-/** `slug` is the case study's — `src/content/work/{en,zh}/<slug>.md`. */
-const products = [
+const featured = [
   {
     slug: 'shouri',
+    kind: t.products.labels.product,
     name: t.shouri.heading,
     statement: t.shouri.summary,
     links: [{ href: SHOURI_URL, label: t.shouri.cta.label }],
   },
+  {
+    slug: 'piship',
+    kind: t.products.labels.infrastructure,
+    name: t.products.piship.heading,
+    statement: t.products.piship.statement,
+    links: [{ href: PISHIP_URL, label: t.products.piship.cta.label }],
+  },
+];
+
+const tools = [
   {
     slug: 'signalforge',
     name: t.products.signalforge.heading,
@@ -50,12 +52,6 @@ const products = [
       { href: SIGNALFORGE_LIVE_URL, label: t.products.signalforge.liveCta.label },
       { href: SIGNALFORGE_URL, label: t.products.signalforge.cta.label },
     ],
-  },
-  {
-    slug: 'piship',
-    name: t.products.piship.heading,
-    statement: t.products.piship.statement,
-    links: [{ href: PISHIP_URL, label: t.products.piship.cta.label }],
   },
   {
     slug: 'claude-team-kit',
@@ -67,17 +63,39 @@ const products = [
 ---
 
 <HomeSection id="products" heading={t.products.heading} index={index}>
-  <ul class="products" role="list">
+  <ul class="featured-products" role="list">
     {
-      products.map((product) => (
-        <li class="product">
-          <div class="product__main">
-            <p class="product__name">
+      featured.map((product) => (
+        <li class="featured-product">
+          <div class="featured-product__main">
+            <p class="featured-product__kind">{product.kind}</p>
+            <h3 class="featured-product__name">
               <a href={localizePath(locale, workDetailRoute(product.slug))}>{product.name}</a>
-            </p>
-            <p class="product__statement">{product.statement}</p>
+            </h3>
+            <p class="featured-product__statement">{product.statement}</p>
           </div>
-          <p class="product__links">
+          <p class="product-links">
+            {product.links.map((link) => (
+              <CtaLink href={link.href} label={link.label} external indicator={externalIndicator} />
+            ))}
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h3 class="tools-heading">{t.products.moreHeading}</h3>
+  <ul class="tools" role="list">
+    {
+      tools.map((product) => (
+        <li class="tool">
+          <div class="tool__main">
+            <h4>
+              <a href={localizePath(locale, workDetailRoute(product.slug))}>{product.name}</a>
+            </h4>
+            <p>{product.statement}</p>
+          </div>
+          <p class="product-links">
             {product.links.map((link) => (
               <CtaLink href={link.href} label={link.label} external indicator={externalIndicator} />
             ))}
@@ -89,7 +107,8 @@ const products = [
 </HomeSection>
 
 <style>
-  .products {
+  .featured-products,
+  .tools {
     display: flex;
     flex-direction: column;
     margin: 0;
@@ -97,62 +116,90 @@ const products = [
     list-style: none;
   }
 
-  /* The ledger row: hairline above, title block left, mono actions aligned to
-     the row top on the right. One column under 48rem, actions below the
-     statement. `minmax(0, …)` keeps a long name from widening a 390px
-     viewport. */
-  .product {
+  .featured-product {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-3);
-    padding-block: var(--space-6);
+    gap: var(--space-5);
+    padding-block: var(--space-7);
     border-block-start: var(--border-width) solid var(--color-border);
   }
 
-  .product:last-child {
+  .featured-product:last-child,
+  .tool:last-child {
     border-block-end: var(--border-width) solid var(--color-border);
   }
 
   @media (width >= 48rem) {
-    .product {
+    .featured-product,
+    .tool {
       grid-template-columns: minmax(0, 1fr) auto;
       column-gap: var(--space-8);
       align-items: start;
     }
   }
 
-  .product__main {
+  .featured-product__main,
+  .tool__main {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: var(--space-2);
     min-width: 0;
   }
 
-  /* The title is the row's focal point: two steps under the 40px section
-     heading (20→23px fluid), so four rows never compete with the ledger
-     header. Hover comes from the global `a` rule (accent-strong). */
-  .product__name {
-    font-size: var(--text-lg);
+  .featured-product__kind,
+  .tools-heading {
+    color: var(--color-text-subtle);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-regular);
+  }
+
+  .featured-product__name {
+    font-size: var(--text-xl);
     font-weight: var(--weight-semibold);
     line-height: var(--leading-snug);
-    letter-spacing: var(--tracking-tight);
     overflow-wrap: anywhere;
   }
 
-  .product__statement {
-    /* A statement measure: the row is wide, the sentence is not. */
-    max-width: 46em;
+  .featured-product__statement {
+    max-width: 52ch;
     color: var(--color-text-muted);
     font-size: var(--text-md);
     line-height: var(--leading-relaxed);
   }
 
-  /* Metadata register: mono, small, stacked. */
-  .product__links {
+  .tools-heading {
+    margin-block: var(--space-8) var(--space-4);
+  }
+
+  .tool {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+    padding-block: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .tool__main h4 {
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+    overflow-wrap: anywhere;
+  }
+
+  .tool__main p {
+    max-width: 56ch;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  .product-links {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-2);
     font-family: var(--font-mono);
+    font-size: var(--text-sm);
   }
 </style>
