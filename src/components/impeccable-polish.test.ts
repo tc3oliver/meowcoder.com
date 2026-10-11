@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import FOOTER from '../components/Footer.astro?raw';
-import LANGUAGE_SWITCHER from '../components/LanguageSwitcher.astro?raw';
-import SYSTEMS_RESEARCH from '../components/home/SystemsResearchSection.astro?raw';
-import SECTION_NAV from '../components/work/SectionNav.astro?raw';
+import FOOTER from './Footer.astro?raw';
+import LANGUAGE_SWITCHER from './LanguageSwitcher.astro?raw';
+import SYSTEMS_RESEARCH from './home/SystemsResearchSection.astro?raw';
+import SECTION_NAV from './work/SectionNav.astro?raw';
 
 describe('Impeccable interface polish regressions', () => {
   it('keeps the desktop case-study contents visible without opening a disclosure', () => {
     expect(SECTION_NAV).toContain('class="section-nav__mobile"');
     expect(SECTION_NAV).toContain('class="section-nav__desktop"');
-    expect(SECTION_NAV).toMatch(/\\.section-nav__desktop\\s*\\{\\s*display: none;/);
-    expect(SECTION_NAV).toMatch(/\\.section-nav__desktop\\s*\\{\\s*display: block;/);
+    expect(SECTION_NAV).toMatch(/\.section-nav__desktop\s*\{\s*display: none;/);
+    expect(SECTION_NAV).toMatch(/\.section-nav__desktop\s*\{\s*display: block;/);
     expect(SECTION_NAV).toContain('class="section-nav__list" role="list"');
     expect(SECTION_NAV).not.toContain('.section-nav details:not([open])');
   });
