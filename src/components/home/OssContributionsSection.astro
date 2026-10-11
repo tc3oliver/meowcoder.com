@@ -1,0 +1,101 @@
+---
+/**
+ * Project-level OSS contribution summaries. The homepage shows the nature of
+ * the work, while the GitHub profile owns PR numbers and their current status.
+ */
+import type { HomeStrings } from '../../i18n/pages/home';
+import { UPSTREAM_PRS_URL } from '../../lib/external';
+import CtaLink from './CtaLink.astro';
+import HomeSection from './HomeSection.astro';
+
+interface Props {
+  t: HomeStrings;
+  externalIndicator: string;
+  index: string;
+}
+const { t, externalIndicator, index } = Astro.props;
+---
+
+<HomeSection id="oss-contributions" heading={t.systems.upstream.heading} index={index}>
+  <ul class="contributions" role="list">
+    {
+      t.systems.upstream.items.map((item) => (
+        <li class="contribution">
+          <h3 class="contribution__name">
+            <a href={item.href} target="_blank" rel="noopener noreferrer">
+              {item.name}
+              <span class="contribution__indicator" aria-hidden="true">
+                {externalIndicator}
+              </span>
+            </a>
+          </h3>
+          <p class="contribution__description">{item.description}</p>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="contributions__all">
+    <CtaLink
+      href={UPSTREAM_PRS_URL}
+      label={t.systems.upstream.cta.label}
+      external
+      indicator={externalIndicator}
+    />
+  </p>
+</HomeSection>
+
+<style>
+  .contributions {
+    display: flex;
+    flex-direction: column;
+    max-width: var(--width-reading);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .contribution {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+    padding-block: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .contribution:last-child {
+    border-block-end: var(--border-width) solid var(--color-border);
+  }
+
+  @media (width >= 48rem) {
+    .contribution {
+      grid-template-columns: 14rem minmax(0, 1fr);
+      column-gap: var(--space-5);
+    }
+  }
+
+  .contribution__name {
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    overflow-wrap: anywhere;
+  }
+
+  .contribution__indicator {
+    margin-inline-start: 0.25em;
+    font-size: 0.75em;
+    font-weight: var(--weight-regular);
+  }
+
+  .contribution__description {
+    min-width: 0;
+    max-width: 55ch;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  .contributions__all {
+    margin-block-start: var(--space-5);
+    font-family: var(--font-mono);
+  }
+</style>

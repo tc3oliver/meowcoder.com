@@ -18,7 +18,26 @@ const { t } = Astro.props;
     {t.summary.map((paragraph) => <p class="about__paragraph">{paragraph}</p>)}
   </header>
 
-  <AboutSection id="career" heading={t.career.heading} index="01" prominence="strong">
+  <AboutSection
+    id="systems-research"
+    heading={t.systemsResearch.heading}
+    index="01"
+    prominence="strong"
+  >
+    <div class="systems-research">
+      <p class="systems-research__description">{t.systemsResearch.description}</p>
+      <a
+        class="about-link"
+        href={t.systemsResearch.href}
+        target="_blank"
+        rel="external noopener noreferrer"
+      >
+        {t.systemsResearch.cta}<span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </AboutSection>
+
+  <AboutSection id="career" heading={t.career.heading} index="02">
     <CareerProgression career={t.career} id="career-progression" />
 
     <div class="current-focus">
@@ -38,34 +57,7 @@ const { t } = Astro.props;
     </div>
   </AboutSection>
 
-  <AboutSection id="engineering-focus" heading={t.focus.heading} index="02">
-    <div class="focus-grid">
-      {
-        t.focus.items.map((item) => (
-          <article class="focus-item">
-            <h3>{item.name}</h3>
-            <p>{item.description}</p>
-          </article>
-        ))
-      }
-    </div>
-  </AboutSection>
-
-  <AboutSection id="systems-research" heading={t.systemsResearch.heading} index="03">
-    <div class="systems-research">
-      <p class="systems-research__description">{t.systemsResearch.description}</p>
-      <a
-        class="about-link"
-        href={t.systemsResearch.href}
-        target="_blank"
-        rel="external noopener noreferrer"
-      >
-        {t.systemsResearch.cta}<span aria-hidden="true">↗</span>
-      </a>
-    </div>
-  </AboutSection>
-
-  <AboutSection id="research" heading={t.research.heading} index="04" prominence="strong">
+  <AboutSection id="research" heading={t.research.heading} index="03" prominence="strong">
     <div class="research">
       <p class="research__venue">{t.research.venue}</p>
       <p class="research__record">{t.research.record}</p>
@@ -85,15 +77,26 @@ const { t } = Astro.props;
     </div>
   </AboutSection>
 
-  <div class="about__credentials-row">
-    <AboutSection id="education" heading={t.education.heading} index="05">
-      <div class="education">
-        <p class="education__degree">{t.education.degree}</p>
-        <p class="education__institution">{t.education.institution}</p>
-      </div>
-    </AboutSection>
+  <AboutSection id="engineering-focus" heading={t.focus.heading} index="04">
+    <div class="focus-grid">
+      {
+        t.focus.items.map((item) => (
+          <article class="focus-item">
+            <h3>{item.name}</h3>
+            <p>{item.description}</p>
+          </article>
+        ))
+      }
+    </div>
+  </AboutSection>
 
-    <AboutSection id="selected-credentials" heading={t.credentials.heading} index="06">
+  <AboutSection id="education" heading={t.education.heading} index="05">
+    <div class="education">
+      <p class="education__degree">{t.education.degree}</p>
+      <p class="education__institution">{t.education.institution}</p>
+    </div>
+    <details class="credentials-disclosure">
+      <summary>{t.credentials.heading}</summary>
       <ul class="credentials" role="list">
         {
           t.credentials.items.map((credential) => (
@@ -105,10 +108,10 @@ const { t } = Astro.props;
           ))
         }
       </ul>
-    </AboutSection>
-  </div>
+    </details>
+  </AboutSection>
 
-  <AboutSection id="engineering-principles" heading={t.principles.heading} index="07">
+  <AboutSection id="engineering-principles" heading={t.principles.heading} index="06">
     <div class="principles">
       <p class="principles__statement">{t.principles.statement}</p>
       <ul class="principles__list" role="list">
@@ -297,10 +300,21 @@ const { t } = Astro.props;
     font-weight: var(--weight-semibold);
   }
 
-  .about__credentials-row {
-    display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: var(--space-9);
+  /* Credentials remain accessible as supporting detail, not a featured claim. */
+  .credentials-disclosure {
+    max-width: var(--width-reading);
+    margin-block-start: var(--space-6);
+    padding-block-start: var(--space-4);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .credentials-disclosure summary {
+    min-height: 2.75rem;
+    padding-block: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
   }
 
   .education,
@@ -333,6 +347,7 @@ const { t } = Astro.props;
     flex-direction: column;
     gap: var(--space-5);
     margin: 0;
+    padding-block-start: var(--space-4);
   }
 
   .principles {
@@ -363,12 +378,10 @@ const { t } = Astro.props;
 
   @media (width < 48rem) {
     .focus-grid,
-    .about__credentials-row,
     .principles {
       grid-template-columns: minmax(0, 1fr);
     }
 
-    .about__credentials-row,
     .principles {
       gap: var(--space-7);
     }

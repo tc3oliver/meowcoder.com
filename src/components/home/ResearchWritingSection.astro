@@ -1,40 +1,9 @@
 ---
 /**
- * Technical Writing — one date-and-title list in ledger form: the latest
- * Study posts, then the journal paper as the last row, then a link to all of
- * Study (PRD §9.5, §9.6).
- *
- * Metadata only — date, category, title. PRD §9.6 forbids duplicating full
- * articles here and keeps Study the canonical publication platform;
- * `src/lib/study-feed.ts` enforces that upstream by never parsing an article
- * body in the first place.
- *
- * The paper is listed here rather than in a section of its own (PRD §9.5 and
- * §8 forbid promoting a single paper into its own navigation entry). Its link
- * resolves through the DOI, so it survives the article being moved.
- *
- * Round 2 renders each entry as a ledger row with the dates in the margin:
- * mono `when` on the left, title and meta on the right, hairlines between the
- * rows. Round 3 moves the page's closing About link into its own `AboutNav`
- * block after this section; the list ends with the link to all writing.
- *
- * Three states are normal rather than exceptional:
- *
- *   - No posts. An unreachable feed, a timeout, or a build with no network at
- *     all resolves to an empty list (PRD §28 requires the build to survive it),
- *     in which case the paper row and the link to all writing still render.
- *     There is no error message: a visitor is not the audience for a build-time
- *     fetch failure, and the reason is already in the build log.
- *   - No category. Study's feed declares none today, so the category only
- *     appears for entries that carry one.
- *   - A title in another language. Study publishes in Chinese, so the English
- *     page shows Chinese titles. PRD §7 forbids machine-translating them, and
- *     doc-2 §9 asks for the honest alternative: keep the original and mark it.
- *     `resolveTitle` decides when that is true — it says so only on the feed's
- *     own evidence, never by guessing from the characters — and the badge names
- *     the language in the reader's own language.
+ * Three curated investigations (stable editorial topics), one peer-reviewed
+ * publication, and a quiet latest-feed pointer. Study remains the canonical
+ * article home; the homepage never copies entire article bodies.
  */
-
 import { LOCALE_TAG, type Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
 import { PUBLICATION_URL, STUDY_URL } from '../../lib/external';
@@ -45,79 +14,77 @@ import HomeSection from './HomeSection.astro';
 interface Props {
   locale: Locale;
   t: HomeStrings;
-  /** Latest Study posts, already limited and ordered by `getStudyPosts`. */
   posts: readonly StudyPost[];
-  /** Localized off-site glyph, from the chrome dictionary. */
   externalIndicator: string;
-  /** Two-digit ledger index for the section heading row. */
   index: string;
 }
 
 const { locale, t, posts, externalIndicator, index } = Astro.props;
 
-/* Built once per render rather than per post; `dateStyle: 'medium'` gives each
-   locale its own conventional form instead of imposing one format on both. */
-const dateFormat = new Intl.DateTimeFormat(LOCALE_TAG[locale], { dateStyle: 'medium' });
-
-/**
- * Everything the list needs, resolved before the markup.
- *
- * The language decision in particular is one expression rather than a condition
- * repeated across two attributes: `badge` and `lang` must agree, since one is
- * how a sighted reader learns the title is in another language and the other is
- * how a screen reader pronounces it.
- */
-const entries = posts.map((post) => {
-  const title = resolveTitle(post, locale);
-
-  return {
-    url: post.url,
-    date: post.date,
-    displayDate: dateFormat.format(new Date(post.date)),
-    category: post.category,
-    title: title.text,
-    lang: title.locale ? LOCALE_TAG[title.locale] : undefined,
-    badge: title.isForeignLanguage && title.locale ? t.writing.languages[title.locale] : undefined,
-  };
-});
+/* The newest article is context, not a randomly replacing featured selection.
+   Exclude exact selected URLs so the same item is not shown twice. */
+const latest = posts.find((post) => !t.writing.selected.some((item) => item.href === post.url));
+const latestTitle = latest ? resolveTitle(latest, locale) : undefined;
+const latestDate = latest
+  ? new Intl.DateTimeFormat(LOCALE_TAG[locale], { dateStyle: 'medium' }).format(
+      new Date(latest.date),
+    )
+  : undefined;
 ---
 
 <HomeSection id="technical-writing" heading={t.writing.heading} index={index}>
-  <ul class="writing" role="list">
+  <ul class="selected" role="list">
     {
-      entries.map((entry) => (
-        <li class="entry">
-          <p class="entry__when">
-            <time datetime={entry.date}>{entry.displayDate}</time>
-          </p>
-          <div class="entry__body">
-            <p class="entry__title">
-              <a href={entry.url} target="_blank" rel="noopener noreferrer" lang={entry.lang}>
-                {entry.title}
+      t.writing.selected.map((item) => (
+        <li class="selected__item">
+          <p class="selected__area">{item.area}</p>
+          <div class="selected__body">
+            <h3 class="selected__topic">
+              <a href={item.href} target="_blank" rel="noopener noreferrer">
+                {item.topic}
               </a>
-            </p>
-            {(entry.category || entry.badge) && (
-              <p class="entry__meta">
-                {entry.category && <span>{entry.category}</span>}
-                {entry.badge && <span>{entry.badge}</span>}
-              </p>
+            </h3>
+            <p class="selected__description">{item.description}</p>
+            {item.language !== locale && (
+              <p class="selected__language">{t.writing.languages[item.language]}</p>
             )}
           </div>
         </li>
       ))
     }
-    <li class="entry">
-      <p class="entry__when">{t.research.year}</p>
-      <div class="entry__body">
-        <p class="entry__title">
-          <a href={PUBLICATION_URL} target="_blank" rel="noopener noreferrer" lang="en">
-            {t.research.paper}
-          </a>
-        </p>
-        <p class="entry__meta">{t.research.venue}</p>
-      </div>
-    </li>
   </ul>
+
+  <div class="publication">
+    <p class="publication__meta">{t.research.year} · {t.research.venue}</p>
+    <h3 class="publication__title">
+      <a href={PUBLICATION_URL} target="_blank" rel="noopener noreferrer" lang="en">
+        {t.research.paper}
+      </a>
+    </h3>
+  </div>
+
+  {
+    latest && latestTitle && (
+      <div class="latest">
+        <p class="latest__label">{t.writing.latestHeading}</p>
+        <p>
+          <time datetime={latest.date}>{latestDate}</time>
+          {' · '}
+          <a
+            href={latest.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            lang={latestTitle.locale ? LOCALE_TAG[latestTitle.locale] : undefined}
+          >
+            {latestTitle.text}
+          </a>
+          {latestTitle.isForeignLanguage && latestTitle.locale && (
+            <span class="latest__language"> · {t.writing.languages[latestTitle.locale]}</span>
+          )}
+        </p>
+      </div>
+    )
+  }
 
   <p class="writing__all">
     <CtaLink href={STUDY_URL} label={t.writing.cta.label} external indicator={externalIndicator} />
@@ -125,63 +92,99 @@ const entries = posts.map((post) => {
 </HomeSection>
 
 <style>
-  .writing {
+  .selected {
     display: flex;
     flex-direction: column;
+    max-width: var(--width-reading);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  /* One ledger row per entry, hairlines above and below the stack. A stack
-     beneath 48rem; the date in the margin beside the title from a tablet up.
-     `minmax(0, 1fr)` keeps a long unbroken title from widening a 390px
-     viewport. */
-  .entry {
+  .selected__item {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-1);
+    gap: var(--space-2);
     padding-block: var(--space-5);
     border-block-start: var(--border-width) solid var(--color-border);
   }
 
-  .entry:last-child {
-    border-block-end: var(--border-width) solid var(--color-border);
-  }
-
   @media (width >= 48rem) {
-    .entry {
-      grid-template-columns: 12rem minmax(0, 1fr);
+    .selected__item {
+      grid-template-columns: 14rem minmax(0, 1fr);
       column-gap: var(--space-5);
     }
   }
 
-  /* Dates and categories are metadata, so they take the margin register: mono
-     at the subtle text level. The title link beside them stays full contrast. */
-  .entry__when,
-  .entry__meta {
-    color: var(--color-text-subtle);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
+  .selected__item:last-child {
+    border-block-end: var(--border-width) solid var(--color-border);
   }
 
-  .entry__body {
+  .selected__area,
+  .selected__language,
+  .publication__meta,
+  .latest__label {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-subtle);
+  }
+
+  .selected__body {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: var(--space-2);
     min-width: 0;
   }
 
-  .entry__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1) var(--space-4);
-  }
-
-  .entry__title {
+  .selected__topic {
     font-size: var(--text-md);
     line-height: var(--leading-snug);
     overflow-wrap: anywhere;
+  }
+
+  .selected__description {
+    max-width: 55ch;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  .publication {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: var(--width-reading);
+    margin-block-start: var(--space-8);
+    padding-block-start: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .publication__title {
+    font-size: var(--text-md);
+    line-height: var(--leading-snug);
+    overflow-wrap: anywhere;
+  }
+
+  .latest {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: var(--width-reading);
+    margin-block-start: var(--space-8);
+    padding-block-start: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .latest > p:last-child {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    overflow-wrap: anywhere;
+  }
+
+  .latest__language {
+    font-size: var(--text-sm);
   }
 
   .writing__all {

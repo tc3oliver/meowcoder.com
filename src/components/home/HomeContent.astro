@@ -1,46 +1,15 @@
 ---
 /**
- * The homepage body (MCD-4, MCD-16, doc-2 §5).
- *
- * Both locales render through this one component, so the English and Chinese
- * homepages cannot drift apart in structure or section order — only the strings
- * and the feed titles differ. That is what PRD §35 means by "the Chinese
- * version follows the same information architecture".
- *
- * Round 2 composes the page as one wide "Engineering Ledger": the masthead and
- * the section ledger rows span the full content width, while prose and reading
- * blocks inside the sections stay at the narrow measure. That width contrast —
- * wide structure, narrow text — is the identity; round 1 was one narrow column
- * top to bottom. No cards, grids of boxes, images or decoration anywhere:
- * `src/styles/design-system.test.ts` scans the source tree for each of them.
- *
- * The order is the visitor journey read top to bottom:
- *
- *   Hero      Who is Oliver?
- *   Research  Can he find and prove a root cause, and does it hold up in other
- *             people's projects? Measured results and upstream pull requests
- *             lead because they are the evidence a visitor can inspect.
- *   Products  Can he build and operate a real product? Shouri, SignalForge and
- *             PiShip, one ledger row each.
- *   Writing   Can I read his technical thinking? Study posts, then the
- *             journal paper, then the link to all writing.
- *   AboutNav  Where do I read more? One full-width link closes the page;
- *             round 3 moved it out of Writing's colophon into its own block.
- *
- * Shouri used to lead the page with its screenshot. Without the visual it is
- * one row among three, so research now comes first. The experience strip,
- * Engineering Focus and every section eyebrow string are gone; the numbered
- * section indexes round 2 adds are decorative digits, not copy.
- *
- * The last item, the footer, is site chrome and is rendered by `SiteShell`
- * after this component — it is the same link row on every route (PRD §9.8).
+ * Evidence-first homepage: the one investigation worth lingering on, then
+ * independent upstream contributions, selected systems, and curated writing.
+ * Both locales use exactly the same composition.
  */
-
 import type { Locale } from '../../i18n/locales';
 import type { HomeStrings } from '../../i18n/pages/home';
 import type { StudyPost } from '../../lib/study-feed';
 import AboutNav from './AboutNav.astro';
 import HomeHero from './HomeHero.astro';
+import OssContributionsSection from './OssContributionsSection.astro';
 import ProductsSection from './ProductsSection.astro';
 import ResearchWritingSection from './ResearchWritingSection.astro';
 import SystemsResearchSection from './SystemsResearchSection.astro';
@@ -48,9 +17,7 @@ import SystemsResearchSection from './SystemsResearchSection.astro';
 interface Props {
   locale: Locale;
   t: HomeStrings;
-  /** Latest Study posts, already limited and ordered by `getStudyPosts`. */
   posts: readonly StudyPost[];
-  /** Localized off-site glyph, from the chrome dictionary. */
   externalIndicator: string;
 }
 
@@ -60,12 +27,13 @@ const { locale, t, posts, externalIndicator } = Astro.props;
 <div class="container home">
   <HomeHero t={t} />
   <SystemsResearchSection locale={locale} t={t} index="01" externalIndicator={externalIndicator} />
-  <ProductsSection locale={locale} t={t} index="02" externalIndicator={externalIndicator} />
+  <OssContributionsSection t={t} index="02" externalIndicator={externalIndicator} />
+  <ProductsSection locale={locale} t={t} index="03" externalIndicator={externalIndicator} />
   <ResearchWritingSection
     locale={locale}
     t={t}
     posts={posts}
-    index="03"
+    index="04"
     externalIndicator={externalIndicator}
   />
   <AboutNav locale={locale} t={t} />
@@ -75,8 +43,6 @@ const { locale, t, posts, externalIndicator } = Astro.props;
   .home {
     display: flex;
     flex-direction: column;
-    /* No gap. Each section opens with `--space-section` of its own padding,
-       and the masthead owns its own `--space-hero` band. */
     gap: 0;
   }
 </style>

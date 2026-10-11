@@ -1,25 +1,9 @@
 ---
 /**
- * Research — a ruled ledger block in the reading column: the measured results
- * of four projects (laya-apple, LLM Inference Systems, the MI300X DeepSeek V4
- * Flash baseline, the Qwen3.8-27B evaluation on one RTX 5070 Ti), then the
- * OSS project summaries. The detailed PR ledger lives on GitHub.
- *
- * It carries numbers rather than figures: research is proved by what it
- * measured, and a chart shrunk to homepage size is unreadable decoration. The
- * charts stay on the case study and the article.
- *
- * Round 2 sets the summary in the ledger register — hairline rules top and
- * bottom of the block (never a box: a four-sided hairline is a card, and PRD
- * §25 forbids them), the measured values in mono, the sub-headings quiet.
- *
- * Every number in `home.ts` for this section is quoted from the project's own
- * case study, which names the data it comes from — or, for the MI300X baseline,
- * which has no case study, from `bench-results/README.md`'s concurrent
- * sub-agent table; for the RTX 5070 Ti evaluation, from the repository's
- * `EVIDENCE-INDEX.md`, quoting each ID's value as written.
+ * The research lead is an investigation, not a metric wall. The published
+ * laya-apple case study anchors the measured result; other experiments remain
+ * visible in a quieter evidence ledger. OSS belongs to its own section.
  */
-
 import type { Locale } from '../../i18n/locales';
 import type { HomeStrings, ResearchProjectId } from '../../i18n/pages/home';
 import {
@@ -31,7 +15,6 @@ import {
   MI300X_URL,
   QWEN38_5070TI_ARTICLE_URL,
   QWEN38_5070TI_URL,
-  UPSTREAM_PRS_URL,
 } from '../../lib/external';
 import { localizePath, workDetailRoute } from '../../lib/i18n';
 import CtaLink from './CtaLink.astro';
@@ -41,22 +24,12 @@ interface Props {
   locale: Locale;
   t: HomeStrings;
   externalIndicator: string;
-  /** Two-digit ledger index for the section heading row. */
   index: string;
 }
 
 const { locale, t, externalIndicator, index } = Astro.props;
 
-/**
- * Where each project's links go. The name links to the case study, or to the
- * repository when there is none; the article, where one exists, trails the
- * row. The slug is the case study's —
- * `src/content/work/{en,zh}/<slug>.md` — and is routed through the same helpers
- * the Work index uses, so these links cannot drift from the pages they name.
- */
 const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: string }> = {
-  // laya-apple's write-up exists in both languages: Study in Chinese, an X
-  // article in English.
   'laya-apple': {
     slug: 'laya-apple',
     article: locale === 'en' ? LAYA_APPLE_ARTICLE_EN_URL : LAYA_APPLE_ARTICLE_URL,
@@ -68,147 +41,208 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
     repo: INFERENCE_SYSTEMS_URL,
   },
   'deepseek-v4-flash-mi300x': { repo: MI300X_URL },
-  'qwen3.8-27b-5070ti-eval': { article: QWEN38_5070TI_ARTICLE_URL, repo: QWEN38_5070TI_URL },
+  'qwen3.8-27b-5070ti-eval': {
+    article: QWEN38_5070TI_ARTICLE_URL,
+    repo: QWEN38_5070TI_URL,
+  },
 };
+
+const featured = t.systems.projects.find((project) => project.id === 'laya-apple');
+const others = t.systems.projects.filter((project) => project.id !== 'laya-apple');
 ---
 
 <HomeSection id="featured-research" heading={t.systems.heading} index={index}>
-  <div class="ledger">
-    <h3 class="list-heading">{t.systems.resultsHeading}</h3>
-    <ul class="results" role="list">
-      {
-        t.systems.projects.map((project) => {
-          const links = LINKS[project.id];
-          const href = links.slug ? localizePath(locale, workDetailRoute(links.slug)) : links.repo;
-          return (
-            <li class="result">
-              <p class="result__stat">{project.stat.value}</p>
-              <div class="result__body">
-                <p class="result__name">
-                  <a
-                    href={href}
-                    target={links.slug ? undefined : '_blank'}
-                    rel={links.slug ? undefined : 'noopener noreferrer'}
-                  >
-                    {project.name}
-                  </a>
-                </p>
-                <p class="result__label">
-                  {project.stat.label}
-                  {links.article && (
-                    <>
-                      {' '}
-                      <CtaLink
-                        href={links.article}
-                        label={project.articleCta?.label ?? t.systems.articleCta.label}
-                        external
-                        indicator={externalIndicator}
-                      />
-                    </>
-                  )}
-                </p>
-                {project.note && <p class="result__label">{project.note}</p>}
-              </div>
-            </li>
-          );
-        })
-      }
-    </ul>
+  {
+    featured && (
+      <article class="feature">
+        <div class="feature__story">
+          <h3>{t.systems.flagship.title}</h3>
+          <p class="feature__summary">{t.systems.flagship.summary}</p>
+          <p class="feature__method">{t.systems.flagship.method}</p>
+          <div class="feature__links">
+            <CtaLink
+              href={localizePath(locale, workDetailRoute('laya-apple'))}
+              label={t.systems.flagship.linkLabel}
+              variant="text"
+            />
+            {LINKS[featured.id].article && (
+              <CtaLink
+                href={LINKS[featured.id].article!}
+                label={featured.articleCta?.label ?? t.systems.articleCta.label}
+                external
+                indicator={externalIndicator}
+              />
+            )}
+          </div>
+        </div>
+        <dl class="feature__evidence">
+          <dt>{featured.stat.label}</dt>
+          <dd>{featured.stat.value}</dd>
+        </dl>
+      </article>
+    )
+  }
 
-    <h3 class="list-heading">{t.systems.upstream.heading}</h3>
-    <ul class="upstream" role="list">
-      {
-        t.systems.upstream.items.map((item) => (
-          <li class="upstream__item">
-            <p class="upstream__name">
-              <a href={item.href} target="_blank" rel="noopener noreferrer">
-                {item.name}
-                <span class="upstream__external" aria-hidden="true">
-                  {externalIndicator}
-                </span>
-              </a>
-            </p>
-            <p class="upstream__description">{item.description}</p>
+  <h3 class="more-heading">{t.systems.resultsHeading}</h3>
+  <ul class="results" role="list">
+    {
+      others.map((project) => {
+        const links = LINKS[project.id];
+        const href = links.slug ? localizePath(locale, workDetailRoute(links.slug)) : links.repo;
+        return (
+          <li class="result">
+            <p class="result__stat">{project.stat.value}</p>
+            <div class="result__body">
+              <p class="result__name">
+                <a
+                  href={href}
+                  target={links.slug ? undefined : '_blank'}
+                  rel={links.slug ? undefined : 'noopener noreferrer'}
+                >
+                  {project.name}
+                </a>
+              </p>
+              <p class="result__label">
+                {project.stat.label}
+                {links.article && (
+                  <>
+                    {' '}
+                    <CtaLink
+                      href={links.article}
+                      label={project.articleCta?.label ?? t.systems.articleCta.label}
+                      external
+                      indicator={externalIndicator}
+                    />
+                  </>
+                )}
+              </p>
+              {project.note && <p class="result__label">{project.note}</p>}
+            </div>
           </li>
-        ))
-      }
-    </ul>
-    <p class="upstream__all">
-      <CtaLink
-        href={UPSTREAM_PRS_URL}
-        label={t.systems.upstream.cta.label}
-        external
-        indicator={externalIndicator}
-      />
-    </p>
-  </div>
+        );
+      })
+    }
+  </ul>
 </HomeSection>
 
 <style>
-  /* The ruled ledger block: reading-column width, hairline rules top and
-     bottom, no box. The rules span the block; the block never spans the
-     content width, which keeps prose at its measure inside a wide page. */
-  .ledger {
-    max-width: var(--width-reading);
-    padding-block: var(--space-6);
+  /* A feature without a card: a single shared baseline and an asymmetric
+     evidence rail carry the hierarchy, continuing the site's ledger identity. */
+  .feature {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+    padding-block: var(--space-7);
     border-block: var(--border-width) solid var(--color-border);
   }
 
-  /* Sub-headings take the quiet metadata register: mono at the subtle level.
-     No letter-spacing — these labels are visible on zh pages. */
-  .list-heading {
+  @media (width >= 56rem) {
+    .feature {
+      grid-template-columns: minmax(0, 1fr) minmax(15rem, 19rem);
+      column-gap: var(--space-9);
+      align-items: start;
+    }
+  }
+
+  .feature__story {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+
+  .feature__story h3 {
+    max-width: 23ch;
+    font-size: var(--text-xl);
+    line-height: var(--leading-heading);
+  }
+
+  .feature__summary {
+    max-width: 49ch;
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+  }
+
+  .feature__method {
+    max-width: 52ch;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-subtle);
+  }
+
+  .feature__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-6);
+    padding-block-start: var(--space-2);
+  }
+
+  .feature__evidence {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--space-3);
+    min-width: 0;
+    padding-block-start: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .feature__evidence dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  .feature__evidence dt {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+  }
+
+  .more-heading {
+    margin-block: var(--space-8) var(--space-4);
     color: var(--color-text-subtle);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     font-weight: var(--weight-regular);
-    letter-spacing: var(--tracking-normal);
   }
 
-  .results,
-  .upstream {
+  .results {
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
+    max-width: var(--width-reading);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .results {
-    margin-block: var(--space-4) var(--space-8);
-  }
-
-  .upstream {
-    margin-block-start: var(--space-4);
-    gap: var(--space-6);
-  }
-
-  /* The number on the left and the project on the right from a tablet up; a
-     stack beneath that. `minmax(0, 1fr)` keeps a long repository name in the
-     right column from widening a 390px viewport. */
   .result {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-1);
+    padding-block-start: var(--space-4);
+    border-block-start: var(--border-width) solid var(--color-border);
   }
 
   @media (width >= 48rem) {
     .result {
-      /* 14rem holds the longest value on one line: JetBrains Mono advances
-         0.6em at every weight, so `228.38 → 79.06 s` (16 characters) measures
-         ~221px at the 23px top of --text-lg, inside the 224px column. */
       grid-template-columns: 14rem minmax(0, 1fr);
       column-gap: var(--space-5);
     }
 
-    /* One line here only — the stacked mobile column keeps its wrap, so a
-       value can never push a 390px viewport sideways. */
     .result__stat {
       white-space: nowrap;
     }
   }
 
-  /* The measured value is the row's ledger entry: mono, tabular. */
   .result__stat {
     font-family: var(--font-mono);
     font-size: var(--text-lg);
@@ -234,47 +268,5 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     line-height: var(--leading-relaxed);
-  }
-
-  /* Match the two-column evidence ledger on wide screens. Keep project
-     names and descriptions stacked on mobile so the full text stays readable. */
-  .upstream__item {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-1);
-  }
-
-  @media (width >= 48rem) {
-    .upstream__item {
-      grid-template-columns: 14rem minmax(0, 1fr);
-      column-gap: var(--space-5);
-      align-items: baseline;
-    }
-  }
-
-  .upstream__name {
-    font-family: var(--font-sans);
-    font-size: var(--text-md);
-    font-weight: var(--weight-semibold);
-    line-height: var(--leading-snug);
-    overflow-wrap: anywhere;
-  }
-
-  .upstream__external {
-    margin-inline-start: 0.25em;
-    font-size: 0.75em;
-    font-weight: var(--weight-regular);
-  }
-
-  .upstream__description {
-    min-width: 0;
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    line-height: var(--leading-relaxed);
-  }
-
-  .upstream__all {
-    margin-block-start: var(--space-5);
-    font-family: var(--font-mono);
   }
 </style>

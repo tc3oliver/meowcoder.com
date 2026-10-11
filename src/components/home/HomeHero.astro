@@ -43,6 +43,7 @@ const statementStart =
   <div class="hero__main">
     <h1 class="hero__name">{t.heading}</h1>
     <p class="hero__role">{t.hero.role}</p>
+    <p class="hero__thesis">{t.hero.thesis}</p>
     <p class="hero__statement">
       {statementStart}{
         noBreakSuffix && t.intro.endsWith(noBreakSuffix) && (
@@ -105,11 +106,22 @@ const statementStart =
     font-size: var(--text-md);
   }
 
+  .hero__thesis {
+    max-width: 18ch;
+    margin-block-start: var(--space-6);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-tight);
+    text-wrap: balance;
+  }
+
   .hero__statement {
     /* A statement measure, not a prose one: ~34em keeps the Traditional
        Chinese line from breaking inside its final technical term. */
     max-width: 34em;
-    margin-block-start: var(--space-5);
+    margin-block-start: var(--space-4);
+    color: var(--color-text-muted);
     font-size: var(--text-lg);
     line-height: var(--leading-relaxed);
   }

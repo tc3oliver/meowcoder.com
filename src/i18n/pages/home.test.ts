@@ -62,6 +62,8 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     expect(Object.keys(t.products).sort()).toEqual([
       'claudeTeamKit',
       'heading',
+      'labels',
+      'moreHeading',
       'piship',
       'signalforge',
     ]);
@@ -123,6 +125,17 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
     }
   });
 
+  it('curates three technical investigations in each locale with known destinations', () => {
+    expect(t.writing.selected).toHaveLength(3);
+    expect(t.writing.selected.every((item) => item.href.startsWith('https://'))).toBe(true);
+    expect(
+      t.writing.selected.every((item) => item.topic && item.description && item.area),
+    ).toBeTruthy();
+    expect(t.writing.selected.map((item) => item.language)).toEqual(
+      _locale === 'en' ? ['en', 'zh', 'zh'] : ['zh', 'zh', 'zh'],
+    );
+  });
+
   it('names a language for every locale a title could arrive in (doc-2 §9)', () => {
     // The badge on a foreign-language title. `resolveTitle` may report any
     // locale, so a missing name would render an empty badge on the one post
@@ -145,14 +158,16 @@ describe('requirement wording', () => {
   it('quotes the doc-2 §5 hero verbatim in English', () => {
     expect(home.en.hero.role).toBe('AI Systems Engineer · System Architect');
     expect(home.en.intro).toBe(
-      'I design and build AI products, AI agents, and LLM inference systems across AMD and NVIDIA GPUs and Apple Silicon, with a focus on system architecture, inference performance, and engineering.',
+      'I build enterprise AI agent systems and investigate inference performance across AMD, NVIDIA, and Apple Silicon—connecting measured bottlenecks, upstream fixes, and deployable runtimes.',
     );
+    expect(home.en.hero.thesis).toMatch(/latency.*recover/);
   });
 
   it('quotes the doc-2 §5 hero statement verbatim in Chinese', () => {
     expect(home.zh.intro).toBe(
-      '我專注於 AI 產品、AI Agent 與 LLM 推論系統的設計與開發，涵蓋 AMD、NVIDIA GPU 及 Apple Silicon 平台，主要投入系統架構、推論效能優化與工程實作。',
+      '我打造企業 AI Agent 系統，並研究 AMD、NVIDIA 與 Apple Silicon 上的推論效能，從量測瓶頸、上游修正到可部署的系統。',
     );
+    expect(home.zh.hero.thesis).toContain('延遲');
     // doc-2 §5 keeps the role line in English in both locales.
     expect(home.zh.hero.role).toBe('AI Systems Engineer · System Architect');
   });
