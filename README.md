@@ -46,7 +46,9 @@ npm test               # Vitest
 ```
 
 `npm run format` rewrites files in place. `npm run linkcheck` reads `dist/`, so
-run `npm run build` first.
+run `npm run build` first. Link checks retry temporary server errors; an HTTP
+503 is reported as a warning after retries instead of failing CI. Actual
+missing pages (404/410) still fail the check.
 
 ## Repository layout
 
