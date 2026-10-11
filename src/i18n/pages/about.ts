@@ -84,7 +84,7 @@ export const about = {
     role: 'AI Systems Engineer · System Architect',
     summary: [
       'I started with iOS and web apps, picked up applied AI in 2017, and moved through backend and cloud work into system architecture.',
-      'These days I build enterprise AI systems at work and do independent research on LLM inference.',
+      'At work I build enterprise AI systems; independently I investigate inference latency, concurrency and recovery across accelerators.',
     ],
     career: {
       heading: 'Career',
@@ -213,7 +213,7 @@ export const about = {
     role: 'AI 系統工程師 · 系統架構師',
     summary: [
       '我從 iOS 和 Web 應用做起，2017 年開始投入 AI 應用，之後負責後端和雲端，再轉到系統架構。',
-      '現在工作上做企業 AI 系統，另外獨立做 LLM 推論的研究。',
+      '工作上打造企業 AI 系統；另外獨立研究不同加速器上的推論延遲、併發與恢復機制。',
     ],
     career: {
       heading: '職涯歷程',
