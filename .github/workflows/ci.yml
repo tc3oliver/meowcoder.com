@@ -50,13 +50,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Runs after Build because it walks the generated site in dist/ as well as
-      # the repository Markdown.
-      - name: Link check
-        run: npm run linkcheck
-
+      # Unit tests include the built pages; run them before the network-dependent
+      # external link audit so GitHub 5xx responses cannot hide test failures.
       - name: Test
         run: npm test
+
+      # Runs after Build because it walks dist/ as well as repository Markdown.
+      - name: Link check
+        run: npm run linkcheck
 
   secret-scan:
     runs-on: ubuntu-latest

@@ -11,13 +11,14 @@
  * and are part of a section's own structure, not a destination.
  *
  * No client JavaScript (PRD §26, §29). Plain anchors do the scrolling, the
- * global `:focus-visible` ring makes each one keyboard-visible, and
- * `scroll-padding-top` in `global.css` keeps a target off the viewport edge.
+ * global `:focus-visible` ring keeps navigation keyboard-visible, and
+ * `scroll-padding-top` keeps anchor targets clear of the viewport edge.
  *
- * Round 2 turns the desktop list into the ledger index: mono at the smallest
- * step, subtle labels, and the reader's current section marked in text color
- * with a 2px accent left border — driven by the URL fragment and `:has()`,
- * still without a line of script.
+ * A closed `details` hides its descendants even if CSS sets `display: flex`.
+ * Use one collapsible mobile list and one permanently visible desktop list;
+ * display:none ensures only the active viewport's list is keyboard-accessible.
+ * Both are generated from the same heading data, so their URLs cannot drift.
+ * URL fragments highlight the active item via `:has()` without JavaScript.
  */
 
 import type { MarkdownHeading } from 'astro';
@@ -56,7 +57,7 @@ const currentRules = sections
 {
   sections.length > 0 && (
     <nav class="section-nav" aria-label={label}>
-      <details>
+      <details class="section-nav__mobile">
         <summary>{label}</summary>
         <ol class="section-nav__list" role="list">
           {sections.map((section) => (
@@ -66,6 +67,16 @@ const currentRules = sections
           ))}
         </ol>
       </details>
+      <div class="section-nav__desktop">
+        <p class="section-nav__heading">{label}</p>
+        <ol class="section-nav__list" role="list">
+          {sections.map((section) => (
+            <li>
+              <a href={`#${section.slug}`}>{section.text}</a>
+            </li>
+          ))}
+        </ol>
+      </div>
     </nav>
   )
 }
@@ -83,7 +94,13 @@ const currentRules = sections
     border-block: var(--border-width) solid var(--color-border);
   }
 
-  .section-nav summary {
+  /* The mobile disclosure stays native: closed means its links are not
+     visible or focusable. A separate desktop index is always visible. */
+  .section-nav__desktop {
+    display: none;
+  }
+
+  .section-nav__mobile summary {
     min-height: 2.75rem;
     padding-block: var(--space-3);
     color: var(--color-text);
@@ -92,18 +109,18 @@ const currentRules = sections
     cursor: pointer;
   }
 
-  /* Narrow screens get a wrapping row: ten section names read as a compact
-     contents strip above the article instead of a column the reader has to
-     scroll past to reach the first paragraph. */
   .section-nav__list {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2) var(--space-4);
-    font-size: var(--text-sm);
     padding-block-end: var(--space-4);
+    font-size: var(--text-sm);
   }
 
   .section-nav__list a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
     overflow-wrap: anywhere;
     color: var(--color-text-muted);
     text-decoration: none;
@@ -114,36 +131,24 @@ const currentRules = sections
     text-decoration: underline;
   }
 
-  /* Matches the sidebar breakpoint in `WorkLayout.astro`: once the sidebar is a
-     column of its own, the list becomes a column too — and a ledger index:
-     mono at the smallest step, subtle, each entry carrying the transparent
-     2px rule the `:target` rules below light up in accent for the section the
-     reader is in. */
   @media (min-width: 72rem) {
     .section-nav {
       border-block: 0;
     }
 
-    .section-nav summary {
+    .section-nav__mobile {
+      display: none;
+    }
+
+    .section-nav__desktop {
       display: block;
-      min-height: auto;
+    }
+
+    .section-nav__heading {
       margin-block-end: var(--space-3);
-      padding: 0;
       color: var(--color-text-muted);
       font-family: var(--font-mono);
       font-size: var(--text-xs);
-      cursor: default;
-      pointer-events: none;
-    }
-
-    .section-nav summary::marker {
-      content: '';
-    }
-
-    /* Keep one set of section links in the DOM. On desktop the sidebar exposes
-       that list directly even though the mobile disclosure remains closed. */
-    .section-nav details:not([open]) > .section-nav__list {
-      display: flex;
     }
 
     .section-nav__list {
@@ -152,7 +157,6 @@ const currentRules = sections
       padding-block-end: 0;
       font-family: var(--font-mono);
       font-size: var(--text-xs);
-      /* Long section names wrap inside the column rather than widening it. */
       text-wrap: pretty;
     }
 
