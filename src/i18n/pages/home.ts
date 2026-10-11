@@ -365,21 +365,24 @@ export const home = {
       selected: [
         {
           topic: 'When host-side contention hides accelerator performance',
-          description: 'Tracing the GIL and latency costs of concurrent GPU and Neural Engine serving.',
+          description:
+            'Tracing the GIL and latency costs of concurrent GPU and Neural Engine serving.',
           href: LAYA_APPLE_ARTICLE_EN_URL,
           language: 'en',
           area: 'Apple Silicon · Inference',
         },
         {
           topic: 'Recovering reusable state between inference requests',
-          description: 'Why saving one request is not enough when the following session pays the cost.',
+          description:
+            'Why saving one request is not enough when the following session pays the cost.',
           href: INFERENCE_SYSTEMS_ARTICLE_URL,
           language: 'zh',
           area: 'LLM Inference · State',
         },
         {
           topic: 'Evaluating a 27B coding model on a single consumer GPU',
-          description: 'An evidence-first account of correctness and memory limits on a 16 GB RTX 5070 Ti.',
+          description:
+            'An evidence-first account of correctness and memory limits on a 16 GB RTX 5070 Ti.',
           href: QWEN38_5070TI_ARTICLE_URL,
           language: 'zh',
           area: 'GPU Evaluation · Methodology',

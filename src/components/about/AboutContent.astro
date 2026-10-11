@@ -18,7 +18,12 @@ const { t } = Astro.props;
     {t.summary.map((paragraph) => <p class="about__paragraph">{paragraph}</p>)}
   </header>
 
-  <AboutSection id="systems-research" heading={t.systemsResearch.heading} index="01" prominence="strong">
+  <AboutSection
+    id="systems-research"
+    heading={t.systemsResearch.heading}
+    index="01"
+    prominence="strong"
+  >
     <div class="systems-research">
       <p class="systems-research__description">{t.systemsResearch.description}</p>
       <a

@@ -128,7 +128,9 @@ describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
   it('curates three technical investigations in each locale with known destinations', () => {
     expect(t.writing.selected).toHaveLength(3);
     expect(t.writing.selected.every((item) => item.href.startsWith('https://'))).toBe(true);
-    expect(t.writing.selected.every((item) => item.topic && item.description && item.area)).toBeTruthy();
+    expect(
+      t.writing.selected.every((item) => item.topic && item.description && item.area),
+    ).toBeTruthy();
     expect(t.writing.selected.map((item) => item.language)).toEqual(
       _locale === 'en' ? ['en', 'zh', 'zh'] : ['zh', 'zh', 'zh'],
     );
