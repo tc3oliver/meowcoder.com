@@ -1,11 +1,11 @@
-name: Scheduled rebuild
+name: Publish site
 
-# The Study feed is read at build time (PRD §28), so a new article only reaches
-# the homepage when the site is rebuilt. Nothing else triggers that between
-# pushes, which would leave new writing invisible indefinitely.
+# Publish only a tested main-branch commit. Pull-request CI runs cannot deploy:
+# workflow_run is restricted to main and the job additionally checks the
+# triggering event, branch and successful conclusion before using secrets.
 #
-# Daily is deliberate: ~30 builds a month against Cloudflare's 500-build free
-# tier, and a personal site's publishing cadence does not justify tighter.
+# The Study feed is read at build time (PRD §28), so daily rebuilding still
+# refreshes the homepage's latest-post pointer between source changes.
 #
 # GitHub cron is UTC. 21:00 UTC is 05:00 the next day in Taipei (UTC+8), so a
 # piece published during the day is live by the following morning.
@@ -14,9 +14,13 @@ name: Scheduled rebuild
 # 60 days. If the feed ever stops updating, check that first.
 
 on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
   schedule:
     - cron: '0 21 * * *'
-  # Lets a new article be pulled in immediately without waiting for the cron.
+  # A manual publish remains available from Actions.
   workflow_dispatch:
 
 permissions:
@@ -28,11 +32,18 @@ concurrency:
 
 jobs:
   rebuild:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # On CI completion, deploy that exact validated source revision.
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
