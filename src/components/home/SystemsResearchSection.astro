@@ -123,7 +123,9 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
             <p class="upstream__name">
               <a href={item.href} target="_blank" rel="noopener noreferrer">
                 {item.name}
-                <span class="upstream__external" aria-hidden="true">{externalIndicator}</span>
+                <span class="upstream__external" aria-hidden="true">
+                  {externalIndicator}
+                </span>
               </a>
             </p>
             <p class="upstream__description">{item.description}</p>
