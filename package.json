@@ -25,7 +25,7 @@
     "@astrojs/check": "^0.9.10",
     "@eslint/js": "^10.0.1",
     "@lhci/cli": "^0.15.1",
-    "@rgrove/parse-xml": "^4.2.3",
+    "@rgrove/parse-xml": "^5.0.0",
     "astro": "^7.3.2",
     "astro-eslint-parser": "^3.1.0",
     "eslint": "^10.10.0",
