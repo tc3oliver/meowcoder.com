@@ -280,8 +280,7 @@ export const home = {
         title: 'When the accelerator is fast, but returning a result is slow',
         summary:
           'Running MLX GPU and Apple Neural Engine requests side by side exposed host-side contention that raw accelerator benchmarks missed.',
-        method:
-          'Measure the handoff · Isolate GIL contention · Ship adaptive GPU + ANE serving',
+        method: 'Measure the handoff · Isolate GIL contention · Ship adaptive GPU + ANE serving',
         linkLabel: 'Explore the full investigation',
       },
       resultsHeading: 'More measured work',

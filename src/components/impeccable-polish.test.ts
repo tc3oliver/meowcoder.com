@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import FOOTER from './Footer.astro?raw';
 import LANGUAGE_SWITCHER from './LanguageSwitcher.astro?raw';
-import SYSTEMS_RESEARCH from './home/SystemsResearchSection.astro?raw';
+import OSS_CONTRIBUTIONS from './home/OssContributionsSection.astro?raw';
 import SECTION_NAV from './work/SectionNav.astro?raw';
 
 describe('Impeccable interface polish regressions', () => {
@@ -24,8 +24,8 @@ describe('Impeccable interface polish regressions', () => {
   });
 
   it('makes OSS project names scannable and marks external destinations', () => {
-    expect(SYSTEMS_RESEARCH).toContain('class="upstream__external" aria-hidden="true"');
-    expect(SYSTEMS_RESEARCH).toContain('grid-template-columns: 14rem minmax(0, 1fr)');
-    expect(SYSTEMS_RESEARCH).toContain('font-size: var(--text-md)');
+    expect(OSS_CONTRIBUTIONS).toContain('class="contribution__indicator" aria-hidden="true"');
+    expect(OSS_CONTRIBUTIONS).toContain('grid-template-columns: 14rem minmax(0, 1fr)');
+    expect(OSS_CONTRIBUTIONS).toContain('font-size: var(--text-md)');
   });
 });
