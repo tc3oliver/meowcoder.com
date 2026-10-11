@@ -66,9 +66,10 @@ Every push and pull request against `main` runs the checks above, plus a
 the full git history. Dependency and GitHub Actions updates arrive as weekly
 Dependabot pull requests; Actions are pinned to commit SHAs.
 
-A separate scheduled workflow rebuilds and redeploys the site once a day. The
-homepage reads the writing feed at build time, so without it new articles would
-not appear between pushes. It can also be run on demand from the Actions tab.
+A separate publishing workflow deploys the exact tested commit after successful
+`main` push CI. It also rebuilds and redeploys daily so the homepage's latest
+Study article stays fresh between source changes, and it can be run manually
+from Actions. PR checks never get deployment credentials.
 
 It needs two repository secrets:
 
