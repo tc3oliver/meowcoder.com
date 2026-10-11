@@ -59,6 +59,12 @@ const { locale, route, ariaLabel, labels } = Astro.props;
   }
 
   .lang-switch__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding-inline: var(--space-1);
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     text-decoration: none;

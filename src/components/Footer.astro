@@ -129,6 +129,9 @@ const { navLabel, links = [], homeHref, homeLabel, copyright } = Astro.props;
   }
 
   .site-footer__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     text-decoration: none;

@@ -123,6 +123,7 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
             <p class="upstream__name">
               <a href={item.href} target="_blank" rel="noopener noreferrer">
                 {item.name}
+                <span class="upstream__external" aria-hidden="true">{externalIndicator}</span>
               </a>
             </p>
             <p class="upstream__description">{item.description}</p>
@@ -177,6 +178,7 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
 
   .upstream {
     margin-block-start: var(--space-4);
+    gap: var(--space-6);
   }
 
   /* The number on the left and the project on the right from a tablet up; a
@@ -232,25 +234,38 @@ const LINKS: Record<ResearchProjectId, { slug?: string; article?: string; repo: 
     line-height: var(--leading-relaxed);
   }
 
+  /* Match the two-column evidence ledger on wide screens. Keep project
+     names and descriptions stacked on mobile so the full text stays readable. */
   .upstream__item {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-1);
   }
 
+  @media (width >= 48rem) {
+    .upstream__item {
+      grid-template-columns: 14rem minmax(0, 1fr);
+      column-gap: var(--space-5);
+      align-items: baseline;
+    }
+  }
+
   .upstream__name {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--space-3);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    letter-spacing: var(--tracking-normal);
-    /* Project names wrap if they outgrow a narrow viewport. */
+    font-family: var(--font-sans);
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
     overflow-wrap: anywhere;
   }
 
+  .upstream__external {
+    margin-inline-start: 0.25em;
+    font-size: 0.75em;
+    font-weight: var(--weight-regular);
+  }
+
   .upstream__description {
+    min-width: 0;
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     line-height: var(--leading-relaxed);
