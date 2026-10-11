@@ -1,5 +1,11 @@
 import type { Locale } from '../locales';
 import type { PageStrings } from './types';
+import {
+  INFERENCE_SYSTEMS_ARTICLE_URL,
+  LAYA_APPLE_ARTICLE_EN_URL,
+  LAYA_APPLE_ARTICLE_URL,
+  QWEN38_5070TI_ARTICLE_URL,
+} from '../../lib/external';
 
 /**
  * Home page content (MCD-4, MCD-16, PRD §9, doc-2 §5).
@@ -66,6 +72,15 @@ export interface ResearchProject {
   articleCta?: CtaLabel;
 }
 
+/** An editor-selected investigation: the label is an editorial topic, not the article's title. */
+export interface SelectedWriting {
+  topic: string;
+  description: string;
+  href: string;
+  language: Locale;
+  area: string;
+}
+
 /** One upstream OSS project, linked to its repository with a short contribution summary. */
 export interface UpstreamProject {
   name: string;
@@ -95,6 +110,7 @@ export interface HomeStrings extends PageStrings {
    */
   hero: {
     role: string;
+    thesis: string;
     facts: readonly string[];
     /** Optional sentence suffix that should remain intact when CJK text wraps. */
     noBreakSuffix?: string;
@@ -117,6 +133,8 @@ export interface HomeStrings extends PageStrings {
    */
   products: {
     heading: string;
+    moreHeading: string;
+    labels: { product: string; infrastructure: string };
     signalforge: {
       heading: string;
       statement: string;
@@ -142,6 +160,7 @@ export interface HomeStrings extends PageStrings {
    */
   systems: {
     heading: string;
+    flagship: { title: string; summary: string; method: string; linkLabel: string };
     /** Heading of the measured-results list. */
     resultsHeading: string;
     /**
@@ -187,6 +206,8 @@ export interface HomeStrings extends PageStrings {
    */
   writing: {
     heading: string;
+    selected: readonly SelectedWriting[];
+    latestHeading: string;
     /**
      * Language names for the badge on a title published in another language,
      * keyed by the language being named.
@@ -217,11 +238,12 @@ export const home = {
       'AI Systems Engineer and System Architect with 10+ years of software engineering experience, building AI systems, developer tooling, and model infrastructure.',
     heading: 'Oliver Yu',
     intro:
-      'I design and build AI products, AI agents, and LLM inference systems across AMD and NVIDIA GPUs and Apple Silicon, with a focus on system architecture, inference performance, and engineering.',
+      'I build enterprise AI agent systems and investigate inference performance across AMD, NVIDIA, and Apple Silicon—connecting measured bottlenecks, upstream fixes, and deployable runtimes.',
     hero: {
       role: 'AI Systems Engineer · System Architect',
+      thesis: 'From unexplained latency to systems that recover.',
       facts: ['laya-apple on PyPI', 'Upstream: MLX · oMLX · coremltools'],
-      noBreakSuffix: 'engineering.',
+      noBreakSuffix: 'runtimes.',
     },
     shouri: {
       heading: 'Shouri / 收理',
@@ -230,7 +252,9 @@ export const home = {
       cta: { label: 'Visit Shouri' },
     },
     products: {
-      heading: 'Products',
+      heading: 'Selected Systems',
+      moreHeading: 'Tools & Experiments',
+      labels: { product: 'Independent product', infrastructure: 'Agent infrastructure' },
       signalforge: {
         heading: 'SignalForge',
         statement: 'An event-centric intelligence pipeline that runs every morning.',
@@ -251,8 +275,16 @@ export const home = {
       },
     },
     systems: {
-      heading: 'Inference Systems Research',
-      resultsHeading: 'Results',
+      heading: 'Featured Research',
+      flagship: {
+        title: 'When the accelerator is fast, but returning a result is slow',
+        summary:
+          'Running MLX GPU and Apple Neural Engine requests side by side exposed host-side contention that raw accelerator benchmarks missed.',
+        method:
+          'Measure the handoff · Isolate GIL contention · Ship adaptive GPU + ANE serving',
+        linkLabel: 'Explore the full investigation',
+      },
+      resultsHeading: 'More measured work',
       projects: [
         {
           id: 'laya-apple',
@@ -329,9 +361,33 @@ export const home = {
       description: 'More about my engineering background and research interests.',
     },
     writing: {
-      heading: 'Technical Writing',
+      heading: 'Selected Writing',
+      selected: [
+        {
+          topic: 'When host-side contention hides accelerator performance',
+          description: 'Tracing the GIL and latency costs of concurrent GPU and Neural Engine serving.',
+          href: LAYA_APPLE_ARTICLE_EN_URL,
+          language: 'en',
+          area: 'Apple Silicon · Inference',
+        },
+        {
+          topic: 'Recovering reusable state between inference requests',
+          description: 'Why saving one request is not enough when the following session pays the cost.',
+          href: INFERENCE_SYSTEMS_ARTICLE_URL,
+          language: 'zh',
+          area: 'LLM Inference · State',
+        },
+        {
+          topic: 'Evaluating a 27B coding model on a single consumer GPU',
+          description: 'An evidence-first account of correctness and memory limits on a 16 GB RTX 5070 Ti.',
+          href: QWEN38_5070TI_ARTICLE_URL,
+          language: 'zh',
+          area: 'GPU Evaluation · Methodology',
+        },
+      ],
+      latestHeading: 'Latest on Study',
       languages: { en: 'English', zh: 'Chinese' },
-      cta: { label: 'All writing' },
+      cta: { label: 'Explore all technical writing' },
     },
   },
   zh: {
@@ -340,13 +396,12 @@ export const home = {
       'AI 系統工程師與系統架構師，有 10 年以上軟體工程經驗，開發 AI 系統、開發者工具與模型基礎架構。',
     heading: 'Oliver Yu',
     intro:
-      '我專注於 AI 產品、AI Agent 與 LLM 推論系統的設計與開發，涵蓋 AMD、NVIDIA GPU 及 Apple Silicon 平台，主要投入系統架構、推論效能優化與工程實作。',
+      '我打造企業 AI Agent 系統，並研究 AMD、NVIDIA 與 Apple Silicon 上的推論效能，從量測瓶頸、上游修正到可部署的系統。',
     hero: {
-      // PRD §9.1 keeps the role line in English in the Chinese hero; it is a
-      // standalone line, so it mixes no languages inside a prose block.
       role: 'AI Systems Engineer · System Architect',
+      thesis: '從難以解釋的延遲，到能恢復的系統。',
       facts: ['laya-apple 已發布到 PyPI', '上游貢獻：MLX · oMLX · coremltools'],
-      noBreakSuffix: '工程實作。',
+      noBreakSuffix: '系統。',
     },
     shouri: {
       heading: 'Shouri / 收理',
@@ -355,7 +410,9 @@ export const home = {
       cta: { label: '前往 Shouri' },
     },
     products: {
-      heading: '產品',
+      heading: '代表系統',
+      moreHeading: '工具與實驗',
+      labels: { product: '獨立產品', infrastructure: 'Agent 基礎設施' },
       signalforge: {
         heading: 'SignalForge',
         statement: '每天早上執行的事件導向情報管線。',
@@ -376,8 +433,15 @@ export const home = {
       },
     },
     systems: {
-      heading: '推論系統研究',
-      resultsHeading: '成果',
+      heading: '代表研究',
+      flagship: {
+        title: '加速器很快，結果卻回得很慢',
+        summary:
+          '讓 MLX GPU 與 Apple Neural Engine 同時服務請求時，發現加速器本身的基準測試無法揭露的主機端競爭問題。',
+        method: '量測資料交接 · 定位 GIL 競爭 · 發布自適應 GPU + ANE 服務',
+        linkLabel: '深入閱讀完整研究',
+      },
+      resultsHeading: '其他實測研究',
       projects: [
         {
           id: 'laya-apple',
@@ -453,9 +517,33 @@ export const home = {
       description: '更多關於我的工程背景與研究方向。',
     },
     writing: {
-      heading: '技術文章',
+      heading: '精選技術文章',
+      selected: [
+        {
+          topic: '當主機端競爭掩蓋加速器效能',
+          description: '追查 GPU 與 Neural Engine 併發服務時的 GIL 問題與延遲成本。',
+          href: LAYA_APPLE_ARTICLE_URL,
+          language: 'zh',
+          area: 'Apple Silicon · 推論',
+        },
+        {
+          topic: '在推論請求之間恢復可重用狀態',
+          description: '不只改善單次請求，也量測快取與狀態重建對後續請求的影響。',
+          href: INFERENCE_SYSTEMS_ARTICLE_URL,
+          language: 'zh',
+          area: 'LLM 推論 · 狀態',
+        },
+        {
+          topic: '在單張消費級 GPU 上評測 27B 程式模型',
+          description: '記錄 16 GB RTX 5070 Ti 的正確性、記憶體限制與實驗方法。',
+          href: QWEN38_5070TI_ARTICLE_URL,
+          language: 'zh',
+          area: 'GPU 評測 · 方法',
+        },
+      ],
+      latestHeading: 'Study 最新文章',
       languages: { en: '英文', zh: '中文' },
-      cta: { label: '全部文章' },
+      cta: { label: '瀏覽所有技術文章' },
     },
   },
 } satisfies HomeDictionary;
