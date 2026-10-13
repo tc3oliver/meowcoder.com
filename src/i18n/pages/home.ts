@@ -241,7 +241,7 @@ export const home = {
       'I build enterprise AI agent systems and investigate inference performance across AMD, NVIDIA, and Apple Silicon—connecting measured bottlenecks, upstream fixes, and deployable runtimes.',
     hero: {
       role: 'AI Systems Engineer · System Architect',
-      thesis: 'From unexplained latency to systems that recover.',
+      thesis: 'Building AI systems that keep working in production.',
       facts: ['laya-apple on PyPI', 'Upstream: MLX · oMLX · coremltools'],
       noBreakSuffix: 'runtimes.',
     },
@@ -401,7 +401,7 @@ export const home = {
       '我打造企業 AI Agent 系統，並研究 AMD、NVIDIA 與 Apple Silicon 上的推論效能，從量測瓶頸、上游修正到可部署的系統。',
     hero: {
       role: 'AI Systems Engineer · System Architect',
-      thesis: '從難以解釋的延遲，到能恢復的系統。',
+      thesis: '把 AI 做成能長期穩定運作的系統。',
       facts: ['laya-apple 已發布到 PyPI', '上游貢獻：MLX · oMLX · coremltools'],
       noBreakSuffix: '系統。',
     },

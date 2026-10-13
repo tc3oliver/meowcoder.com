@@ -89,3 +89,8 @@ export const INFERENCE_SYSTEMS_ARTICLE_URL =
  * answers 404 to anything not logged in, which would fail the link check.
  */
 export const LAYA_APPLE_ARTICLE_EN_URL = 'https://x.com/oliver_yu9/status/2103930467183706274';
+
+/** Social profiles shown in the homepage hero. */
+export const X_URL = 'https://x.com/oliver_yu9';
+export const HUGGINGFACE_URL = 'https://huggingface.co/tc3oliver';
+export const YOUTUBE_URL = 'https://www.youtube.com/@ear6666';

@@ -160,14 +160,14 @@ describe('requirement wording', () => {
     expect(home.en.intro).toBe(
       'I build enterprise AI agent systems and investigate inference performance across AMD, NVIDIA, and Apple Silicon—connecting measured bottlenecks, upstream fixes, and deployable runtimes.',
     );
-    expect(home.en.hero.thesis).toMatch(/latency.*recover/);
+    expect(home.en.hero.thesis).toMatch(/AI systems.*production/);
   });
 
   it('quotes the doc-2 §5 hero statement verbatim in Chinese', () => {
     expect(home.zh.intro).toBe(
       '我打造企業 AI Agent 系統，並研究 AMD、NVIDIA 與 Apple Silicon 上的推論效能，從量測瓶頸、上游修正到可部署的系統。',
     );
-    expect(home.zh.hero.thesis).toContain('延遲');
+    expect(home.zh.hero.thesis).toContain('穩定運作');
     // doc-2 §5 keeps the role line in English in both locales.
     expect(home.zh.hero.role).toBe('AI Systems Engineer · System Architect');
   });
