@@ -93,4 +93,4 @@ export const LAYA_APPLE_ARTICLE_EN_URL = 'https://x.com/oliver_yu9/status/210393
 /** Social profiles shown in the homepage hero. */
 export const X_URL = 'https://x.com/oliver_yu9';
 export const HUGGINGFACE_URL = 'https://huggingface.co/tc3oliver';
-export const YOUTUBE_URL = 'https://www.youtube.com/@ear6666';
+export const YOUTUBE_URL = 'https://www.youtube.com/@ear6666/shorts';
