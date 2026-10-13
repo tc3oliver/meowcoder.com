@@ -39,21 +39,6 @@ function strings(value: unknown): string[] {
 const BY_LOCALE = LOCALES.map((locale) => [locale, home[locale]] as const);
 
 describe.each(BY_LOCALE)('Home content (%s)', (_locale, t: HomeStrings) => {
-  it('states only facts about the work in the hero', () => {
-    // Two verifiable facts: a shipped release and where the upstream work went.
-    // `Taiwan` used to sit here, the one entry not about the work; the length
-    // of the career went too, because the owner asked to stop leading with
-    // years. Names rather than counts, because a count of pull requests is
-    // stale the week the next one merges.
-    expect(t.hero.facts).toHaveLength(2);
-    expect(t.hero.facts[0]).toMatch(/laya-apple.*PyPI/);
-    // No version: it would be stale the day the next release ships.
-    expect(t.hero.facts[0]).not.toMatch(/\d/);
-    expect(t.hero.facts[1]).toMatch(/coremltools/);
-    expect(t.hero.facts[1]).toMatch(/MLX/);
-    expect(t.hero.facts.join(' ')).not.toMatch(/\d+ (merged|pull requests|PRs)/i);
-  });
-
   it('carries only what the Products list shows', () => {
     // Shouri keeps its name, its sentence (also the structured-data
     // description) and one action; the principles, eyebrow, screenshot and the

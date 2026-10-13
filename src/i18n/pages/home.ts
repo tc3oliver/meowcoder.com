@@ -93,25 +93,17 @@ export interface HomeStrings extends PageStrings {
    * doc-2 §5. `heading` is the name and `intro` the statement beneath it, so
    * the hero adds only what `PageStrings` has no field for.
    *
-   * doc-2 §5 keeps the name, the role line and the facts, and replaces only
-   * the supporting statement; round 3 drops the two hero actions, because the
-   * numbered sections below are the page's navigation. `role` stays in
-   * English in both locales: PRD §9.1 writes the Chinese hero that way, and it
-   * is its own standalone line rather than a prose block, so no block mixes
-   * languages (PRD §34).
-   *
-   * `facts` carried a second entry, `Taiwan`, also in English in both
-   * locales. It was the only fact that was not about the work, which put a
-   * bare country name at the same weight as the work facts (a career-length
-   * fact sat beside it then and has since been dropped), and in the Chinese
-   * hero it told a Taiwanese reader nothing, in English. A
-   * location is worth stating when it answers something — a timezone for
-   * someone deciding whether to work together — and the bare name did not.
+   * doc-2 §5 keeps the name and the role line and replaces only the
+   * supporting statement; round 3 drops the two hero actions, because the
+   * numbered sections below are the page's navigation, and the hero facts are
+   * dropped too: the sections below already carry the same evidence. `role`
+   * stays in English in both locales: PRD §9.1 writes the Chinese hero that
+   * way, and it is its own standalone line rather than a prose block, so no
+   * block mixes languages (PRD §34).
    */
   hero: {
     role: string;
     thesis: string;
-    facts: readonly string[];
     /** Optional sentence suffix that should remain intact when CJK text wraps. */
     noBreakSuffix?: string;
   };
@@ -242,7 +234,6 @@ export const home = {
     hero: {
       role: 'AI Systems Engineer · System Architect',
       thesis: 'Building AI systems that keep working in production.',
-      facts: ['laya-apple on PyPI', 'Upstream: MLX · oMLX · coremltools'],
       noBreakSuffix: 'runtimes.',
     },
     shouri: {
@@ -402,7 +393,6 @@ export const home = {
     hero: {
       role: 'AI Systems Engineer · System Architect',
       thesis: '把 AI 做成能長期穩定運作的系統。',
-      facts: ['laya-apple 已發布到 PyPI', '上游貢獻：MLX · oMLX · coremltools'],
       noBreakSuffix: '系統。',
     },
     shouri: {

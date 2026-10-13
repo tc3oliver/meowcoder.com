@@ -9,15 +9,11 @@
  * no client-side JavaScript here at all. `src/styles/design-system.test.ts`
  * scans the source tree for each of them by name.
  *
- * Round 2 composes the hero as an asymmetric ledger masthead: the oversized
- * name leads a wide left column (role line in mono, statement under it), and a
- * narrow right rail — desktop only — carries the hairline-separated mono
- * facts. Round 3 drops the two hero actions: the numbered sections below are
- * the page's navigation, and a masthead with nothing to click reads calmer.
- * The facts are plain text, not badges: PRD §37 prefers evidence over
- * ornament, and a shipped release and upstream projects are the evidence. The
- * list renders however many facts the dictionary carries; it does not assume a
- * count.
+ * Round 2 composes the hero as a ledger masthead: the oversized name, the role
+ * line in mono, the thesis and the statement under it, then the profile links.
+ * Round 3 drops the two hero actions: the numbered sections below are the
+ * page's navigation, and a masthead with nothing to click reads calmer. The
+ * hero facts are gone too — the sections below carry the same evidence.
  *
  * doc-2 §5 asks for a hero that is confident and spacious but not an empty
  * full-screen splash: the next section has to be reachable within about one
@@ -66,41 +62,15 @@ const statementStart =
       }
     </ul>
   </div>
-
-  <div class="hero__rail">
-    <ul class="hero__facts" role="list">
-      {t.hero.facts.map((fact) => <li>{fact}</li>)}
-    </ul>
-  </div>
 </div>
 
 <style>
-  /* One column on a phone; the asymmetric two-column masthead from 64rem. The
-     grid spans the full content width — the width contrast against the narrow
-     prose inside the sections below is part of the round-2 identity.
-
-     Round 3 trims the bottom padding to `--space-10`: with no CTA to anchor
+  /* Round 3 trims the bottom padding to `--space-10`: with no CTA to anchor
      the eye at the end of the masthead, the "01" eyebrow of the research
      section has to appear within about one screen (doc-2 §5) instead of below
      a full second hero band. The top keeps the full `--space-hero` presence. */
   .hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-8);
     padding-block: var(--space-hero) var(--space-10);
-  }
-
-  @media (width >= 64rem) {
-    .hero {
-      grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
-      column-gap: var(--space-9);
-    }
-
-    /* The facts sit level with the bottom of the statement and icons, so the
-       empty space falls above them, where the hero's top padding already is. */
-    .hero__rail {
-      align-self: end;
-    }
   }
 
   .hero__main {
@@ -175,34 +145,15 @@ const statementStart =
     fill: currentColor;
   }
 
+  /* With the facts rail gone the line is no longer squeezed by a second
+     column, and 34em put the Chinese break inside 推論效能. 38em breaks at the
+     comma after it. English keeps 34em: longer lines would exceed a readable
+     measure. */
+  .hero__statement:lang(zh) {
+    max-width: 38em;
+  }
+
   .hero__statement-tail {
     white-space: nowrap;
-  }
-
-  /* The right rail: hairline-topped, its fact rows separated by hairlines. On
-     mobile the same stack simply follows the statement. The facts are now the
-     rail's whole content, so their rows get the taller `--space-4` padding —
-     two tight rows under a hairline would read as leftovers from the removed
-     actions rather than as a deliberate metadata block. */
-  .hero__rail {
-    min-width: 0;
-    border-block-start: var(--border-width) solid var(--color-border);
-  }
-
-  .hero__facts {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-  }
-
-  .hero__facts li {
-    padding-block: var(--space-4);
-  }
-
-  .hero__facts li + li {
-    border-block-start: var(--border-width) solid var(--color-border);
   }
 </style>
