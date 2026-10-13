@@ -51,8 +51,6 @@ export interface ChromeDictionary {
     orcid: string;
     shouri: string;
     email: string;
-    /** The public meowcoder.com repository — secondary evidence (PRD §24). */
-    siteSource: string;
     /**
      * Accessible name for the footer's wordmark link back to the locale home
      * page. The wordmark SVG carries its own `aria-label` ("meowcoder.com"),

@@ -24,7 +24,6 @@ export const chromeEn = {
     orcid: 'ORCID',
     shouri: 'Shouri',
     email: 'Email',
-    siteSource: 'Site Source',
     homeLabel: 'meowcoder.com home',
     copyright: '© 2026 Oliver Yu',
   },

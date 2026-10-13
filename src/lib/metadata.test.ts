@@ -231,23 +231,15 @@ describe('footer link row (PRD §9.8)', () => {
   /*
    * PRD §9.8 fixes both the membership and the order of this row:
    *
-   *   GitHub · Study · ORCID · Shouri · Site Source
+   *   GitHub · LinkedIn · Study · ORCID · Shouri · Email
    *
    * It is asserted against `dist/` rather than against `SiteShell`'s array
-   * because the point is that every page actually carries all five — a route
+   * because the point is that every page actually carries all six — a route
    * that bypassed `SiteShell` would pass a source-level check and fail here.
    */
-  const EXPECTED = [
-    GITHUB_URL,
-    LINKEDIN_URL,
-    STUDY_URL,
-    ORCID_URL,
-    SHOURI_URL,
-    EMAIL_URL,
-    'https://github.com/tc3oliver/meowcoder.com',
-  ];
+  const EXPECTED = [GITHUB_URL, LINKEDIN_URL, STUDY_URL, ORCID_URL, SHOURI_URL, EMAIL_URL];
 
-  it('carries the five destinations in order on every page', () => {
+  it('carries the six destinations in order on every page', () => {
     for (const file of pageFiles()) {
       const hrefs = [...read(file).matchAll(/class="site-footer__link"\s+href="([^"]+)"/g)].map(
         (m) => m[1],

@@ -55,21 +55,9 @@ const navItems = [
 ];
 
 /*
- * This site's own repository (PRD §9.8 `Site Source`, `decision-1` and
- * `.agent-workflow/PROJECT.md`). It is not in `src/lib/external.ts` with the
- * rest of the ecosystem because that module records the properties the site
- * links *out* to; this one is the site itself, and PRD §24 is explicit that it
- * is secondary evidence — a footer link, never a homepage feature.
- *
- * The repository is still private and goes public at MCD-13, so `linkcheck`
- * skips it until then; see the `linkcheck:site` script.
- */
-const SITE_SOURCE_URL = 'https://github.com/tc3oliver/meowcoder.com';
-
-/*
  * The footer link row, in the exact order PRD §9.8 lists it:
  *
- *   GitHub · Study · ORCID · Shouri · Site Source
+ *   GitHub · LinkedIn · Study · ORCID · Shouri · Email
  *
  * This array is the only place that order is decided, and `metadata.test.ts`
  * asserts it against every built page.
@@ -81,7 +69,6 @@ const footerLinks = [
   { href: ORCID_URL, label: t.footer.orcid, external: true },
   { href: SHOURI_URL, label: t.footer.shouri, external: true },
   { href: EMAIL_URL, label: t.footer.email, external: true },
-  { href: SITE_SOURCE_URL, label: t.footer.siteSource, external: true },
 ];
 ---
 

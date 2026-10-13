@@ -29,7 +29,6 @@ export const chromeZh = {
     orcid: 'ORCID',
     shouri: 'Shouri',
     email: 'Email',
-    siteSource: '網站原始碼',
     homeLabel: 'meowcoder.com 首頁',
     // Proper-noun legal line, left untranslated per PRD §7.
     copyright: '© 2026 Oliver Yu',
