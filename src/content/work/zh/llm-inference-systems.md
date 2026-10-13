@@ -183,25 +183,25 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 
 這個實驗問的是：**如果 sparse prefill 不留下任何可重用狀態，這份狀態能不能事後補回來，而且不讓前景付代價？**
 
-可以，但功能實際換到的，和原本預期的不一樣。在一組受控的七輪 session 裡，sparse 那一邊的可重用 canonical 前綴始終停在 0，prompt 卻長到 43,065 tokens，於是每一輪都把整份重算一次。改成在前景閒置的空檔重建這段前綴，而且只在 cache block 邊界上發布——這些邊界是一般 serving 路徑自己就能獨立還原的。累積 session 延遲在該 workload 上因此從 228.38 s 降到 79.06 s。兩邊的前景都被釘在 SpecPrefill。
+可以，但換到的和原本預期的不一樣。在一組七輪 session 裡，sparse 那一邊的可重用 canonical 前綴始終停在 0，prompt 卻長到 43,065 tokens，每一輪都整份重算。改成在前景閒置的空檔重建這段前綴，只在 cache block 邊界發布——這些邊界是一般 serving 路徑自己就能獨立還原的。在這個 workload，累積 session 延遲從 228.38 s 降到 79.06 s。兩邊的前景都釘在 SpecPrefill。
 
-真正花掉大半力氣的，是讓它能安全上線。以時間比例設的 budget 只框得住背景工作「多常」撞到請求，框不住撞到之後那個請求要等多久——budget 調了二十倍，最糟的一次碰撞仍落在同樣的 12–15 s 區間。真正決定等待時間的是 execution slice，而它和 publication grain 是兩件事：跑過的每一種 slice 設定，都發布在完全相同的邊界上，把 slice 從 block grain 縮到 512 之後，client 端觀測到的最糟等待從 15.08 s 降到 1.30 s，代價是補回的吞吐量在最極端的設定約掉 2.4%。再縮到 256 並沒有更好——它從 trace 推導出來的上界更低，實際觀測到的最糟值反而更高。當時還有一個缺陷必須先修掉，才談得上送上游——recovery budget 是每個 engine 各持一份，但 accelerator 是共用的，於是每多載入一個模型，上限就被乘一次。
+更費力的是讓它能安全上線。以時間比例設的 budget 只框得住背景工作「多常」撞到請求，框不住撞到之後那個請求要等多久——budget 調了二十倍，最糟的一次碰撞仍落在同樣的 12–15 s 區間。決定等待時間的是 execution slice，而它和 publication grain 是兩件事：每一種 slice 設定都發布在完全相同的邊界上，把 slice 從 block grain 縮到 512 之後，client 端觀測到的最糟等待從 15.08 s 降到 1.30 s，代價是最極端的設定下補回吞吐量約掉 2.4%。再縮到 256 沒有更好——它從 trace 推導的上界更低，實測的最糟值反而更高。送上游前還得先修一個缺陷——recovery budget 是每個 engine 各持一份，但 accelerator 是共用的，每多載入一個模型，上限就被乘一次。
 
 <div class="decision">
 
 ### 最快的設定從未退回 dense prefill，下一輪要算的東西卻變少了
 
-**原因** — 這個功能本來是為了在前綴補回之後，讓前景能退回 dense prefill。但量到最快的那個設定，正好是從來沒有退回去的那個；而真的換了路徑的那幾輪，都是各自 session 裡最貴的一輪。
+**原因** — 這個功能本來是要在前綴補回後，讓前景退回 dense prefill。但量到最快的設定，正好是從來沒退回去的那個；而真的換了路徑的那幾輪，都是各自 session 裡最貴的一輪。
 
-**結果** — 背景補回的價值在於下一輪要算的東西變少，不在於下一輪換一條路徑走。某一輪該走哪條路徑是另一個問題，這裡不回答。
+**結果** — 跟只用 sparse prefill 比，補回讓下一輪少算；換路徑沒有幫助。該走哪條路徑是另一個問題，這裡不談。
 
 </div>
 
-這組七輪 session 在執行前沒有訂下前景延遲的目標。把 slice 縮到 512 之後，runtime trace 裡最長的不可中斷 execution slice 是 2.39 s；這是推導出來的上界，代表一個請求最多可能要等多久，並不是實際觀測到的延遲，也不代表這個數字可以接受。
+實驗前沒有訂前景延遲的目標。slice 縮到 512 後，runtime trace 裡最長的不可中斷 execution slice 是 2.39 s；這是推導的等待時間上界，不是實際觀測到的延遲，也不代表可以接受。
 <a href="https://github.com/tc3oliver/llm-inference-systems/tree/main/experiments/exp-003-progressive-shadow-prefill" target="_blank" rel="noopener noreferrer">EXP-003</a>
-收錄了資料集、圖表與限制；功能本身已經以
+收錄了資料集、圖表與限制；功能曾以
 <a href="https://github.com/jundot/omlx/pull/3964" target="_blank" rel="noopener noreferrer"><code>omlx#3964</code></a>
-送交上游，目前開放審查、尚未合併。長文版本是
+送交上游，被維護者關掉，未合併。理由是補回會在閒置時把略過的 token 當 dense prefill 重算，多數情況最多只能跟關掉 SpecPrefill 打平，而且新增約 7,500 行。換路徑的 threshold 設 8,192 時，補回從第 1 輪起就走 dense，跟關掉 SpecPrefill 差不多。關掉的那次，prompt 最大的兩輪被 memory throttle 暫停，不能當 79.06 s 的乾淨對照。長文版本是
 <a href="https://study.meowcoder.com/posts/260921-canonical-state-debt-recovery/" target="_blank" rel="noopener noreferrer">償還 reusable state 的債</a>。
 
 ## 系統主題
@@ -250,14 +250,14 @@ Request 層級的 trace 讓機制現形：可重用 checkpoint 爬到 37,888 tok
 - <a href="https://github.com/jundot/omlx/pull/3842" target="_blank" rel="noopener noreferrer"><code>omlx#3842</code></a>——已合併。在 draft cache 的 block 邊界保留可重用的 recurrent state。它相依於 #3840，並在其後合併。
 - <a href="https://github.com/jundot/omlx/pull/3792" target="_blank" rel="noopener noreferrer"><code>omlx#3792</code></a>——原本是要修正 prefill OOM 重新排隊路徑上的 SpecPrefill RoPE 清理問題（開發 EXP-003 時發現，與背景補回功能無關）。上游審查後確認，不會有請求帶著 patch 走到那條路徑，所以現在只把那段註解改成跟程式實際行為一致。
 - <a href="https://github.com/jundot/omlx/pull/3811" target="_blank" rel="noopener noreferrer"><code>omlx#3811</code></a>——在 mRoPE VLM 上，SpecPrefill 把選出的 token 寫到壓縮後的位置，而不是原始位置。這個問題是在驗證漸進式 canonical 狀態補回（PCSR）時發現的，但**不是 PCSR 造成的**：關掉背景補回，問題依然存在。
-- <a href="https://github.com/jundot/omlx/pull/3964" target="_blank" rel="noopener noreferrer"><code>omlx#3964</code></a>——背景 canonical 狀態補回，也就是 EXP-003 的功能本身，預設關閉。它取代 #3793：#3793 後來多包了一個後續功能，補回的程式碼則沒有改變。VLM 的驗證以 #3811 為前提，所以 #3811 應該先合併。
+- <a href="https://github.com/jundot/omlx/pull/3964" target="_blank" rel="noopener noreferrer"><code>omlx#3964</code></a>——已關閉，未合併。EXP-003 的補回功能；它取代 #3793。
 - <a href="https://github.com/jundot/omlx/pull/3962" target="_blank" rel="noopener noreferrer"><code>omlx#3962</code></a>——修正測試隔離問題：圖片解碼快取由整個行程共用，會殘留到下一個測試，圖片測試先跑、中間又沒跑到同檔其他測試時，某個記憶體壓力測試就會失敗。CI 預設的執行順序剛好把問題藏住，單獨挑那個測試來跑就會出現。
 - <a href="https://github.com/jundot/omlx/pull/3746" target="_blank" rel="noopener noreferrer"><code>omlx#3746</code></a>——已合併。ANE 的 prefill 排程器會排出 accelerator 無法接受的 sequence length：accelerator 要求長度是 64 的倍數，而且至少 1024 token。合併後的修改會直接回報這種配置不可行。它不改排程，也不改執行，只是讓原本不會報錯的錯誤設定浮上檯面。
-- <a href="https://github.com/jundot/omlx/pull/3664" target="_blank" rel="noopener noreferrer"><code>omlx#3664</code></a>——已合併，也是這裡唯一不是來自實驗的一項。Responses API 的 tool group 在送進 chat template 之前就被丟掉，因為轉換時只保留型別為 function 的項目，client 帶命名空間的工具因此從未送到模型。這是實際使用這套系統時遇到的 bug。
+- <a href="https://github.com/jundot/omlx/pull/3664" target="_blank" rel="noopener noreferrer"><code>omlx#3664</code></a>——已合併，也是這裡唯一不是來自實驗的一項。Responses API 的 tool group 在送進 chat template 之前就被丟掉，因為轉換時只保留型別為 function 的項目，client 帶命名空間的工具因此從未送到模型。這是實際使用時遇到的 bug。
 
-強化背景補回功能的過程中（先是 #3793，現在是 #3964），又找出六個實驗本身的 workload 碰不到的缺陷，觸發條件包括：同一行程裡有第二個模型、開啟 MTP、補回途中發生 eviction，以及 prompt 長度剛好是 cache block 的整數倍。其中三個問題不限於這個 runtime：背景工作必須讓出**所有權**，不只是讓出執行；前景請求一到，整個行程都要看得到，而且要在執行開始之前；cache 的 watermark 只是記帳，不等於 cache 的實際狀態，所以必須允許往回移。這些不變式記錄在 EXP-003 的 <code>HARDENING.md</code>。
+強化背景補回功能時（先是 #3793，後來是 #3964），又找出六個實驗本身的 workload 碰不到的缺陷，觸發條件包括：行程裡有第二個模型、開啟 MTP、補回途中發生 eviction，以及 prompt 長度剛好是 cache block 的整數倍。其中三個不限於這個 runtime：背景工作必須讓出**所有權**，不只是讓出執行；前景請求一到，整個行程都要看得到，而且要在執行開始之前；cache 的 watermark 只是記帳，不等於 cache 的實際狀態，所以必須允許往回移。不變式記錄在 EXP-003 的 <code>HARDENING.md</code>。
 
-實驗結束後，把這個機制放進真實的 agent workload 執行，又發現兩個獨立的缺陷。它們位在 SpecPrefill 的 draft cache 路徑，不在背景補回機制裡，上游修正就是前面的 <code>omlx#3840</code> 與 <code>omlx#3842</code>。兩者都不影響 EXP-003 的結論，也**不算**前面六個 hardening 缺陷之外的第七、第八個。
+實驗結束後，把這個機制放進真實的 agent workload 跑，又發現兩個獨立的缺陷。它們位在 SpecPrefill 的 draft cache 路徑，不在背景補回機制裡，上游修正就是 <code>omlx#3840</code> 與 <code>omlx#3842</code>。兩者都不影響 EXP-003 的結論，也**不算**第七、第八個 hardening 缺陷。
 
 ## 證據與限制
 

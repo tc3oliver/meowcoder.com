@@ -300,7 +300,7 @@ export const home = {
           stat: {
             value: '228.38 → 79.06 s',
             label:
-              'Cumulative latency of a seven-turn session, once reusable prefix state is rebuilt in idle time',
+              'Seven-turn session latency: sparse prefill alone vs rebuilding the reusable prefix in idle time',
           },
         },
         {
@@ -459,7 +459,7 @@ export const home = {
           name: 'llm-inference-systems',
           stat: {
             value: '228.38 → 79.06 s',
-            label: '七輪 session 的累積延遲，在閒置時重建可重用前綴狀態之後',
+            label: '七輪 session 累積延遲：只用 sparse prefill → 閒置時重建前綴',
           },
         },
         {
