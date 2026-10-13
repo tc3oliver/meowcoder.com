@@ -151,6 +151,11 @@ const statementStart =
      measure. */
   .hero__statement:lang(zh) {
     max-width: 38em;
+    /* Break only at punctuation and spaces, so a narrow screen never splits a
+       word such as 修正 across lines; `anywhere` still breaks a run too long
+       to fit, so edited copy cannot overflow. */
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
   .hero__statement-tail {
